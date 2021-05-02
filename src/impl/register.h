@@ -8,6 +8,7 @@
 #include <patomic/types/memory_order.h>
 
 #include "null/null.h"
+#include "std/std.h"
 
 /*
  * REGISTER STRUCT
@@ -37,6 +38,11 @@ patomic_impl_register_t patomic_impl_register[] = {
         patomic_impl_id_NULL,
         patomic_impl_create_ops_null,
         patomic_impl_create_ops_explicit_null
+    },
+    {
+        patomic_impl_id_STD,
+        patomic_impl_create_ops_std,
+        patomic_impl_create_ops_explicit_std
     }
 };
 

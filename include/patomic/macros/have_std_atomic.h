@@ -1,4 +1,4 @@
-#ifndef PATOMIC_HAVE_STD_ATOMIC_H
+#ifndef PATOMIC_HAVE_STD_ATOMIC
 
 /* define temp macros */
 #define PATOMIC__MIN_STD 0
@@ -53,4 +53,4 @@
 #undef PATOMIC__GCC_BUG
 #undef PATOMIC__HAS_INC
 
-#endif  /* !PATOMIC_HAVE_STD_ATOMIC_H */
+#endif  /* !PATOMIC_HAVE_STD_ATOMIC */

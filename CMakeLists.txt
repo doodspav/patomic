@@ -35,6 +35,9 @@ add_library(
     # src/impl/null
     src/impl/null/null.h
     src/impl/null/null.c
+    # src/impl/std
+    src/impl/std/std.h
+    src/impl/std/std.c
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
