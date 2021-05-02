@@ -27,7 +27,7 @@
 
 /* force inline */
 #if PATOMIC__MSC
-    #define PATOMIC_FORCE_INLINE __force_inline
+    #define PATOMIC_FORCE_INLINE __forceinline
 #elif PATOMIC__GNU && PATOMIC__C99
     #define PATOMIC_FORCE_INLINE inline __attribute__((always_inline))
 /* #elif PATOMIC__GNU - gcc will warn if attribute is used without inline
