@@ -19,7 +19,7 @@ typedef enum {
     patomic_ACQUIRE,
     patomic_RELEASE,
     patomic_ACQ_REL,
-    patomic_SEQ_CST,
+    patomic_SEQ_CST
 } patomic_memory_order_t;
 
 #ifdef __cplusplus

@@ -19,6 +19,12 @@ add_library(
     patomic_patomic
     # include/impl
     include/patomic/impl/ids.h
+    # include/macros
+    include/patomic/macros/force_inline.h
+    include/patomic/macros/ignore_unused.h
+    include/patomic/macros/have_long_long.h
+    include/patomic/macros/have_std_atomic.h
+    include/patomic/macros/have_std_alignof.h
     # include/types
     include/patomic/types/memory_order.h
     include/patomic/types/ops.h
