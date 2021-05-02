@@ -17,7 +17,18 @@ include(cmake/variables.cmake)
 
 add_library(
     patomic_patomic
+    # include/impl
+    include/patomic/impl/ids.h
+    # include/types
+    include/patomic/types/memory_order.h
+    include/patomic/types/ops.h
+    # src
     src/patomic.c
+    # src/impl
+    src/impl/register.h
+    # src/impl/null
+    src/impl/null/null.h
+    src/impl/null/null.c
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
