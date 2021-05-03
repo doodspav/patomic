@@ -19,8 +19,8 @@ extern "C" {
  */
 
 typedef enum {
-    patomic_impl_id_STD,
-    patomic_impl_id_NULL = INT_MAX
+    patomic_impl_id_STD
+    ,patomic_impl_id_NULL = INT_MAX
 } patomic_impl_id_t;
 
 #ifdef __cplusplus

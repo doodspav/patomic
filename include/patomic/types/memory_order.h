@@ -1,8 +1,6 @@
 #ifndef PATOMIC_MEMORY_ORDER_H
 #define PATOMIC_MEMORY_ORDER_H
 
-#include <patomic/macros/force_inline.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

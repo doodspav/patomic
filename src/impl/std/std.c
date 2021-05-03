@@ -13,6 +13,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 #include <string.h>
 
 #include <patomic/types/ops.h>
+#include <patomic/types/options.h>
 #include <patomic/types/memory_order.h>
 
 #include <patomic/macros/force_inline.h>
@@ -891,134 +892,76 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 #endif
 
 
+
+#define PATOMIC_DEFINE_SET_RET(type, name, width, order, ret)                  \
+       ((width == sizeof(_Atomic(type)))                                       \
+        && (sizeof(_Atomic(type)) == sizeof(type))                             \
+        && (_Alignof(_Atomic(type)) == _Alignof(type)))                        \
+    {                                                                          \
+        switch(order)                                                          \
+        {                                                                      \
+            case patomic_RELAXED: ret = patomic_ops_create_##name##_relaxed(); \
+                                  break;                                       \
+            case patomic_CONSUME:                                              \
+            case patomic_ACQUIRE: ret = patomic_ops_create_##name##_acquire(); \
+                                  break;                                       \
+            case patomic_RELEASE: ret = patomic_ops_create_##name##_release(); \
+                                  break;                                       \
+            case patomic_ACQ_REL: ret = patomic_ops_create_##name##_acq_rel(); \
+                                  break;                                       \
+            case patomic_SEQ_CST: ret = patomic_ops_create_##name##_seq_cst(); \
+                                  break;                                       \
+            default: break;                                                    \
+        }                                                                      \
+    }
+
+#define PATOMIC_DEFINE_SET_RET_EXPLICIT(type, name, width, ret) \
+       ((width == sizeof(_Atomic(type)))                        \
+        && (sizeof(_Atomic(type)) == sizeof(type))              \
+        && (_Alignof(_Atomic(type)) == _Alignof(type)))         \
+    {                                                           \
+        ret = patomic_ops_create_##name##_explicit();           \
+    }
+
+
 patomic_ops_t
 patomic_impl_create_ops_std(
         size_t byte_width,
-        patomic_memory_order_t order
+        patomic_memory_order_t order,
+        int options
 )
 {
     patomic_ops_t ret = patomic_ops_NULL;
+    assert(patomic_is_valid_order((int) order));
 
-    /* check width, alignment, and lock-free-ness */
-    if ((byte_width == sizeof(_Atomic(char)))
-        && (sizeof(_Atomic(char)) == sizeof(char))
-        && (_Alignof(_Atomic(char)) == _Alignof(char)))
-    {
-        switch (order)
-        {
-            case patomic_RELAXED: ret = patomic_ops_create_char_relaxed(); break;
-            case patomic_CONSUME:
-            case patomic_ACQUIRE: ret = patomic_ops_create_char_acquire(); break;
-            case patomic_RELEASE: ret = patomic_ops_create_char_release(); break;
-            case patomic_ACQ_REL: ret = patomic_ops_create_char_acq_rel(); break;
-            case patomic_SEQ_CST: ret = patomic_ops_create_char_seq_cst(); break;
-            default: break;
-        }
-    }
-    else if ((byte_width == sizeof(_Atomic(short)))
-             && (sizeof(_Atomic(short)) == sizeof(short))
-             && (_Alignof(_Atomic(short)) == _Alignof(short)))
-    {
-        switch (order)
-        {
-            case patomic_RELAXED: ret = patomic_ops_create_short_relaxed(); break;
-            case patomic_CONSUME:
-            case patomic_ACQUIRE: ret = patomic_ops_create_short_acquire(); break;
-            case patomic_RELEASE: ret = patomic_ops_create_short_release(); break;
-            case patomic_ACQ_REL: ret = patomic_ops_create_short_acq_rel(); break;
-            case patomic_SEQ_CST: ret = patomic_ops_create_short_seq_cst(); break;
-            default: break;
-        }
-    }
-    else if ((byte_width == sizeof(_Atomic(int)))
-             && (sizeof(_Atomic(int)) == sizeof(int))
-             && (_Alignof(_Atomic(int)) == _Alignof(int)))
-    {
-        switch (order)
-        {
-            case patomic_RELAXED: ret = patomic_ops_create_int_relaxed(); break;
-            case patomic_CONSUME:
-            case patomic_ACQUIRE: ret = patomic_ops_create_int_acquire(); break;
-            case patomic_RELEASE: ret = patomic_ops_create_int_release(); break;
-            case patomic_ACQ_REL: ret = patomic_ops_create_int_acq_rel(); break;
-            case patomic_SEQ_CST: ret = patomic_ops_create_int_seq_cst(); break;
-            default: break;
-        }
-    }
-    else if ((byte_width == sizeof(_Atomic(long)))
-             && (sizeof(_Atomic(long)) == sizeof(long))
-             && (_Alignof(_Atomic(long)) == _Alignof(long)))
-    {
-        switch (order)
-        {
-            case patomic_RELAXED: ret = patomic_ops_create_long_relaxed(); break;
-            case patomic_CONSUME:
-            case patomic_ACQUIRE: ret = patomic_ops_create_long_acquire(); break;
-            case patomic_RELEASE: ret = patomic_ops_create_long_release(); break;
-            case patomic_ACQ_REL: ret = patomic_ops_create_long_acq_rel(); break;
-            case patomic_SEQ_CST: ret = patomic_ops_create_long_seq_cst(); break;
-            default: break;
-        }
-    }
+    if PATOMIC_DEFINE_SET_RET(char, char, byte_width, order, ret)
+    else if PATOMIC_DEFINE_SET_RET(short, short, byte_width, order, ret)
+    else if PATOMIC_DEFINE_SET_RET(int, int, byte_width, order, ret)
+    else if PATOMIC_DEFINE_SET_RET(long, long, byte_width, order, ret)
 #if PATOMIC_HAVE_LONG_LONG
-    else if ((byte_width == sizeof(_Atomic(long long)))
-             && (sizeof(_Atomic(long long)) == sizeof(long long))
-             && (_Alignof(_Atomic(long long)) == _Alignof(long long)))
-    {
-        switch (order)
-        {
-            case patomic_RELAXED: ret = patomic_ops_create_llong_relaxed(); break;
-            case patomic_CONSUME:
-            case patomic_ACQUIRE: ret = patomic_ops_create_llong_acquire(); break;
-            case patomic_RELEASE: ret = patomic_ops_create_llong_release(); break;
-            case patomic_ACQ_REL: ret = patomic_ops_create_llong_acq_rel(); break;
-            case patomic_SEQ_CST: ret = patomic_ops_create_llong_seq_cst(); break;
-            default: break;
-        }
-    }
+    else if PATOMIC_DEFINE_SET_RET(long long, llong, byte_width, order, ret)
 #endif
+
     return ret;
 }
 
 patomic_ops_explicit_t
 patomic_impl_create_ops_explicit_std(
-        size_t byte_width
+        size_t byte_width,
+        int options
 )
 {
-    /* check width, alignment, and lock-free-ness */
-    if ((byte_width == sizeof(_Atomic(char)))
-        && (sizeof(_Atomic(char)) == sizeof(char))
-        && (_Alignof(_Atomic(char)) == _Alignof(char)))
-    {
-        return patomic_ops_create_char_explicit();
-    }
-    if ((byte_width == sizeof(_Atomic(short)))
-        && (sizeof(_Atomic(short)) == sizeof(short))
-        && (_Alignof(_Atomic(short)) == _Alignof(short)))
-    {
-        return patomic_ops_create_short_explicit();
-    }
-    if ((byte_width == sizeof(_Atomic(int)))
-        && (sizeof(_Atomic(int)) == sizeof(int))
-        && (_Alignof(_Atomic(int)) == _Alignof(int)))
-    {
-        return patomic_ops_create_int_explicit();
-    }
-    if ((byte_width == sizeof(_Atomic(long)))
-        && (sizeof(_Atomic(long)) == sizeof(long))
-        && (_Alignof(_Atomic(long)) == _Alignof(long)))
-    {
-        return patomic_ops_create_long_explicit();
-    }
+    patomic_ops_explicit_t ret = patomic_ops_explicit_NULL;
+
+    if PATOMIC_DEFINE_SET_RET_EXPLICIT(char, char, byte_width, ret)
+    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(short, short, byte_width, ret)
+    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(int, int, byte_width, ret)
+    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(long, long, byte_width, ret)
 #if PATOMIC_HAVE_LONG_LONG
-    if ((byte_width == sizeof(_Atomic(long long)))
-        && (sizeof(_Atomic(long long)) == sizeof(long long))
-        && (_Alignof(_Atomic(long long)) == _Alignof(long long)))
-    {
-        return patomic_ops_create_llong_explicit();
-    }
+    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
 #endif
-    else { return patomic_ops_explicit_NULL; }
+
+    return ret;
 }
 
 #else
@@ -1028,20 +971,24 @@ patomic_impl_create_ops_explicit_std(
 patomic_ops_t
 patomic_impl_create_ops_std(
     size_t byte_width,
-    patomic_memory_order_t order
+    patomic_memory_order_t order,
+    int options
 )
 {
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(order);
+    PATOMIC_IGNORE_UNUSED(options);
     return patomic_ops_NULL;
 }
 
 patomic_ops_explicit_t
 patomic_impl_create_ops_explicit_std(
-    size_t byte_width
+    size_t byte_width,
+    int options
 )
 {
     PATOMIC_IGNORE_UNUSED(byte_width);
+    PATOMIC_IGNORE_UNUSED(options);
     return patomic_ops_explicit_NULL;
 }
 

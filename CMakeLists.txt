@@ -27,6 +27,7 @@ add_library(
     include/patomic/macros/have_std_alignof.h
     # include/types
     include/patomic/types/memory_order.h
+    include/patomic/types/options.h
     include/patomic/types/ops.h
     # src
     src/patomic.c
