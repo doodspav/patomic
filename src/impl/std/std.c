@@ -41,7 +41,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
  * - vis: order parameter visibility (e.g. SHOW_P)
  * - inv: the inverse of vis, but for anything (e.g. HIDE, not HIDE_P)
  * - opsk: return type ops kind (e.g. ops_explicit)
- * - min: minimum value of arithmetic type (e.g. 0u)
+ * - min: minimum value of arithmetic type (e.g. INT_MIN)
  */
 
 
@@ -157,17 +157,168 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
  * - bit_test_complement (n)
  * - bit_test_set (n)
  * - bit_test_reset (n)
+ *
+ * OPS SECTIONS:
+ * - test: relaxed, consume, acquire, seq_cst
+ * - test_modify: all
+ *
+ * CREATE SECTIONS:
+ * - nrar: no {release, acq_rel} orders
+ * - any: all orders permitted
+ *
+ * NOTE:
+ * - we make the assumption that type is always an unsigned integer type
+ * - these will not work properly if type can be anything
  */
-#define PATOMIC_DEFINE_BIT_OPS_CREATE(name, opsk) \
-    static patomic_##opsk##_bitwise_t             \
-    patomic_ops_bitwise_create_##name(void)       \
-    {                                             \
-        patomic_##opsk##_bitwise_t pao;           \
-        pao.fp_test = NULL;                       \
-        pao.fp_test_comp = NULL;                  \
-        pao.fp_test_set = NULL;                   \
-        pao.fp_test_reset = NULL;                 \
-        return pao;                               \
+#define PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis) \
+    static PATOMIC_FORCE_INLINE int                         \
+    patomic_opimpl_test_##name(                             \
+        const volatile void *obj                            \
+        ,int offset                                         \
+    vis(,int order)                                         \
+    )                                                       \
+    {                                                       \
+        const type mask = (type) (1u << offset);            \
+        type val = atomic_load_explicit(                    \
+            (const volatile _Atomic(type) *) obj,           \
+            order                                           \
+        );                                                  \
+        return (val & mask) == 1;                           \
+    }
+
+#define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis) \
+    static PATOMIC_FORCE_INLINE int                        \
+    patomic_opimpl_test_comp_##name(                       \
+        volatile void *obj                                 \
+        ,int offset                                        \
+    vis(,int order)                                        \
+    )                                                      \
+    {                                                      \
+        /* declarations */                                 \
+        type expected;                                     \
+        type desired;                                      \
+        const type mask = (type) (1u << offset);           \
+        /* setup memory orders */                          \
+        int succ = order;                                  \
+        int fail = patomic_cmpxchg_fail_order(order);      \
+        /* load initial value */                           \
+        expected = atomic_load_explicit(                   \
+            (const volatile _Atomic(type) *) obj,          \
+            fail                                           \
+        );                                                 \
+        /* cas loop */                                     \
+        do {                                               \
+            /* complement bit at offset */                 \
+            desired = expected;                            \
+            desired ^= mask;                               \
+        }                                                  \
+        while (!atomic_compare_exchange_weak_explicit(     \
+            (volatile _Atomic(type) *) obj,                \
+            &expected,                                     \
+            desired,                                       \
+            succ,                                          \
+            fail                                           \
+        ));                                                \
+        /* return old bit value */                         \
+        return (expected & mask) == 1;                     \
+    }                                                      \
+    static PATOMIC_FORCE_INLINE int                        \
+    patomic_opimpl_test_set_##name(                        \
+        volatile void *obj                                 \
+        ,int offset                                        \
+    vis(,int order)                                        \
+    )                                                      \
+    {                                                      \
+        /* declarations */                                 \
+        type expected;                                     \
+        type desired;                                      \
+        const type mask = (type) (1u << offset);           \
+        /* setup memory orders */                          \
+        int succ = order;                                  \
+        int fail = patomic_cmpxchg_fail_order(order);      \
+        /* load initial value */                           \
+        expected = atomic_load_explicit(                   \
+            (const volatile _Atomic(type) *) obj,          \
+            fail                                           \
+        );                                                 \
+        /* cas loop */                                     \
+        do {                                               \
+            /* set bit at offset */                        \
+            desired = expected;                            \
+            desired |= mask;                               \
+        }                                                  \
+        while (!atomic_compare_exchange_weak_explicit(     \
+            (volatile _Atomic(type) *) obj,                \
+            &expected,                                     \
+            desired,                                       \
+            succ,                                          \
+            fail                                           \
+        ));                                                \
+        /* return old bit value */                         \
+        return (expected & mask) == 1;                     \
+    }                                                      \
+    static PATOMIC_FORCE_INLINE int                        \
+    patomic_opimpl_test_reset_##name(                      \
+        volatile void *obj                                 \
+        ,int offset                                        \
+    vis(,int order)                                        \
+    )                                                      \
+    {                                                      \
+        /* declarations */                                 \
+        type expected;                                     \
+        type desired;                                      \
+        const type mask = (type) (1u << offset);           \
+        const type mask_inv = (type) (~mask);              \
+        /* setup memory orders */                          \
+        int succ = order;                                  \
+        int fail = patomic_cmpxchg_fail_order(order);      \
+        /* load initial value */                           \
+        expected = atomic_load_explicit(                   \
+            (const volatile _Atomic(type) *) obj,          \
+            fail                                           \
+        );                                                 \
+        /* cas loop */                                     \
+        do {                                               \
+            /* reset bit at offset */                      \
+            desired = expected;                            \
+            desired &= mask_inv;                           \
+        }                                                  \
+        while (!atomic_compare_exchange_weak_explicit(     \
+            (volatile _Atomic(type) *) obj,                \
+            &expected,                                     \
+            desired,                                       \
+            succ,                                          \
+            fail                                           \
+        ));                                                \
+        /* return old bit value */                         \
+        return (expected & mask) == 1;                     \
+    }
+
+#define PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(type, name, order, vis, opsk) \
+    PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis)          \
+    static patomic_##opsk##_bitwise_t                                   \
+    patomic_ops_bitwise_create_##name(void)                             \
+    {                                                                   \
+        patomic_##opsk##_bitwise_t pao;                                 \
+        pao.fp_test = NULL;                                             \
+        pao.fp_test_comp = patomic_opimpl_test_comp_##name;             \
+        pao.fp_test_set = patomic_opimpl_test_set_##name;               \
+        pao.fp_test_reset = patomic_opimpl_test_reset_##name;           \
+        return pao;                                                     \
+    }
+
+#define PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(type, name, order, vis, opsk) \
+    PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis)                  \
+    PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis)           \
+    static patomic_##opsk##_bitwise_t                                    \
+    patomic_ops_bitwise_create_##name(void)                              \
+    {                                                                    \
+        patomic_##opsk##_bitwise_t pao;                                  \
+        pao.fp_test = patomic_opimpl_test_##name;                        \
+        pao.fp_test_comp = patomic_opimpl_test_comp_##name;              \
+        pao.fp_test_set = patomic_opimpl_test_set_##name;                \
+        pao.fp_test_reset = patomic_opimpl_test_reset_##name;            \
+        return pao;                                                      \
     }
 
 
@@ -284,7 +435,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         unsigned char const *const end = (unsigned char *)(&desired + 1); \
         /* setup memory orders */                                         \
         int succ = order;                                                 \
-        int fail = patomic_cmpxchg_fail_order(succ);                      \
+        int fail = patomic_cmpxchg_fail_order(order);                     \
         /* load initial value */                                          \
         expected = atomic_load_explicit(                                  \
             (const volatile _Atomic(type) *) obj,                         \
@@ -472,7 +623,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         type desired;                                                    \
         /* setup memory orders */                                        \
         int succ = order;                                                \
-        int fail = patomic_cmpxchg_fail_order(succ);                     \
+        int fail = patomic_cmpxchg_fail_order(order);                    \
         /* load initial value */                                         \
         expected = atomic_load_explicit(                                 \
             (const volatile _Atomic(type) *) obj,                        \
@@ -536,15 +687,18 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 /*
  * CREATE STRUCTS
  *
- * - read: (consume), acquire
- * - write: release
- * - rmw: relaxed, acq_rel, seq_cst
+ * MEMORY ORDER SUFFIXES
+ * - ca: only {consume, acquire} orders
+ * - r: only {release} orders
+ * - ar: only {acq_rel} orders
+ * - rsc: only {relaxed, seq_cst} orders
  * - explicit: explicit
  */
-#define PATOMIC_DEFINE_OPS_CREATE_READ(type, name, order, vis, inv, opsk, min)    \
+#define PATOMIC_DEFINE_OPS_CREATE_CA(type, name, order, vis, inv, opsk, min)      \
+    /* no store in consume/acquire */                                             \
     PATOMIC_DEFINE_LOAD_OPS(unsigned type, u##name, order, vis)                   \
     PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE(u##name, opsk)                                  \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(unsigned type, u##name, order, vis, opsk)  \
     PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis, opsk)       \
     PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis, opsk, 0u)   \
     PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis, opsk, min)    \
@@ -562,10 +716,11 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         return pao;                                                               \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_WRITE(type, name, order, vis, inv, opsk, min)   \
+#define PATOMIC_DEFINE_OPS_CREATE_R(type, name, order, vis, inv, opsk, min)       \
     PATOMIC_DEFINE_STORE_OPS(unsigned type, u##name, order, vis)                  \
+    /* no load in release */                                                      \
     PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE(u##name, opsk)                                  \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(unsigned type, u##name, order, vis, opsk)   \
     PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis, opsk)       \
     PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis, opsk, 0u)   \
     PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis, opsk, min)    \
@@ -583,9 +738,10 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         return pao;                                                               \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_RMW(type, name, order, vis, inv, opsk, min)     \
+#define PATOMIC_DEFINE_OPS_CREATE_AR(type, name, order, vis, inv, opsk, min)      \
+    /* no store/load in acq_rel */                                                \
     PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE(u##name, opsk)                                  \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(unsigned type, u##name, order, vis, opsk)   \
     PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis, opsk)       \
     PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis, opsk, 0u)   \
     PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis, opsk, min)    \
@@ -603,11 +759,34 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         return pao;                                                               \
     }
 
+#define PATOMIC_DEFINE_OPS_CREATE_RSC(type, name, order, vis, inv, opsk, min)     \
+    PATOMIC_DEFINE_STORE_OPS(unsigned type, u##name, order, vis)                  \
+    PATOMIC_DEFINE_LOAD_OPS(unsigned type, u##name, order, vis)                   \
+    PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis, inv, opsk) \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(unsigned type, u##name, order, vis, opsk)  \
+    PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis, opsk)       \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis, opsk, 0u)   \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis, opsk, min)    \
+    static patomic_##opsk##_t                                                     \
+    patomic_ops_create_##name(void)                                               \
+    {                                                                             \
+        patomic_##opsk##_t pao;                                                   \
+        pao.fp_store = patomic_opimpl_store_u##name;                              \
+        pao.fp_load = patomic_opimpl_load_u##name;                                \
+        pao.xchg_ops = patomic_ops_xchg_create_u##name();                         \
+        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                   \
+        pao.binary_ops = patomic_ops_binary_create_u##name();                     \
+        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();               \
+        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                 \
+        return pao;                                                               \
+    }
+
 #define PATOMIC_DEFINE_OPS_CREATE_EXPLICIT(type, name, order, vis, inv, opsk, min) \
     PATOMIC_DEFINE_STORE_OPS(unsigned type, u##name, order, vis)                   \
     PATOMIC_DEFINE_LOAD_OPS(unsigned type, u##name, order, vis)                    \
     PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis, inv, opsk)  \
-    PATOMIC_DEFINE_BIT_OPS_CREATE(u##name, opsk)                                   \
+    /* BIT NRAR because we want all ops available */                               \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(unsigned type, u##name, order, vis, opsk)   \
     PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis, opsk)        \
     PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis, opsk, 0u)    \
     PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis, opsk, min)     \
@@ -627,19 +806,19 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 
 
 #define PATOMIC_DEFINE_OPS_CREATE_ALL(type, name, min)                     \
-    PATOMIC_DEFINE_OPS_CREATE_READ(                                        \
+    PATOMIC_DEFINE_OPS_CREATE_CA(                                          \
         type, name##_acquire, memory_order_acquire, HIDE_P, SHOW, ops, min \
     )                                                                      \
-    PATOMIC_DEFINE_OPS_CREATE_WRITE(                                       \
+    PATOMIC_DEFINE_OPS_CREATE_R(                                           \
         type, name##_release, memory_order_release, HIDE_P, SHOW, ops, min \
     )                                                                      \
-    PATOMIC_DEFINE_OPS_CREATE_RMW(                                         \
-        type, name##_relaxed, memory_order_relaxed, HIDE_P, SHOW, ops, min \
-    )                                                                      \
-    PATOMIC_DEFINE_OPS_CREATE_RMW(                                         \
+    PATOMIC_DEFINE_OPS_CREATE_AR(                                          \
         type, name##_acq_rel, memory_order_acq_rel, HIDE_P, SHOW, ops, min \
     )                                                                      \
-    PATOMIC_DEFINE_OPS_CREATE_RMW(                                         \
+    PATOMIC_DEFINE_OPS_CREATE_RSC(                                         \
+        type, name##_relaxed, memory_order_relaxed, HIDE_P, SHOW, ops, min \
+    )                                                                      \
+    PATOMIC_DEFINE_OPS_CREATE_RSC(                                         \
         type, name##_seq_cst, memory_order_seq_cst, HIDE_P, SHOW, ops, min \
     )                                                                      \
     PATOMIC_DEFINE_OPS_CREATE_EXPLICIT(                                    \

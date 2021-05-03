@@ -30,8 +30,12 @@ typedef int (* patomic_opsig_cmpxchg_t) \
      const void *desired);
 
 typedef int (* patomic_opsig_test_t) \
-    (volatile void *obj,             \
+    (const volatile void *obj,       \
      int offset);
+
+typedef int (* patomic_opsig_test_modify_t) \
+    (volatile void *obj,                    \
+     int offset);                           \
 
 typedef void (* patomic_opsig_fetch_t) \
     (volatile void *obj,               \
@@ -81,8 +85,13 @@ typedef int (* patomic_opsig_explicit_cmpxchg_t) \
      int fail);
 
 typedef int (* patomic_opsig_explicit_test_t) \
-    (volatile void *obj,                      \
+    (const volatile void *obj,                \
      int offset,                              \
+     int order);
+
+typedef int (* patomic_opsig_explicit_test_modify_t) \
+    (volatile void *obj,                             \
+     int offset,                                     \
      int order);
 
 typedef void (* patomic_opsig_explicit_fetch_t) \
@@ -147,9 +156,9 @@ typedef void (* patomic_opsig_explicit_void_noarg_t) \
 #define PATOMIC_DEFINE_BITWISE_OPS_STRUCT(opsig_kind, ops_kind) \
     typedef struct {                                            \
         patomic_##opsig_kind##_test_t fp_test;                  \
-        patomic_##opsig_kind##_test_t fp_test_comp;             \
-        patomic_##opsig_kind##_test_t fp_test_set;              \
-        patomic_##opsig_kind##_test_t fp_test_reset;            \
+        patomic_##opsig_kind##_test_modify_t fp_test_comp;      \
+        patomic_##opsig_kind##_test_modify_t fp_test_set;       \
+        patomic_##opsig_kind##_test_modify_t fp_test_reset;     \
     } patomic_##ops_kind##_bitwise_t
 
 #define PATOMIC_DEFINE_XCHG_OPS_STRUCT(opsig_kind, ops_kind) \
