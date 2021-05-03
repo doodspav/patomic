@@ -25,18 +25,22 @@ typedef enum {
 } patomic_memory_order_t;
 
 
-static PATOMIC_FORCE_INLINE int
-patomic_cmpxchg_fail_order(int succ)
+static int
+patomic_is_valid_order(int order)
 {
-    switch (succ)
+    switch (order)
     {
+        case patomic_RELAXED:
+        case patomic_CONSUME:
+        case patomic_ACQUIRE:
         case patomic_RELEASE:
-        case patomic_ACQ_REL: return patomic_ACQUIRE;
-        default: return succ;
+        case patomic_ACQ_REL:
+        case patomic_SEQ_CST: return 1;
+        default: return 0;
     }
 }
 
-static PATOMIC_FORCE_INLINE int
+static int
 patomic_is_valid_store_order(int order)
 {
     switch (order)
@@ -48,7 +52,7 @@ patomic_is_valid_store_order(int order)
     }
 }
 
-static PATOMIC_FORCE_INLINE int
+static int
 patomic_is_valid_load_order(int order)
 {
     switch (order)
@@ -58,6 +62,27 @@ patomic_is_valid_load_order(int order)
         case patomic_ACQUIRE:
         case patomic_SEQ_CST: return 1;
         default: return 0;
+    }
+}
+
+static int
+patomic_is_valid_fail_order(int succ, int fail)
+{
+    if ((fail > succ)
+        || (fail == patomic_RELEASE)
+        || (fail == patomic_ACQ_REL))
+    { return 0; }
+    else { return 1; }
+}
+
+static int
+patomic_cmpxchg_fail_order(int succ)
+{
+    switch (succ)
+    {
+        case patomic_RELEASE:
+        case patomic_ACQ_REL: return patomic_ACQUIRE;
+        default: return succ;
     }
 }
 

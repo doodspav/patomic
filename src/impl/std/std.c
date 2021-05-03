@@ -7,6 +7,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 
 #if PATOMIC_HAVE_STD_ATOMIC
 
+#include <assert.h>
 #include <limits.h>
 #include <stdatomic.h>
 #include <string.h>
@@ -50,20 +51,21 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
  * - store (y)
  * - load (y)
  */
-#define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis)         \
-    static PATOMIC_FORCE_INLINE void                             \
-    patomic_opimpl_store_##name(                                 \
-        volatile void *obj                                       \
-        ,const void *desired                                     \
-    vis(,int order)                                              \
-    )                                                            \
-    {                                                            \
-        atomic_store_explicit(                                   \
-            (volatile _Atomic(type) *) obj,                      \
-            *((const type *) desired),                           \
-            order                                                \
-        );                                                       \
-    }                                                            \
+#define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis) \
+    static PATOMIC_FORCE_INLINE void                     \
+    patomic_opimpl_store_##name(                         \
+        volatile void *obj                               \
+        ,const void *desired                             \
+    vis(,int order)                                      \
+    )                                                    \
+    {                                                    \
+        assert(patomic_is_valid_load_order(order));      \
+        atomic_store_explicit(                           \
+            (volatile _Atomic(type) *) obj,              \
+            *((const type *) desired),                   \
+            order                                        \
+        );                                               \
+    }                                                    \
 
 #define PATOMIC_DEFINE_LOAD_OPS(type, name, order, vis)         \
     static PATOMIC_FORCE_INLINE void                            \
@@ -73,7 +75,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                              \
     )                                                           \
     {                                                           \
-        type val = atomic_load_explicit(                        \
+        type val;                                               \
+        assert(patomic_is_valid_store_order(order));            \
+        val = atomic_load_explicit(                             \
             (const volatile _Atomic(type) *) obj,               \
             order                                               \
         );                                                      \
@@ -96,7 +100,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        type val = atomic_exchange_explicit(                              \
+        type val;                                                         \
+        assert(patomic_is_valid_order(order));                            \
+        val = atomic_exchange_explicit(                                   \
             (volatile _Atomic(type) *) obj,                               \
             *((const type *) desired),                                    \
             order                                                         \
@@ -114,6 +120,8 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     {                                                                     \
         inv(int succ = order;)                                            \
         inv(int fail = patomic_cmpxchg_fail_order(order);)                \
+        assert(patomic_is_valid_order(succ));                             \
+        assert(patomic_is_valid_fail_order(succ, fail));                  \
         return atomic_compare_exchange_weak_explicit(                     \
             (volatile _Atomic(type) *) obj,                               \
             (type *) expected,                                            \
@@ -133,6 +141,8 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     {                                                                     \
         inv(int succ = order;)                                            \
         inv(int fail = patomic_cmpxchg_fail_order(order);)                \
+        assert(patomic_is_valid_order(succ));                             \
+        assert(patomic_is_valid_fail_order(succ, fail));                  \
         return atomic_compare_exchange_strong_explicit(                   \
             (volatile _Atomic(type) *) obj,                               \
             (type *) expected,                                            \
@@ -153,10 +163,10 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 
 /*
  * BITWISE:
- * - bit_test (n)
- * - bit_test_complement (n)
- * - bit_test_set (n)
- * - bit_test_reset (n)
+ * - bit_test (y)
+ * - bit_test_complement (y)
+ * - bit_test_set (y)
+ * - bit_test_reset (y)
  *
  * OPS SECTIONS:
  * - test: relaxed, consume, acquire, seq_cst
@@ -170,128 +180,155 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
  * - we make the assumption that type is always an unsigned integer type
  * - these will not work properly if type can be anything
  */
-#define PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis) \
-    static PATOMIC_FORCE_INLINE int                         \
-    patomic_opimpl_test_##name(                             \
-        const volatile void *obj                            \
-        ,int offset                                         \
-    vis(,int order)                                         \
-    )                                                       \
-    {                                                       \
-        const type mask = (type) (1u << offset);            \
-        type val = atomic_load_explicit(                    \
-            (const volatile _Atomic(type) *) obj,           \
-            order                                           \
-        );                                                  \
-        return (val & mask) == 1;                           \
+#define PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis)  \
+    static PATOMIC_FORCE_INLINE int                          \
+    patomic_opimpl_test_##name(                              \
+        const volatile void *obj                             \
+        ,int offset                                          \
+    vis(,int order)                                          \
+    )                                                        \
+    {                                                        \
+        type mask;                                           \
+        type val;                                            \
+        assert(offset >= 0);                                 \
+        assert((CHAR_BIT * sizeof(type)) > (size_t) offset); \
+        assert(patomic_is_valid_load_order(order));          \
+        mask = (type) (1u << offset);                        \
+        val = atomic_load_explicit(                          \
+            (const volatile _Atomic(type) *) obj,            \
+            order                                            \
+        );                                                   \
+        return (val & mask) == 1;                            \
     }
 
 #define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis) \
-    static PATOMIC_FORCE_INLINE int                        \
-    patomic_opimpl_test_comp_##name(                       \
-        volatile void *obj                                 \
-        ,int offset                                        \
-    vis(,int order)                                        \
-    )                                                      \
-    {                                                      \
-        /* declarations */                                 \
-        type expected;                                     \
-        type desired;                                      \
-        const type mask = (type) (1u << offset);           \
-        /* setup memory orders */                          \
-        int succ = order;                                  \
-        int fail = patomic_cmpxchg_fail_order(order);      \
-        /* load initial value */                           \
-        expected = atomic_load_explicit(                   \
-            (const volatile _Atomic(type) *) obj,          \
-            fail                                           \
-        );                                                 \
-        /* cas loop */                                     \
-        do {                                               \
-            /* complement bit at offset */                 \
-            desired = expected;                            \
-            desired ^= mask;                               \
-        }                                                  \
-        while (!atomic_compare_exchange_weak_explicit(     \
-            (volatile _Atomic(type) *) obj,                \
-            &expected,                                     \
-            desired,                                       \
-            succ,                                          \
-            fail                                           \
-        ));                                                \
-        /* return old bit value */                         \
-        return (expected & mask) == 1;                     \
-    }                                                      \
-    static PATOMIC_FORCE_INLINE int                        \
-    patomic_opimpl_test_set_##name(                        \
-        volatile void *obj                                 \
-        ,int offset                                        \
-    vis(,int order)                                        \
-    )                                                      \
-    {                                                      \
-        /* declarations */                                 \
-        type expected;                                     \
-        type desired;                                      \
-        const type mask = (type) (1u << offset);           \
-        /* setup memory orders */                          \
-        int succ = order;                                  \
-        int fail = patomic_cmpxchg_fail_order(order);      \
-        /* load initial value */                           \
-        expected = atomic_load_explicit(                   \
-            (const volatile _Atomic(type) *) obj,          \
-            fail                                           \
-        );                                                 \
-        /* cas loop */                                     \
-        do {                                               \
-            /* set bit at offset */                        \
-            desired = expected;                            \
-            desired |= mask;                               \
-        }                                                  \
-        while (!atomic_compare_exchange_weak_explicit(     \
-            (volatile _Atomic(type) *) obj,                \
-            &expected,                                     \
-            desired,                                       \
-            succ,                                          \
-            fail                                           \
-        ));                                                \
-        /* return old bit value */                         \
-        return (expected & mask) == 1;                     \
-    }                                                      \
-    static PATOMIC_FORCE_INLINE int                        \
-    patomic_opimpl_test_reset_##name(                      \
-        volatile void *obj                                 \
-        ,int offset                                        \
-    vis(,int order)                                        \
-    )                                                      \
-    {                                                      \
-        /* declarations */                                 \
-        type expected;                                     \
-        type desired;                                      \
-        const type mask = (type) (1u << offset);           \
-        const type mask_inv = (type) (~mask);              \
-        /* setup memory orders */                          \
-        int succ = order;                                  \
-        int fail = patomic_cmpxchg_fail_order(order);      \
-        /* load initial value */                           \
-        expected = atomic_load_explicit(                   \
-            (const volatile _Atomic(type) *) obj,          \
-            fail                                           \
-        );                                                 \
-        /* cas loop */                                     \
-        do {                                               \
-            /* reset bit at offset */                      \
-            desired = expected;                            \
-            desired &= mask_inv;                           \
-        }                                                  \
-        while (!atomic_compare_exchange_weak_explicit(     \
-            (volatile _Atomic(type) *) obj,                \
-            &expected,                                     \
-            desired,                                       \
-            succ,                                          \
-            fail                                           \
-        ));                                                \
-        /* return old bit value */                         \
-        return (expected & mask) == 1;                     \
+    static PATOMIC_FORCE_INLINE int                                \
+    patomic_opimpl_test_comp_##name(                               \
+        volatile void *obj                                         \
+        ,int offset                                                \
+    vis(,int order)                                                \
+    )                                                              \
+    {                                                              \
+        /* declarations */                                         \
+        type expected;                                             \
+        type desired;                                              \
+        type mask;                                                 \
+        int succ;                                                  \
+        int fail;                                                  \
+        /* assertions */                                           \
+        assert(offset >= 0);                                       \
+        assert((CHAR_BIT * sizeof(type)) > (size_t) offset);       \
+        assert(patomic_is_valid_order(order));                     \
+        /* setup memory orders and mask */                         \
+        mask = (type) (1u << offset);                              \
+        succ = order;                                              \
+        fail = patomic_cmpxchg_fail_order(order);                  \
+        /* load initial value */                                   \
+        expected = atomic_load_explicit(                           \
+            (const volatile _Atomic(type) *) obj,                  \
+            fail                                                   \
+        );                                                         \
+        /* cas loop */                                             \
+        do {                                                       \
+            /* complement bit at offset */                         \
+            desired = expected;                                    \
+            desired ^= mask;                                       \
+        }                                                          \
+        while (!atomic_compare_exchange_weak_explicit(             \
+            (volatile _Atomic(type) *) obj,                        \
+            &expected,                                             \
+            desired,                                               \
+            succ,                                                  \
+            fail                                                   \
+        ));                                                        \
+        /* return old bit value */                                 \
+        return (expected & mask) == 1;                             \
+    }                                                              \
+    static PATOMIC_FORCE_INLINE int                                \
+    patomic_opimpl_test_set_##name(                                \
+        volatile void *obj                                         \
+        ,int offset                                                \
+    vis(,int order)                                                \
+    )                                                              \
+    {                                                              \
+        /* declarations */                                         \
+        type expected;                                             \
+        type desired;                                              \
+        type mask;                                                 \
+        int succ;                                                  \
+        int fail;                                                  \
+        /* assertions */                                           \
+        assert(offset >= 0);                                       \
+        assert((CHAR_BIT * sizeof(type)) > (size_t) offset);       \
+        assert(patomic_is_valid_order(order));                     \
+        /* setup memory orders and mask */                         \
+        mask = (type) (1u << offset);                              \
+        succ = order;                                              \
+        fail = patomic_cmpxchg_fail_order(order);                  \
+        /* load initial value */                                   \
+        expected = atomic_load_explicit(                           \
+            (const volatile _Atomic(type) *) obj,                  \
+            fail                                                   \
+        );                                                         \
+        /* cas loop */                                             \
+        do {                                                       \
+            /* set bit at offset */                                \
+            desired = expected;                                    \
+            desired |= mask;                                       \
+        }                                                          \
+        while (!atomic_compare_exchange_weak_explicit(             \
+            (volatile _Atomic(type) *) obj,                        \
+            &expected,                                             \
+            desired,                                               \
+            succ,                                                  \
+            fail                                                   \
+        ));                                                        \
+        /* return old bit value */                                 \
+        return (expected & mask) == 1;                             \
+    }                                                              \
+    static PATOMIC_FORCE_INLINE int                                \
+    patomic_opimpl_test_reset_##name(                              \
+        volatile void *obj                                         \
+        ,int offset                                                \
+    vis(,int order)                                                \
+    )                                                              \
+    {                                                              \
+        /* declarations */                                         \
+        type expected;                                             \
+        type desired;                                              \
+        type mask;                                                 \
+        type mask_inv;                                             \
+        int succ;                                                  \
+        int fail;                                                  \
+        /* assertions */                                           \
+        assert(offset >= 0);                                       \
+        assert((CHAR_BIT * sizeof(type)) > (size_t) offset);       \
+        assert(patomic_is_valid_order(order));                     \
+        /* setup memory orders and masks */                        \
+        mask = (type) (1u << offset);                              \
+        mask_inv = (type) (~mask);                                 \
+        succ = order;                                              \
+        fail = patomic_cmpxchg_fail_order(order);                  \
+        /* load initial value */                                   \
+        expected = atomic_load_explicit(                           \
+            (const volatile _Atomic(type) *) obj,                  \
+            fail                                                   \
+        );                                                         \
+        /* cas loop */                                             \
+        do {                                                       \
+            /* reset bit at offset */                              \
+            desired = expected;                                    \
+            desired &= mask_inv;                                   \
+        }                                                          \
+        while (!atomic_compare_exchange_weak_explicit(             \
+            (volatile _Atomic(type) *) obj,                        \
+            &expected,                                             \
+            desired,                                               \
+            succ,                                                  \
+            fail                                                   \
+        ));                                                        \
+        /* return old bit value */                                 \
+        return (expected & mask) == 1;                             \
     }
 
 #define PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(type, name, order, vis, opsk) \
@@ -338,7 +375,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        type val = atomic_fetch_or_explicit(                              \
+        type val;                                                         \
+        assert(patomic_is_valid_order(order));                            \
+        val = atomic_fetch_or_explicit(                                   \
             (volatile _Atomic(type) *) obj,                               \
             *((const type *) arg),                                        \
             order                                                         \
@@ -353,6 +392,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        /* assertion in called function */                                \
         patomic_opimpl_fetch_or_##name(                                   \
             obj                                                           \
             ,arg                                                          \
@@ -368,7 +408,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        type val = atomic_fetch_xor_explicit(                             \
+        type val;                                                         \
+        assert(patomic_is_valid_order(order));                            \
+        val = atomic_fetch_xor_explicit(                                  \
             (volatile _Atomic(type) *) obj,                               \
             *((const type *) arg),                                        \
             order                                                         \
@@ -383,6 +425,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        /* assertion in called function */                                \
         patomic_opimpl_fetch_xor_##name(                                  \
             obj                                                           \
             ,arg                                                          \
@@ -398,7 +441,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        type val = atomic_fetch_and_explicit(                             \
+        type val;                                                         \
+        assert(patomic_is_valid_order(order));                            \
+        val = atomic_fetch_and_explicit(                                  \
             (volatile _Atomic(type) *) obj,                               \
             *((const type *) arg),                                        \
             order                                                         \
@@ -413,6 +458,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        /* assertion in called function */                                \
         patomic_opimpl_fetch_and_##name(                                  \
             obj                                                           \
             ,arg                                                          \
@@ -430,12 +476,16 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         /* declarations */                                                \
         type expected;                                                    \
         type desired;                                                     \
+        int succ;                                                         \
+        int fail;                                                         \
         unsigned char const *src;                                         \
         unsigned char *begin;                                             \
         unsigned char const *const end = (unsigned char *)(&desired + 1); \
+        /* assertion */                                                   \
+        assert(patomic_is_valid_order(order));                            \
         /* setup memory orders */                                         \
-        int succ = order;                                                 \
-        int fail = patomic_cmpxchg_fail_order(order);                     \
+        succ = order;                                                     \
+        fail = patomic_cmpxchg_fail_order(order);                         \
         /* load initial value */                                          \
         expected = atomic_load_explicit(                                  \
             (const volatile _Atomic(type) *) obj,                         \
@@ -466,6 +516,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        /* assertion in called function */                                \
         patomic_opimpl_fetch_not_##name(                                  \
             obj                                                           \
         vis(,order)                                                       \
@@ -505,7 +556,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
-        type val = atomic_fetch_add_explicit(                            \
+        type val;                                                        \
+        assert(patomic_is_valid_order(order));                           \
+        val = atomic_fetch_add_explicit(                                 \
             (volatile _Atomic(type) *) obj,                              \
             *((const type *) arg),                                       \
             order                                                        \
@@ -520,6 +573,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        /* assertion in called function */                               \
         patomic_opimpl_fetch_add_##name(                                 \
             obj                                                          \
             ,arg                                                         \
@@ -535,7 +589,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
-        type val = atomic_fetch_sub_explicit(                            \
+        type val;                                                        \
+        assert(patomic_is_valid_order(order));                           \
+        val = atomic_fetch_sub_explicit(                                 \
             (volatile _Atomic(type) *) obj,                              \
             *((const type *) arg),                                       \
             order                                                        \
@@ -550,6 +606,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        /* assertion in called function */                               \
         patomic_opimpl_fetch_sub_##name(                                 \
             obj                                                          \
             ,arg                                                         \
@@ -564,7 +621,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
-        type val = atomic_fetch_add_explicit(                            \
+        type val;                                                        \
+        assert(patomic_is_valid_order(order));                           \
+        val = atomic_fetch_add_explicit(                                 \
             (volatile _Atomic(type) *) obj,                              \
             (type) 1,                                                    \
             order                                                        \
@@ -578,6 +637,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        /* assertion in called function */                               \
         patomic_opimpl_fetch_inc_##name(                                 \
             obj                                                          \
         vis(,order)                                                      \
@@ -591,7 +651,9 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
-        type val = atomic_fetch_sub_explicit(                            \
+        type val;                                                        \
+        assert(patomic_is_valid_order(order));                           \
+        val = atomic_fetch_sub_explicit(                                 \
             (volatile _Atomic(type) *) obj,                              \
             (type) 1,                                                    \
             order                                                        \
@@ -605,6 +667,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        /* assertion in called function */                               \
         patomic_opimpl_fetch_dec_##name(                                 \
             obj                                                          \
         vis(,order)                                                      \
@@ -621,9 +684,13 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         /* declarations */                                               \
         type expected;                                                   \
         type desired;                                                    \
+        int succ;                                                        \
+        int fail;                                                        \
+        /* assertion */                                                  \
+        assert(patomic_is_valid_order(order));                           \
         /* setup memory orders */                                        \
-        int succ = order;                                                \
-        int fail = patomic_cmpxchg_fail_order(order);                    \
+        succ = order;                                                    \
+        fail = patomic_cmpxchg_fail_order(order);                        \
         /* load initial value */                                         \
         expected = atomic_load_explicit(                                 \
             (const volatile _Atomic(type) *) obj,                        \
@@ -661,6 +728,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        /* assertion in called function */                               \
         patomic_opimpl_fetch_neg_##name(                                 \
             obj                                                          \
         vis(,order)                                                      \
@@ -781,29 +849,6 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         return pao;                                                               \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_EXPLICIT(type, name, order, vis, inv, opsk, min) \
-    PATOMIC_DEFINE_STORE_OPS(unsigned type, u##name, order, vis)                   \
-    PATOMIC_DEFINE_LOAD_OPS(unsigned type, u##name, order, vis)                    \
-    PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis, inv, opsk)  \
-    /* BIT NRAR because we want all ops available */                               \
-    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(unsigned type, u##name, order, vis, opsk)   \
-    PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis, opsk)        \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis, opsk, 0u)    \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis, opsk, min)     \
-    static patomic_##opsk##_t                                                      \
-    patomic_ops_create_##name(void)                                                \
-    {                                                                              \
-        patomic_##opsk##_t pao;                                                    \
-        pao.fp_store = patomic_opimpl_store_u##name;                               \
-        pao.fp_load = patomic_opimpl_load_u##name;                                 \
-        pao.xchg_ops = patomic_ops_xchg_create_u##name();                          \
-        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                    \
-        pao.binary_ops = patomic_ops_binary_create_u##name();                      \
-        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                \
-        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                  \
-        return pao;                                                                \
-    }
-
 
 #define PATOMIC_DEFINE_OPS_CREATE_ALL(type, name, min)                     \
     PATOMIC_DEFINE_OPS_CREATE_CA(                                          \
@@ -821,7 +866,8 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     PATOMIC_DEFINE_OPS_CREATE_RSC(                                         \
         type, name##_seq_cst, memory_order_seq_cst, HIDE_P, SHOW, ops, min \
     )                                                                      \
-    PATOMIC_DEFINE_OPS_CREATE_EXPLICIT(                                    \
+    /* all ops are in RSC */                                               \
+    PATOMIC_DEFINE_OPS_CREATE_RSC(                                         \
         type, name##_explicit, order, SHOW_P, HIDE, ops_explicit, min      \
     )
 
