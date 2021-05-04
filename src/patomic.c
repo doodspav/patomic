@@ -213,6 +213,7 @@ static const patomic_explicit_t patomic_explicit_NULL;
         va_list impl_id_argv;                               \
         int i, impl_count;                                  \
                                                             \
+        va_start(impl_id_argv, impl_id_argc);               \
     vis(assert(patomic_is_valid_order((int) order));)       \
         impl_count = patomic_copy_impl_array(               \
             &patomic_impl_register[0],                      \

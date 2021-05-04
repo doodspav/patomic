@@ -12,7 +12,7 @@ enum memory_order {
     memory_order_seq_cst
 };
 
-struct atomic_flag {};
+struct atomic_flag { int value; };
 
 #define ATOMIC_BOOL_LOCK_FREE 2
 #define ATOMIC_CHAR_LOCK_FREE 2
@@ -35,7 +35,7 @@ struct atomic_flag {};
 #define atomic_flag_test_and_set(f) (0)
 #define atomic_flag_clear(f) ((void) 0)
 #define atomic_store(a, c) ((void) 0)
-#define atomic_load(a) (*a)
+#define atomic_load(a) (*(a))
 #define atomic_exchange(a, d) (d)
 #define atomic_compare_exchange_weak(a, e, d) (0)
 #define atomic_compare_exchange_strong(a, e, d) (0)
@@ -48,7 +48,7 @@ struct atomic_flag {};
 #define atomic_flag_test_and_set_explicit(f, o) (0)
 #define atomic_flag_clear_explicit(f, o) ((void) 0)
 #define atomic_store_explicit(a, c, o) ((void) 0)
-#define atomic_load_explicit(a, o) (*a)
+#define atomic_load_explicit(a, o) (*(a))
 #define atomic_exchange_explicit(a, d, o) (d)
 #define atomic_compare_exchange_weak_explicit(a, e, d, s, f) (0)
 #define atomic_compare_exchange_strong_explicit(a, e, d, s, f) (0)
@@ -58,7 +58,7 @@ struct atomic_flag {};
 #define atomic_fetch_xor_explicit(a, m, o) (m)
 #define atomic_fetch_and_explicit(a, m, o) (m)
 
-#define atomic_thread_fence(0) ((void) 0)
-#define atomic_signal_fence(0) ((void) 0)
+#define atomic_thread_fence(o) ((void) 0)
+#define atomic_signal_fence(o) ((void) 0)
 
 #endif /* !PATOMIC_FAKE_STDATOMIC_H */
