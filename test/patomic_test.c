@@ -1,6 +1,6 @@
 #include <patomic/patomic.h>
 
-int check(void)
+static int check(void)
 {
     typedef patomic_explicit_t poe_t;
     poe_t a32 = patomic_create_explicit(32, patomic_options_DEFAULT, 0);

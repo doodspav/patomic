@@ -114,8 +114,6 @@ patomic_copy_impl_array(
     return (int) IMPL_REGISTER_SIZE;
 }
 
-#define BLANK
-
 #define COPY_IF_NULL(c, a, b, m) if ((a)->m == NULL) { (a)->m = (b)->m; ++(c); }
 
 #define PATOMIC_DEFINE_COMBINE(cmbk, type)                         \
