@@ -60,7 +60,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_store_##name(                         \
         volatile void *obj                               \
         ,const void *desired                             \
-    vis(,int order)                                      \
+   vis(_,int order)                                      \
     )                                                    \
     {                                                    \
         assert(patomic_is_valid_load_order(order));      \
@@ -75,7 +75,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     static PATOMIC_FORCE_INLINE void                            \
     patomic_opimpl_load_##name(                                 \
         const volatile void *obj                                \
-    vis(,int order)                                             \
+   vis(_,int order)                                             \
         ,void *ret                                              \
     )                                                           \
     {                                                           \
@@ -100,7 +100,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_exchange_##name(                                       \
         volatile void *obj                                                \
         ,const void *desired                                              \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
@@ -118,8 +118,8 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         volatile void *obj                                                \
         ,void *expected                                                   \
         ,const void *desired                                              \
-    vis(,int succ)                                                        \
-    vis(,int fail)                                                        \
+   vis(_,int succ)                                                        \
+   vis(_,int fail)                                                        \
     )                                                                     \
     {                                                                     \
         inv(int succ = order;)                                            \
@@ -139,8 +139,8 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         volatile void *obj                                                \
         ,void *expected                                                   \
         ,const void *desired                                              \
-    vis(,int succ)                                                        \
-    vis(,int fail)                                                        \
+   vis(_,int succ)                                                        \
+   vis(_,int fail)                                                        \
     )                                                                     \
     {                                                                     \
         inv(int succ = order;)                                            \
@@ -189,7 +189,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_test_##name(                              \
         const volatile void *obj                             \
         ,int offset                                          \
-    vis(,int order)                                          \
+   vis(_,int order)                                          \
     )                                                        \
     {                                                        \
         type mask;                                           \
@@ -210,7 +210,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_test_comp_##name(                               \
         volatile void *obj                                         \
         ,int offset                                                \
-    vis(,int order)                                                \
+   vis(_,int order)                                                \
     )                                                              \
     {                                                              \
         /* declarations */                                         \
@@ -252,7 +252,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_test_set_##name(                                \
         volatile void *obj                                         \
         ,int offset                                                \
-    vis(,int order)                                                \
+   vis(_,int order)                                                \
     )                                                              \
     {                                                              \
         /* declarations */                                         \
@@ -294,7 +294,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_test_reset_##name(                              \
         volatile void *obj                                         \
         ,int offset                                                \
-    vis(,int order)                                                \
+   vis(_,int order)                                                \
     )                                                              \
     {                                                              \
         /* declarations */                                         \
@@ -375,7 +375,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_fetch_or_##name(                                       \
         volatile void *obj                                                \
         ,const void *arg                                                  \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
@@ -392,7 +392,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_or_##name(                                             \
         volatile void *obj                                                \
         ,const void *arg                                                  \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
         type val;                                                         \
@@ -400,7 +400,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         patomic_opimpl_fetch_or_##name(                                   \
             obj                                                           \
             ,arg                                                          \
-        vis(,order)                                                       \
+       vis(_,order)                                                       \
             ,&val                                                         \
         );                                                                \
     }                                                                     \
@@ -408,7 +408,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_fetch_xor_##name(                                      \
         volatile void *obj                                                \
         ,const void *arg                                                  \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
@@ -425,7 +425,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_xor_##name(                                            \
         volatile void *obj                                                \
         ,const void *arg                                                  \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
         type val;                                                         \
@@ -433,7 +433,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         patomic_opimpl_fetch_xor_##name(                                  \
             obj                                                           \
             ,arg                                                          \
-        vis(,order)                                                       \
+       vis(_,order)                                                       \
             ,&val                                                         \
         );                                                                \
     }                                                                     \
@@ -441,7 +441,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_fetch_and_##name(                                      \
         volatile void *obj                                                \
         ,const void *arg                                                  \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
@@ -458,7 +458,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_and_##name(                                            \
         volatile void *obj                                                \
         ,const void *arg                                                  \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
         type val;                                                         \
@@ -466,14 +466,14 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         patomic_opimpl_fetch_and_##name(                                  \
             obj                                                           \
             ,arg                                                          \
-        vis(,order)                                                       \
+       vis(_,order)                                                       \
             ,&val                                                         \
         );                                                                \
     }                                                                     \
     static PATOMIC_FORCE_INLINE void                                      \
     patomic_opimpl_fetch_not_##name(                                      \
         volatile void *obj                                                \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
@@ -516,14 +516,14 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     static PATOMIC_FORCE_INLINE void                                      \
     patomic_opimpl_not_##name(                                            \
         volatile void *obj                                                \
-    vis(,int order)                                                       \
+   vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
         type val;                                                         \
         /* assertion in called function */                                \
         patomic_opimpl_fetch_not_##name(                                  \
             obj                                                           \
-        vis(,order)                                                       \
+       vis(_,order)                                                       \
             ,&val                                                         \
         );                                                                \
     }                                                                     \
@@ -556,7 +556,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_fetch_add_##name(                                     \
         volatile void *obj                                               \
         ,const void *arg                                                 \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
@@ -573,7 +573,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_add_##name(                                           \
         volatile void *obj                                               \
         ,const void *arg                                                 \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
     )                                                                    \
     {                                                                    \
         type val;                                                        \
@@ -581,7 +581,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         patomic_opimpl_fetch_add_##name(                                 \
             obj                                                          \
             ,arg                                                         \
-        vis(,order)                                                      \
+       vis(_,order)                                                      \
             ,&val                                                        \
         );                                                               \
     }                                                                    \
@@ -589,7 +589,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_fetch_sub_##name(                                     \
         volatile void *obj                                               \
         ,const void *arg                                                 \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
@@ -606,7 +606,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     patomic_opimpl_sub_##name(                                           \
         volatile void *obj                                               \
         ,const void *arg                                                 \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
     )                                                                    \
     {                                                                    \
         type val;                                                        \
@@ -614,14 +614,14 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         patomic_opimpl_fetch_sub_##name(                                 \
             obj                                                          \
             ,arg                                                         \
-        vis(,order)                                                      \
+       vis(_,order)                                                      \
             ,&val                                                        \
         );                                                               \
     }                                                                    \
     static PATOMIC_FORCE_INLINE void                                     \
     patomic_opimpl_fetch_inc_##name(                                     \
         volatile void *obj                                               \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
@@ -637,21 +637,21 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     static PATOMIC_FORCE_INLINE void                                     \
     patomic_opimpl_inc_##name(                                           \
         volatile void *obj                                               \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
     )                                                                    \
     {                                                                    \
         type val;                                                        \
         /* assertion in called function */                               \
         patomic_opimpl_fetch_inc_##name(                                 \
             obj                                                          \
-        vis(,order)                                                      \
+       vis(_,order)                                                      \
             ,&val                                                        \
         );                                                               \
     }                                                                    \
     static PATOMIC_FORCE_INLINE void                                     \
     patomic_opimpl_fetch_dec_##name(                                     \
         volatile void *obj                                               \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
@@ -667,21 +667,21 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     static PATOMIC_FORCE_INLINE void                                     \
     patomic_opimpl_dec_##name(                                           \
         volatile void *obj                                               \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
     )                                                                    \
     {                                                                    \
         type val;                                                        \
         /* assertion in called function */                               \
         patomic_opimpl_fetch_dec_##name(                                 \
             obj                                                          \
-        vis(,order)                                                      \
+       vis(_,order)                                                      \
             ,&val                                                        \
         );                                                               \
     }                                                                    \
     static PATOMIC_FORCE_INLINE void                                     \
     patomic_opimpl_fetch_neg_##name(                                     \
         volatile void *obj                                               \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
         ,void *ret                                                       \
     )                                                                    \
     {                                                                    \
@@ -728,14 +728,14 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     static PATOMIC_FORCE_INLINE void                                     \
     patomic_opimpl_neg_##name(                                           \
         volatile void *obj                                               \
-    vis(,int order)                                                      \
+   vis(_,int order)                                                      \
     )                                                                    \
     {                                                                    \
         type val;                                                        \
         /* assertion in called function */                               \
         patomic_opimpl_fetch_neg_##name(                                 \
             obj                                                          \
-        vis(,order)                                                      \
+       vis(_,order)                                                      \
             ,&val                                                        \
         );                                                               \
     }                                                                    \
