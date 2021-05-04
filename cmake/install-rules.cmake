@@ -7,8 +7,8 @@ include(GNUInstallDirs)
 
 install(
     DIRECTORY
-    "${PROJECT_SOURCE_DIR}/include/"
-    "${PROJECT_BINARY_DIR}/include/"
+    "${PROJECT_SOURCE_DIR}/include/patomic/"
+    "${PROJECT_BINARY_DIR}/include/patomic/"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT patomic_Development
 )

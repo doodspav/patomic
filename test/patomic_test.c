@@ -1,15 +1,6 @@
 #include <patomic/patomic.h>
 
-#include <patomic/types/options.h>
-
-#include <patomic/macros/force_inline.h>
-#include <patomic/macros/ignore_unused.h>
-
-#include <patomic/macros/have_std_atomic.h>
-#include <patomic/macros/have_std_alignof.h>
-#include <patomic/macros/have_long_long.h>
-
-PATOMIC_FORCE_INLINE int check(void)
+int check(void)
 {
     typedef patomic_ops_explicit_t poe_t;
     poe_t ops = patomic_create_ops_explicit(32, patomic_options_DEFAULT, 0);
@@ -19,8 +10,8 @@ PATOMIC_FORCE_INLINE int check(void)
 
 int main(int argc, char** argv)
 {
-    PATOMIC_IGNORE_UNUSED(argc);
-    PATOMIC_IGNORE_UNUSED(argv);
+    (void) argc;
+    (void) argv;
 
     return !check();
 }

@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include <patomic/impl/ids.h>
+#include <patomic/types/ids.h>
 #include <patomic/types/ops.h>
 #include <patomic/types/options.h>
 #include <patomic/types/memory_order.h>
@@ -117,7 +117,9 @@ patomic_copy_sort_impl_register(
     patomic_impl_register_t const *const reg_mid = reg_dst + argc;
     patomic_impl_register_t const *const reg_dst_og = reg_dst;
 
-    assert(argc <= (int) (reg_end - reg_begin));
+    assert(argc >= 0);
+    assert(reg_end >= reg_begin);
+    assert((size_t) argc <= (size_t) (reg_end - reg_begin));
     assert(IMPL_REGISTER_SIZE == (size_t) (reg_end - reg_begin));
 
     /* copy over arg impl ids */
@@ -178,7 +180,7 @@ patomic_copy_sort_impl_register(
         patomic_compare_impl
     );
 
-    return IMPL_REGISTER_SIZE;
+    return (int) IMPL_REGISTER_SIZE;
 }
 
 #define SHOW(x) x
@@ -204,7 +206,7 @@ patomic_copy_sort_impl_register(
                                                               \
         vis(assert(patomic_is_valid_order((int) order));)     \
         assert(impl_id_argc >= 0);                            \
-        assert(impl_id_argc <= IMPL_REGISTER_SIZE);           \
+        assert((size_t) impl_id_argc <= IMPL_REGISTER_SIZE);  \
                                                               \
         va_start(impl_id_argv, impl_id_argc);                 \
         impl_count = patomic_copy_sort_impl_register(         \
@@ -220,6 +222,7 @@ patomic_copy_sort_impl_register(
         ret = patomic_##opsk##_NULL;                          \
         for (i = 0; i < impl_count; ++i)                      \
         {                                                     \
+            assert(reg_copy[i].fp_create_##opsk != NULL);     \
             tmp = reg_copy[i].fp_create_##opsk(               \
                 byte_width                                    \
          vis_p(_,order)                                       \

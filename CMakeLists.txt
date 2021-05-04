@@ -17,20 +17,19 @@ include(cmake/variables.cmake)
 
 add_library(
     patomic_patomic
-    # include/impl
-    include/patomic/impl/ids.h
-    # include/macros
-    include/patomic/macros/force_inline.h
-    include/patomic/macros/ignore_unused.h
-    include/patomic/macros/have_long_long.h
-    include/patomic/macros/have_std_atomic.h
-    include/patomic/macros/have_std_alignof.h
     # include/types
     include/patomic/types/memory_order.h
     include/patomic/types/options.h
     include/patomic/types/ops.h
+    include/patomic/types/ids.h
     # src
     src/patomic.c
+    # src/include/patomic/macros
+    src/include/patomic/macros/force_inline.h
+    src/include/patomic/macros/ignore_unused.h
+    src/include/patomic/macros/have_long_long.h
+    src/include/patomic/macros/have_std_atomic.h
+    src/include/patomic/macros/have_std_alignof.h
     # src/impl
     src/impl/register.h
     # src/impl/null
@@ -69,6 +68,15 @@ target_include_directories(
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>"
+)
+
+# macro includes (private)
+target_include_directories(
+    patomic_patomic
+    ${patomic_warning_guard}
+    PRIVATE
+    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/include>"
+    "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src/include>"
 )
 
 target_compile_features(patomic_patomic PUBLIC c_std_90)

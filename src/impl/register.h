@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include <patomic/impl/ids.h>
+#include <patomic/types/ids.h>
 #include <patomic/types/ops.h>
 #include <patomic/types/memory_order.h>
 
