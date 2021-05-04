@@ -2,19 +2,22 @@
 
 #include <patomic/macros/have_std_atomic.h>
 
+#if PATOMIC_HAVE_STD_ATOMIC || defined(PATOMIC_TEST_C90)
+
+#if PATOMIC_HAVE_STD_ATOMIC
+    #include <stdatomic.h>
+#else  /* testing c90 */
+    #include <patomic/fake/stdatomic.h>
+#endif
+
 static const patomic_ops_t patomic_ops_NULL;
 static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 
-#if PATOMIC_HAVE_STD_ATOMIC
-
 #include <assert.h>
 #include <limits.h>
-#include <stdatomic.h>
 #include <string.h>
 
-#include <patomic/types/ops.h>
-#include <patomic/types/options.h>
-#include <patomic/types/memory_order.h>
+#include <patomic/patomic.h>
 
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
@@ -892,8 +895,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 #endif
 
 
-
-#define PATOMIC_DEFINE_SET_RET(type, name, width, order, ret)                  \
+#define PATOMIC_SET_RET(type, name, width, order, ret)                         \
        ((width == sizeof(_Atomic(type)))                                       \
         && (sizeof(_Atomic(type)) == sizeof(type))                             \
         && (_Alignof(_Atomic(type)) == _Alignof(type)))                        \
@@ -915,7 +917,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         }                                                                      \
     }
 
-#define PATOMIC_DEFINE_SET_RET_EXPLICIT(type, name, width, ret) \
+#define PATOMIC_SET_RET_EXPLICIT(type, name, width, ret)        \
        ((width == sizeof(_Atomic(type)))                        \
         && (sizeof(_Atomic(type)) == sizeof(type))              \
         && (_Alignof(_Atomic(type)) == _Alignof(type)))         \
@@ -924,43 +926,93 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     }
 
 
-patomic_ops_t
-patomic_impl_create_ops_std(
-        size_t byte_width,
-        patomic_memory_order_t order,
-        int options
+static patomic_ops_t
+patomic_create_ops(
+    size_t byte_width,
+    patomic_memory_order_t order
 )
 {
     patomic_ops_t ret = patomic_ops_NULL;
     assert(patomic_is_valid_order((int) order));
 
-    if PATOMIC_DEFINE_SET_RET(char, char, byte_width, order, ret)
-    else if PATOMIC_DEFINE_SET_RET(short, short, byte_width, order, ret)
-    else if PATOMIC_DEFINE_SET_RET(int, int, byte_width, order, ret)
-    else if PATOMIC_DEFINE_SET_RET(long, long, byte_width, order, ret)
+    if PATOMIC_SET_RET(char, char, byte_width, order, ret)
+    else if PATOMIC_SET_RET(short, short, byte_width, order, ret)
+    else if PATOMIC_SET_RET(int, int, byte_width, order, ret)
+    else if PATOMIC_SET_RET(long, long, byte_width, order, ret)
 #if PATOMIC_HAVE_LONG_LONG
-    else if PATOMIC_DEFINE_SET_RET(long long, llong, byte_width, order, ret)
+    else if PATOMIC_SET_RET(long long, llong, byte_width, order, ret)
 #endif
 
     return ret;
 }
 
-patomic_ops_explicit_t
-patomic_impl_create_ops_explicit_std(
-        size_t byte_width,
-        int options
+static patomic_ops_explicit_t
+patomic_create_ops_explicit(
+    size_t byte_width
 )
 {
     patomic_ops_explicit_t ret = patomic_ops_explicit_NULL;
 
-    if PATOMIC_DEFINE_SET_RET_EXPLICIT(char, char, byte_width, ret)
-    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(short, short, byte_width, ret)
-    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(int, int, byte_width, ret)
-    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(long, long, byte_width, ret)
+    if PATOMIC_SET_RET_EXPLICIT(char, char, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(short, short, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(int, int, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(long, long, byte_width, ret)
 #if PATOMIC_HAVE_LONG_LONG
-    else if PATOMIC_DEFINE_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
 #endif
 
+    return ret;
+}
+
+#define PATOMIC_SET_ALIGNOF(width, type, val) \
+    ((width) == sizeof(type)) { (val) = _Alignof(type); }\
+
+static patomic_align_t
+patomic_create_align(
+    size_t byte_width
+)
+{
+    patomic_align_t pat;
+
+    if PATOMIC_SET_ALIGNOF(byte_width, char, pat.recommended)
+    else if PATOMIC_SET_ALIGNOF(byte_width, short, pat.recommended)
+    else if PATOMIC_SET_ALIGNOF(byte_width, int, pat.recommended)
+    else if PATOMIC_SET_ALIGNOF(byte_width, long, pat.recommended)
+#if PATOMIC_HAVE_LONG_LONG
+    else if PATOMIC_SET_ALIGNOF(byte_width, long long, pat.recommended)
+#endif
+    else { pat.recommended = 1; }
+
+    pat.minimum = pat.recommended;
+    pat.size_within = 0;
+    return pat;
+}
+
+
+patomic_t
+patomic_impl_create_std(
+    size_t byte_width,
+    patomic_memory_order_t order,
+    int options
+)
+{
+    patomic_t ret;
+    PATOMIC_IGNORE_UNUSED(options);
+    ret.ops = patomic_create_ops(byte_width, order);
+    ret.align = patomic_create_align(byte_width);
+    return ret;
+}
+
+patomic_explicit_t
+patomic_impl_create_explicit_std(
+    size_t byte_width,
+    int options
+)
+{
+    patomic_explicit_t ret;
+    PATOMIC_IGNORE_UNUSED(options);
+    ret.ops = patomic_create_ops_explicit(byte_width);
+    ret.align = patomic_create_align(byte_width);
     return ret;
 }
 
@@ -968,8 +1020,11 @@ patomic_impl_create_ops_explicit_std(
 
 #include <patomic/macros/ignore_unused.h>
 
-patomic_ops_t
-patomic_impl_create_ops_std(
+static const patomic_t patomic_NULL;
+static const patomic_explicit_t patomic_explicit_NULL;
+
+patomic_t
+patomic_impl_create_std(
     size_t byte_width,
     patomic_memory_order_t order,
     int options
@@ -978,18 +1033,18 @@ patomic_impl_create_ops_std(
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(order);
     PATOMIC_IGNORE_UNUSED(options);
-    return patomic_ops_NULL;
+    return patomic_NULL;
 }
 
-patomic_ops_explicit_t
-patomic_impl_create_ops_explicit_std(
+patomic_explicit_t
+patomic_impl_create_explicit_std(
     size_t byte_width,
     int options
 )
 {
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(options);
-    return patomic_ops_explicit_NULL;
+    return patomic_explicit_NULL;
 }
 
 #endif

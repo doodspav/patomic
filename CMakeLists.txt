@@ -18,12 +18,15 @@ include(cmake/variables.cmake)
 add_library(
     patomic_patomic
     # include/types
+    include/patomic/types/align.h
     include/patomic/types/memory_order.h
     include/patomic/types/options.h
     include/patomic/types/ops.h
     include/patomic/types/ids.h
     # src
     src/patomic.c
+    # src/include/patomic/fake
+    src/include/patomic/fake/stdatomic.h
     # src/include/patomic/macros
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/ignore_unused.h

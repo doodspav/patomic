@@ -1,12 +1,13 @@
 #include "null.h"
 
+#include <patomic/patomic.h>
 #include <patomic/macros/ignore_unused.h>
 
-static const patomic_ops_t patomic_ops_NULL;
-static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
+static const patomic_t patomic_NULL;
+static const patomic_explicit_t patomic_explicit_NULL;
 
-patomic_ops_t
-patomic_impl_create_ops_null(
+patomic_t
+patomic_impl_create_null(
     size_t byte_width,
     patomic_memory_order_t order,
     int options
@@ -15,16 +16,16 @@ patomic_impl_create_ops_null(
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(order);
     PATOMIC_IGNORE_UNUSED(options);
-    return patomic_ops_NULL;
+    return patomic_NULL;
 }
 
-patomic_ops_explicit_t
-patomic_impl_create_ops_explicit_null(
+patomic_explicit_t
+patomic_impl_create_explicit_null(
     size_t byte_width,
     int options
 )
 {
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(options);
-    return patomic_ops_explicit_NULL;
+    return patomic_explicit_NULL;
 }
