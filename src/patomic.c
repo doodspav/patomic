@@ -49,20 +49,25 @@ patomic_copy_impl_array(
 {
     int i;
     patomic_impl_id_t id;
+    patomic_impl_t const *tmp;
+    patomic_impl_t const *dst_argv_end;
     patomic_impl_t const *const dst_begin = dst;
-    patomic_impl_t const *const dst_argv_end = dst + argc;
 
     assert(argc >= 0);
     assert(end >= begin);
     assert((size_t) argc <= (size_t) (end - begin));
     assert(IMPL_REGISTER_SIZE == (size_t) (end - begin));
 
-    /* copy over argv impls */
+    /* copy over valid argv impls */
     for (i = 0; i < argc; ++i)
     {
         id = va_arg(argv, patomic_impl_id_t);
-        *dst++ = *patomic_find_impl(begin, end, (int) id);
+        tmp = patomic_find_impl(begin, end, (int) id);
+        assert(! ((begin != end) && (tmp == end)));
+        if (tmp != end) { *dst++ = *tmp; }
     }
+    dst_argv_end = dst;
+    argc = (int) (dst_argv_end - dst_begin);
 
     /* sort argv impls if prioritising them */
     dst -= argc;
