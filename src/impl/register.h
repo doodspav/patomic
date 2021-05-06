@@ -14,13 +14,9 @@
  * - id: implementation id from ids.h
  * - fp_create: (byte_width, order, options)
  * - fp_create_explicit: (order, options)
- *
- * NOTE: - id doesn't HAVE to be provided from ids.h, but if it
- *         isn't, it won't be explicitly selectable by a user
- *       - the behaviour is UNDEFINED if two ids have the same value
  */
 typedef struct {
-    int id;
+    patomic_impl_id_t id;
     patomic_t (* fp_create) (size_t, patomic_memory_order_t, int);
     patomic_explicit_t (* fp_create_explicit) (size_t, int);
 } patomic_impl_t;
@@ -28,6 +24,7 @@ typedef struct {
 /*
  * REGISTER ARRAY
  *
+ * - two ids MUST NOT have the same value
  * - there is NO REQUIREMENT that id matches index
  * - nor that NULL must be the final element
  */

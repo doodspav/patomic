@@ -15,7 +15,7 @@ static const patomic_impl_t *
 patomic_find_impl(
         patomic_impl_t const *begin,
         patomic_impl_t const *const end,
-        int id
+        patomic_impl_id_t id
 )
 {
     while (begin != end)
@@ -244,3 +244,62 @@ static const patomic_explicit_t patomic_explicit_NULL;
 
 PATOMIC_DEFINE_CREATE(SHOW_P, SHOW, _, e)
 PATOMIC_DEFINE_CREATE(HIDE_P, HIDE, _explicit_, e_explicit)
+
+
+#define PATOMIC_DEFINE_NONNULL_COUNT(cntk, type)            \
+    int                                                     \
+    patomic_nonnull_ops_##cntk(                             \
+        type const *const p                                 \
+    )                                                       \
+    {                                                       \
+        int i = 0;                                          \
+                                                            \
+        /* base */                                          \
+        if (p->fp_store != NULL) { ++i; }                   \
+        if (p->fp_load != NULL) { ++i; }                    \
+        /* xchg */                                          \
+        if (p->xchg_ops.fp_exchange != NULL) { ++i; }       \
+        if (p->xchg_ops.fp_cmpxchg_weak != NULL) { ++i; }   \
+        if (p->xchg_ops.fp_cmpxchg_strong != NULL) { ++i; } \
+        /* bitwise */                                       \
+        if (p->bitwise_ops.fp_test != NULL) { ++i; }        \
+        if (p->bitwise_ops.fp_test_comp != NULL) { ++i; }   \
+        if (p->bitwise_ops.fp_test_set != NULL) { ++i; }    \
+        if (p->bitwise_ops.fp_test_reset != NULL) { ++i; }  \
+        /* binary */                                        \
+        if (p->binary_ops.fp_or != NULL) { ++i; }           \
+        if (p->binary_ops.fp_xor != NULL) { ++i; }          \
+        if (p->binary_ops.fp_and != NULL) { ++i; }          \
+        if (p->binary_ops.fp_not != NULL) { ++i; }          \
+        if (p->binary_ops.fp_fetch_or != NULL) { ++i; }     \
+        if (p->binary_ops.fp_fetch_xor != NULL) { ++i; }    \
+        if (p->binary_ops.fp_fetch_and != NULL) { ++i; }    \
+        if (p->binary_ops.fp_fetch_not != NULL) { ++i; }    \
+        /* signed */                                        \
+        if (p->signed_ops.fp_add != NULL) { ++i; }          \
+        if (p->signed_ops.fp_sub != NULL) { ++i; }          \
+        if (p->signed_ops.fp_inc != NULL) { ++i; }          \
+        if (p->signed_ops.fp_dec != NULL) { ++i; }          \
+        if (p->signed_ops.fp_neg != NULL) { ++i; }          \
+        if (p->signed_ops.fp_fetch_add != NULL) { ++i; }    \
+        if (p->signed_ops.fp_fetch_sub != NULL) { ++i; }    \
+        if (p->signed_ops.fp_fetch_inc != NULL) { ++i; }    \
+        if (p->signed_ops.fp_fetch_dec != NULL) { ++i; }    \
+        if (p->signed_ops.fp_fetch_neg != NULL) { ++i; }    \
+        /* unsigned */                                      \
+        if (p->unsigned_ops.fp_add != NULL) { ++i; }        \
+        if (p->unsigned_ops.fp_sub != NULL) { ++i; }        \
+        if (p->unsigned_ops.fp_inc != NULL) { ++i; }        \
+        if (p->unsigned_ops.fp_dec != NULL) { ++i; }        \
+        if (p->unsigned_ops.fp_neg != NULL) { ++i; }        \
+        if (p->unsigned_ops.fp_fetch_add != NULL) { ++i; }  \
+        if (p->unsigned_ops.fp_fetch_sub != NULL) { ++i; }  \
+        if (p->unsigned_ops.fp_fetch_inc != NULL) { ++i; }  \
+        if (p->unsigned_ops.fp_fetch_dec != NULL) { ++i; }  \
+        if (p->unsigned_ops.fp_fetch_neg != NULL) { ++i; }  \
+                                                            \
+        return i;                                           \
+    }
+
+PATOMIC_DEFINE_NONNULL_COUNT(count, patomic_ops_t)
+PATOMIC_DEFINE_NONNULL_COUNT(count_explicit, patomic_ops_explicit_t)

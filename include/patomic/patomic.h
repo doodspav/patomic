@@ -44,6 +44,16 @@ patomic_create_explicit(
     ...
 );
 
+PATOMIC_EXPORT int
+patomic_nonnull_ops_count(
+    patomic_ops_t const *const ops
+);
+
+PATOMIC_EXPORT int
+patomic_nonnull_ops_count_explicit(
+    patomic_ops_explicit_t const *const ops
+);
+
 
 #ifdef __cplusplus
 }
