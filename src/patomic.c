@@ -62,7 +62,7 @@ patomic_copy_impl_array(
     for (i = 0; i < argc; ++i)
     {
         id = va_arg(argv, patomic_impl_id_t);
-        tmp = patomic_find_impl(begin, end, (int) id);
+        tmp = patomic_find_impl(begin, end, id);
         assert(! ((begin != end) && (tmp == end)));
         if (tmp != end) { *dst++ = *tmp; }
     }
@@ -121,6 +121,15 @@ patomic_copy_impl_array(
 
 #define COPY_IF_NULL(c, a, b, m) if ((a)->m == NULL) { (a)->m = (b)->m; ++(c); }
 
+static int
+patomic_is_pow2(
+    size_t val
+)
+{
+    if (val == 0) { return 0; }
+    else { return (val & (val - 1)) == 0; }
+}
+
 #define PATOMIC_DEFINE_COMBINE(cmbk, type)                         \
     static void patomic_##cmbk(                                    \
         type *dst,                                                 \
@@ -177,6 +186,11 @@ patomic_copy_impl_array(
         /* only copy alignment if ops have been copied */          \
         if (i != 0)                                                \
         {                                                          \
+            assert(patomic_is_pow2(dst->align.recommended));       \
+            assert(patomic_is_pow2(dst->align.minimum));           \
+            assert(patomic_is_pow2(src->align.recommended));       \
+            assert(patomic_is_pow2(src->align.minimum));           \
+                                                                   \
             if (dst->align.recommended < src->align.recommended)   \
             {                                                      \
                 dst->align.recommended = src->align.recommended;   \
@@ -229,6 +243,8 @@ static const patomic_explicit_t patomic_explicit_NULL;
         va_end(impl_id_argv);                               \
                                                             \
         ret = patomic##hexp##NULL;                          \
+        ret.align.recommended = 1;                          \
+        ret.align.minimum = 1;                              \
         for (i = 0; i < impl_count; ++i)                    \
         {                                                   \
             assert(reg_copy[i].fp_creat##eexp != NULL);     \

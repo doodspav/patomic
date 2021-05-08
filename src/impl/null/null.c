@@ -13,10 +13,14 @@ patomic_impl_create_null(
     int options
 )
 {
+    patomic_t ret;
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(order);
     PATOMIC_IGNORE_UNUSED(options);
-    return patomic_NULL;
+    ret = patomic_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
 }
 
 patomic_explicit_t
@@ -25,7 +29,11 @@ patomic_impl_create_explicit_null(
     int options
 )
 {
+    patomic_explicit_t ret;
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(options);
-    return patomic_explicit_NULL;
+    ret = patomic_explicit_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
 }
