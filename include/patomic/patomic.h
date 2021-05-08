@@ -54,19 +54,6 @@ patomic_nonnull_ops_count_explicit(
     patomic_ops_explicit_t const *const ops
 );
 
-/*
- * returns:
- * - 2 if ptr meets recommended alignment
- * - 1 if ptr meets minimum alignment
- * - 0 if ptr meets neither alignments
- */
-PATOMIC_EXPORT int
-patomic_is_aligned(
-    void const *const ptr,
-    size_t width,
-    patomic_align_t align
-);
-
 
 #ifdef __cplusplus
 }

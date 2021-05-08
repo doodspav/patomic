@@ -303,23 +303,3 @@ PATOMIC_DEFINE_CREATE(HIDE_P, HIDE, _explicit_, e_explicit)
 
 PATOMIC_DEFINE_NONNULL_COUNT(count, patomic_ops_t)
 PATOMIC_DEFINE_NONNULL_COUNT(count_explicit, patomic_ops_explicit_t)
-
-
-int
-patomic_is_aligned(
-    void const *const ptr,
-    size_t width,
-    patomic_align_t align
-)
-{
-    size_t val = (size_t) ptr;
-
-    if (val % align.recommended == 0) { return 2; }
-    else if (val % align.minimum == 0)
-    {
-        val %= align.size_within;
-        if ((val + width) <= align.size_within) { return 1; }
-        else { return 0; }
-    }
-    else { return 0; }
-}
