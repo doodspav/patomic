@@ -17,17 +17,15 @@ extern "C" {
  *                (always valid)
  * - minimum: the alignment required by the architecture
  *            (conditionally valid)
- * - size_within: the size and alignment of a buffer within which
- *                the object must entirely reside if "minimum" is
- *                to be considered valid
+ * - size_within: the size and alignment of a hypothetical buffer
+ *                within which the object must reside if "minimum"
+ *                is to be considered valid
  *
  * NOTE:
  * - "recommended" and "minimum" are always a positive power of 2
  * - "size_within" has no restrictions on its value
  * - the "minimum" alignment is only valid if the object resides
  *   entirely within the buffer specified with "size_within"
- * - UNLESS "size_within" is 0 (in which case "minimum" is always
- *   valid)
  * - the purpose of this is to communicate on x86 that operations
  *   on a type are atomic if the object doesn't cross a cache line
  *
