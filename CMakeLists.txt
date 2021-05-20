@@ -4,7 +4,7 @@ include(cmake/in-source-guard.cmake)
 
 project(
     patomic
-    VERSION 0.1.2
+    VERSION 0.2.0
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
@@ -41,6 +41,10 @@ add_library(
     # src/impl/std
     src/impl/std/std.h
     src/impl/std/std.c
+    # src/impl/msvc
+    src/impl/msvc/msvc.h
+    src/impl/msvc/msvc.c
+    src/impl/msvc/msvc_x86.h
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
