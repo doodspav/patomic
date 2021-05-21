@@ -688,15 +688,14 @@ PATOMIC_DEFINE_ARI_OPS_CREATE(8, 8, order, SHOW_P, ops_explicit)
     static patomic_##opsk##_t                                            \
     patomic_ops_create_##name(void)                                      \
     {                                                                    \
-        static const patomic_##opsk##_t patomic_ops_NULL;                \
-        patomic_##opsk##_t pao = patomic_ops_NULL;                       \
+        patomic_##opsk##_t pao;                                          \
         pao.fp_store = NULL;                                             \
         pao.fp_load = patomic_opimpl_load_##name;                        \
         pao.xchg_ops = patomic_ops_xchg_create_##name();                 \
         pao.bitwise_ops = patomic_ops_bitwise_create_##name();           \
         pao.binary_ops = patomic_ops_binary_create_##name();             \
         pao.unsigned_ops = patomic_ops_arithmetic_create_##name();       \
-        pao.signed_ops = pao.signed_ops;                                 \
+        pao.signed_ops = pao.unsigned_ops;                               \
         return pao;                                                      \
     }
 
@@ -710,15 +709,14 @@ PATOMIC_DEFINE_ARI_OPS_CREATE(8, 8, order, SHOW_P, ops_explicit)
     static patomic_##opsk##_t                                           \
     patomic_ops_create_##name(void)                                     \
     {                                                                   \
-        static const patomic_##opsk##_t patomic_ops_NULL;               \
-        patomic_##opsk##_t pao = patomic_ops_NULL;                      \
+        patomic_##opsk##_t pao;                                         \
         pao.fp_store = patomic_opimpl_store_##name;                     \
         pao.fp_load = NULL;                                             \
         pao.xchg_ops = patomic_ops_xchg_create_##name();                \
         pao.bitwise_ops = patomic_ops_bitwise_create_##name();          \
         pao.binary_ops = patomic_ops_binary_create_##name();            \
         pao.unsigned_ops = patomic_ops_arithmetic_create_##name();      \
-        pao.signed_ops = pao.signed_ops;                                \
+        pao.signed_ops = pao.unsigned_ops;                              \
         return pao;                                                     \
     }
 
@@ -731,15 +729,14 @@ PATOMIC_DEFINE_ARI_OPS_CREATE(8, 8, order, SHOW_P, ops_explicit)
     static patomic_##opsk##_t                                            \
     patomic_ops_create_##name(void)                                      \
     {                                                                    \
-        static const patomic_##opsk##_t patomic_ops_NULL;                \
-        patomic_##opsk##_t pao = patomic_ops_NULL;                       \
+        patomic_##opsk##_t pao;                                          \
         pao.fp_store = NULL;                                             \
         pao.fp_load = NULL;                                              \
         pao.xchg_ops = patomic_ops_xchg_create_##name();                 \
         pao.bitwise_ops = patomic_ops_bitwise_create_##name();           \
         pao.binary_ops = patomic_ops_binary_create_##name();             \
         pao.unsigned_ops = patomic_ops_arithmetic_create_##name();       \
-        pao.signed_ops = pao.signed_ops;                                 \
+        pao.signed_ops = pao.unsigned_ops;                               \
         return pao;                                                      \
     }
 
@@ -753,15 +750,14 @@ PATOMIC_DEFINE_ARI_OPS_CREATE(8, 8, order, SHOW_P, ops_explicit)
     static patomic_##opsk##_t                                             \
     patomic_ops_create_##name(void)                                       \
     {                                                                     \
-        static const patomic_##opsk##_t patomic_ops_NULL;                 \
-        patomic_##opsk##_t pao = patomic_ops_NULL;                        \
+        patomic_##opsk##_t pao;                                           \
         pao.fp_store = patomic_opimpl_store_##name;                       \
         pao.fp_load = patomic_opimpl_load_##name;                         \
         pao.xchg_ops = patomic_ops_xchg_create_##name();                  \
         pao.bitwise_ops = patomic_ops_bitwise_create_##name();            \
         pao.binary_ops = patomic_ops_binary_create_##name();              \
         pao.unsigned_ops = patomic_ops_arithmetic_create_##name();        \
-        pao.signed_ops = pao.signed_ops;                                  \
+        pao.signed_ops = pao.unsigned_ops;                                \
         return pao;                                                       \
     }
 
