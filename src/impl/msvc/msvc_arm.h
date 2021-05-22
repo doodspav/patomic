@@ -13,6 +13,7 @@
 #include <patomic/patomic.h>
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
+#include <patomic/macros/static_assert.h>
 
 
 /*
@@ -608,35 +609,118 @@
  * - bit_test_set [[e8, e16, 32, e64]]
  * - bit_test_reset [[e8, e16, 32, e64]]
  */
+PATOMIC_STATIC_ASSERT(msvc_arm_bittest, (sizeof(size_t) == sizeof(void *)));
 
-#define PATOMIC_DEFINE_IL_BIT_SET(width) \
-    static PATOMIC_FORCE_INLINE int      \
-    patomic_il_bit_test_and_set_##width( \
-        volatile void *obj,              \
-        int offset,                      \
-        int order                        \
-    )                                    \
-    {                                    \
-        /* TODO */                       \
-        PATOMIC_IGNORE_UNUSED(obj);      \
-        PATOMIC_IGNORE_UNUSED(offset);   \
-        PATOMIC_IGNORE_UNUSED(order);    \
-        return 0;                        \
+#define PATOMIC_DEFINE_IL_BIT_SET(width)                         \
+    static PATOMIC_FORCE_INLINE int                              \
+    patomic_il_bit_test_and_set_##width(                         \
+        volatile void *obj,                                      \
+        int offset,                                              \
+        int order                                                \
+    )                                                            \
+    {                                                            \
+        static const size_t long_bits = sizeof(long) * CHAR_BIT; \
+        static const size_t long_bytes = sizeof(long);           \
+        volatile char *ptr = obj;                                \
+        size_t diff;                                             \
+        /* make sure access is aligned */                        \
+        /* 8 or 16 bit op */                                     \
+        if (width <= 16) {                                       \
+            diff = (size_t) obj;                                 \
+            diff %= long_bytes;                                  \
+            ptr -= diff;                                         \
+            /* may over-extend offset */                         \
+            offset += (int) (diff * CHAR_BIT);                   \
+        }                                                        \
+        /* 64 bit op, or fixing over-extended offset */          \
+        if (offset >= (int) long_bits) {                         \
+            ptr += long_bytes;                                   \
+            offset -= (int) long_bits;                           \
+        }                                                        \
+        /* 32 bit op assumed to be correctly aligned */          \
+        /* perform op */                                         \
+        switch (order)                                           \
+        {                                                        \
+            case patomic_RELAXED:                                \
+                return _interlockedbittestandset_nf(             \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+            case patomic_CONSUME:                                \
+            case patomic_ACQUIRE:                                \
+                return _interlockedbittestandset_acq(            \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+            case patomic_RELEASE:                                \
+                return _interlockedbittestandset_rel(            \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+            case patomic_ACQ_REL:                                \
+            case patomic_SEQ_CST:                                \
+            default:                                             \
+                return _interlockedbittestandset(                \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+        }                                                        \
     }
 
-#define PATOMIC_DEFINE_IL_BIT_RESET(width) \
-    static PATOMIC_FORCE_INLINE int        \
-    patomic_il_bit_test_and_reset_##width( \
-        volatile *obj,                     \
-        int offset,                        \
-        int order                          \
-    )                                      \
-    {                                      \
-        /* TODO */                         \
-        PATOMIC_IGNORE_UNUSED(obj);        \
-        PATOMIC_IGNORE_UNUSED(offset);     \
-        PATOMIC_IGNORE_UNUSED(order);      \
-        return 0;                          \
+#define PATOMIC_DEFINE_IL_BIT_RESET(width)                       \
+    static PATOMIC_FORCE_INLINE int                              \
+    patomic_il_bit_test_and_reset_##width(                       \
+        volatile void *obj,                                      \
+        int offset,                                              \
+        int order                                                \
+    )                                                            \
+    {                                                            \
+        static const size_t long_bits = sizeof(long) * CHAR_BIT; \
+        static const size_t long_bytes = sizeof(long);           \
+        volatile char *ptr = obj;                                \
+        size_t diff;                                             \
+        /* make sure access is aligned */                        \
+        /* 8 or 16 bit op */                                     \
+        if (width <= 16) {                                       \
+            diff = (size_t) obj;                                 \
+            diff %= long_bytes;                                  \
+            ptr -= diff;                                         \
+            /* may over-extend offset */                         \
+            offset += (int) (diff * CHAR_BIT);                   \
+        }                                                        \
+        /* 64 bit op, or fixing over-extended offset */          \
+        if (offset >= (int) long_bits) {                         \
+            ptr += long_bytes;                                   \
+            offset -= (int) long_bits;                           \
+        }                                                        \
+        /* 32 bit op assumed to be correctly aligned */          \
+        /* perform op */                                         \
+        switch (order)                                           \
+        {                                                        \
+            case patomic_RELAXED:                                \
+                return _interlockedbittestandreset_nf(           \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+            case patomic_CONSUME:                                \
+            case patomic_ACQUIRE:                                \
+                return _interlockedbittestandreset_acq(          \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+            case patomic_RELEASE:                                \
+                return _interlockedbittestandreset_rel(          \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+            case patomic_ACQ_REL:                                \
+            case patomic_SEQ_CST:                                \
+            default:                                             \
+                return _interlockedbittestandreset(              \
+                    (volatile long *) ptr,                       \
+                    offset                                       \
+                );                                               \
+        }                                                        \
     }
 
 

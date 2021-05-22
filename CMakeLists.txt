@@ -4,7 +4,7 @@ include(cmake/in-source-guard.cmake)
 
 project(
     patomic
-    VERSION 0.2.2
+    VERSION 0.3.0
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
@@ -30,6 +30,7 @@ add_library(
     # src/include/patomic/macros
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/ignore_unused.h
+    src/include/patomic/macros/static_assert.h
     src/include/patomic/macros/have_long_long.h
     src/include/patomic/macros/have_std_atomic.h
     src/include/patomic/macros/have_std_alignof.h
