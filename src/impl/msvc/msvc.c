@@ -10,11 +10,10 @@
 static const patomic_t patomic_NULL;
 static const patomic_explicit_t patomic_explicit_NULL;
 
-#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_AMD64) || defined(_M_X64))
-
 #include "msvc_x86.h"
-/* TODO: msvc_arm.h */
+#include "msvc_arm.h"
 
+#if defined(PATOMIC_DEFINE_IL)
 
 PATOMIC_DEFINE_IL(char, __int8, 8)
 PATOMIC_DEFINE_IL(short, __int16, 16)
@@ -935,4 +934,4 @@ patomic_impl_create_explicit_msvc(
     return ret;
 }
 
-#endif  /* _MSC_VER */
+#endif  /* defined(PATOMIC_DEFINE_IL) */

@@ -1,6 +1,7 @@
 #ifndef PATOMIC_MSVC_X86_H
 #define PATOMIC_MSVC_X86_H
 
+#if defined(_MSC_VER)
 #if defined(_M_IX86) || defined(_M_AMD64) || defined(_M_X64)
 
 #include <assert.h>
@@ -368,7 +369,6 @@
     }
 
 
-
 #define PATOMIC_DEFINE_IL(type, iso_type, width)    \
     PATOMIC_DEFINE_IL_AND(type, width)              \
     PATOMIC_DEFINE_IL_COMPARE_EXCHANGE(type, width) \
@@ -385,5 +385,6 @@
 
 
 #endif  /* defined(_M_IX86) || defined(_M_AMD64) || defined(_M_X64) */
+#endif  /* defined(_MSC_VER) */
 
 #endif  /* !PATOMIC_MSVC_X86_H */
