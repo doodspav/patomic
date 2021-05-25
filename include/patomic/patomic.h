@@ -10,7 +10,6 @@
 #include <patomic/types/memory_order.h>
 
 #include <patomic/patomic_export.h>
-#include <patomic/patomic_version.h>
 
 #ifdef __cplusplus
 extern "C" {
