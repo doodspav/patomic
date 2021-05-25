@@ -186,10 +186,15 @@ patomic_is_pow2(
         /* only copy alignment if ops have been copied */          \
         if (i != 0)                                                \
         {                                                          \
+            /* recommended is a power of 2 */                      \
             assert(patomic_is_pow2(dst->align.recommended));       \
-            assert(patomic_is_pow2(dst->align.minimum));           \
             assert(patomic_is_pow2(src->align.recommended));       \
+            /* minimum is a power of 2 */                          \
+            assert(patomic_is_pow2(dst->align.minimum));           \
             assert(patomic_is_pow2(src->align.minimum));           \
+            /* recommended >= minimum */                           \
+            assert(dst->align.recommended >= dst->align.minimum);  \
+            assert(src->align.recommended >= src->align.minimum);  \
                                                                    \
             if (dst->align.recommended < src->align.recommended)   \
             {                                                      \
