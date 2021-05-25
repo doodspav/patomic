@@ -4,7 +4,7 @@ include(cmake/in-source-guard.cmake)
 
 project(
     patomic
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
@@ -54,6 +54,12 @@ generate_export_header(
     patomic_patomic
     BASE_NAME patomic
     EXPORT_FILE_NAME include/patomic/patomic_export.h
+)
+
+configure_file(
+    cmake/patomic_version.h.in
+    include/patomic/patomic_version.h
+    @ONLY
 )
 
 if(NOT BUILD_SHARED_LIBS)
