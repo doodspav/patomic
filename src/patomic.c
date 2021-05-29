@@ -148,7 +148,7 @@ patomic_is_pow2(
         COPY_IF_NULL(i, dst, src, ops.xchg_ops.fp_cmpxchg_strong); \
         /* bitwise */                                              \
         COPY_IF_NULL(i, dst, src, ops.bitwise_ops.fp_test);        \
-        COPY_IF_NULL(i, dst, src, ops.bitwise_ops.fp_test_comp);   \
+        COPY_IF_NULL(i, dst, src, ops.bitwise_ops.fp_test_compl);  \
         COPY_IF_NULL(i, dst, src, ops.bitwise_ops.fp_test_set);    \
         COPY_IF_NULL(i, dst, src, ops.bitwise_ops.fp_test_reset);  \
         /* binary */                                               \
@@ -284,7 +284,7 @@ PATOMIC_DEFINE_CREATE(HIDE_P, HIDE, _explicit_, e_explicit)
         if (p->xchg_ops.fp_cmpxchg_strong != NULL) { ++i; } \
         /* bitwise */                                       \
         if (p->bitwise_ops.fp_test != NULL) { ++i; }        \
-        if (p->bitwise_ops.fp_test_comp != NULL) { ++i; }   \
+        if (p->bitwise_ops.fp_test_compl != NULL) { ++i; }  \
         if (p->bitwise_ops.fp_test_set != NULL) { ++i; }    \
         if (p->bitwise_ops.fp_test_reset != NULL) { ++i; }  \
         /* binary */                                        \

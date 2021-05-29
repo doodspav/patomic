@@ -177,7 +177,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
 
 #define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(width, name, order, vis) \
     static PATOMIC_FORCE_INLINE int                                 \
-    patomic_opimpl_test_comp_##name(                                \
+    patomic_opimpl_test_compl_##name(                               \
         volatile void *obj                                          \
         ,int offset                                                 \
    vis(_,int order)                                                 \
@@ -259,7 +259,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     {                                                                    \
         patomic_##opsk##_bitwise_t pao;                                  \
         pao.fp_test = NULL;                                              \
-        pao.fp_test_comp = patomic_opimpl_test_comp_##name;              \
+        pao.fp_test_compl = patomic_opimpl_test_compl_##name;            \
         pao.fp_test_set = patomic_opimpl_test_set_##name;                \
         pao.fp_test_reset = patomic_opimpl_test_reset_##name;            \
         return pao;                                                      \
@@ -274,7 +274,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         static const patomic_##opsk##_bitwise_t patomic_bitwise_NULL;     \
         patomic_##opsk##_bitwise_t pao = patomic_bitwise_NULL;            \
         pao.fp_test = patomic_opimpl_test_##name;                         \
-        pao.fp_test_comp = patomic_opimpl_test_comp_##name;               \
+        pao.fp_test_compl = patomic_opimpl_test_compl_##name;             \
         pao.fp_test_set = patomic_opimpl_test_set_##name;                 \
         pao.fp_test_reset = patomic_opimpl_test_reset_##name;             \
         return pao;                                                       \
