@@ -197,12 +197,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         assert(offset >= 0);                                 \
         assert((CHAR_BIT * sizeof(type)) > (size_t) offset); \
         assert(patomic_is_valid_load_order(order));          \
-        mask = (type) (1u << offset);                        \
+        mask = (type) (((type) 1u) << offset);               \
         val = atomic_load_explicit(                          \
             (const volatile _Atomic(type) *) obj,            \
             order                                            \
         );                                                   \
-        return (val & mask) == 1;                            \
+        return (val & mask) != 0;                            \
     }
 
 #define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis) \
@@ -224,7 +224,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         assert((CHAR_BIT * sizeof(type)) > (size_t) offset);       \
         assert(patomic_is_valid_order(order));                     \
         /* setup memory orders and mask */                         \
-        mask = (type) (1u << offset);                              \
+        mask = (type) (((type) 1u) << offset);                     \
         succ = order;                                              \
         fail = patomic_cmpxchg_fail_order(order);                  \
         /* load initial value */                                   \
@@ -246,7 +246,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
             fail                                                   \
         ));                                                        \
         /* return old bit value */                                 \
-        return (expected & mask) == 1;                             \
+        return (expected & mask) != 0;                             \
     }                                                              \
     static PATOMIC_FORCE_INLINE int                                \
     patomic_opimpl_test_set_##name(                                \
@@ -266,7 +266,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         assert((CHAR_BIT * sizeof(type)) > (size_t) offset);       \
         assert(patomic_is_valid_order(order));                     \
         /* setup memory orders and mask */                         \
-        mask = (type) (1u << offset);                              \
+        mask = (type) (((type) 1u) << offset);                     \
         succ = order;                                              \
         fail = patomic_cmpxchg_fail_order(order);                  \
         /* load initial value */                                   \
@@ -288,7 +288,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
             fail                                                   \
         ));                                                        \
         /* return old bit value */                                 \
-        return (expected & mask) == 1;                             \
+        return (expected & mask) != 0;                             \
     }                                                              \
     static PATOMIC_FORCE_INLINE int                                \
     patomic_opimpl_test_reset_##name(                              \
@@ -309,7 +309,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
         assert((CHAR_BIT * sizeof(type)) > (size_t) offset);       \
         assert(patomic_is_valid_order(order));                     \
         /* setup memory orders and masks */                        \
-        mask = (type) (1u << offset);                              \
+        mask = (type) (((type) 1u) << offset);                     \
         mask_inv = (type) (~mask);                                 \
         succ = order;                                              \
         fail = patomic_cmpxchg_fail_order(order);                  \
@@ -332,7 +332,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
             fail                                                   \
         ));                                                        \
         /* return old bit value */                                 \
-        return (expected & mask) == 1;                             \
+        return (expected & mask) != 0;                             \
     }
 
 #define PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(type, name, order, vis, opsk) \

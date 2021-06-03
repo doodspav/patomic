@@ -1,3 +1,4 @@
+#include <climits>
 #include <cstring>
 #include <random>
 #include <type_traits>
@@ -30,6 +31,7 @@ protected:
     std::vector<unsigned char *> m_arg1s;
     std::vector<unsigned char *> m_arg2s;
     std::vector<unsigned char *> m_arg3s;
+    std::vector<int> m_offsets;
     static constexpr int m_argc = 50;
 
     void SetUpBuffers(size_t width, size_t align, unsigned int seed)
@@ -61,6 +63,10 @@ protected:
             m_arg2s.push_back((it++)->data);
             m_arg3s.push_back((it++)->data);
         }
+        // setup offsets
+        auto max_offset = static_cast<int>((m_width * CHAR_BIT) - 1);
+        std::uniform_int_distribution<int> idist(0, max_offset);
+        for (int i = 0; i < m_argc; ++i) { m_offsets.push_back(idist(gen)); }
     }
 
     void SetUpImplicit()
@@ -111,9 +117,9 @@ protected:
 
 TEST_P(BufferOpsLogicTestFixture, fp_store)
 {
-    CURRY_OP_NO_RET(store, ops.fp_, obj, des);
+    CURRY_OP_NO_RET(store, store, ops.fp_, obj, des);
     // skip
-    if (!patomic_is_valid_store_order(m_order)) { GTEST_SKIP_("Invalid store order"); }
+    if (!patomic_is_valid_store_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_store == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
     for (auto arg : m_arg1s)
@@ -125,9 +131,9 @@ TEST_P(BufferOpsLogicTestFixture, fp_store)
 
 TEST_P(BufferOpsLogicTestFixture, fp_load)
 {
-    CURRY_OP_RET(load, ops.fp_, ret, obj);
+    CURRY_OP_RET(load, load, ops.fp_, ret, obj);
     // skip
-    if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid load order"); }
+    if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_load == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
     for (auto arg : m_arg1s)
@@ -140,7 +146,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_load)
 
 TEST_P(BufferOpsLogicTestFixture, fp_exchange)
 {
-    CURRY_OP_RET(exchange, ops.xchg_ops.fp_, ret, obj, des);
+    CURRY_OP_RET(exchange, exchange, ops.xchg_ops.fp_, ret, obj, des);
     // skip
     if (fp_exchange == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
@@ -230,6 +236,92 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_strong)
             ASSERT_TRUE(std::memcmp(m_obj, expected, m_width) == 0);
             ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
         }
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_test)
+{
+    CURRY_OP_NO_RET(test, test, ops.bitwise_ops.fp_, obj, offset);
+    // skip
+    if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
+    else if (fp_test == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        int offset = m_offsets[i];
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        // get bit
+        auto const &byte = *(m_obj + (offset / CHAR_BIT));
+        bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
+        // op
+        xored_bit ^= fp_test(m_obj, offset);
+        ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_test_compl)
+{
+    CURRY_OP_NO_RET(test_modify, test_compl, ops.bitwise_ops.fp_, obj, offset);
+    // skip
+    if (fp_test_compl == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        int offset = m_offsets[i];
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        // get bit
+        auto &byte = *(m_res + (offset / CHAR_BIT));
+        bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
+        // op
+        byte ^= 1u << (offset % CHAR_BIT);
+        xored_bit ^= fp_test_compl(m_obj, offset);
+        ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_test_set)
+{
+    CURRY_OP_NO_RET(test_modify, test_set, ops.bitwise_ops.fp_, obj, offset);
+    // skip
+    if (fp_test_set == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        int offset = m_offsets[i];
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        // get bit
+        auto &byte = *(m_res + (offset / CHAR_BIT));
+        bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
+        // op
+        byte |= 1u << (offset % CHAR_BIT);
+        xored_bit ^= fp_test_set(m_obj, offset);
+        ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_test_reset)
+{
+    CURRY_OP_NO_RET(test_modify, test_reset, ops.bitwise_ops.fp_, obj, offset);
+    // skip
+    if (fp_test_reset == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        int offset = m_offsets[i];
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        // get bit
+        auto &byte = *(m_res + (offset / CHAR_BIT));
+        bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
+        // op
+        byte &= ~(1u << (offset % CHAR_BIT));
+        xored_bit ^= fp_test_reset(m_obj, offset);
+        ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
     }
 }
 
