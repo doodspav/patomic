@@ -24,16 +24,18 @@ protected:
     std::vector<patomic::test::aligned_buffer> m_buffers;
     // non-owning pointers to aligned buffers
     unsigned char *m_obj;  // "atomic" object
+    unsigned char *m_old;  // old value to compare against
     unsigned char *m_ret;  // potential return value
     unsigned char *m_res;  // independent result
     std::vector<unsigned char *> m_arg1s;
     std::vector<unsigned char *> m_arg2s;
+    std::vector<unsigned char *> m_arg3s;
     static constexpr int m_argc = 50;
 
     void SetUpBuffers(size_t width, size_t align, unsigned int seed)
     {
         // setup arg buffers
-        auto bufc = m_argc * 2;  // number of arg vectors
+        auto bufc = m_argc * 3;  // number of arg vectors
         for (int i = 0; i < bufc; ++i) { m_buffers.emplace_back(width, align); }
         // randomise buffer state
         std::mt19937 gen(seed);
@@ -45,9 +47,10 @@ protected:
             while (begin != end) { *begin++ = dist(gen); }
         }
         // setup non-arg buffers and pointers
-        for (int i = 0; i < 3; ++i) { m_buffers.emplace_back(width, align); }
+        for (int i = 0; i < 4; ++i) { m_buffers.emplace_back(width, align); }
         auto it = m_buffers.end();
         m_obj = (--it)->data;
+        m_old = (--it)->data;
         m_ret = (--it)->data;
         m_res = (--it)->data;
         // setup arg pointers
@@ -56,6 +59,7 @@ protected:
         {
             m_arg1s.push_back((it++)->data);
             m_arg2s.push_back((it++)->data);
+            m_arg3s.push_back((it++)->data);
         }
     }
 
@@ -114,9 +118,8 @@ TEST_P(BufferOpsLogicTestFixture, fp_store)
     // test
     for (auto arg : m_arg1s)
     {
-        std::memcpy(m_res, arg, m_width);
         fp_store(m_obj, arg);
-        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, arg, m_width) == 0);
     }
 }
 
@@ -152,6 +155,84 @@ TEST_P(BufferOpsLogicTestFixture, fp_exchange)
     }
 }
 
+TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_weak)
+{
+    CURRY_OP_CMPXCHG(cmpxchg_weak, ops.xchg_ops.fp_, obj, exp, des);
+    // skip
+    if (fp_cmpxchg_weak == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj , m_arg1s[i], m_width);
+        // make sure on failure that obj->expected not expected->obj
+        std::memcpy(m_old, m_obj, m_width);
+        auto expected = m_arg2s[i];
+        auto desired = m_arg3s[i];
+        // obj == expected
+        if (i % 2 == 0 || std::memcmp(m_obj, expected, m_width) == 0)
+        {
+            // set expected <- obj, and save expected value
+            std::memcpy(expected, m_obj, m_width);
+            std::memcpy(m_res, expected, m_width);
+            bool ok = fp_cmpxchg_weak(m_obj, expected, desired);
+            if (ok)
+            {
+                ASSERT_TRUE(std::memcmp(m_obj, desired, m_width) == 0);
+                ASSERT_TRUE(std::memcmp(m_res, expected, m_width) == 0);
+            }
+            // spurious failure
+            else
+            {
+                ASSERT_TRUE(std::memcmp(m_obj, expected, m_width) == 0);
+                ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
+            }
+        }
+        // obj != expected
+        else
+        {
+            bool ok = fp_cmpxchg_weak(m_obj, expected, desired);
+            ASSERT_FALSE(ok);
+            ASSERT_TRUE(std::memcmp(m_obj, expected, m_width) == 0);
+            ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
+        }
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_strong)
+{
+    CURRY_OP_CMPXCHG(cmpxchg_strong, ops.xchg_ops.fp_, obj, exp, des);
+    // skip
+    if (fp_cmpxchg_strong == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        // make sure on failure that obj NOT modified
+        std::memcpy(m_old, m_obj, m_width);
+        auto expected = m_arg2s[i];
+        auto desired = m_arg3s[i];
+        // obj == expected
+        if (i % 2 == 0 || std::memcmp(m_obj, expected, m_width) == 0)
+        {
+            // set expected <- obj, and save expected value
+            std::memcpy(expected, m_obj, m_width);
+            std::memcpy(m_res, expected, m_width);
+            bool ok = fp_cmpxchg_strong(m_obj, expected, desired);
+            ASSERT_TRUE(ok);
+            ASSERT_TRUE(std::memcmp(m_obj, desired, m_width) == 0);
+            ASSERT_TRUE(std::memcmp(m_res, expected, m_width) == 0);
+        }
+        // obj != expected
+        else
+        {
+            bool ok = fp_cmpxchg_strong(m_obj, expected, desired);
+            ASSERT_FALSE(ok);
+            ASSERT_TRUE(std::memcmp(m_obj, expected, m_width) == 0);
+            ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
+        }
+    }
+}
+
 
 static auto get_test_params() -> const std::vector<patomic::test::sized_param>&
 {
@@ -164,6 +245,8 @@ static auto get_test_params() -> const std::vector<patomic::test::sized_param>&
         std::uniform_int_distribution<unsigned int> dist;
         // generate implicit params
         for (auto id : patomic::test::get_ids()) {
+            // don't include NULL
+            if (id == patomic_impl_id_NULL) { continue; }
             for (auto width : patomic::test::get_widths()) {
                 for (auto order : patomic::test::get_orders()) {
                     // .is_explicit=false

@@ -66,8 +66,9 @@ namespace patomic {
 
         static auto get_widths() -> std::vector<size_t>
         {
+            // widths in bytes
             static const auto widths = std::vector<size_t>{
-                    1, 2, 4, 8, 16, 32, 64
+                    1, 2, 4, 8
             };
             return widths;
         }
