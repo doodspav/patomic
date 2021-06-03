@@ -63,7 +63,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
    vis(_,int order)                                      \
     )                                                    \
     {                                                    \
-        assert(patomic_is_valid_load_order(order));      \
+        assert(patomic_is_valid_store_order(order));     \
         atomic_store_explicit(                           \
             (volatile _Atomic(type) *) obj,              \
             *((const type *) desired),                   \
@@ -80,7 +80,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                           \
     {                                                           \
         type val;                                               \
-        assert(patomic_is_valid_store_order(order));            \
+        assert(patomic_is_valid_load_order(order));             \
         val = atomic_load_explicit(                             \
             (const volatile _Atomic(type) *) obj,               \
             order                                               \

@@ -127,7 +127,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_load)
 {
     CURRY_OP_RET(load, ops.fp_, ret, obj);
     // skip
-    if (!patomic_is_valid_load_order(m_order)) {GTEST_SKIP_("Invalid load order"); }
+    if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid load order"); }
     else if (fp_load == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
     for (auto arg : m_arg1s)
@@ -164,7 +164,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_weak)
     for (int i = 0; i < m_argc; ++i)
     {
         std::memcpy(m_obj , m_arg1s[i], m_width);
-        // make sure on failure that obj->expected not expected->obj
+        // make sure on failure that obj NOT modified
         std::memcpy(m_old, m_obj, m_width);
         auto expected = m_arg2s[i];
         auto desired = m_arg3s[i];

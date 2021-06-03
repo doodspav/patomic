@@ -4,7 +4,7 @@ include(cmake/in-source-guard.cmake)
 
 project(
     patomic
-    VERSION 1.0.0
+    VERSION 1.0.1
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
