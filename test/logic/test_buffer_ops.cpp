@@ -123,7 +123,6 @@ protected:
         this->m_order                 \
     )
 
-#undef CURRY_OP_RET
 #define CURRY_OP_RET(name, parent) \
     ::patomic::test::curry_op_ret( \
         this->m_i##parent##name,   \
@@ -348,6 +347,138 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_reset)
         xored_bit ^= fp_test_reset(m_obj, offset);
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_or)
+{
+    auto fp_or = CURRY_OP_NO_RET(or, ops.binary_ops.fp_);
+    // skip
+    if (fp_or == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] |= m_arg2s[i][w]; }
+        fp_or(m_obj, m_arg2s[i]);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_xor)
+{
+    auto fp_xor = CURRY_OP_NO_RET(xor, ops.binary_ops.fp_);
+    // skip
+    if (fp_xor == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] ^= m_arg2s[i][w]; }
+        fp_xor(m_obj, m_arg2s[i]);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_and)
+{
+    auto fp_and = CURRY_OP_NO_RET(and, ops.binary_ops.fp_);
+    // skip
+    if (fp_and == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] &= m_arg2s[i][w]; }
+        fp_and(m_obj, m_arg2s[i]);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_not)
+{
+    auto fp_not = CURRY_OP_NO_RET(not, ops.binary_ops.fp_);
+    // skip
+    if (fp_not == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] = ~m_res[w]; }
+        fp_not(m_obj);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_fetch_or)
+{
+    auto fp_fetch_or = CURRY_OP_RET(fetch_or, ops.binary_ops.fp_);
+    // skip
+    if (fp_fetch_or == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] |= m_arg2s[i][w]; }
+        fp_fetch_or(m_obj, m_arg2s[i], m_ret);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_fetch_xor)
+{
+    auto fp_fetch_xor = CURRY_OP_RET(fetch_xor, ops.binary_ops.fp_);
+    // skip
+    if (fp_fetch_xor == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] ^= m_arg2s[i][w]; }
+        fp_fetch_xor(m_obj, m_arg2s[i], m_ret);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_fetch_and)
+{
+    auto fp_fetch_and = CURRY_OP_RET(fetch_and, ops.binary_ops.fp_);
+    // skip
+    if (fp_fetch_and == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] &= m_arg2s[i][w]; }
+        fp_fetch_and(m_obj, m_arg2s[i], m_ret);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+    }
+}
+
+TEST_P(BufferOpsLogicTestFixture, fp_fetch_not)
+{
+    auto fp_fetch_not = CURRY_OP_RET(fetch_not, ops.binary_ops.fp_);
+    // skip
+    if (fp_fetch_not == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // test
+    for (int i = 0; i < m_argc; ++i)
+    {
+        std::memcpy(m_obj, m_arg1s[i], m_width);
+        std::memcpy(m_res, m_obj, m_width);
+        for (int w = 0; w < m_width; ++w) { m_res[w] = ~m_res[w]; }
+        fp_fetch_not(m_obj, m_ret);
+        ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
     }
 }
 
