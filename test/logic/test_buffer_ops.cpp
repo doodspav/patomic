@@ -115,9 +115,35 @@ protected:
 };
 
 
+#define CURRY_OP_NO_RET(name, parent) \
+    ::patomic::test::curry_op_no_ret( \
+        this->m_i##parent##name,      \
+        this->m_e##parent##name,      \
+        this->m_is_explicit,          \
+        this->m_order                 \
+    )
+
+#undef CURRY_OP_RET
+#define CURRY_OP_RET(name, parent) \
+    ::patomic::test::curry_op_ret( \
+        this->m_i##parent##name,   \
+        this->m_e##parent##name,   \
+        this->m_is_explicit,       \
+        this->m_order              \
+    )
+
+#define CURRY_OP_CMPXCHG(name, parent) \
+    ::patomic::test::curry_op_cmpxchg( \
+        this->m_i##parent##name,       \
+        this->m_e##parent##name,       \
+        this->m_is_explicit,           \
+        this->m_order                  \
+    )
+
+
 TEST_P(BufferOpsLogicTestFixture, fp_store)
 {
-    CURRY_OP_NO_RET(store, store, ops.fp_, obj, des);
+    auto fp_store = CURRY_OP_NO_RET(store, ops.fp_);
     // skip
     if (!patomic_is_valid_store_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_store == nullptr) { GTEST_SKIP_("Not implemented"); }
@@ -131,7 +157,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_store)
 
 TEST_P(BufferOpsLogicTestFixture, fp_load)
 {
-    CURRY_OP_RET(load, load, ops.fp_, ret, obj);
+    auto fp_load = CURRY_OP_RET(load, ops.fp_);
     // skip
     if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_load == nullptr) { GTEST_SKIP_("Not implemented"); }
@@ -146,7 +172,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_load)
 
 TEST_P(BufferOpsLogicTestFixture, fp_exchange)
 {
-    CURRY_OP_RET(exchange, exchange, ops.xchg_ops.fp_, ret, obj, des);
+    auto fp_exchange = CURRY_OP_RET(exchange, ops.xchg_ops.fp_);
     // skip
     if (fp_exchange == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
@@ -163,7 +189,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_exchange)
 
 TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_weak)
 {
-    CURRY_OP_CMPXCHG(cmpxchg_weak, ops.xchg_ops.fp_, obj, exp, des);
+    auto fp_cmpxchg_weak = CURRY_OP_CMPXCHG(cmpxchg_weak, ops.xchg_ops.fp_);
     // skip
     if (fp_cmpxchg_weak == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
@@ -206,7 +232,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_weak)
 
 TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_strong)
 {
-    CURRY_OP_CMPXCHG(cmpxchg_strong, ops.xchg_ops.fp_, obj, exp, des);
+    auto fp_cmpxchg_strong = CURRY_OP_CMPXCHG(cmpxchg_strong, ops.xchg_ops.fp_);
     // skip
     if (fp_cmpxchg_strong == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
@@ -241,7 +267,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_strong)
 
 TEST_P(BufferOpsLogicTestFixture, fp_test)
 {
-    CURRY_OP_NO_RET(test, test, ops.bitwise_ops.fp_, obj, offset);
+    auto fp_test = CURRY_OP_NO_RET(test, ops.bitwise_ops.fp_);
     // skip
     if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_test == nullptr) { GTEST_SKIP_("Not implemented"); }
@@ -261,7 +287,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test)
 
 TEST_P(BufferOpsLogicTestFixture, fp_test_compl)
 {
-    CURRY_OP_NO_RET(test_modify, test_compl, ops.bitwise_ops.fp_, obj, offset);
+    auto fp_test_compl = CURRY_OP_NO_RET(test_compl, ops.bitwise_ops.fp_);
     // skip
     if (fp_test_compl == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
@@ -283,7 +309,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_compl)
 
 TEST_P(BufferOpsLogicTestFixture, fp_test_set)
 {
-    CURRY_OP_NO_RET(test_modify, test_set, ops.bitwise_ops.fp_, obj, offset);
+    auto fp_test_set = CURRY_OP_NO_RET(test_set, ops.bitwise_ops.fp_);
     // skip
     if (fp_test_set == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
@@ -305,7 +331,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_set)
 
 TEST_P(BufferOpsLogicTestFixture, fp_test_reset)
 {
-    CURRY_OP_NO_RET(test_modify, test_reset, ops.bitwise_ops.fp_, obj, offset);
+    auto fp_test_reset = CURRY_OP_NO_RET(test_reset, ops.bitwise_ops.fp_);
     // skip
     if (fp_test_reset == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test

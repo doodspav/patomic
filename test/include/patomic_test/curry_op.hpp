@@ -1,53 +1,114 @@
 #ifndef PATOMIC_TEST_CURRY_OP_HPP
 #define PATOMIC_TEST_CURRY_OP_HPP
 
+#include <cstddef>
 #include <functional>
+#include <tuple>
 #include <type_traits>
+#include <utility>
+
+#include <patomic/types/memory_order.h>
+#include <patomic/types/ops.h>
 
 
-#define PT_MAKE_AUTO_0()
-#define PT_MAKE_AUTO_1(a) auto a
-#define PT_MAKE_AUTO_2(a, ...) auto a, PT_MAKE_AUTO_1(__VA_ARGS__)
-#define PT_MAKE_AUTO_3(a, ...) auto a, PT_MAKE_AUTO_2(__VA_ARGS__)
+namespace patomic {
+    namespace test {
 
-#define PT_GET(dummy, a, b, c, d, ...) d
-#define PT_COUNT(...) PT_GET(dummy, ## __VA_ARGS__, 3, 2, 1, 0)
+        namespace detail {
 
-#define PT_CONCAT1(a, b) a ## b
-#define PT_CONCAT(a, b) PT_CONCAT1(a, b)
+            template <typename... Ts, std::size_t... Is>
+            constexpr auto split_args(
+                std::tuple<Ts...> tup,
+                std::index_sequence<Is...>
+            )
+            {
+                return std::make_pair(
+                    std::make_tuple(std::get<Is>(tup)...),
+                    std::get<sizeof...(Ts) - 1>(tup)
+                );
+            }
 
-#define PT_MAKE_AUTO(...) PT_CONCAT(PT_MAKE_AUTO_, PT_COUNT(__VA_ARGS__)) (__VA_ARGS__)
+            template <typename... Ts>
+            constexpr auto split_args(Ts... args)
+            {
+                return split_args(
+                    std::make_tuple(args...),
+                    std::make_index_sequence<sizeof...(Ts) - 1>{}
+                );
+            }
 
+            template<typename F, typename... Ts, std::size_t... Is>
+            constexpr auto apply(
+                F f,
+                std::tuple<Ts...> tup,
+                std::index_sequence<Is...>
+            )
+            {
+                return f(std::get<Is>(tup)...);
+            }
 
-#define CURRY_OP_NO_RET(sig, name, parent, ...)                     \
-    using sig##_t = std::remove_pointer_t<patomic_opsig_##sig##_t>; \
-    std::function<sig##_t> fp_##name;                               \
-    if (!this->m_is_explicit) { fp_##name = m_i##parent##name; }    \
-    else if (m_e##parent##name == nullptr) { fp_##name = nullptr; } \
-    else { fp_##name = [=](PT_MAKE_AUTO(__VA_ARGS__)) {             \
-        return m_e##parent##name(__VA_ARGS__, this->m_order);       \
-    };}                                                             \
-    do {} while (0)
+            template<typename F, typename... Ts>
+            constexpr auto apply(
+                F f,
+                std::tuple<Ts...> tup
+            )
+            {
+                return apply(f, tup, std::make_index_sequence<sizeof...(Ts)>{});
+            }
+        }
 
-#define CURRY_OP_RET(sig, name, parent, ret, ...)                   \
-    using sig##_t = std::remove_pointer_t<patomic_opsig_##sig##_t>; \
-    std::function<sig##_t> fp_##name;                               \
-    if (!this->m_is_explicit) { fp_##name = m_i##parent##name; }    \
-    else if (m_e##parent##name == nullptr) { fp_##name = nullptr; } \
-    else { fp_##name = [=](PT_MAKE_AUTO(__VA_ARGS__), auto ret) {   \
-        return m_e##parent##name(__VA_ARGS__, this->m_order, ret);  \
-    };}                                                             \
-    do {} while (0)
+        template <typename I, typename E>
+        std::function<std::remove_pointer_t<I>>
+        curry_op_no_ret(
+            I fp_implicit,
+            E fp_explicit,
+            bool is_explicit,
+            patomic_memory_order_t order
+        )
+        {
+            if (!is_explicit) { return {fp_implicit}; }
+            else if (fp_explicit == nullptr) { return {nullptr}; }
+            else { return {[=](auto... args){
+                return fp_explicit(args..., order);
+            }}; }
+        }
 
-#define CURRY_OP_CMPXCHG(name, parent, ...)                          \
-    using name##_t = std::remove_pointer_t<patomic_opsig_cmpxchg_t>; \
-    std::function<name##_t> fp_##name;                               \
-    if (!this->m_is_explicit) { fp_##name = m_i##parent##name; }     \
-    else if (m_e##parent##name == nullptr) { fp_##name = nullptr; }  \
-    else { fp_##name = [=](PT_MAKE_AUTO(__VA_ARGS__)) {              \
-        auto fail = patomic_cmpxchg_fail_order(this->m_order);       \
-        return m_e##parent##name(__VA_ARGS__, this->m_order, fail);  \
-    };}                                                              \
-    do {} while (0)
+        template <typename I, typename E>
+        std::function<std::remove_pointer_t<I>>
+        curry_op_ret(
+            I fp_implicit,
+            E fp_explicit,
+            bool is_explicit,
+            patomic_memory_order_t order
+        )
+        {
+            if (!is_explicit) { return {fp_implicit}; }
+            else if (fp_explicit == nullptr) { return {nullptr}; }
+            else { return {[=](auto... args){
+                auto split = detail::split_args(args...);
+                detail::apply([=](auto... fs){
+                    return fp_explicit(fs..., order, split.second);
+                }, split.first);
+            }}; }
+        }
+
+        std::function<std::remove_pointer_t<patomic_opsig_cmpxchg_t>>
+        curry_op_cmpxchg(
+            patomic_opsig_cmpxchg_t fp_implicit,
+            patomic_opsig_explicit_cmpxchg_t fp_explicit,
+            bool is_explicit,
+            patomic_memory_order_t order
+        )
+        {
+            if (!is_explicit) { return {fp_implicit}; }
+            else if (fp_explicit == nullptr) { return {nullptr}; }
+            else { return {[=](auto... args){
+                auto fail = patomic_cmpxchg_fail_order(order);
+                return fp_explicit(args..., order, fail);
+            }}; }
+        }
+
+}}  // ns patomic::test
+
 
 #endif  // !PATOMIC_TEST_CURRY_OP_HPP

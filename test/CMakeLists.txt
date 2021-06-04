@@ -46,7 +46,7 @@ target_compile_features(
     patomic_test
     PRIVATE
     cxx_generic_lambdas
-    cxx_variadic_macros
+    cxx_variadic_templates
 )
 
 include(GoogleTest)
