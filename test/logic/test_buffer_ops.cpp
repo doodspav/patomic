@@ -498,8 +498,8 @@ static auto get_test_params() -> const std::vector<patomic::test::sized_param>&
             if (id == patomic_impl_id_NULL) { continue; }
             for (auto width : patomic::test::get_widths()) {
                 for (auto order : patomic::test::get_orders()) {
-                    // .is_explicit=false
-                    params.push_back({width, order, id, dist(gen), false});
+                    // .is_explicit=false, .is_signed=false
+                    params.push_back({width, order, id, dist(gen), false, false});
                 }
             }
         }

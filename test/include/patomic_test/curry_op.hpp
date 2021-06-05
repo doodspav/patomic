@@ -17,7 +17,7 @@ namespace patomic {
         namespace detail {
 
             template <typename... Ts, std::size_t... Is>
-            constexpr auto split_args(
+            static constexpr auto split_args(
                 std::tuple<Ts...> tup,
                 std::index_sequence<Is...>
             )
@@ -29,7 +29,7 @@ namespace patomic {
             }
 
             template <typename... Ts>
-            constexpr auto split_args(Ts... args)
+            static constexpr auto split_args(Ts... args)
             {
                 return split_args(
                     std::make_tuple(args...),
@@ -38,7 +38,7 @@ namespace patomic {
             }
 
             template<typename F, typename... Ts, std::size_t... Is>
-            constexpr auto apply(
+            static constexpr auto apply(
                 F f,
                 std::tuple<Ts...> tup,
                 std::index_sequence<Is...>
@@ -48,7 +48,7 @@ namespace patomic {
             }
 
             template<typename F, typename... Ts>
-            constexpr auto apply(
+            static constexpr auto apply(
                 F f,
                 std::tuple<Ts...> tup
             )
@@ -59,7 +59,7 @@ namespace patomic {
 
         template <typename I, typename E>
         std::function<std::remove_pointer_t<I>>
-        curry_op_no_ret(
+        static curry_op_no_ret(
             I fp_implicit,
             E fp_explicit,
             bool is_explicit,
@@ -75,7 +75,7 @@ namespace patomic {
 
         template <typename I, typename E>
         std::function<std::remove_pointer_t<I>>
-        curry_op_ret(
+        static curry_op_ret(
             I fp_implicit,
             E fp_explicit,
             bool is_explicit,
@@ -93,7 +93,7 @@ namespace patomic {
         }
 
         std::function<std::remove_pointer_t<patomic_opsig_cmpxchg_t>>
-        curry_op_cmpxchg(
+        static curry_op_cmpxchg(
             patomic_opsig_cmpxchg_t fp_implicit,
             patomic_opsig_explicit_cmpxchg_t fp_explicit,
             bool is_explicit,

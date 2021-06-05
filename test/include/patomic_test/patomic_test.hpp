@@ -80,16 +80,8 @@ namespace patomic {
             patomic_impl_id_t id;
             unsigned int seed;
             bool is_explicit;
+            bool is_signed;
         };
-
-        /*template <typename T, patomic_impl_id_t I, unsigned int S>
-        struct typed_param
-        {
-            using type = T;
-            static constexpr auto orders = get_orders();
-            static constexpr auto id = I;
-            static constexpr auto seed = S;
-        };*/
 
 }}  // ns patomic::test
 

@@ -26,9 +26,11 @@ add_executable(
     # include
     include/patomic_test/patomic_test.hpp
     include/patomic_test/aligned_buffer.hpp
+    include/patomic_test/aligned_vint.hpp
     include/patomic_test/curry_op.hpp
     # logic
     logic/test_buffer_ops.cpp
+    logic/test_arithmetic_ops.cpp
 )
 target_include_directories(
     patomic_test
