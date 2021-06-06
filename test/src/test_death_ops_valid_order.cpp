@@ -17,7 +17,7 @@ protected:
     patomic_ops_explicit_t m_ops;
     patomic_memory_order_t m_order;
     std::vector<int> m_orders;
-    static constexpr int m_argc = 5;  // death tests are really expensive
+    static constexpr int m_argc = 50;
 
     void SetUp() override
     {
