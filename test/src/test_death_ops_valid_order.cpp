@@ -161,6 +161,174 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_strong)
     // tested in ValidLoadOrderOpsDeathTestFixture
 }
 
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test)
+{
+    auto fp_test = m_ops.bitwise_ops.fp_test;
+    if (fp_test == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_test(nullptr, 0, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_compl)
+{
+    auto fp_test_compl = m_ops.bitwise_ops.fp_test_compl;
+    if (fp_test_compl == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_test_compl(nullptr, 0, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_set)
+{
+    auto fp_test_set = m_ops.bitwise_ops.fp_test_set;
+    if (fp_test_set == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_test_set(nullptr, 0, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_reset)
+{
+    auto fp_test_reset = m_ops.bitwise_ops.fp_test_reset;
+    if (fp_test_reset == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_test_reset(nullptr, 0, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_or)
+{
+    auto fp_or = m_ops.binary_ops.fp_or;
+    if (fp_or == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_or(nullptr, nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_xor)
+{
+    auto fp_xor = m_ops.binary_ops.fp_xor;
+    if (fp_xor == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_xor(nullptr, nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_and)
+{
+    auto fp_and = m_ops.binary_ops.fp_and;
+    if (fp_and == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_and(nullptr, nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_not)
+{
+    auto fp_not = m_ops.binary_ops.fp_not;
+    if (fp_not == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_not(nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_or)
+{
+    auto fp_fetch_or = m_ops.binary_ops.fp_fetch_or;
+    if (fp_fetch_or == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_or(nullptr, nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_xor)
+{
+    auto fp_fetch_xor = m_ops.binary_ops.fp_fetch_xor;
+    if (fp_fetch_xor == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_xor(nullptr, nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_and)
+{
+    auto fp_fetch_and = m_ops.binary_ops.fp_fetch_and;
+    if (fp_fetch_and == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_and(nullptr, nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_not)
+{
+    auto fp_fetch_not = m_ops.binary_ops.fp_fetch_not;
+    if (fp_fetch_not == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_not(nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
 
 /*class ValidOrderArithmeticOpsDeathTestFixture
     : public ValidOrderOpsDeathTestFixture
