@@ -16,7 +16,6 @@ class ValidOrderOpsDeathTestFixture
 protected:
     patomic_ops_explicit_t m_ops;
     patomic_memory_order_t m_order;
-    bool m_is_signed;
     std::vector<int> m_orders;
     static constexpr int m_argc = 5;  // death tests are really expensive
 
@@ -28,7 +27,6 @@ protected:
         auto pet = patomic_create_explicit(p.width, opt, 1, p.id);
         m_ops = pet.ops;
         m_order = p.order;
-        m_is_signed = p.is_signed;
         // setup order inputs
         auto umin = static_cast<unsigned int>(patomic_SEQ_CST) + 1u;
         ASSERT_FALSE(patomic_is_valid_order(umin));
@@ -330,9 +328,168 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_not)
 }
 
 
-/*class ValidOrderArithmeticOpsDeathTestFixture
+class ValidOrderArithmeticOpsDeathTestFixture
     : public ValidOrderOpsDeathTestFixture
-{};*/
+{
+protected:
+    bool m_is_signed;
+
+    void SetUp() override
+    {
+        using Base = ValidOrderOpsDeathTestFixture;
+        Base::SetUp();
+        auto &p = GetParam();
+        m_is_signed = p.is_signed;
+        RecordProperty("IsSigned", p.is_signed);
+    }
+};
+
+
+#define GET_ARI_OP(name)               \
+    this->m_is_signed ?                \
+    this->m_ops.signed_ops.fp_##name : \
+    this->m_ops.unsigned_ops.fp_##name
+
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_add)
+{
+    auto fp_add = GET_ARI_OP(add);
+    if (fp_add == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_add(nullptr, nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_sub)
+{
+    auto fp_sub = GET_ARI_OP(sub);
+    if (fp_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_sub(nullptr, nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_inc)
+{
+    auto fp_inc = GET_ARI_OP(inc);
+    if (fp_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_inc(nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_dec)
+{
+    auto fp_dec = GET_ARI_OP(dec);
+    if (fp_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_dec(nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_neg)
+{
+    auto fp_neg = GET_ARI_OP(neg);
+    if (fp_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_neg(nullptr, order),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_add)
+{
+    auto fp_fetch_add = GET_ARI_OP(fetch_add);
+    if (fp_fetch_add == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_add(nullptr, nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_sub)
+{
+    auto fp_fetch_sub = GET_ARI_OP(fetch_sub);
+    if (fp_fetch_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_sub(nullptr, nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_inc)
+{
+    auto fp_fetch_inc = GET_ARI_OP(fetch_inc);
+    if (fp_fetch_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_inc(nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_dec)
+{
+    auto fp_fetch_dec = GET_ARI_OP(fetch_dec);
+    if (fp_fetch_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_dec(nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_neg)
+{
+    auto fp_fetch_neg = GET_ARI_OP(fetch_neg);
+    if (fp_fetch_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_fetch_neg(nullptr, order, nullptr),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
 
 
 class ValidLoadOrderOpsDeathTestFixture
@@ -424,7 +581,7 @@ get_buffer_test_params()
     return params;
 }
 
-/*static std::vector<patomic::test::sized_param>&
+static std::vector<patomic::test::sized_param>&
 get_arithmetic_test_params()
 {
     static bool once_flag;
@@ -443,7 +600,6 @@ get_arithmetic_test_params()
     }
     return params;
 }
-*/
 
 static std::vector<patomic::test::sized_param>&
 get_load_test_params()
@@ -509,12 +665,12 @@ INSTANTIATE_TEST_SUITE_P(
                         get_buffer_test_params().end())
 );
 
-/*INSTANTIATE_TEST_SUITE_P(
+INSTANTIATE_TEST_SUITE_P(
     ValidOrderArithmeticOpsDeathTest,
     ValidOrderArithmeticOpsDeathTestFixture,
     ::testing::ValuesIn(get_arithmetic_test_params().begin(),
                         get_arithmetic_test_params().end())
-);*/
+);
 
 INSTANTIATE_TEST_SUITE_P(
     ValidLoadOrderOpsDeathTest,
