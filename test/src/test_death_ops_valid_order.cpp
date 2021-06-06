@@ -79,6 +79,88 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_load)
     }
 }
 
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_exchange)
+{
+    auto fp_exchange = m_ops.xchg_ops.fp_exchange;
+    if (fp_exchange == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        ASSERT_EXIT(
+            fp_exchange(nullptr, nullptr, order, nullptr),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_weak)
+{
+    auto fp_cmpxchg_weak = m_ops.xchg_ops.fp_cmpxchg_weak;
+    if (fp_cmpxchg_weak == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // invalid succ and valid fail
+    for (auto order : m_orders)
+    {
+        auto fail = patomic_RELAXED;
+        ASSERT_EXIT(
+            fp_cmpxchg_weak(nullptr, nullptr, nullptr, order, fail),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+    // valid succ and invalid fail
+    for (auto order : m_orders)
+    {
+        auto succ = patomic_SEQ_CST;
+        ASSERT_EXIT(
+            fp_cmpxchg_weak(nullptr, nullptr, nullptr, succ, order),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+    // fail is stronger than succ
+    ASSERT_EXIT(
+        fp_cmpxchg_weak(nullptr, nullptr, nullptr, patomic_RELAXED, patomic_SEQ_CST),
+        ::testing::KilledBySignal(SIGABRT),
+        ".*"
+    );
+    // no test here for fail being valid order but invalid *load* order
+    // tested in ValidLoadOrderOpsDeathTestFixture
+}
+
+TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_strong)
+{
+    auto fp_cmpxchg_strong = m_ops.xchg_ops.fp_cmpxchg_strong;
+    if (fp_cmpxchg_strong == nullptr) { GTEST_SKIP_("Not implemented"); }
+    // invalid succ and valid fail
+    for (auto order : m_orders)
+    {
+        auto fail = patomic_RELAXED;
+        ASSERT_EXIT(
+            fp_cmpxchg_strong(nullptr, nullptr, nullptr, order, fail),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+    // valid succ and invalid fail
+    for (auto order : m_orders)
+    {
+        auto succ = patomic_SEQ_CST;
+        ASSERT_EXIT(
+            fp_cmpxchg_strong(nullptr, nullptr, nullptr, succ, order),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+    // fail is stronger than succ
+    ASSERT_EXIT(
+        fp_cmpxchg_strong(nullptr, nullptr, nullptr, patomic_RELAXED, patomic_SEQ_CST),
+        ::testing::KilledBySignal(SIGABRT),
+        ".*"
+    );
+    // no test here for fail being valid order but invalid *load* order
+    // tested in ValidLoadOrderOpsDeathTestFixture
+}
+
 
 /*class ValidOrderArithmeticOpsDeathTestFixture
     : public ValidOrderOpsDeathTestFixture
@@ -99,6 +181,36 @@ TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_load)
         ::testing::KilledBySignal(SIGABRT),
         ".*"
     );
+}
+
+TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_cmpxchg_weak)
+{
+    auto fp_cmpxchg_weak = m_ops.xchg_ops.fp_cmpxchg_weak;
+    if (fp_cmpxchg_weak == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        auto succ = patomic_SEQ_CST;
+        ASSERT_EXIT(
+            fp_cmpxchg_weak(nullptr, nullptr, nullptr, succ, order),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
+
+TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_cmpxchg_strong)
+{
+    auto fp_cmpxchg_strong = m_ops.xchg_ops.fp_cmpxchg_strong;
+    if (fp_cmpxchg_strong == nullptr) { GTEST_SKIP_("Not implemented"); }
+    for (auto order : m_orders)
+    {
+        auto succ = patomic_SEQ_CST;
+        ASSERT_EXIT(
+            fp_cmpxchg_strong(nullptr, nullptr, nullptr, succ, order),
+            ::testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
 }
 
 

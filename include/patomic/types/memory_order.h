@@ -67,6 +67,8 @@ static int
 patomic_is_valid_fail_order(int succ, int fail)
 {
     if ((fail > succ)
+        || !patomic_is_valid_order(succ)
+        || !patomic_is_valid_order(fail)
         || (fail == patomic_RELEASE)
         || (fail == patomic_ACQ_REL))
     { return 0; }
