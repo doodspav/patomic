@@ -31,6 +31,7 @@ add_executable(
     # src
     src/test_logic_ops_buffer.cpp
     src/test_logic_ops_arithmetic.cpp
+    src/test_death_ops_valid_order.cpp
 )
 target_include_directories(
     patomic_test
