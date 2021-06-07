@@ -10,7 +10,9 @@
 #include <gtest/gtest.h>
 
 
-#define KilledBySignal(sig) ExitedWithCode(3)
+#ifdef _MSC_VER
+    #define KilledBySignal(sig) ExitedWithCode(3)
+#endif
 
 
 class ValidOrderOpsDeathTestFixture
