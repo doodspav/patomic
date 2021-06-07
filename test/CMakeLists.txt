@@ -53,6 +53,11 @@ target_compile_features(
 )
 
 include(GoogleTest)
-gtest_discover_tests(patomic_test)
+gtest_add_tests(
+    TARGET patomic_test
+    TEST_LIST patomic_test_TESTS
+)
 
-windows_set_path(patomic_test patomic::patomic gtest_main)
+foreach(test IN ITEMS ${patomic_test_TESTS})
+    windows_set_path("${test}" patomic::patomic)
+endforeach()

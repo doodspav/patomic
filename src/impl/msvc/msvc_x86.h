@@ -276,7 +276,7 @@
             val = (type) _InterlockedIncrement##width(          \
                 (volatile type *) obj                           \
             );                                                  \
-            ++val;                                              \
+            --val;                                              \
         }                                                       \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type))); \
     }

@@ -10,6 +10,9 @@
 #include <gtest/gtest.h>
 
 
+#define KilledBySignal(sig) ExitedWithCode(3)
+
+
 class ValidOrderOpsDeathTestFixture
     : public testing::TestWithParam<patomic::test::sized_param>
 {

@@ -57,7 +57,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                       \
     )                                                     \
     {                                                     \
-        assert(patomic_is_valid_load_order(order));       \
+        assert(patomic_is_valid_store_order(order));      \
         patomic_il_store_##width(                         \
             obj,                                          \
             desired,                                      \
@@ -73,7 +73,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                        \
     )                                                     \
     {                                                     \
-        assert(patomic_is_valid_store_order(order));      \
+        assert(patomic_is_valid_load_order(order));       \
         patomic_il_load_##width(                          \
             obj,                                          \
             order,                                        \
@@ -166,13 +166,15 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         assert(offset >= 0);                                 \
         assert(width > offset);                              \
         assert(patomic_is_valid_load_order(order));          \
-        mask = (unsigned __int##width) (1u << offset);       \
+        mask = (unsigned __int##width) (                     \
+            ((unsigned __int##width) 1u) << offset           \
+        );                                                   \
         patomic_il_load_##width(                             \
             obj,                                             \
             order,                                           \
             &val                                             \
         );                                                   \
-        return (val & mask) == 1;                            \
+        return (val & mask) != 0;                            \
     }
 
 #define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(width, name, order, vis) \
@@ -194,7 +196,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         assert(width > offset);                                     \
         assert(patomic_is_valid_order(order));                      \
         /* setup memory orders and mask */                          \
-        mask = (unsigned __int##width) (1u << offset);              \
+        mask = (unsigned __int##width) (                            \
+            ((unsigned __int##width) 1u) << offset                  \
+        );                                                          \
         succ = order;                                               \
         fail = patomic_cmpxchg_fail_order(order);                   \
         /* load initial value */                                    \
@@ -217,7 +221,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
             fail                                                    \
         ));                                                         \
         /* return old bit value */                                  \
-        return (expected & mask) == 1;                              \
+        return (expected & mask) != 0;                              \
     }                                                               \
     static PATOMIC_FORCE_INLINE int                                 \
     patomic_opimpl_test_set_##name(                                 \
@@ -510,8 +514,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                          \
     )                                                                       \
     {                                                                       \
-        unsigned __int##width arg_val = *((const __int##width *) arg);      \
+        unsigned __int##width arg_val;                                      \
         assert(patomic_is_valid_order(order));                              \
+        arg_val = *((const __int##width *) arg);                            \
         /* negation - msvc only supports 2's complement */                  \
         arg_val = (unsigned __int##width) ~arg_val;                         \
         ++arg_val;                                                          \
