@@ -48,6 +48,7 @@ namespace patomic {
         private:
             using self_t = aligned_vint_tmp<T>;
             using uint_t = typename std::make_unsigned<T>::type;
+            using sint_t = typename std::make_signed<T>::type;
             T* m_val{};
 
         public:
@@ -88,13 +89,11 @@ namespace patomic {
             }
             void neg() noexcept override
             {
-                constexpr auto min = std::numeric_limits<T>::min();
-                // C++ guarantees 2s complement
-                // avoid -x where x == INT_MIN
-                if (min == 0 || *m_val != min)
-                {
-                    *m_val = static_cast<T>(-(*m_val));
-                }
+                // msvc complains about unsigned negation (C4146)
+                auto val = static_cast<sint_t>(*m_val);
+                // C++ guarantees 2s complement (-INT_MIN == INT_MIN)
+                constexpr auto min = std::numeric_limits<sint_t>::max();
+                if (val != min) { *m_val = static_cast<T>(-val); }
             }
         };
 

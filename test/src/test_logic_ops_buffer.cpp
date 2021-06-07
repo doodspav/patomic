@@ -281,7 +281,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test)
         auto const &byte = *(m_obj + (offset / CHAR_BIT));
         bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
         // op
-        xored_bit ^= fp_test(m_obj, offset);
+        xored_bit ^= static_cast<bool>(fp_test(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
     }
 }
@@ -302,7 +302,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_compl)
         bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
         // op
         byte ^= 1u << (offset % CHAR_BIT);
-        xored_bit ^= fp_test_compl(m_obj, offset);
+        xored_bit ^= static_cast<bool>(fp_test_compl(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
     }
@@ -324,7 +324,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_set)
         bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
         // op
         byte |= 1u << (offset % CHAR_BIT);
-        xored_bit ^= fp_test_set(m_obj, offset);
+        xored_bit ^= static_cast<bool>(fp_test_set(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
     }
@@ -346,7 +346,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_reset)
         bool xored_bit = (byte >> (offset % CHAR_BIT)) & 1u;
         // op
         byte &= ~(1u << (offset % CHAR_BIT));
-        xored_bit ^= fp_test_reset(m_obj, offset);
+        xored_bit ^= static_cast<bool>(fp_test_reset(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
     }
