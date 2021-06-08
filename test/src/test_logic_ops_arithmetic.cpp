@@ -61,8 +61,8 @@ protected:
 
     void InsertMinMaxArgs()
     {
-        auto min = patomic::test::create_vint(m_width, m_align, m_is_signed);
-        auto max = patomic::test::create_vint(m_width, m_align, m_is_signed);
+        auto min = patomic::test::create_vint(m_width, m_is_signed);
+        auto max = patomic::test::create_vint(m_width, m_is_signed);
         min->min();
         max->max();
         // arg1s
@@ -153,8 +153,8 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_add)
     // skip
     if (fp_add == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
+    auto varg = patomic::test::create_vint(m_width, m_is_signed);
     if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (int i = 0; i < m_argc; ++i)
@@ -174,8 +174,8 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_sub)
     // skip
     if (fp_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
+    auto varg = patomic::test::create_vint(m_width, m_is_signed);
     if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (int i = 0; i < m_argc; ++i)
@@ -195,7 +195,7 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_inc)
     // skip
     if (fp_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
     if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (auto arg : m_arg1s)
@@ -214,7 +214,7 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_dec)
     // skip
     if (fp_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
     if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (auto arg : m_arg1s)
@@ -233,7 +233,7 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_neg)
     // skip
     if (fp_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
     if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (auto arg : m_arg1s)
@@ -252,8 +252,8 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_add)
     // skip
     if (fp_fetch_add == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
+    auto varg = patomic::test::create_vint(m_width, m_is_signed);
     if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (int i = 0; i < m_argc; ++i)
@@ -274,8 +274,8 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_sub)
     // skip
     if (fp_fetch_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
+    auto varg = patomic::test::create_vint(m_width, m_is_signed);
     if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (int i = 0; i < m_argc; ++i)
@@ -296,7 +296,7 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_inc)
     // skip
     if (fp_fetch_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
     if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (auto arg : m_arg1s)
@@ -316,7 +316,7 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_dec)
     // skip
     if (fp_fetch_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
     if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (auto arg : m_arg1s)
@@ -336,7 +336,7 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_neg)
     // skip
     if (fp_fetch_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_align, m_is_signed);
+    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
     if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
     // test
     for (auto arg : m_arg1s)
@@ -366,8 +366,8 @@ static auto get_test_params() -> const std::vector<patomic::test::sized_param>&
             if (id == patomic_impl_id_NULL) { continue; }
             for (auto width : patomic::test::get_widths()) {
                 // don't include unrepresentable widths
-                auto uup = patomic::test::create_vint(width, width, false);
-                auto sup = patomic::test::create_vint(width, width, true);
+                auto uup = patomic::test::create_vint(width, false);
+                auto sup = patomic::test::create_vint(width, true);
                 if (uup == nullptr || sup == nullptr) { continue; }
                 for (auto order : patomic::test::get_orders()) {
                     // .is_explicit= false, .is_signed=false

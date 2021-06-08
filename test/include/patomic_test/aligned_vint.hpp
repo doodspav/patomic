@@ -56,11 +56,9 @@ namespace patomic {
             T* m_val{};
 
         public:
-            aligned_vint_tmp(std::size_t align)
-                : aligned_vint(sizeof(T), align)
+            aligned_vint_tmp()
+                : aligned_vint(sizeof(T), alignof(T))
             {
-                // aligned_buffer will check is_pow2(align)
-                assert(align >= alignof(T));
                 m_val = new (this->data()) T{};
             }
             ~aligned_vint_tmp() override
@@ -126,23 +124,23 @@ namespace patomic {
         using avt_ull_t = aligned_vint_tmp<unsigned long long>;
 
         static std::unique_ptr<aligned_vint>
-        create_vint(std::size_t width, std::size_t align, bool is_signed)
+        create_vint(std::size_t width, bool is_signed)
         {
             if (is_signed)
             {
-                if (width == sizeof(char)) { return std::make_unique<avt_sc_t>(align); }
-                else if (width == sizeof(short)) { return std::make_unique<avt_ss_t>(align); }
-                else if (width == sizeof(int)) { return std::make_unique<avt_si_t>(align); }
-                else if (width == sizeof(long)) { return std::make_unique<avt_sl_t>(align); }
-                else if (width == sizeof(long long)) { return std::make_unique<avt_sll_t>(align); }
+                if (width == sizeof(char)) { return std::make_unique<avt_sc_t>(); }
+                else if (width == sizeof(short)) { return std::make_unique<avt_ss_t>(); }
+                else if (width == sizeof(int)) { return std::make_unique<avt_si_t>(); }
+                else if (width == sizeof(long)) { return std::make_unique<avt_sl_t>(); }
+                else if (width == sizeof(long long)) { return std::make_unique<avt_sll_t>(); }
             }
             else
             {
-                if (width == sizeof(char)) { return std::make_unique<avt_uc_t>(align); }
-                else if (width == sizeof(short)) { return std::make_unique<avt_us_t>(align); }
-                else if (width == sizeof(int)) { return std::make_unique<avt_ui_t>(align); }
-                else if (width == sizeof(long)) { return std::make_unique<avt_ul_t>(align); }
-                else if (width == sizeof(long long)) { return std::make_unique<avt_ull_t>(align); }
+                if (width == sizeof(char)) { return std::make_unique<avt_uc_t>(); }
+                else if (width == sizeof(short)) { return std::make_unique<avt_us_t>(); }
+                else if (width == sizeof(int)) { return std::make_unique<avt_ui_t>(); }
+                else if (width == sizeof(long)) { return std::make_unique<avt_ul_t>(); }
+                else if (width == sizeof(long long)) { return std::make_unique<avt_ull_t>(); }
             }
             return nullptr;
         }
