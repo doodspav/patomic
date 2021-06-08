@@ -28,7 +28,7 @@ protected:
     unsigned char *m_ret;  // potential return value
     std::vector<unsigned char *> m_arg1s;
     std::vector<unsigned char *> m_arg2s;
-    static constexpr int m_argc = 5;
+    static constexpr int m_argc = 50;
 
     void SetUpBuffers(size_t width, size_t align, unsigned int seed)
     {

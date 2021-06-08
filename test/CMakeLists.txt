@@ -58,6 +58,6 @@ gtest_add_tests(
     TEST_LIST patomic_test_TESTS
 )
 
-foreach(test IN ITEMS ${patomic_test_TESTS})
-    windows_set_path("${test}" patomic::patomic)
+foreach(test IN LISTS patomic_test_TESTS)
+    windows_set_path("${test}" patomic::patomic gtest)
 endforeach()
