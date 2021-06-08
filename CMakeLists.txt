@@ -102,16 +102,15 @@ include(cmake/install-rules.cmake)
 # ---- Developer mode ----
 
 if(NOT patomic_DEVELOPER_MODE)
-  return()
+    return()
 elseif(NOT PROJECT_IS_TOP_LEVEL)
-  message(
-      AUTHOR_WARNING
-      "Developer mode is intended for developers of patomic"
-  )
+    message(
+        AUTHOR_WARNING
+        "Developer mode is intended for developers of patomic"
+    )
 endif()
 
 include(CTest)
 if(BUILD_TESTING)
-  message("Building stuff")
-  add_subdirectory(test)
+    add_subdirectory(test)
 endif()

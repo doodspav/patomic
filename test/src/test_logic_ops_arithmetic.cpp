@@ -59,6 +59,28 @@ protected:
         }
     }
 
+    void InsertMinMaxArgs()
+    {
+        auto min = patomic::test::create_vint(m_width, m_align, m_is_signed);
+        auto max = patomic::test::create_vint(m_width, m_align, m_is_signed);
+        min->min();
+        max->max();
+        // arg1s
+        if (m_arg1s.size() >= 2)
+        {
+            auto it = m_arg1s.end();
+            std::memcpy(*(--it), min->data(), m_width);
+            std::memcpy(*(--it), max->data(), m_width);
+        }
+        // arg2s
+        if (m_arg2s.size() >= 2)
+        {
+            auto it = m_arg2s.begin();
+            std::memcpy(*it++, min->data(), m_width);
+            std::memcpy(*it++, max->data(), m_width);
+        }
+    }
+
     void SetUpImplicit()
     {
         // get patomic
@@ -94,6 +116,7 @@ protected:
         if (p.is_explicit) { SetUpExplicit(); }
         else { SetUpImplicit(); }
         SetUpBuffers(p.width, m_align, p.seed);
+        InsertMinMaxArgs();
         // record properties
         RecordProperty("IsExplicit", p.is_explicit);
         RecordProperty("IsSigned", p.is_signed);
@@ -121,14 +144,6 @@ protected:
         this->m_eops.fp_##name,    \
         this->m_is_explicit,       \
         this->m_order              \
-    )
-
-#define CURRY_OP_CMPXCHG(name)         \
-    ::patomic::test::curry_op_cmpxchg( \
-        this->m_iops.fp_##name,        \
-        this->m_eops.fp_##name,        \
-        this->m_is_explicit,           \
-        this->m_order                  \
     )
 
 

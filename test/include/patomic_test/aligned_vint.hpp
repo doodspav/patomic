@@ -23,6 +23,7 @@ namespace patomic {
             aligned_vint(std::size_t width, std::size_t align)
                 : m_buf(width, align)
             {}
+            virtual ~aligned_vint() = default;
 
             std::size_t width() const noexcept { return m_buf.size; }
             unsigned char *data() noexcept { return m_buf.data; }
@@ -39,6 +40,9 @@ namespace patomic {
             virtual void inc() noexcept = 0;
             virtual void dec() noexcept = 0;
             virtual void neg() noexcept = 0;
+
+            virtual void min() noexcept = 0;
+            virtual void max() noexcept = 0;
         };
 
         template <typename T>
@@ -55,9 +59,11 @@ namespace patomic {
             aligned_vint_tmp(std::size_t align)
                 : aligned_vint(sizeof(T), align)
             {
+                // aligned_buffer will check is_pow2(align)
+                assert(align >= alignof(T));
                 m_val = new (this->data()) T{};
             }
-            ~aligned_vint_tmp()
+            ~aligned_vint_tmp() override
             {
                 m_val->~T();
             }
@@ -91,9 +97,19 @@ namespace patomic {
             {
                 // msvc complains about unsigned negation (C4146)
                 auto val = static_cast<sint_t>(*m_val);
-                // C++ guarantees 2s complement (-INT_MIN == INT_MIN)
-                constexpr auto min = std::numeric_limits<sint_t>::max();
+                // C++20 guarantees 2s complement
+                // -INT_MIN == INT_MIN
+                constexpr auto min = std::numeric_limits<sint_t>::min();
                 if (val != min) { *m_val = static_cast<T>(-val); }
+            }
+
+            void min() noexcept override
+            {
+                *m_val = std::numeric_limits<T>::min();
+            }
+            void max() noexcept override
+            {
+                *m_val = std::numeric_limits<T>::max();
             }
         };
 
