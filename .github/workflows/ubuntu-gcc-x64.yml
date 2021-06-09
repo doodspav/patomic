@@ -1,0 +1,43 @@
+name: Ubuntu-GCC-x64
+
+on:
+  push:
+    branches:
+      - devel
+      - main
+  pull_request:
+
+jobs:
+  test_execution:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CXX: g++
+      GTEST_OUTPUT: xml:output.xml
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          mkdir build && cd build
+          cmake --preset=ci-ubuntu-gcc ..
+          cmake --build . --config Debug
+      - name: test
+        run: |
+          ctest -C Debug -j $(nproc)
+      - name: upload xml
+        uses: actions/upload-artifact@v2
+        with:
+          name: ubuntu-gcc-x64.xml
+          path: test/output.xml
+  test_conformance:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          mkdir build && cd build
+          cmake --preset=ci-unix-ansi ..
+          cmake --build . --config Debug

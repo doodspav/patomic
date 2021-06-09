@@ -1,0 +1,43 @@
+name: Ubuntu-Clang-x64
+
+on:
+  push:
+    branches:
+      - devel
+      - main
+  pull_request:
+
+jobs:
+  test_execution:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+      GTEST_OUTPUT: xml:output.xml
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          mkdir build && cd build
+          cmake --preset=ci-ubuntu-clang ..
+          cmake --build . --config Debug
+      - name: test
+        run: |
+          ctest -C Debug -j $(nproc)
+      - name: upload xml
+        uses: actions/upload-artifact@v2
+        with:
+          name: ubuntu-clang-x64.xml
+          path: test/output.xml
+  test_conformance:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          mkdir build && cd build
+          cmake --preset=ci-unix-ansi ..
+          cmake --build . --config Debug
