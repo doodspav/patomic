@@ -18,12 +18,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: build
         run: |
-          mkdir build && cd build
-          cmake --preset=ci-ubuntu-gcc ..
-          cmake --build . --config Debug
+          cmake --preset=ci-ubuntu-gcc
+          cmake --build build
       - name: test
         run: |
-          ctest -C Debug -j $(nproc)
+          cd build && ctest -j $(nproc)
       - name: upload xml
         uses: actions/upload-artifact@v2
         with:
