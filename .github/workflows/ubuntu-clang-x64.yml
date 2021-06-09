@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ubuntu-clang-x64.xml
-          path: test/output.xml
+          path: build/test/output.xml
   test_conformance:
     runs-on: ubuntu-latest
     env:

@@ -23,16 +23,11 @@ jobs:
         run: |
           cd build
           GTEST_OUTPUT=xml:output.xml ctest -j $(nproc)
-      - name: echo stuff
-        run: |
-          echo $PWD
-          ls
-          ls test/
       - name: upload xml
         uses: actions/upload-artifact@v2
         with:
           name: ubuntu-gcc-x64.xml
-          path: test/output.xml
+          path: build/test/output.xml
   test_conformance:
     runs-on: ubuntu-latest
     env:
