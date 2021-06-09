@@ -27,7 +27,7 @@
       "name": "ci-flags-msvc",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS": "/UNDEBUG /Wall /WX /permissive- /wd4464 /wd4132 /wd4820 /wd4127 /wd5045",
+        "CMAKE_C_FLAGS": "/Wall /WX /permissive- /wd4464 /wd4132 /wd4820 /wd4127 /wd5045",
         "CMAKE_C_STANDARD": "90",
         "CMAKE_C_STANDARD_REQUIRED": "ON",
         "CMAKE_C_EXTENSIONS": "OFF",
@@ -63,7 +63,7 @@
       "inherits": ["ci-flags-gnu-base"],
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS": "-UNDEBUG -fsanitize=address,undefined -Weverything -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function"
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -Weverything -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function"
       }
     },
     {
