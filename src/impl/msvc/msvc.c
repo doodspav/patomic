@@ -794,6 +794,10 @@ PATOMIC_DEFINE_OPS_CREATE_ALL(32)
 #endif
 
 
+static const patomic_ops_t patomic_ops_NULL;
+static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
+
+
 #define PATOMIC_SET_RET(width, order, ret)                                    \
     {switch (order)                                                           \
     {                                                                         \
@@ -808,11 +812,8 @@ PATOMIC_DEFINE_OPS_CREATE_ALL(32)
                               break;                                          \
         case patomic_SEQ_CST: (ret) = patomic_ops_create_##width##_seq_cst(); \
                               break;                                          \
-        default: break;                                                       \
+        default: (ret) = patomic_ops_NULL;                                    \
     }}
-
-static const patomic_ops_t patomic_ops_NULL;
-static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 
 static patomic_ops_t
 patomic_create_ops(
@@ -826,11 +827,11 @@ patomic_create_ops(
     switch (byte_width)
     {
 #ifndef _M_IX86
-        case 8: PATOMIC_SET_RET(64, order, ret)
+        case 8: PATOMIC_SET_RET(64, order, ret) break;
 #endif
-        case 4: PATOMIC_SET_RET(32, order, ret)
-        case 2: PATOMIC_SET_RET(16, order, ret)
-        case 1: PATOMIC_SET_RET(8, order, ret)
+        case 4: PATOMIC_SET_RET(32, order, ret) break;
+        case 2: PATOMIC_SET_RET(16, order, ret) break;
+        case 1: PATOMIC_SET_RET(8, order, ret) break;
         default: ret = patomic_ops_NULL;
     }
 
