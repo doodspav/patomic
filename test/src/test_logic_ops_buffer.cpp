@@ -113,6 +113,7 @@ protected:
         RecordProperty("ImplId", std::to_string(p.id));
         RecordProperty("ImplName", patomic::test::get_id_name(p.id));
         RecordProperty("Seed", std::to_string(p.seed));
+        RecordProperty("Iterations", 0);
     }
 };
 
@@ -149,10 +150,12 @@ TEST_P(BufferOpsLogicTestFixture, fp_store)
     if (!patomic_is_valid_store_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_store == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
+    int i = 0;
     for (auto arg : m_arg1s)
     {
         fp_store(m_obj, arg);
         ASSERT_TRUE(std::memcmp(m_obj, arg, m_width) == 0);
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -163,11 +166,13 @@ TEST_P(BufferOpsLogicTestFixture, fp_load)
     if (!patomic_is_valid_load_order(m_order)) { GTEST_SKIP_("Invalid memory order"); }
     else if (fp_load == nullptr) { GTEST_SKIP_("Not implemented"); }
     // test
+    int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
         fp_load(m_obj, m_ret);
         ASSERT_TRUE(std::memcmp(m_obj, m_ret, m_width) == 0);
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -185,6 +190,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_exchange)
         fp_exchange(m_obj, desired, m_ret);
         ASSERT_TRUE(std::memcmp(m_obj, desired, m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, current, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -220,7 +226,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_weak)
                 ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
             }
         }
-            // obj != expected
+        // obj != expected
         else
         {
             bool ok = fp_cmpxchg_weak(m_obj, expected, desired);
@@ -228,6 +234,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_weak)
             ASSERT_TRUE(std::memcmp(m_obj, expected, m_width) == 0);
             ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
         }
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -263,6 +270,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_cmpxchg_strong)
             ASSERT_TRUE(std::memcmp(m_obj, expected, m_width) == 0);
             ASSERT_TRUE(std::memcmp(m_obj, m_old, m_width) == 0);
         }
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -283,6 +291,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test)
         // op
         xored_bit ^= static_cast<bool>(fp_test(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -305,6 +314,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_compl)
         xored_bit ^= static_cast<bool>(fp_test_compl(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -327,6 +337,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_set)
         xored_bit ^= static_cast<bool>(fp_test_set(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -349,6 +360,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_test_reset)
         xored_bit ^= static_cast<bool>(fp_test_reset(m_obj, offset));
         ASSERT_FALSE(xored_bit);  // xor x y -> 0 if x == y
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -365,6 +377,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_or)
         for (size_t w = 0; w < m_width; ++w) { m_res[w] |= m_arg2s[i][w]; }
         fp_or(m_obj, m_arg2s[i]);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -381,6 +394,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_xor)
         for (size_t w = 0; w < m_width; ++w) { m_res[w] ^= m_arg2s[i][w]; }
         fp_xor(m_obj, m_arg2s[i]);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -397,6 +411,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_and)
         for (size_t w = 0; w < m_width; ++w) { m_res[w] &= m_arg2s[i][w]; }
         fp_and(m_obj, m_arg2s[i]);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -413,6 +428,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_not)
         for (size_t w = 0; w < m_width; ++w) { m_res[w] = ~m_res[w]; }
         fp_not(m_obj);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -430,6 +446,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_fetch_or)
         fp_fetch_or(m_obj, m_arg2s[i], m_ret);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -447,6 +464,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_fetch_xor)
         fp_fetch_xor(m_obj, m_arg2s[i], m_ret);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -464,6 +482,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_fetch_and)
         fp_fetch_and(m_obj, m_arg2s[i], m_ret);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 
@@ -481,6 +500,7 @@ TEST_P(BufferOpsLogicTestFixture, fp_fetch_not)
         fp_fetch_not(m_obj, m_ret);
         ASSERT_TRUE(std::memcmp(m_obj, m_res, m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
+        RecordProperty("Iterations", i + 1);
     }
 }
 

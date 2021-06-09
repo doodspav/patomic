@@ -45,6 +45,7 @@ protected:
         RecordProperty("ImplId", std::to_string(p.id));
         RecordProperty("ImplName", patomic::test::get_id_name(p.id));
         RecordProperty("Seed", std::to_string(p.seed));
+        RecordProperty("Iterations", 0);
     }
 };
 
@@ -58,6 +59,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_store)
 {
     auto fp_store = m_ops.fp_store;
     if (fp_store == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -65,6 +67,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_store)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -72,6 +75,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_load)
 {
     auto fp_load = m_ops.fp_load;
     if (fp_load == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -79,6 +83,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_load)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -86,6 +91,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_exchange)
 {
     auto fp_exchange = m_ops.xchg_ops.fp_exchange;
     if (fp_exchange == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -93,6 +99,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_exchange)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -101,6 +108,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_weak)
     auto fp_cmpxchg_weak = m_ops.xchg_ops.fp_cmpxchg_weak;
     if (fp_cmpxchg_weak == nullptr) { GTEST_SKIP_("Not implemented"); }
     // invalid succ and valid fail
+    int i = 0;
     for (auto order : m_orders)
     {
         auto fail = patomic_RELAXED;
@@ -109,8 +117,10 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_weak)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
     // valid succ and invalid fail
+    i = 0;
     for (auto order : m_orders)
     {
         auto succ = patomic_SEQ_CST;
@@ -119,6 +129,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_weak)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
     // fail is stronger than succ
     ASSERT_EXIT(
@@ -135,6 +146,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_strong)
     auto fp_cmpxchg_strong = m_ops.xchg_ops.fp_cmpxchg_strong;
     if (fp_cmpxchg_strong == nullptr) { GTEST_SKIP_("Not implemented"); }
     // invalid succ and valid fail
+    int i = 0;
     for (auto order : m_orders)
     {
         auto fail = patomic_RELAXED;
@@ -143,8 +155,10 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_strong)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
     // valid succ and invalid fail
+    i = 0;
     for (auto order : m_orders)
     {
         auto succ = patomic_SEQ_CST;
@@ -153,6 +167,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_cmpxchg_strong)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
     // fail is stronger than succ
     ASSERT_EXIT(
@@ -168,6 +183,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test)
 {
     auto fp_test = m_ops.bitwise_ops.fp_test;
     if (fp_test == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -175,6 +191,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -182,6 +199,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_compl)
 {
     auto fp_test_compl = m_ops.bitwise_ops.fp_test_compl;
     if (fp_test_compl == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -189,6 +207,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_compl)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -196,6 +215,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_set)
 {
     auto fp_test_set = m_ops.bitwise_ops.fp_test_set;
     if (fp_test_set == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -203,6 +223,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_set)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -210,6 +231,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_reset)
 {
     auto fp_test_reset = m_ops.bitwise_ops.fp_test_reset;
     if (fp_test_reset == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -217,6 +239,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_test_reset)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -224,6 +247,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_or)
 {
     auto fp_or = m_ops.binary_ops.fp_or;
     if (fp_or == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -231,6 +255,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_or)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -238,6 +263,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_xor)
 {
     auto fp_xor = m_ops.binary_ops.fp_xor;
     if (fp_xor == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -245,6 +271,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_xor)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -252,6 +279,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_and)
 {
     auto fp_and = m_ops.binary_ops.fp_and;
     if (fp_and == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -259,6 +287,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_and)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -266,6 +295,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_not)
 {
     auto fp_not = m_ops.binary_ops.fp_not;
     if (fp_not == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -273,6 +303,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_not)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -280,6 +311,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_or)
 {
     auto fp_fetch_or = m_ops.binary_ops.fp_fetch_or;
     if (fp_fetch_or == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -287,6 +319,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_or)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -294,6 +327,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_xor)
 {
     auto fp_fetch_xor = m_ops.binary_ops.fp_fetch_xor;
     if (fp_fetch_xor == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -301,6 +335,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_xor)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -308,6 +343,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_and)
 {
     auto fp_fetch_and = m_ops.binary_ops.fp_fetch_and;
     if (fp_fetch_and == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -315,6 +351,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_and)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -322,6 +359,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_not)
 {
     auto fp_fetch_not = m_ops.binary_ops.fp_fetch_not;
     if (fp_fetch_not == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -329,6 +367,7 @@ TEST_P(ValidOrderBufferOpsDeathTestFixture, fp_fetch_not)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -360,6 +399,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_add)
 {
     auto fp_add = GET_ARI_OP(add);
     if (fp_add == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -367,6 +407,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_add)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -374,6 +415,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_sub)
 {
     auto fp_sub = GET_ARI_OP(sub);
     if (fp_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -381,6 +423,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_sub)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -388,6 +431,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_inc)
 {
     auto fp_inc = GET_ARI_OP(inc);
     if (fp_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -395,6 +439,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_inc)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -402,6 +447,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_dec)
 {
     auto fp_dec = GET_ARI_OP(dec);
     if (fp_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -409,6 +455,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_dec)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -416,6 +463,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_neg)
 {
     auto fp_neg = GET_ARI_OP(neg);
     if (fp_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -423,6 +471,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_neg)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -430,6 +479,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_add)
 {
     auto fp_fetch_add = GET_ARI_OP(fetch_add);
     if (fp_fetch_add == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -437,6 +487,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_add)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -444,6 +495,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_sub)
 {
     auto fp_fetch_sub = GET_ARI_OP(fetch_sub);
     if (fp_fetch_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -451,6 +503,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_sub)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -458,6 +511,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_inc)
 {
     auto fp_fetch_inc = GET_ARI_OP(fetch_inc);
     if (fp_fetch_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -465,6 +519,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_inc)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -472,6 +527,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_dec)
 {
     auto fp_fetch_dec = GET_ARI_OP(fetch_dec);
     if (fp_fetch_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -479,6 +535,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_dec)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -486,6 +543,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_neg)
 {
     auto fp_fetch_neg = GET_ARI_OP(fetch_neg);
     if (fp_fetch_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         ASSERT_EXIT(
@@ -493,6 +551,7 @@ TEST_P(ValidOrderArithmeticOpsDeathTestFixture, fp_fetch_neg)
             testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -517,6 +576,7 @@ TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_cmpxchg_weak)
 {
     auto fp_cmpxchg_weak = m_ops.xchg_ops.fp_cmpxchg_weak;
     if (fp_cmpxchg_weak == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         auto succ = patomic_SEQ_CST;
@@ -525,6 +585,7 @@ TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_cmpxchg_weak)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
@@ -532,6 +593,7 @@ TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_cmpxchg_strong)
 {
     auto fp_cmpxchg_strong = m_ops.xchg_ops.fp_cmpxchg_strong;
     if (fp_cmpxchg_strong == nullptr) { GTEST_SKIP_("Not implemented"); }
+    int i = 0;
     for (auto order : m_orders)
     {
         auto succ = patomic_SEQ_CST;
@@ -540,6 +602,7 @@ TEST_P(ValidLoadOrderOpsDeathTestFixture, fp_cmpxchg_strong)
             ::testing::KilledBySignal(SIGABRT),
             ".*"
         );
+        RecordProperty("Iterations", ++i);
     }
 }
 
