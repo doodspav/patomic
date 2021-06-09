@@ -23,6 +23,11 @@ jobs:
         run: |
           cd build
           GTEST_OUTPUT=xml:output.xml ctest -j $(nproc)
+      - name: echo stuff
+        run: |
+          echo $PWD
+          ls
+          ls test/
       - name: upload xml
         uses: actions/upload-artifact@v2
         with:
