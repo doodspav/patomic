@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 14,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "dev-mode",
+      "hidden": true,
+      "cacheVariables": {
+        "patomic_DEVELOPER_MODE": "ON"
+      }
+    },
+    {
+      "name": "ansi-flags",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function",
+        "CMAKE_C_STANDARD": "90",
+        "CMAKE_C_STANDARD_REQUIRED": "TRUE",
+        "CMAKE_C_EXTENSIONS": "OFF"
+      }
+    },
+    {
+      "name": "ci-flags-msvc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "/UNDEBUG /Wall /WX /permissive- /wd4464 /wd4132 /wd4820 /wd4127 /wd5045",
+        "CMAKE_C_STANDARD": "90",
+        "CMAKE_C_STANDARD_REQUIRED": "ON",
+        "CMAKE_C_EXTENSIONS": "OFF",
+        "CMAKE_CXX_STANDARD": "14",
+        "CMAKE_CXX_EXTENSIONS": "OFF"
+      }
+    },
+    {
+      "name": "ci-flags-gnu-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address,undefined",
+        "CMAKE_C_STANDARD": "11",
+        "CMAKE_C_STANDARD_REQUIRED": "ON",
+        "CMAKE_C_EXTENSIONS": "OFF",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -Wall -Wextra -Werror -Wpedantic",
+        "CMAKE_CXX_STANDARD": "14",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF"
+      }
+    },
+    {
+      "name": "ci-flags-gcc",
+      "inherits": ["ci-flags-gnu-base"],
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function"
+      }
+    },
+    {
+      "name": "ci-flags-clang",
+      "inherits": ["ci-flags-gnu-base"],
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-UNDEBUG -fsanitize=address,undefined -Weverything -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function"
+      }
+    },
+    {
+      "name": "ci-build",
+      "binaryDir": "${sourceDir}/build",
+      "hidden": true,
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "ci-win64-msvc",
+      "inherits": ["dev-mode", "ci-build","ci-flags-msvc"],
+      "generator": "Visual Studio 16 2019",
+      "architecture": "x64"
+    },
+    {
+      "name": "ci-unix-ansi",
+      "inherits": ["ci-build", "ansi-flags"],
+      "generator": "Unix Makefiles"
+    },
+    {
+      "name": "ci-macos-clang",
+      "inherits": ["dev-mode", "ci-build", "ci-flags-clang"],
+      "generator": "Unix Makefiles"
+    },
+    {
+      "name": "ci-ubuntu-gcc",
+      "inherits": ["dev-mode", "ci-build", "ci-flags-gcc"],
+      "generator": "Unix Makefiles"
+    },
+    {
+      "name": "ci-ubuntu-clang",
+      "inherits": ["dev-mode", "ci-build", "ci-flags-clang"],
+      "generator": "Unix Makefiles"
+    }
+  ]
+}
