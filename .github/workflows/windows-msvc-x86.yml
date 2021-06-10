@@ -1,0 +1,31 @@
+name: Windows-MSVC-x86
+
+on:
+  push:
+    branches:
+      - devel
+      - main
+  pull_request:
+
+jobs:
+  # no need for test_conformance on msvc
+  # msvc has no ANSI C or C90 support
+  test_execution:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          cmake --preset=ci-win32-msvc
+          cmake --build build --config Debug
+      - name: test
+        run: |
+          cd build
+          $Env:PATH += ";$pwd\Debug;$pwd\bin\Debug"
+          cd test/Debug
+          ./patomic_test --gtest_output=xml:output.xml
+      - name: upload xml
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-msvc-x86.xml
+          path: build/test/Debug/output.xml
