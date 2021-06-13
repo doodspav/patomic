@@ -8,6 +8,7 @@
 #include "null/null.h"
 #include "std/std.h"
 #include "msvc/msvc.h"
+#include "tsx/tsx.h"
 
 /*
  * REGISTER STRUCT
@@ -35,16 +36,21 @@ patomic_impl_register[] = {
         patomic_impl_id_NULL,
         patomic_impl_create_null,
         patomic_impl_create_explicit_null
-    },
-    {
+    }
+    ,{
         patomic_impl_id_STD,
         patomic_impl_create_std,
         patomic_impl_create_explicit_std
-    },
-    {
+    }
+    ,{
         patomic_impl_id_MSVC,
         patomic_impl_create_msvc,
         patomic_impl_create_explicit_msvc
+    }
+    ,{
+        patomic_impl_id_TSX,
+        patomic_impl_create_tsx,
+        patomic_impl_create_explicit_tsx
     }
 };
 
