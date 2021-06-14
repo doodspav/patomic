@@ -18,13 +18,14 @@ namespace patomic {
         template <size_t N> using order_array = std::array<patomic_memory_order_t, N>;
         template <size_t N> using id_array = std::array<patomic_impl_id_t, N>;
 
-        static constexpr auto get_ids() -> id_array<4>
+        static constexpr auto get_ids() -> id_array<5>
         {
             return {
                 patomic_impl_id_NULL
                 ,patomic_impl_id_MSVC
                 ,patomic_impl_id_STD
                 ,patomic_impl_id_TSX
+                ,patomic_impl_id_GNU
             };
         }
 
@@ -36,6 +37,7 @@ namespace patomic {
                 case patomic_impl_id_MSVC: return "MSVC";
                 case patomic_impl_id_STD: return "STD";
                 case patomic_impl_id_TSX: return "TSX";
+                case patomic_impl_id_GNU: return "GNU";
                 default: return "UNKNOWN";
             }
         }

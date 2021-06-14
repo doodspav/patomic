@@ -9,6 +9,7 @@
 #include "std/std.h"
 #include "msvc/msvc.h"
 #include "tsx/tsx.h"
+#include "gnu/gnu.h"
 
 /*
  * REGISTER STRUCT
@@ -51,6 +52,11 @@ patomic_impl_register[] = {
         patomic_impl_id_TSX,
         patomic_impl_create_tsx,
         patomic_impl_create_explicit_tsx
+    }
+    ,{
+        patomic_impl_id_GNU,
+        patomic_impl_create_gnu,
+        patomic_impl_create_explicit_gnu
     }
 };
 
