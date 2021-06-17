@@ -46,6 +46,8 @@ add_library(
     src/impl/msvc/msvc.h
     src/impl/msvc/msvc.c
     src/impl/msvc/msvc_x86.h
+    src/impl/msvc/msvc_arm.h
+    src/impl/msvc/msvc_e64.h
     # src/impl/tsx
     src/impl/tsx/tsx.h
     src/impl/tsx/tsx.c

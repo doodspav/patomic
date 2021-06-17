@@ -12,6 +12,7 @@ static const patomic_explicit_t patomic_explicit_NULL;
 
 #include "msvc_x86.h"
 #include "msvc_arm.h"
+#include "msvc_e64.h"
 
 #if defined(PATOMIC_DEFINE_IL)
 
@@ -22,14 +23,26 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     PATOMIC_DEFINE_IL(__int64, __int64, 64)
 #endif
 
+#if defined(PATOMIC_DEFINE_IL_E64)
+    PATOMIC_DEFINE_IL_E64()
+#endif
+
 
 /* hide/show anything */
-#define HIDE(x)
-#define SHOW(x) x
+#ifndef HIDE
+    #define HIDE(x)
+#endif
+#ifndef SHOW
+    #define SHOW(x) x
+#endif
 
 /* hide/show function param with leading comma */
-#define HIDE_P(x, y)
-#define SHOW_P(x, y) ,y
+#ifndef HIDE_P
+    #define HIDE_P(x, y)
+#endif
+#ifndef SHOW_P
+    #define SHOW_P(x, y) ,y
+#endif
 
 
 /*
@@ -789,9 +802,7 @@ PATOMIC_DEFINE_ARI_OPS_CREATE(8, 8, order, SHOW_P, ops_explicit)
 PATOMIC_DEFINE_OPS_CREATE_ALL(8)
 PATOMIC_DEFINE_OPS_CREATE_ALL(16)
 PATOMIC_DEFINE_OPS_CREATE_ALL(32)
-#ifndef _M_IX86
-    PATOMIC_DEFINE_OPS_CREATE_ALL(64)
-#endif
+PATOMIC_DEFINE_OPS_CREATE_ALL(64)
 
 
 static const patomic_ops_t patomic_ops_NULL;
@@ -826,9 +837,7 @@ patomic_create_ops(
 
     switch (byte_width)
     {
-#ifndef _M_IX86
         case 8: PATOMIC_SET_RET(64, order, ret) break;
-#endif
         case 4: PATOMIC_SET_RET(32, order, ret) break;
         case 2: PATOMIC_SET_RET(16, order, ret) break;
         case 1: PATOMIC_SET_RET(8, order, ret) break;
@@ -847,9 +856,7 @@ patomic_create_ops_explicit(
 
     switch (byte_width)
     {
-#ifndef _M_IX86
         case 8: ret = patomic_ops_create_64_explicit(); break;
-#endif
         case 4: ret = patomic_ops_create_32_explicit(); break;
         case 2: ret = patomic_ops_create_16_explicit(); break;
         case 1: ret = patomic_ops_create_8_explicit(); break;
