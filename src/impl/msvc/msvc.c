@@ -14,6 +14,9 @@ static const patomic_explicit_t patomic_explicit_NULL;
 #include "msvc_arm.h"
 #include "msvc_e64.h"
 
+#include "generic_uint.h"
+
+
 #if defined(PATOMIC_DEFINE_IL)
 
 PATOMIC_DEFINE_IL(char, __int8, 8)
@@ -174,20 +177,24 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                          \
     )                                                        \
     {                                                        \
-        unsigned __int##width mask;                          \
-        unsigned __int##width val;                           \
+        /* declarations */                                   \
+        patomic_uint##width##_t mask;                        \
+        patomic_uint##width##_t val;                         \
+        /* assertions */                                     \
         assert(offset >= 0);                                 \
         assert(width > offset);                              \
         assert(patomic_is_valid_load_order(order));          \
-        mask = (unsigned __int##width) (                     \
-            ((unsigned __int##width) 1u) << offset           \
-        );                                                   \
+        /* setup mask */                                     \
+        PATOMIC_UINT_SET_TO_ONE(width, mask);                \
+        mask = PATOMIC_UINT_LSHIFT(width, mask, offset);     \
+        /* op and return */                                  \
         patomic_il_load_##width(                             \
             obj,                                             \
             order,                                           \
             &val                                             \
         );                                                   \
-        return (val & mask) != 0;                            \
+        mask = PATOMIC_UINT_AND(width, val, mask);           \
+        return PATOMIC_UINT_NEQ_ZERO(width, mask);           \
     }
 
 #define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(width, name, order, vis) \
@@ -199,9 +206,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     )                                                               \
     {                                                               \
         /* declarations */                                          \
-        unsigned __int##width expected;                             \
-        unsigned __int##width desired;                              \
-        unsigned __int##width mask;                                 \
+        patomic_uint##width##_t expected;                           \
+        patomic_uint##width##_t desired;                            \
+        patomic_uint##width##_t mask;                               \
         int succ;                                                   \
         int fail;                                                   \
         /* assertions */                                            \
@@ -209,9 +216,8 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         assert(width > offset);                                     \
         assert(patomic_is_valid_order(order));                      \
         /* setup memory orders and mask */                          \
-        mask = (unsigned __int##width) (                            \
-            ((unsigned __int##width) 1u) << offset                  \
-        );                                                          \
+        PATOMIC_UINT_SET_TO_ONE(width, mask);                       \
+        mask = PATOMIC_UINT_LSHIFT(width, mask, offset);            \
         succ = order;                                               \
         fail = patomic_cmpxchg_fail_order(order);                   \
         /* load initial value */                                    \
@@ -224,7 +230,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         do {                                                        \
             /* complement bit at offset */                          \
             desired = expected;                                     \
-            desired ^= mask;                                        \
+            desired = PATOMIC_UINT_XOR(width, desired, mask);       \
         }                                                           \
         while (!patomic_il_compare_exchange_##width(                \
             obj,                                                    \
@@ -234,7 +240,8 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
             fail                                                    \
         ));                                                         \
         /* return old bit value */                                  \
-        return (expected & mask) != 0;                              \
+        mask = PATOMIC_UINT_AND(width, expected, mask);             \
+        return PATOMIC_UINT_NEQ_ZERO(width, mask);                  \
     }                                                               \
     static PATOMIC_FORCE_INLINE int                                 \
     patomic_opimpl_test_set_##name(                                 \
@@ -329,7 +336,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
-        unsigned __int##width val;                                        \
+        patomic_uint##width##_t val;                                      \
         /* assertion in called function */                                \
         patomic_opimpl_fetch_or_##name(                                   \
             obj                                                           \
@@ -361,7 +368,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
-        unsigned __int##width val;                                        \
+        patomic_uint##width##_t val;                                      \
         /* assertion in called function */                                \
         patomic_opimpl_fetch_xor_##name(                                  \
             obj                                                           \
@@ -393,7 +400,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
-        unsigned __int##width val;                                        \
+        patomic_uint##width##_t val;                                      \
         /* assertion in called function */                                \
         patomic_opimpl_fetch_and_##name(                                  \
             obj                                                           \
@@ -410,8 +417,8 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     )                                                                     \
     {                                                                     \
         /* declarations */                                                \
-        unsigned __int##width expected;                                   \
-        unsigned __int##width desired;                                    \
+        patomic_uint##width##_t expected;                                 \
+        patomic_uint##width##_t desired;                                  \
         int succ;                                                         \
         int fail;                                                         \
         unsigned char const *src;                                         \
@@ -444,7 +451,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
             succ,                                                         \
             fail                                                          \
         ));                                                               \
-        PATOMIC_IGNORE_UNUSED(memcpy(ret, &expected, (sizeof desired)));  \
+        PATOMIC_IGNORE_UNUSED(memcpy(ret, &expected, (sizeof expected))); \
     }                                                                     \
     static PATOMIC_FORCE_INLINE void                                      \
     patomic_opimpl_not_##name(                                            \
@@ -452,7 +459,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                       \
     )                                                                     \
     {                                                                     \
-        unsigned __int##width val;                                        \
+        patomic_uint##width##_t val;                                      \
         /* assertion in called function */                                \
         patomic_opimpl_fetch_not_##name(                                  \
             obj                                                           \
@@ -509,8 +516,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                         \
     )                                                                       \
     {                                                                       \
-        /* ExchangeAdd doesn't care about sign */                           \
-        __int##width val;                                                   \
+        patomic_uint##width##_t val;                                        \
         /* assertion in called function */                                  \
         patomic_opimpl_fetch_add_##name(                                    \
             obj                                                             \
@@ -527,12 +533,11 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                          \
     )                                                                       \
     {                                                                       \
-        unsigned __int##width arg_val;                                      \
+        patomic_uint##width##_t arg_val;                                    \
         assert(patomic_is_valid_order(order));                              \
-        arg_val = *((const __int##width *) arg);                            \
+        PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof arg_val));       \
         /* negation - msvc only supports 2's complement */                  \
-        arg_val = (unsigned __int##width) ~arg_val;                         \
-        ++arg_val;                                                          \
+        arg_val = PATOMIC_UINT_NEG(width, arg_val);                         \
         patomic_il_exchange_add_##width(                                    \
             obj,                                                            \
             &arg_val,                                                       \
@@ -547,7 +552,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                         \
     )                                                                       \
     {                                                                       \
-        __int##width val;                                                   \
+        patomic_uint##width##_t val;                                        \
         /* assertion in called function */                                  \
         patomic_opimpl_fetch_sub_##name(                                    \
             obj                                                             \
@@ -576,7 +581,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                         \
     )                                                                       \
     {                                                                       \
-        __int##width val;                                                   \
+        patomic_uint##width##_t val;                                        \
         /* assertion in called function */                                  \
         patomic_opimpl_fetch_inc_##name(                                    \
             obj                                                             \
@@ -604,7 +609,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                         \
     )                                                                       \
     {                                                                       \
-        __int##width val;                                                   \
+        patomic_uint##width##_t val;                                        \
         /* assertion in called function */                                  \
         patomic_opimpl_fetch_dec_##name(                                    \
             obj                                                             \
@@ -620,8 +625,8 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     )                                                                       \
     {                                                                       \
         /* declarations */                                                  \
-        unsigned __int##width expected;                                     \
-        unsigned __int##width desired;                                      \
+        patomic_uint##width##_t expected;                                   \
+        patomic_uint##width##_t desired;                                    \
         int succ;                                                           \
         int fail;                                                           \
         /* assertion */                                                     \
@@ -638,8 +643,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         /* cas loop */                                                      \
         do {                                                                \
             /* negation - msvc only supports 2's complement */              \
-            desired = ~expected;                                            \
-            ++desired;                                                      \
+            desired = PATOMIC_UINT_NEG(width, expected);                    \
         }                                                                   \
         while (!patomic_il_compare_exchange_##width(                        \
             obj,                                                            \
@@ -656,7 +660,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                         \
     )                                                                       \
     {                                                                       \
-        __int##width val;                                                   \
+        patomic_uint##width##_t val;                                        \
         /* assertion in called function */                                  \
         patomic_opimpl_fetch_neg_##name(                                    \
             obj                                                             \
@@ -681,8 +685,6 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         pao.fp_fetch_neg = patomic_opimpl_fetch_neg_##name;                 \
         return pao;                                                         \
     }
-
-PATOMIC_DEFINE_ARI_OPS_CREATE(8, 8, order, SHOW_P, ops_explicit)
 
 
 /*
