@@ -623,7 +623,7 @@ PATOMIC_STATIC_ASSERT(msvc_arm_bittest, (sizeof(size_t) == sizeof(void *)));
         static const size_t long_bytes = sizeof(long);           \
         volatile char *ptr = obj;                                \
         size_t diff;                                             \
-        /* make sure access is aligned */                        \
+        /* make sure access is 32bit aligned */                  \
         /* 8 or 16 bit op */                                     \
         if (width <= 16) {                                       \
             diff = (size_t) obj;                                 \
@@ -679,7 +679,7 @@ PATOMIC_STATIC_ASSERT(msvc_arm_bittest, (sizeof(size_t) == sizeof(void *)));
         static const size_t long_bytes = sizeof(long);           \
         volatile char *ptr = obj;                                \
         size_t diff;                                             \
-        /* make sure access is aligned */                        \
+        /* make sure access is 32bit aligned */                  \
         /* 8 or 16 bit op */                                     \
         if (width <= 16) {                                       \
             diff = (size_t) obj;                                 \

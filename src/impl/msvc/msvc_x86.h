@@ -4,7 +4,6 @@
 #if defined(_MSC_VER)
 #if defined(_M_IX86) || defined(_M_AMD64) || defined(_M_X64)
 
-#include <assert.h>
 #include <limits.h>
 #include <string.h>
 
@@ -13,6 +12,7 @@
 #include <patomic/patomic.h>
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
+#include <patomic/macros/static_assert.h>
 
 
 /*
@@ -63,7 +63,6 @@
         iso_type val = (iso_type) __iso_volatile_load##width(       \
             (const volatile iso_type *) obj                         \
         );                                                          \
-        assert(patomic_is_valid_load_order(order));                 \
         switch (order)                                              \
         {                                                           \
             case patomic_RELAXED:                                   \
@@ -87,7 +86,6 @@
         int order                                                  \
     )                                                              \
     {                                                              \
-        assert(patomic_is_valid_store_order(order));               \
         switch (order)                                             \
         {                                                          \
             case patomic_RELEASE:                                  \
@@ -325,47 +323,76 @@
  * - bit_test_set [[e8, e16, 32, e64]]
  * - bit_test_reset [[e8, e16, 32, e64]]
  */
+PATOMIC_STATIC_ASSERT(msvc_x86_bittest, (sizeof(size_t) == sizeof(void *)));
 
-#define PATOMIC_DEFINE_IL_BIT_SET(width)             \
-    static PATOMIC_FORCE_INLINE int                  \
-    patomic_il_bit_test_and_set_##width(             \
-        volatile void *obj,                          \
-        int offset,                                  \
-        int order                                    \
-    )                                                \
-    {                                                \
-        volatile long *ptr = (volatile long *) obj;  \
-        PATOMIC_IGNORE_UNUSED(order);                \
-        if (width == 64 && offset >= 32)             \
-        {                                            \
-                ++ptr;                               \
-                offset -= 32;                        \
-        }                                            \
-        return (int) _interlockedbittestandset(      \
-            ptr,                                     \
-            offset                                   \
-        );                                           \
+#define PATOMIC_DEFINE_IL_BIT_SET(width)                         \
+    static PATOMIC_FORCE_INLINE int                              \
+    patomic_il_bit_test_and_set_##width(                         \
+        volatile void *obj,                                      \
+        int offset,                                              \
+        int order                                                \
+    )                                                            \
+    {                                                            \
+        static const size_t long_bits = sizeof(long) * CHAR_BIT; \
+        static const size_t long_bytes = sizeof(long);           \
+        volatile char *ptr = obj;                                \
+        size_t diff;                                             \
+        PATOMIC_IGNORE_UNUSED(order);                            \
+        /* make sure access is 32bit aligned */                  \
+        /* 8 or 16 bit op */                                     \
+        if (width <= 16) {                                       \
+            diff = (size_t) obj;                                 \
+            diff %= long_bytes;                                  \
+            ptr -= diff;                                         \
+            /* may over-extend offset */                         \
+            offset += (int) (diff * CHAR_BIT);                   \
+        }                                                        \
+        /* 64 bit op, or fixing over-extended offset */          \
+        if (offset >= (int) long_bits) {                         \
+            ptr += long_bytes;                                   \
+            offset -= (int) long_bits;                           \
+        }                                                        \
+        /* 32 bit op assumed to be correctly aligned */          \
+        /* perform op */                                         \
+        return (int) _interlockedbittestandset(                  \
+            (volatile long *) ptr,                               \
+            offset                                               \
+        );                                                       \
     }
 
-#define PATOMIC_DEFINE_IL_BIT_RESET(width)           \
-    static PATOMIC_FORCE_INLINE int                  \
-    patomic_il_bit_test_and_reset_##width(           \
-        volatile void *obj,                          \
-        int offset,                                  \
-        int order                                    \
-    )                                                \
-    {                                                \
-        volatile long *ptr = (volatile long *) obj;  \
-        PATOMIC_IGNORE_UNUSED(order);                \
-        if (width == 64 && offset >= 32)             \
-        {                                            \
-                ++ptr;                               \
-                offset -= 32;                        \
-        }                                            \
-        return (int) _interlockedbittestandreset(    \
-            ptr,                                     \
-            offset                                   \
-        );                                           \
+#define PATOMIC_DEFINE_IL_BIT_RESET(width)                       \
+    static PATOMIC_FORCE_INLINE int                              \
+    patomic_il_bit_test_and_reset_##width(                       \
+        volatile void *obj,                                      \
+        int offset,                                              \
+        int order                                                \
+    )                                                            \
+    {                                                            \
+        static const size_t long_bits = sizeof(long) * CHAR_BIT; \
+        static const size_t long_bytes = sizeof(long);           \
+        volatile char *ptr = obj;                                \
+        size_t diff;                                             \
+        PATOMIC_IGNORE_UNUSED(order);                            \
+        /* make sure access is 32bit aligned */                  \
+        /* 8 or 16 bit op */                                     \
+        if (width <= 16) {                                       \
+            diff = (size_t) obj;                                 \
+            diff %= long_bytes;                                  \
+            ptr -= diff;                                         \
+            /* may over-extend offset */                         \
+            offset += (int) (diff * CHAR_BIT);                   \
+        }                                                        \
+        /* 64 bit op, or fixing over-extended offset */          \
+        if (offset >= (int) long_bits) {                         \
+            ptr += long_bytes;                                   \
+            offset -= (int) long_bits;                           \
+        }                                                        \
+        /* 32 bit op assumed to be correctly aligned */          \
+        /* perform op */                                         \
+        return (int) _interlockedbittestandreset(                \
+            (volatile long *) ptr,                               \
+            offset                                               \
+        );                                                       \
     }
 
 
