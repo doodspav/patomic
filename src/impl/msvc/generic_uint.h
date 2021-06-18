@@ -1,6 +1,8 @@
 #ifndef PATOMIC_MSVC_GENERIC_UINT_H
 #define PATOMIC_MSVC_GENERIC_UINT_H
 
+#if defined(_MSC_VER)
+
 #include <patomic/macros/force_inline.h>
 
 /*
@@ -33,8 +35,17 @@ typedef struct {
 #define PATOMIC_LOW_64(obj) ((obj).arr[0])
 #define PATOMIC_HIGH_64(obj) ((obj).arr[1])
 
-#define PATOMIC_CREATE_128(high, low) \
-    ((patomic_uint128_t){(unsigned __int64) (low), (unsigned __int64) (high)})
+static PATOMIC_FORCE_INLINE patomic_uint128_t
+patomic_create_128(
+    patomic_uint64_t high,
+    patomic_uint64_t low
+)
+{
+    patomic_uint128_t ret;
+    PATOMIC_HIGH_64(ret) = high;
+    PATOMIC_LOW_64(ret) = low;
+    return ret;
+}
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
 patomic_lshift_128(
@@ -42,7 +53,9 @@ patomic_lshift_128(
     int offset
 )
 {
-    return obj;  // TODO
+    // TODO
+    (void) offset;
+    return obj;
 }
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
@@ -51,7 +64,9 @@ patomic_add_128(
     patomic_uint128_t b
 )
 {
-    return a;  // TODO
+    // TODO
+    (void) b;
+    return a;
 }
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
@@ -59,7 +74,7 @@ patomic_inc_128(
     patomic_uint128_t obj
 )
 {
-    return patomic_add_128(obj, PATOMIC_CREATE_128(0, 1));
+    return patomic_add_128(obj, patomic_create_128(0, 1));
 }
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
@@ -67,7 +82,7 @@ patomic_dec_128(
     patomic_uint128_t obj
 )
 {
-    return patomic_add_128(obj, PATOMIC_CREATE_128(-1, -1));
+    return patomic_add_128(obj, patomic_create_128(-1, -1));
 }
 
 
@@ -90,7 +105,7 @@ patomic_dec_128(
 #define PATOMIC_UINT_SET_TO_ONE_16(obj) obj = (patomic_uint16_t) 1
 #define PATOMIC_UINT_SET_TO_ONE_32(obj) obj = (patomic_uint32_t) 1
 #define PATOMIC_UINT_SET_TO_ONE_64(obj) obj = (patomic_uint64_t) 1
-#define PATOMIC_UINT_SET_TO_ONE_128(obj) obj = PATOMIC_CREATE_128(0, 1)
+#define PATOMIC_UINT_SET_TO_ONE_128(obj) obj = patomic_create_128(0, 1)
 
 #define PATOMIC_UINT_NEQ_ZERO(width, obj) PATOMIC_UINT_NEQ_ZERO_##width(obj)
 #define PATOMIC_UINT_NEQ_ZERO_8(obj)  ((obj) != 0u)
@@ -120,7 +135,7 @@ patomic_dec_128(
 #define PATOMIC_UINT_OR_64(obj, arg) \
    ((patomic_uint64_t) ((patomic_uint64_t) (obj) | (patomic_uint64_t) (arg)))
 #define PATOMIC_UINT_OR_128(obj, arg)                \
-    PATOMIC_CREATE_128(                              \
+    patomic_create_128(                              \
         PATOMIC_HIGH_64(obj) | PATOMIC_HIGH_64(arg), \
         PATOMIC_LOW_64(obj) | PATOMIC_LOW_64(arg)    \
     )
@@ -135,7 +150,7 @@ patomic_dec_128(
 #define PATOMIC_UINT_XOR_64(obj, arg) \
     ((patomic_uint64_t) ((patomic_uint64_t) (obj) ^ (patomic_uint64_t) (arg)))
 #define PATOMIC_UINT_XOR_128(obj, arg)               \
-    PATOMIC_CREATE_128(                              \
+    patomic_create_128(                              \
         PATOMIC_HIGH_64(obj) ^ PATOMIC_HIGH_64(arg), \
         PATOMIC_LOW_64(obj) ^ PATOMIC_LOW_64(arg)    \
     )
@@ -150,7 +165,7 @@ patomic_dec_128(
 #define PATOMIC_UINT_AND_64(obj, arg) \
     ((patomic_uint64_t) ((patomic_uint64_t) (obj) & (patomic_uint64_t) (arg)))
 #define PATOMIC_UINT_AND_128(obj, arg)               \
-    PATOMIC_CREATE_128(                              \
+    patomic_create_128(                              \
         PATOMIC_HIGH_64(obj) & PATOMIC_HIGH_64(arg), \
         PATOMIC_LOW_64(obj) & PATOMIC_LOW_64(arg)    \
     )
@@ -166,10 +181,12 @@ patomic_dec_128(
     ((patomic_uint64_t) (((patomic_uint64_t) ~((patomic_uint64_t) (obj))) + 1u))
 #define PATOMIC_UINT_NEG_128(obj) \
     patomic_inc_128(              \
-        PATOMIC_CREATE_128(       \
+        patomic_create_128(       \
             ~PATOMIC_HIGH_64(obj),\
             ~PATOMIC_LOW_64(obj), \
     ))
 
+
+#endif  /* defined(_MSC_VER) */
 
 #endif  /* !PATOMIC_MSVC_GENERIC_UINT_H */
