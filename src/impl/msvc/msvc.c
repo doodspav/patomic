@@ -10,11 +10,11 @@
 static const patomic_t patomic_NULL;
 static const patomic_explicit_t patomic_explicit_NULL;
 
+#include "generic_uint.h"
+
 #include "msvc_x86.h"
 #include "msvc_arm.h"
-#include "msvc_e64.h"
-
-#include "generic_uint.h"
+#include "msvc_ext.h"
 
 
 #if defined(PATOMIC_DEFINE_IL)
@@ -26,8 +26,17 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     PATOMIC_DEFINE_IL(__int64, __int64, 64)
 #endif
 
-#if defined(PATOMIC_DEFINE_IL_E64)
-    PATOMIC_DEFINE_IL_E64()
+/*
+ * WARNING:
+ * - 64bit ops for x86/ARM
+ * - 128bit ops for x64/AMD64/ARM64
+ * - patomic_il_load_128 is NOT const safe
+ * - it casts away the const and uses cmpxchg internally
+ * - DO NOT USE IT with const objects
+ * - fp_load and fp_test are set to NULL for 128bit widths
+ */
+#if defined(PATOMIC_DEFINE_ILE)
+    PATOMIC_DEFINE_ILE()
 #endif
 
 
@@ -186,7 +195,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         assert(patomic_is_valid_load_order(order));          \
         /* setup mask */                                     \
         PATOMIC_UINT_SET_TO_ONE(width, mask);                \
-        mask = PATOMIC_UINT_LSHIFT(width, mask, offset);     \
+        mask = PATOMIC_UINT_SHL(width, mask, offset);        \
         /* op and return */                                  \
         patomic_il_load_##width(                             \
             obj,                                             \
@@ -217,7 +226,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         assert(patomic_is_valid_order(order));                      \
         /* setup memory orders and mask */                          \
         PATOMIC_UINT_SET_TO_ONE(width, mask);                       \
-        mask = PATOMIC_UINT_LSHIFT(width, mask, offset);            \
+        mask = PATOMIC_UINT_SHL(width, mask, offset);               \
         succ = order;                                               \
         fail = patomic_cmpxchg_fail_order(order);                   \
         /* load initial value */                                    \
@@ -805,6 +814,9 @@ PATOMIC_DEFINE_OPS_CREATE_ALL(8)
 PATOMIC_DEFINE_OPS_CREATE_ALL(16)
 PATOMIC_DEFINE_OPS_CREATE_ALL(32)
 PATOMIC_DEFINE_OPS_CREATE_ALL(64)
+#if defined(_M_X64)||defined(_M_AMD64) || defined(_M_ARM64)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(128)
+#endif
 
 
 static const patomic_ops_t patomic_ops_NULL;
@@ -839,11 +851,21 @@ patomic_create_ops(
 
     switch (byte_width)
     {
+#if defined(_M_X64)||defined(_M_AMD64) || defined(_M_ARM64)
+        case 16: PATOMIC_SET_RET(128, order, ret) break;
+#endif
         case 8: PATOMIC_SET_RET(64, order, ret) break;
         case 4: PATOMIC_SET_RET(32, order, ret) break;
         case 2: PATOMIC_SET_RET(16, order, ret) break;
         case 1: PATOMIC_SET_RET(8, order, ret) break;
         default: ret = patomic_ops_NULL;
+    }
+
+    /* patomic_il_load_128 is NOT const safe */
+    if (byte_width == 16)
+    {
+        ret.fp_load = NULL;
+        ret.bitwise_ops.fp_test = NULL;
     }
 
     return ret;
@@ -858,11 +880,21 @@ patomic_create_ops_explicit(
 
     switch (byte_width)
     {
+#if defined(_M_X64)||defined(_M_AMD64) || defined(_M_ARM64)
+        case 16: ret = patomic_ops_create_128_explicit(); break;
+#endif
         case 8: ret = patomic_ops_create_64_explicit(); break;
         case 4: ret = patomic_ops_create_32_explicit(); break;
         case 2: ret = patomic_ops_create_16_explicit(); break;
         case 1: ret = patomic_ops_create_8_explicit(); break;
         default: ret = patomic_ops_explicit_NULL;
+    }
+
+    /* patomic_il_load_128 is NOT const safe */
+    if (byte_width == 16)
+    {
+        ret.fp_load = NULL;
+        ret.bitwise_ops.fp_test = NULL;
     }
 
     return ret;
@@ -877,6 +909,7 @@ patomic_create_align(
 
     switch (byte_width)
     {
+        case 16:
         case 8:
         case 4:
         case 2: pat.recommended = byte_width; break;
@@ -900,6 +933,12 @@ patomic_impl_create_msvc(
     PATOMIC_IGNORE_UNUSED(options);
     ret.ops = patomic_create_ops(byte_width, order);
     ret.align = patomic_create_align(byte_width);
+    /* patomic_il_load_128 is NOT const safe */
+    if (byte_width == 16)
+    {
+        assert(ret.ops.fp_load == NULL);
+        assert(ret.ops.bitwise_ops.fp_test == NULL);
+    }
     return ret;
 }
 
@@ -913,6 +952,12 @@ patomic_impl_create_explicit_msvc(
     PATOMIC_IGNORE_UNUSED(options);
     ret.ops = patomic_create_ops_explicit(byte_width);
     ret.align = patomic_create_align(byte_width);
+    /* patomic_il_load_128 is NOT const safe */
+    if (byte_width == 16)
+    {
+        assert(ret.ops.fp_load == NULL);
+        assert(ret.ops.bitwise_ops.fp_test == NULL);
+    }
     return ret;
 }
 

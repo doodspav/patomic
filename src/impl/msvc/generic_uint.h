@@ -3,7 +3,12 @@
 
 #if defined(_MSC_VER)
 
+#include <assert.h>
+#include <string.h>
+
 #include <patomic/macros/force_inline.h>
+#include <patomic/macros/ignore_unused.h>
+#include <patomic/macros/static_assert.h>
 
 /*
  * TYPES & OPERATIONS
@@ -32,6 +37,8 @@ typedef struct {
     unsigned __int64 arr[2];
 } patomic_uint128_t;
 
+PATOMIC_STATIC_ASSERT(msvc_u128_size, (sizeof(patomic_uint128_t) == 16));
+
 #define PATOMIC_LOW_64(obj) ((obj).arr[0])
 #define PATOMIC_HIGH_64(obj) ((obj).arr[1])
 
@@ -48,14 +55,33 @@ patomic_create_128(
 }
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
-patomic_lshift_128(
+patomic_shl_128(
     patomic_uint128_t obj,
     int offset
 )
 {
-    // TODO
-    (void) offset;
-    return obj;
+    patomic_uint128_t res = {0};
+    assert(offset >= 0);
+    assert(offset < 128);
+
+    if (offset >= 64)
+    {
+        PATOMIC_LOW_64(obj) <<= (offset - 64);
+        PATOMIC_HIGH_64(res) = PATOMIC_LOW_64(obj);
+    }
+    else if (offset != 0)
+    {
+        /* res.low */
+        PATOMIC_LOW_64(res) = PATOMIC_LOW_64(obj);
+        PATOMIC_LOW_64(res) <<= offset;
+        /* res.high */
+        PATOMIC_HIGH_64(obj) <<= offset;
+        PATOMIC_LOW_64(obj) >>= (64 - offset);
+        PATOMIC_HIGH_64(res) = PATOMIC_LOW_64(obj);
+        PATOMIC_HIGH_64(res) |= PATOMIC_HIGH_64(obj);
+    }
+    else { res = obj; }
+    return res;
 }
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
@@ -64,8 +90,27 @@ patomic_add_128(
     patomic_uint128_t b
 )
 {
-    // TODO
-    (void) b;
+    /* declarations */
+    patomic_uint32_t num1[4];
+    patomic_uint32_t num2[4];
+    patomic_uint32_t result[4];
+    const patomic_uint32_t u32_max = (patomic_uint32_t) -1;
+    patomic_uint64_t carry;
+    int i;
+    /* copy over inputs */
+    PATOMIC_IGNORE_UNUSED(memcpy(num1, &a, 16));
+    PATOMIC_IGNORE_UNUSED(memcpy(num2, &b, 16));
+    /* add */
+    carry = (patomic_uint64_t) 0i64;
+    for (i = 0; i < 4; ++i)
+    {
+        carry += (patomic_uint64_t) num1[i];
+        carry += (patomic_uint64_t) num2[i];
+        result[i] = (patomic_uint32_t) (carry & (patomic_uint64_t) u32_max);
+        carry >>= 32u;
+    }
+    /* return */
+    PATOMIC_IGNORE_UNUSED(memcpy(&a, result, 16));
     return a;
 }
 
@@ -74,7 +119,11 @@ patomic_inc_128(
     patomic_uint128_t obj
 )
 {
-    return patomic_add_128(obj, patomic_create_128(0, 1));
+    const patomic_uint128_t one = patomic_create_128(
+        (patomic_uint64_t) 0i64,
+        (patomic_uint64_t) 1i64
+    );
+    return patomic_add_128(obj, one);
 }
 
 static PATOMIC_FORCE_INLINE patomic_uint128_t
@@ -82,23 +131,38 @@ patomic_dec_128(
     patomic_uint128_t obj
 )
 {
-    return patomic_add_128(obj, patomic_create_128(-1, -1));
+    const patomic_uint128_t neg_one = patomic_create_128(
+        (patomic_uint64_t) -1i64,
+        (patomic_uint64_t) -1i64
+    );
+    return patomic_add_128(obj, neg_one);
 }
 
 
 /*
  * OPERATIONS
  *
- * - ALL RETURN VALUES ARE TYPE CAST
+ * - ALL SCALAR RETURN VALUES ARE TYPE CAST
+ *
+ * - we have cast macro because ISO C forbids casting non-scalar
+ *   objects to their type (why they thought that was a good idea idk)
+ *   source: ISO C, Cast operators, 6.5.4
  *
  * - set_to_one (equiv. to: obj = 1)
  * - neq_zero (equiv. to: obj == 0)
- * - lshift (equiv. to: obj << val)
- * - or (equiv. to: obj | arg)
+ * - shl (equiv. to: obj << val)
  * - xor (equiv. to: obj ^ arg)
  * - and (equiv. to: obj & arg)
  * - neg (equiv. to: ++(~obj))
+ * - add (equiv. to: obj + arg)
  */
+
+#define PATOMIC_UINT_CAST(width) PATOMIC_UINT_CAST_##width
+#define PATOMIC_UINT_CAST_8   (patomic_uint8_t)
+#define PATOMIC_UINT_CAST_16  (patomic_uint16_t)
+#define PATOMIC_UINT_CAST_32  (patomic_uint32_t)
+#define PATOMIC_UINT_CAST_64  (patomic_uint64_t)
+#define PATOMIC_UINT_CAST_128
 
 #define PATOMIC_UINT_SET_TO_ONE(width, obj) PATOMIC_UINT_SET_TO_ONE_##width(obj)
 #define PATOMIC_UINT_SET_TO_ONE_8(obj)  obj = (patomic_uint8_t) 1
@@ -114,16 +178,16 @@ patomic_dec_128(
 #define PATOMIC_UINT_NEQ_ZERO_64(obj) ((obj) != 0u)
 #define PATOMIC_UINT_NEQ_ZERO_128(obj) ((obj).arr[0] != 0u || (obj).arr[1] != 0u)
 
-#define PATOMIC_UINT_LSHIFT(width, obj, val) PATOMIC_UINT_LSHIFT_##width(obj, val)
-#define PATOMIC_UINT_LSHIFT_8(obj, val)  \
+#define PATOMIC_UINT_SHL(width, obj, val) PATOMIC_UINT_SHL_##width(obj, val)
+#define PATOMIC_UINT_SHL_8(obj, val)  \
     ((patomic_uint8_t) ((patomic_uint8_t) (obj) << (val)))
-#define PATOMIC_UINT_LSHIFT_16(obj, val) \
+#define PATOMIC_UINT_SHL_16(obj, val) \
     ((patomic_uint16_t) ((patomic_uint16_t) (obj) << (val)))
-#define PATOMIC_UINT_LSHIFT_32(obj, val) \
+#define PATOMIC_UINT_SHL_32(obj, val) \
     ((patomic_uint32_t) ((patomic_uint32_t) (obj) << (val)))
-#define PATOMIC_UINT_LSHIFT_64(obj, val) \
+#define PATOMIC_UINT_SHL_64(obj, val) \
     ((patomic_uint64_t) ((patomic_uint64_t) (obj) << (val)))
-#define PATOMIC_UINT_LSHIFT_128(obj, val) patomic_lshift_128(obj, (int) (val))
+#define PATOMIC_UINT_SHL_128(obj, val) patomic_shl_128(obj, (int) (val))
 
 #define PATOMIC_UINT_OR(width, obj, arg) PATOMIC_UINT_OR_##width(obj, arg)
 #define PATOMIC_UINT_OR_8(obj, arg)  \
@@ -133,7 +197,7 @@ patomic_dec_128(
 #define PATOMIC_UINT_OR_32(obj, arg) \
     ((patomic_uint32_t) ((patomic_uint32_t) (obj) | (patomic_uint32_t) (arg)))
 #define PATOMIC_UINT_OR_64(obj, arg) \
-   ((patomic_uint64_t) ((patomic_uint64_t) (obj) | (patomic_uint64_t) (arg)))
+    ((patomic_uint64_t) ((patomic_uint64_t) (obj) | (patomic_uint64_t) (arg)))
 #define PATOMIC_UINT_OR_128(obj, arg)                \
     patomic_create_128(                              \
         PATOMIC_HIGH_64(obj) | PATOMIC_HIGH_64(arg), \
@@ -183,7 +247,7 @@ patomic_dec_128(
     patomic_inc_128(              \
         patomic_create_128(       \
             ~PATOMIC_HIGH_64(obj),\
-            ~PATOMIC_LOW_64(obj), \
+            ~PATOMIC_LOW_64(obj)  \
     ))
 
 
