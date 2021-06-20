@@ -4,7 +4,7 @@
 
 #include <patomic_test/patomic_test.hpp>
 #include <patomic_test/aligned_buffer.hpp>
-#include <patomic_test/aligned_vint.hpp>
+#include <patomic_test/generic_int.hpp>
 #include <patomic_test/curry_op.hpp>
 
 #include <patomic/patomic.h>
@@ -61,23 +61,23 @@ protected:
 
     void InsertMinMaxArgs()
     {
-        auto min = patomic::test::create_vint(m_width, m_is_signed);
-        auto max = patomic::test::create_vint(m_width, m_is_signed);
-        min->min();
-        max->max();
+        auto min = patomic::test::generic_int(m_width, m_is_signed);
+        auto max = patomic::test::generic_int(m_width, m_is_signed);
+        min.min();
+        max.max();
         // arg1s
         if (m_arg1s.size() >= 2)
         {
             auto it = m_arg1s.end();
-            std::memcpy(*(--it), min->data(), m_width);
-            std::memcpy(*(--it), max->data(), m_width);
+            std::memcpy(*(--it), min.data(), m_width);
+            std::memcpy(*(--it), max.data(), m_width);
         }
         // arg2s
         if (m_arg2s.size() >= 2)
         {
             auto it = m_arg2s.begin();
-            std::memcpy(*it++, min->data(), m_width);
-            std::memcpy(*it++, max->data(), m_width);
+            std::memcpy(*it++, min.data(), m_width);
+            std::memcpy(*it++, max.data(), m_width);
         }
     }
 
@@ -154,18 +154,17 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_add)
     // skip
     if (fp_add == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_is_signed);
-    if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
+    auto varg = patomic::test::generic_int(m_width, m_is_signed);
     // test
     for (int i = 0; i < m_argc; ++i)
     {
         std::memcpy(m_obj, m_arg1s[i], m_width);
-        vobj->store(m_arg1s[i], m_width);
-        varg->store(m_arg2s[i], m_width);
-        vobj->add(*varg);
+        vobj.store(m_arg1s[i], m_width);
+        varg.store(m_arg2s[i], m_width);
+        vobj.add(varg);
         fp_add(m_obj, m_arg2s[i]);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         RecordProperty("Iterations", i + 1);
     }
 }
@@ -176,18 +175,17 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_sub)
     // skip
     if (fp_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_is_signed);
-    if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
+    auto varg = patomic::test::generic_int(m_width, m_is_signed);
     // test
     for (int i = 0; i < m_argc; ++i)
     {
         std::memcpy(m_obj, m_arg1s[i], m_width);
-        vobj->store(m_arg1s[i], m_width);
-        varg->store(m_arg2s[i], m_width);
-        vobj->sub(*varg);
+        vobj.store(m_arg1s[i], m_width);
+        varg.store(m_arg2s[i], m_width);
+        vobj.sub(varg);
         fp_sub(m_obj, m_arg2s[i]);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         RecordProperty("Iterations", i + 1);
     }
 }
@@ -198,17 +196,16 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_inc)
     // skip
     if (fp_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
     // test
     int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
-        vobj->store(arg, m_width);
-        vobj->inc();
+        vobj.store(arg, m_width);
+        vobj.inc();
         fp_inc(m_obj);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         RecordProperty("Iterations", ++i);
     }
 }
@@ -219,17 +216,16 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_dec)
     // skip
     if (fp_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
     // test
     int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
-        vobj->store(arg, m_width);
-        vobj->dec();
+        vobj.store(arg, m_width);
+        vobj.dec();
         fp_dec(m_obj);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         RecordProperty("Iterations", ++i);
     }
 }
@@ -240,17 +236,16 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_neg)
     // skip
     if (fp_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
     // test
     int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
-        vobj->store(arg, m_width);
-        vobj->neg();
+        vobj.store(arg, m_width);
+        vobj.neg();
         fp_neg(m_obj);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         RecordProperty("Iterations", ++i);
     }
 }
@@ -261,18 +256,17 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_add)
     // skip
     if (fp_fetch_add == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_is_signed);
-    if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
+    auto varg = patomic::test::generic_int(m_width, m_is_signed);
     // test
     for (int i = 0; i < m_argc; ++i)
     {
         std::memcpy(m_obj, m_arg1s[i], m_width);
-        vobj->store(m_arg1s[i], m_width);
-        varg->store(m_arg2s[i], m_width);
-        vobj->add(*varg);
+        vobj.store(m_arg1s[i], m_width);
+        varg.store(m_arg2s[i], m_width);
+        vobj.add(varg);
         fp_fetch_add(m_obj, m_arg2s[i], m_ret);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
         RecordProperty("Iterations", i + 1);
     }
@@ -284,18 +278,17 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_sub)
     // skip
     if (fp_fetch_sub == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vints
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    auto varg = patomic::test::create_vint(m_width, m_is_signed);
-    if (!(vobj && varg)) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
+    auto varg = patomic::test::generic_int(m_width, m_is_signed);
     // test
     for (int i = 0; i < m_argc; ++i)
     {
         std::memcpy(m_obj, m_arg1s[i], m_width);
-        vobj->store(m_arg1s[i], m_width);
-        varg->store(m_arg2s[i], m_width);
-        vobj->sub(*varg);
+        vobj.store(m_arg1s[i], m_width);
+        varg.store(m_arg2s[i], m_width);
+        vobj.sub(varg);
         fp_fetch_sub(m_obj, m_arg2s[i], m_ret);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, m_arg1s[i], m_width) == 0);
         RecordProperty("Iterations", i + 1);
     }
@@ -307,17 +300,16 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_inc)
     // skip
     if (fp_fetch_inc == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
     // test
     int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
-        vobj->store(arg, m_width);
-        vobj->inc();
+        vobj.store(arg, m_width);
+        vobj.inc();
         fp_fetch_inc(m_obj, m_ret);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, arg, m_width) == 0);
         RecordProperty("Iterations", ++i);
     }
@@ -329,17 +321,16 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_dec)
     // skip
     if (fp_fetch_dec == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
     // test
     int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
-        vobj->store(arg, m_width);
-        vobj->dec();
+        vobj.store(arg, m_width);
+        vobj.dec();
         fp_fetch_dec(m_obj, m_ret);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, arg, m_width) == 0);
         RecordProperty("Iterations", ++i);
     }
@@ -351,17 +342,16 @@ TEST_P(ArithmeticOpsLogicTestFixture, fp_fetch_neg)
     // skip
     if (fp_fetch_neg == nullptr) { GTEST_SKIP_("Not implemented"); }
     // create vint
-    auto vobj = patomic::test::create_vint(m_width, m_is_signed);
-    if (!vobj) { GTEST_FATAL_FAILURE_("Could not create vint"); }
+    auto vobj = patomic::test::generic_int(m_width, m_is_signed);
     // test
     int i = 0;
     for (auto arg : m_arg1s)
     {
         std::memcpy(m_obj, arg, m_width);
-        vobj->store(arg, m_width);
-        vobj->neg();
+        vobj.store(arg, m_width);
+        vobj.neg();
         fp_fetch_neg(m_obj, m_ret);
-        ASSERT_TRUE(std::memcmp(m_obj, vobj->data(), m_width) == 0);
+        ASSERT_TRUE(std::memcmp(m_obj, vobj.data(), m_width) == 0);
         ASSERT_TRUE(std::memcmp(m_ret, arg, m_width) == 0);
         RecordProperty("Iterations", ++i);
     }
@@ -382,10 +372,6 @@ static auto get_test_params() -> const std::vector<patomic::test::sized_param>&
             // don't include NULL
             if (id == patomic_impl_id_NULL) { continue; }
             for (auto width : patomic::test::get_widths()) {
-                // don't include unrepresentable widths
-                auto uup = patomic::test::create_vint(width, false);
-                auto sup = patomic::test::create_vint(width, true);
-                if (uup == nullptr || sup == nullptr) { continue; }
                 for (auto order : patomic::test::get_orders()) {
                     // .is_explicit= false, .is_signed=false
                     params.push_back({width, order, id, dist(gen), false, false});

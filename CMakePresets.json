@@ -64,7 +64,7 @@
       "inherits": ["ci-flags-gnu-base"],
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -Weverything -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function"
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function"
       }
     },
     {

@@ -26,7 +26,7 @@ add_executable(
     # include
     include/patomic_test/patomic_test.hpp
     include/patomic_test/aligned_buffer.hpp
-    include/patomic_test/aligned_vint.hpp
+    include/patomic_test/generic_int.hpp
     include/patomic_test/curry_op.hpp
     # src
     src/test_logic_ops_buffer.cpp
