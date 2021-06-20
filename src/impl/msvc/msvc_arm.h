@@ -160,7 +160,7 @@
                 if (width == 64) {                     \
                     PATOMIC_ARM_SEQ_CST_STORE64(       \
                         obj,                           \
-                        desired                        \
+                        *((const iso_type *) desired)  \
                     );                                 \
                 } else {                               \
                     __dmb(0xB);                        \

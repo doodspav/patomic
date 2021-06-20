@@ -72,7 +72,7 @@ namespace patomic {
         {
             // widths in bytes
             static const auto widths = std::vector<size_t>{
-                    1, 2, 4, 8
+                    1, 2, 4, 8, 16
             };
             return widths;
         }

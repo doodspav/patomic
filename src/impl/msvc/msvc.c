@@ -909,7 +909,9 @@ patomic_create_align(
 
     switch (byte_width)
     {
+#if defined(_M_X64)||defined(_M_AMD64) || defined(_M_ARM64)
         case 16:
+#endif
         case 8:
         case 4:
         case 2: pat.recommended = byte_width; break;
