@@ -23,6 +23,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 #include <patomic/macros/ignore_unused.h>
 #include <patomic/macros/have_long_long.h>
 #include <patomic/macros/have_std_alignof.h>
+#include <patomic/macros/have_twos_compl.h>
 
 #if !PATOMIC_HAVE_STD_ALIGNOF
     #define _Alignof(t) sizeof(t)
@@ -706,13 +707,26 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
             if ((type) (min) == (type) 0) { desired = (type)-expected; } \
             /* signed */                                                 \
             else {                                                       \
-                /* -INT_MIN is UB but also evaluates to INT_MIN */       \
-                if ((type) (min) == expected) {                          \
-                    /* would be the same after negation */               \
-                    if (succ == fail) { break; }                         \
-                    else { desired = expected; }                         \
+                /* twos complement */                                    \
+                if (PATOMIC_HAVE_TWOS_COMPL) {                           \
+                    /* -INT_MIN is UB but also evaluates to INT_MIN */   \
+                    if ((type) (min) == expected) {                      \
+                        /* value would be the same after negation */     \
+                        /* enforce memory order */                       \
+                        if (succ > fail) {                               \
+                            PATOMIC_IGNORE_UNUSED(                       \
+                                atomic_fetch_or_explicit(                \
+                                    (volatile _Atomic(type) *) obj,      \
+                                    (type) 0,                            \
+                                    succ                                 \
+                            ));                                          \
+                        }                                                \
+                        break;                                           \
+                    }                                                    \
+                    /* not INT_MIN so fine to negate */                  \
+                    else { desired = (type) -expected; }                 \
                 }                                                        \
-                /* not INT_MIN so fine to negate */                      \
+                /* not twos complement (ones compl or sign-magnitude) */ \
                 else { desired = (type) -expected; }                     \
             }                                                            \
         }                                                                \

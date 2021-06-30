@@ -34,6 +34,7 @@ add_library(
     src/include/patomic/macros/have_long_long.h
     src/include/patomic/macros/have_std_atomic.h
     src/include/patomic/macros/have_std_alignof.h
+    src/include/patomic/macros/have_twos_compl.h
     # src/impl
     src/impl/register.h
     # src/impl/null
