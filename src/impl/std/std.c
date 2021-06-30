@@ -56,21 +56,23 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
  * - store (y)
  * - load (y)
  */
-#define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis) \
-    static PATOMIC_FORCE_INLINE void                     \
-    patomic_opimpl_store_##name(                         \
-        volatile void *obj                               \
-        ,const void *desired                             \
-   vis(_,int order)                                      \
-    )                                                    \
-    {                                                    \
-        assert(patomic_is_valid_store_order(order));     \
-        atomic_store_explicit(                           \
-            (volatile _Atomic(type) *) obj,              \
-            *((const type *) desired),                   \
-            order                                        \
-        );                                               \
-    }                                                    \
+#define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis)                \
+    static PATOMIC_FORCE_INLINE void                                    \
+    patomic_opimpl_store_##name(                                        \
+        volatile void *obj                                              \
+        ,const void *desired                                            \
+   vis(_,int order)                                                     \
+    )                                                                   \
+    {                                                                   \
+        type des_val;                                                   \
+        assert(patomic_is_valid_store_order(order));                    \
+        PATOMIC_IGNORE_UNUSED(memcpy(&des_val, desired, sizeof(type))); \
+        atomic_store_explicit(                                          \
+            (volatile _Atomic(type) *) obj,                             \
+            des_val,                                                    \
+            order                                                       \
+        );                                                              \
+    }                                                                   \
 
 #define PATOMIC_DEFINE_LOAD_OPS(type, name, order, vis)         \
     static PATOMIC_FORCE_INLINE void                            \
@@ -106,10 +108,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        type des_val;                                                     \
         assert(patomic_is_valid_order(order));                            \
+        PATOMIC_IGNORE_UNUSED(memcpy(&des_val, desired, sizeof(type)));   \
         val = atomic_exchange_explicit(                                   \
             (volatile _Atomic(type) *) obj,                               \
-            *((const type *) desired),                                    \
+            des_val,                                                      \
             order                                                         \
         );                                                                \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type)));           \
@@ -123,17 +127,24 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
    vis(_,int fail)                                                        \
     )                                                                     \
     {                                                                     \
+        type exp_val;                                                     \
+        type des_val;                                                     \
+        int ret;                                                          \
         inv(int succ = order;)                                            \
         inv(int fail = patomic_cmpxchg_fail_order(order);)                \
         assert(patomic_is_valid_order(succ));                             \
         assert(patomic_is_valid_fail_order(succ, fail));                  \
-        return atomic_compare_exchange_weak_explicit(                     \
+        PATOMIC_IGNORE_UNUSED(memcpy(&exp_val, expected, sizeof(type)));  \
+        PATOMIC_IGNORE_UNUSED(memcpy(&des_val, desired, sizeof(type)));   \
+        ret = (int) atomic_compare_exchange_weak_explicit(                \
             (volatile _Atomic(type) *) obj,                               \
-            (type *) expected,                                            \
-            *((const type *) desired),                                    \
+            &exp_val,                                                     \
+            des_val,                                                      \
             succ,                                                         \
             fail                                                          \
         );                                                                \
+        PATOMIC_IGNORE_UNUSED(memcpy(expected, &exp_val, sizeof(type)));  \
+        return ret;                                                       \
     }                                                                     \
     static PATOMIC_FORCE_INLINE int                                       \
     patomic_opimpl_cmpxchg_strong_##name(                                 \
@@ -144,17 +155,24 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
    vis(_,int fail)                                                        \
     )                                                                     \
     {                                                                     \
+        type exp_val;                                                     \
+        type des_val;                                                     \
+        int ret;                                                          \
         inv(int succ = order;)                                            \
         inv(int fail = patomic_cmpxchg_fail_order(order);)                \
         assert(patomic_is_valid_order(succ));                             \
         assert(patomic_is_valid_fail_order(succ, fail));                  \
-        return atomic_compare_exchange_strong_explicit(                   \
+        PATOMIC_IGNORE_UNUSED(memcpy(&exp_val, expected, sizeof(type)));  \
+        PATOMIC_IGNORE_UNUSED(memcpy(&des_val, desired, sizeof(type)));   \
+        ret = (int) atomic_compare_exchange_strong_explicit(              \
             (volatile _Atomic(type) *) obj,                               \
-            (type *) expected,                                            \
-            *((const type *) desired),                                    \
+            &exp_val,                                                     \
+            des_val,                                                      \
             succ,                                                         \
             fail                                                          \
         );                                                                \
+        PATOMIC_IGNORE_UNUSED(memcpy(expected, &exp_val, sizeof(type)));  \
+        return ret;                                                       \
     }                                                                     \
     static patomic_##opsk##_xchg_t                                        \
     patomic_ops_xchg_create_##name(void)                                  \
@@ -381,10 +399,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        type arg_val;                                                     \
         assert(patomic_is_valid_order(order));                            \
+        PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof(type)));       \
         val = atomic_fetch_or_explicit(                                   \
             (volatile _Atomic(type) *) obj,                               \
-            *((const type *) arg),                                        \
+            arg_val,                                                      \
             order                                                         \
         );                                                                \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type)));           \
@@ -397,7 +417,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
-        /* assertion in called function */                                \
+        /* assertion and arg memcpy in called function */                 \
         patomic_opimpl_fetch_or_##name(                                   \
             obj                                                           \
             ,arg                                                          \
@@ -414,10 +434,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        type arg_val;                                                     \
         assert(patomic_is_valid_order(order));                            \
+        PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof(type)));       \
         val = atomic_fetch_xor_explicit(                                  \
             (volatile _Atomic(type) *) obj,                               \
-            *((const type *) arg),                                        \
+            arg_val,                                                      \
             order                                                         \
         );                                                                \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type)));           \
@@ -430,7 +452,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
-        /* assertion in called function */                                \
+        /* assertion and arg memcpy in called function */                 \
         patomic_opimpl_fetch_xor_##name(                                  \
             obj                                                           \
             ,arg                                                          \
@@ -447,10 +469,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
+        type arg_val;                                                     \
         assert(patomic_is_valid_order(order));                            \
+        PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof(type)));       \
         val = atomic_fetch_and_explicit(                                  \
             (volatile _Atomic(type) *) obj,                               \
-            *((const type *) arg),                                        \
+            arg_val,                                                      \
             order                                                         \
         );                                                                \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type)));           \
@@ -463,7 +487,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                     \
     {                                                                     \
         type val;                                                         \
-        /* assertion in called function */                                \
+        /* assertion and arg memcpy in called function */                 \
         patomic_opimpl_fetch_and_##name(                                  \
             obj                                                           \
             ,arg                                                          \
@@ -562,10 +586,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        type arg_val;                                                    \
         assert(patomic_is_valid_order(order));                           \
+        PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof(type)));      \
         val = atomic_fetch_add_explicit(                                 \
             (volatile _Atomic(type) *) obj,                              \
-            *((const type *) arg),                                       \
+            arg_val,                                                     \
             order                                                        \
         );                                                               \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type)));          \
@@ -578,7 +604,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
-        /* assertion in called function */                               \
+        /* assertion and arg memcpy in called function */                \
         patomic_opimpl_fetch_add_##name(                                 \
             obj                                                          \
             ,arg                                                         \
@@ -595,10 +621,12 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
+        type arg_val;                                                    \
         assert(patomic_is_valid_order(order));                           \
+        PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof(type)));      \
         val = atomic_fetch_sub_explicit(                                 \
             (volatile _Atomic(type) *) obj,                              \
-            *((const type *) arg),                                       \
+            arg_val,                                                     \
             order                                                        \
         );                                                               \
         PATOMIC_IGNORE_UNUSED(memcpy(ret, &val, sizeof(type)));          \
@@ -611,7 +639,7 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
     )                                                                    \
     {                                                                    \
         type val;                                                        \
-        /* assertion in called function */                               \
+        /* assertion and arg memcpy in called function */                \
         patomic_opimpl_fetch_sub_##name(                                 \
             obj                                                          \
             ,arg                                                         \
