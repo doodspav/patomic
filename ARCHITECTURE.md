@@ -71,12 +71,13 @@ provided it marks all its functions as `static` (except functions mentioned in
 the previous section).
 
 ## Information Flow
-The user provides the API with the following information:
+The user provides the API (`patomic_create` or `patomic_create_explicit`) with 
+the following information:
 * `size_t byte_width`
 * `patomic_memory_order_t memory_order` (if calling the non-explicit version)
 * `int options`
-* `int impl_id_argc`
-* `patomic_impl_id_t ...`
+* `int impl_id_argc`  (implementation id argument count)
+* `patomic_impl_id_t ...`  (zero or more implementation ids)
 
 The API function (defined in `/src/patomic.c`) may use, ignore, or otherwise treat
 any implementation ids passed based on which bits are set in the `options` value.
@@ -99,3 +100,14 @@ correctness of any program).
 The API function will combine the objects from the implementations in an unspecified
 manner (which does not affect the correctness of the program), and return the 
 final object to the user.
+
+## State
+Both API and implementation functions may maintain state of their own (although
+currently none do). Objects of type `patomic_t` and `patomic_explicit_t` returned
+by API functions DO NOT constitute a "handle", and not keeping track of such
+objects DOES NOT constitute a leak. In fact such objects may be freely copied or
+lost. 
+
+Any state maintained internally is not exposed to the user, and it is 
+guaranteed that it will be appropriately cleaned up internally. In the future a 
+cleanup function may be added if necessary.
