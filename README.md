@@ -2,7 +2,22 @@
 This library provides portable access to lock-free atomic operations at runtime
 through a unified interface.  
 The goal of it is to be used in Python, however there is no reason it can't be 
-used in any other language.
+used in any other language.  
+For an overview of the codebase, look at `ARCHITECTURE.md`.
+
+## Table of Contents
+<!--ts-->
+* [Requirements](#requirements)
+* [Feature Macros](#feature-macros)
+* [Build](#build)
+  * [Without CMake](#without-cmake)
+* [Usage](#usage)
+  * [API Call](#1-api-call)
+  * [Alignment Requirements](#2-check-alignment-requirements)
+  * [Availability](#3-check-availability)
+* [Guarantees](#guarantees)
+* [Example](#example)
+<!--te-->
 
 ## Requirements
 This library requires a C90 standards compliant compiler to be compiled. In
