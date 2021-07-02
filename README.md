@@ -194,8 +194,6 @@ are followed:
 * the memory ordering of the operation is at least as strong as what was requested
 * operations do not require any alignment on any `void *` parameters except the 
 first one (atomic object)
-* this library can be used at the same time as other libraries whose operations
-provide the same guarantees
 
 ### Example
 The only file you need to include is `patomic/patomic.h`, which works both in C and C++ (although the library still needs to be built as C++).
