@@ -4,13 +4,13 @@ It should compile on any standards compliant C90 compiler with no errors.
 
 
 ### Build
-
+TODO
 
 ### Usage
-
+TODO
 
 ### Guarantees
-
+TODO
 
 ### Example
 The only file you need to include is `patomic/patomic.h`, which works both in C and C++ (although the library still needs to be built as C++).
