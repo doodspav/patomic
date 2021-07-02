@@ -4,7 +4,7 @@ through a unified interface.
 The goal of it is to be used in Python, however there is no reason it can't be 
 used in any other language.
 
-### Requirements
+## Requirements
 This library requires a C90 standards compliant compiler to be compiled. In
 addition to this it requires that fundamental integer types not have a trap value
 (or at least that a `memcpy` into such a type produces a valid value). This is not 
@@ -30,7 +30,7 @@ and the following implementations are going to be added:
 * GNU (`__atomic` & other intrinsics)
 * TSX (`_xbegin()`/`_xend()`)
 
-### Feature Macros
+## Feature Macros
 These macros are used to decide which features to use internally. Rarely their
 definitions might be wrong, in which case they can be overridden. They are always
 defined to be either `0` or `1` (i.e. it is assumed they will always be defined, 
@@ -45,7 +45,7 @@ either through internal or command line means).
 
 Their implementations can be found in `/src/include/patomic/macros/`.
 
-### Build
+## Build
 This project uses CMake as its build system.  
 To build and test on Windows (or with a multi-config generator):
 ```shell
@@ -65,7 +65,7 @@ ctest
 are also available in `CMakePresets.json`, however these are currently only used
 for CI purposes (although they are a good starting point).
 
-##### Without CMake
+### Without CMake
 It is possible to compile without CMake although it is slightly more involved.
 The `#include`s of `<patomic/patomic_export.h>` and `<patomic/patomic_version.h>`
 in `/include/patomic/patomic.h` must be removed, or equivalents must be provided.
@@ -90,10 +90,10 @@ $ gcc -I../src/include ../src/patomic.c $(bash find ../src/impl/ -name "*.c") \
       -o patomic.so
 ```
 This will not compile the tests.
-### Usage
+## Usage
 Usage of this library is split into three stages.
 
-##### 1. API Call
+### 1. API Call
 The types `patomic_t` and `patomic_explicit_t` contain function pointers and
 alignment requirements for the operations. Objects of these types can be obtained
 through the following two API calls:
@@ -120,7 +120,7 @@ has its own unique ID). Options can be found in `/include/patomic/types/options.
 and can be combined with `&`. Options do not change the correctness of the program
 and are followed by the library on a best faith effort.
 
-##### 2. Check Alignment Requirements
+### 2. Check Alignment Requirements
 The `patomic_t` (or `patomic_explicit_t`) object contains the alignment required
 by the operations for the atomic object (in the `.align` member). The first 
 requirement is the `recommended` one and it can be checked like this:
@@ -153,7 +153,7 @@ int check_minimum(const volatile void *obj, patomic_t p, size_t byte_width)
 The reasoning for the two alignment requirements and their purposes can be read
 in `/include/patomic/types/align.h`.
 
-##### 3. Check Availability
+### 3. Check Availability
 The `.ops` member is a collection of function pointers denoting operations. These
 must be checked for `NULL` before they can be used. Once this is done the
 operations can be used on the atomic object as shown below:
@@ -184,7 +184,7 @@ patomic_nonnull_ops_count_explicit(
     patomic_ops_explicit_t const *const ops
 );
 ```
-### Guarantees
+## Guarantees
 The following guarantees are always in place provided the alignment requirements
 are followed:
 * `recommended` and `minimum` alignment requirements are positive powers of `2`
@@ -195,7 +195,7 @@ are followed:
 * operations do not require any alignment on any `void *` parameters except the 
 first one (atomic object)
 
-### Example
+## Example
 The only file you need to include is `patomic/patomic.h`, which works both in C and C++ (although the library still needs to be built as C++).
 ```c
 #include <stdio.h>
