@@ -7,6 +7,7 @@ For an overview of the codebase, look at `ARCHITECTURE.md`.
 
 ## Table of Contents
 <!--ts-->
+* [Versioning](#versioning)
 * [Requirements](#requirements)
 * [Feature Macros](#feature-macros)
 * [Build](#build)
@@ -18,6 +19,16 @@ For an overview of the codebase, look at `ARCHITECTURE.md`.
 * [Guarantees](#guarantees)
 * [Example](#example)
 <!--te-->
+
+## Versioning
+During development, this project got to version `1.2.0` before I realised that
+this is beta software and not stable. The final commit with this old versioning
+system is `b9da1c6`. After this, the project version was reset to `0.1.0`.
+
+Until `devel` gets merged into `main`, all breaking changes in `devel` will only
+increment the `MINOR` version (the `MAJOR` version will stay at `0`). All releases
+will be tagged with `-beta` to signify this. Once merged with `main`, the version
+will be incremented to `1.0.0` and obey normal semver rules.
 
 ## Requirements
 This library requires a C90 standards compliant compiler to be compiled. In
