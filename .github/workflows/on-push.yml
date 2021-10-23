@@ -20,35 +20,35 @@ jobs:
             os: windows-latest
             cc: cl
             ccx: cl
-            preset-test: "ci-win32-msvc"
+            preset: "ci-win32-msvc"
             output-dir: "build/test/Debug"
 
           - name: "windows-msvc-x64"
             os: windows-latest
             cc: cl
             ccx: cl
-            preset-test: "ci-win64-msvc"
+            preset: "ci-win64-msvc"
             output-dir: "build/test/Debug"
 
           - name: "ubuntu-gcc-x64"
             os: ubuntu-latest
             cc: gcc
             ccx: g++
-            preset-test: "ci-ubuntu-gcc"
+            preset: "ci-ubuntu-gcc"
             output-dir: "build/test"
 
           - name: "ubuntu-clang-x64"
             os: ubuntu-latest
             cc: clang
             ccx: clang++
-            preset-test: "ci-ubuntu-clang"
+            preset: "ci-ubuntu-clang"
             output-dir: "build/test"
 
           - name: "macos-clang-x64"
             os: macos-latest
             cc: clang
             ccx: clang++
-            preset-test: "ci-macos-clang"
+            preset: "ci-macos-clang"
             output-dir: "build/test"
 
     steps:
@@ -63,7 +63,7 @@ jobs:
       - name: build-test
         shell: bash
         run: |
-          cmake --preset=${{ matrix.config.preset-test }}
+          cmake --preset=${{ matrix.config.preset }}
           if [ ${{ startsWith(matrix.config.os, 'windows') }} ]
           then
               cmake --build build --config Debug
