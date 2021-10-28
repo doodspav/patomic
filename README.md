@@ -26,8 +26,8 @@ this is beta software and not stable. The final commit with this old versioning
 system is `b9da1c6`. After this, the project version was reset to `0.1.0`.
 
 Until `devel` gets merged into `main`, all breaking changes in `devel` will only
-increment the `MINOR` version (the `MAJOR` version will stay at `0`). All release
-versions/tags from the `devel` branch will be suffixed with `b` to signify this. 
+increment the `MINOR` version (the `MAJOR` version will stay at `0`). All releases
+based on the `devel` branch will be marked as `pre-release` to signify this.
 Once merged with `main`, the version will be incremented to `1.0.0` and obey 
 normal semver rules.
 
