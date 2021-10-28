@@ -1,0 +1,82 @@
+name: on-release
+
+
+on:
+  release:
+    types:
+      - created
+
+
+jobs:
+  build-upload-release:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    env:
+      CC: ${{ matrix.config.cc }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "win32-x86"
+            os: windows-latest
+            cc: cl
+            output-dir: "build/Release"
+            set-arch: "-A Win32"
+
+          - name: "win32-x64"
+            os: windows-latest
+            cc: cl
+            output-dir: "build/Release"
+            set-arch: "-A x64"
+
+          - name: "macos"
+            os: macos-latest
+            cc: clang
+            output-dir: "build"
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: get-release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: save-asset-name
+        shell: bash
+        run: |
+          version=`echo ${{ steps.get_release.outputs.tag_name }} | cut -c2-`
+          name=${{ matrix.config.name }}
+          ext="zip"
+          echo ASSET_NAME="patomic-$version-$name.$ext" >> $GITHUB_ENV
+
+      - name: build-release
+        if: ${{ matrix.config.name != 'source' }}
+        shell: bash
+        run: |
+          cmake ${{ matrix.config.set-arch }} \
+                -DCMAKE_C_STANDARD=11         \
+                -DCMAKE_CXX_STANDARD=14       \
+                -DCMAKE_BUILD_TYPE=Release    \
+                -DBUILD_SHARED_LIBS=ON        \
+                -S . -B build
+          if ${{ startsWith(matrix.config.os, 'windows') }}
+          then
+              cmake --build build --config Release --verbose
+              cd ${{ matrix.config.output-dir }}
+              "/c/Program Files/7-Zip/7z.exe" a patomic.zip patomic.dll
+          else
+              cmake --build build --verbose
+              cd ${{ matrix.config.output-dir }}
+              7z a patomic.zip libpatomic.*.*.*.dylib  # libpatomic.x.y.z.dylib
+          fi
+
+      - name: upload-release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ${{ matrix.config.output-dir }}/patomic.zip
+          asset_name: ${{ env.ASSET_NAME }}
+          asset_content_type: "application/zip"
