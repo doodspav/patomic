@@ -111,11 +111,21 @@ when the library is being used. For GNU compilers it's always defined to
 Once these macros and files are dealt with, something equivalent to the following
 `GCC` command can be used:
 ```shell
+$ echo '#define PATOMIC_VERSION "X.Y.Z"
+#define PATOMIC_VERSION_MAJOR X
+#define PATOMIC_VERSION_MINOR Y
+#define PATOMIC_VERSION_PATCH Z' \
+  > ./include/patomic/patomic_version.h
+$ echo '#define PATOMIC_EXPORT __attribute__ ((visibility ("default")))' \
+  > ./include/patomic/patomic_export.h
 $ mkdir build && cd build
-$ gcc -I../src/include ../src/patomic.c $(bash find ../src/impl/ -name "*.c") \
-      -fvisibility=hidden -fvisibility-inlines-hidden -shared -fpic           \
-      -o patomic.so
+$ gcc -I../include -I../src/include                      \
+      ../src/patomic.c  $(find ../src/impl/ -name "*.c") \
+      -fvisibility=hidden -shared -fpic                  \
+      -o libpatomic.so
+$ rm ../include/patomic/patomic_*.h
 ```
+You should replace the version in this example with actual versions.  
 This will not compile the tests.
 ## Usage
 Usage of this library is split into three stages.
