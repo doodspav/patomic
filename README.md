@@ -116,13 +116,17 @@ $ echo '#define PATOMIC_VERSION "X.Y.Z"
 #define PATOMIC_VERSION_MINOR Y
 #define PATOMIC_VERSION_PATCH Z' \
   > ./include/patomic/patomic_version.h
+
 $ echo '#define PATOMIC_EXPORT __attribute__ ((visibility ("default")))' \
   > ./include/patomic/patomic_export.h
+
 $ mkdir build && cd build
+
 $ gcc -I../include -I../src/include                      \
       ../src/patomic.c  $(find ../src/impl/ -name "*.c") \
       -fvisibility=hidden -shared -fpic                  \
       -o libpatomic.so
+
 $ rm ../include/patomic/patomic_*.h
 ```
 You should replace the version in this example with actual versions.  

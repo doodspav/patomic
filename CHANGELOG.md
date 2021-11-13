@@ -9,6 +9,7 @@ increment the `minor` version for breaking changes.
 ## [Unreleased] [Patch]
 ### Added
 - Enable IPO (if supported) when config is not Debug
+- Link `libatomic.so` if it exists
 ### Fixed
 - gcc build example now works correctly
 
