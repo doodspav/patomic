@@ -59,6 +59,8 @@ add_library(
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
+# ---- Export library ----
+
 include(GenerateExportHeader)
 generate_export_header(
     patomic_patomic
@@ -71,6 +73,8 @@ configure_file(
     include/patomic/patomic_version.h
     @ONLY
 )
+
+# ---- Library properties ----
 
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(patomic_patomic PUBLIC PATOMIC_STATIC_DEFINE)
@@ -104,6 +108,19 @@ target_include_directories(
 )
 
 target_compile_features(patomic_patomic PUBLIC c_std_90)
+
+# ---- Enable IPO when not Debug ----
+
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_result OUTPUT ipo_output)
+if(ipo_result)
+    set_target_properties(
+        patomic_patomic
+        PROPERTIES
+        INTERPROCEDURAL_OPTIMIZATION ON
+        INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF
+    )
+endif()
 
 # ---- Install rules ----
 
