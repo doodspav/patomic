@@ -16,7 +16,7 @@ if(COMPILER_HAS_INLINE STREQUAL "")
 endif()
 
 check_c_source_compiles(
-    "int main(void) { _Alignas(0) int x; return (int)_Alignof(int); }"
+    "int main(void) { _Alignas(_Alignof(int)) int x = 0; return x; }"
     COMPILER_HAS_ALIGNOF
 )
 if(COMPILER_HAS_ALIGNOF STREQUAL "")
