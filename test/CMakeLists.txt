@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 project(patomic_test LANGUAGES CXX)
 
-include(../cmake/project-is-top-level.cmake)
-include(../cmake/windows-set-path.cmake)
+include(../cmake/ProjectIsTopLevel.cmake)
+include(../cmake/WindowsSetPath.cmake)
 
 if(PROJECT_IS_TOP_LEVEL)
   find_package(patomic REQUIRED)

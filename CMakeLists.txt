@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-include(cmake/in-source-guard.cmake)
+include(cmake/InSourceGuard.cmake)
 
 project(
     patomic
@@ -10,8 +10,8 @@ project(
     LANGUAGES C
 )
 
-include(cmake/project-is-top-level.cmake)
-include(cmake/variables.cmake)
+include(cmake/ProjectIsTopLevel.cmake)
+include(cmake/Variables.cmake)
 
 # ---- Declare library ----
 
@@ -137,7 +137,7 @@ endif()
 
 # ---- Install rules ----
 
-include(cmake/install-rules.cmake)
+include(cmake/InstallRules.cmake)
 
 # ---- Developer mode ----
 

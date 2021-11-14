@@ -12,6 +12,8 @@ increment the `minor` version for breaking changes.
 - Link `libatomic.so` if it exists
 ### Fixed
 - gcc build example now works correctly
+### Changed
+- Changed `.cmake` file case from `kebab-case` to `PascalCase`
 
 ## [0.1.0] [Major] - 2021-10-28
 ### Added
