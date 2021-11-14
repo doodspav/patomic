@@ -125,13 +125,13 @@ endif()
 # ---- Link libatomic ----
 
 # .so.1 in case of no .so symlink (e.g. FC19 and Ubuntu)
-# courtesy of HP's foedus_code's FindGccAtomic.cmake @f72fe1905a
+# courtesy of HP's foedus_code's FindGccAtomic.cmake#L24-L25 @f72fe1905a
 find_library(ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
 if(ATOMIC)
     target_link_libraries(
-            patomic_patomic
-            PRIVATE
-            ${ATOMIC}
+        patomic_patomic
+        PRIVATE
+        ${ATOMIC}
     )
 endif()
 
