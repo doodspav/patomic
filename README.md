@@ -66,11 +66,11 @@ either through internal or command line means).
 | Name | Guarding |
 | --- | --- |
 | `PATOMIC_HAVE_LONG_LONG` | `long long` |
-| `PATOMIC_HAVE_STD_ALIGNOF` | `_Alignof` |
+| `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
 
-Their implementations can be found in `/src/include/patomic/macros/`.
+Their implementations can be found in `/src/include/patomic/patomic_config.h`.
 
 ## Build
 This project uses CMake as its build system.  

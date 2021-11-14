@@ -1,0 +1,26 @@
+#ifndef PATOMIC_CONFIG_H
+#define PATOMIC_CONFIG_H
+
+
+/* 'long long' is a fundamental type */
+#ifndef PATOMIC_HAVE_LONG_LONG
+    #define PATOMIC_HAVE_LONG_LONG @COMPILER_HAS_LONG_LONG@
+#endif
+
+/* 'inline' keyword is available */
+#ifndef PATOMIC_HAVE_INLINE
+    #define PATOMIC_HAVE_INLINE @COMPILER_HAS_INLINE@
+#endif
+
+/* '_Alignof' and '_Alignas' keywords are available */
+#ifndef PATOMIC_HAVE_ALIGNOF
+    #define PATOMIC_HAVE_ALIGNOF @COMPILER_HAS_ALIGNOF@
+#endif
+
+/* <stdatomic.h> header and '_Atomic' keyword are available */
+#ifndef PATOMIC_HAVE_STD_ATOMIC
+    #define PATOMIC_HAVE_STD_ATOMIC @COMPILER_HAS_STD_ATOMIC@
+#endif
+
+
+#endif  /* !PATOMIC_CONFIG_H */

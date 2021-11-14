@@ -1,6 +1,6 @@
 #include "std.h"
 
-#include <patomic/macros/have_std_atomic.h>
+#include <patomic/patomic_config.h>
 
 #if PATOMIC_HAVE_STD_ATOMIC || defined(PATOMIC_TEST_C90)
 
@@ -21,11 +21,8 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
-#include <patomic/macros/have_long_long.h>
-#include <patomic/macros/have_std_alignof.h>
-#include <patomic/macros/have_twos_compl.h>
 
-#if !PATOMIC_HAVE_STD_ALIGNOF
+#if !PATOMIC_HAVE_ALIGNOF
     #define _Alignof(t) sizeof(t)
 #endif
 

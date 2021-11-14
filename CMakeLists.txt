@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 include(cmake/InSourceGuard.cmake)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+
 project(
     patomic
     VERSION 0.1.0
@@ -17,6 +19,8 @@ include(cmake/Variables.cmake)
 
 add_library(
     patomic_patomic
+    # include
+    include/patomic/patomic.h
     # include/types
     include/patomic/types/align.h
     include/patomic/types/memory_order.h
@@ -25,16 +29,14 @@ add_library(
     include/patomic/types/ids.h
     # src
     src/patomic.c
+    # src/include/patomic
+    src/include/patomic/patomic_config.h
     # src/include/patomic/fake
     src/include/patomic/fake/stdatomic.h
     # src/include/patomic/macros
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/ignore_unused.h
     src/include/patomic/macros/static_assert.h
-    src/include/patomic/macros/have_long_long.h
-    src/include/patomic/macros/have_std_atomic.h
-    src/include/patomic/macros/have_std_alignof.h
-    src/include/patomic/macros/have_twos_compl.h
     # src/impl
     src/impl/register.h
     # src/impl/null
@@ -69,8 +71,15 @@ generate_export_header(
 )
 
 configure_file(
-    cmake/patomic_version.h.in
+    cmake/in/patomic_version.h.in
     include/patomic/patomic_version.h
+    @ONLY
+)
+
+include(cmake/CompilerFeatureChecks.cmake)
+configure_file(
+    cmake/in/patomic_config.h.in
+    src/include/patomic/_patomic_config.h
     @ONLY
 )
 
