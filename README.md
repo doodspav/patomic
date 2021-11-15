@@ -58,14 +58,17 @@ and the following implementations are going to be added:
 * TSX (`_xbegin()`/`_xend()`)
 
 ## Feature Macros
-These macros are used to decide which features to use internally. Rarely their
-definitions might be wrong, in which case they can be overridden. They are always
-defined to be either `0` or `1` (i.e. it is assumed they will always be defined, 
-either through internal or command line means).
+These macros are used to decide which features to use internally. In the
+unlikely case that any of the definitions are wrong, they can be overridden. 
+They are always defined to be either `0` or `1` (i.e. it is assumed they will 
+always be defined, either through internal or command line means).
 
 | Name | Guarding |
 | --- | --- |
 | `PATOMIC_HAVE_LONG_LONG` | `long long` |
+| `PATOMIC_HAVE_FORCEINLINE` | `__forceinline` |
+| `PATOMIC_HAVE_ALWAYS_INLINE_ATTR` | `__attribute__((always_inline))` |
+| `PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR` | `inline __attribute__((always_inline)` |
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
