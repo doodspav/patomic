@@ -7,9 +7,19 @@
     #define PATOMIC_HAVE_LONG_LONG @COMPILER_HAS_LONG_LONG@
 #endif
 
-/* 'inline' keyword is available */
-#ifndef PATOMIC_HAVE_INLINE
-    #define PATOMIC_HAVE_INLINE @COMPILER_HAS_INLINE@
+/* '__forceinline' keyword is available */
+#ifndef PATOMIC_HAVE_FORCEINLINE
+    #define PATOMIC_HAVE_FORCEINLINE @COMPILER_HAS_FORCEINLINE@
+#endif
+
+/* '__attribute__((always_inline))' is available to use without 'inline' */
+#ifndef PATOMIC_HAVE_ALWAYS_INLINE_ATTR
+    #define PATOMIC_HAVE_ALWAYS_INLINE_ATTR @COMPILER_HAS_ALWAYS_INLINE_ATTR@
+#endif
+
+/* 'inline __attribute__((always_inline))' is available */
+#ifndef PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR
+    #define PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR @COMPILER_HAS_INLINE_ALWAYS_INLINE_ATTR@
 #endif
 
 /* '_Alignof' and '_Alignas' keywords are available */

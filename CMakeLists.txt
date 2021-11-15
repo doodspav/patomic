@@ -2,11 +2,10 @@ cmake_minimum_required(VERSION 3.14)
 
 include(cmake/InSourceGuard.cmake)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 
 project(
     patomic
-    VERSION 0.1.0
+    VERSION 0.1.1
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C

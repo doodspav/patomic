@@ -1,33 +1,47 @@
+function(zero_if_blank var)
+    if(${var} STREQUAL "")
+        set(${var} 0 PARENT_SCOPE)
+    endif()
+endfunction()
+
 check_c_source_compiles(
     "int main(void) { long long x = 0; return (int)x; }"
     COMPILER_HAS_LONG_LONG
 )
-if(COMPILER_HAS_LONG_LONG STREQUAL "")
-    set(COMPILER_HAS_LONG_LONG 0)
-endif()
+zero_if_blank(COMPILER_HAS_LONG_LONG)
 
 check_c_source_compiles(
-     "static inline int s(int a, int b) { return a + b; } \n\
-     int main(void) { return s(1, 2); }"
-    COMPILER_HAS_INLINE
+    "__forceinline static int inc(int x) { return ++x; } \n\
+     int main(void) { return inc(0); }"
+    COMPILER_HAS_FORCEINLINE
 )
-if(COMPILER_HAS_INLINE STREQUAL "")
-    set(COMPILER_HAS_INLINE 0)
-endif()
+zero_if_blank(COMPILER_HAS_FORCEINLINE)
+
+check_c_source_compiles(
+    "__attribute__((always_inline)) static \n\
+     int inc(int x) { return ++x; } \n\
+     int main(void) { return inc(0); }"
+    COMPILER_HAS_ALWAYS_INLINE_ATTR
+)
+zero_if_blank(COMPILER_HAS_ALWAYS_INLINE_ATTR)
+
+check_c_source_compiles(
+    "inline __attribute__((always_inline)) static \n\
+     int inc(int x) { return ++x; } \n\
+     int main(void) { return inc(0); }"
+    COMPILER_HAS_INLINE_ALWAYS_INLINE_ATTR
+)
+zero_if_blank(COMPILER_HAS_INLINE_ALWAYS_INLINE_ATTR)
 
 check_c_source_compiles(
     "int main(void) { _Alignas(_Alignof(int)) int x = 0; return x; }"
     COMPILER_HAS_ALIGNOF
 )
-if(COMPILER_HAS_ALIGNOF STREQUAL "")
-    set(COMPILER_HAS_ALIGNOF 0)
-endif()
+zero_if_blank(COMPILER_HAS_ALIGNOF)
 
 check_c_source_compiles(
     "#include <stdatomic.h> \n\
      int main(void) { return (int)sizeof(_Atomic(int)); }"
     COMPILER_HAS_STD_ATOMIC
 )
-if(COMPILER_HAS_STD_ATOMIC STREQUAL "")
-    set(COMPILER_HAS_STD_ATOMIC 0)
-endif()
+zero_if_blank(COMPILER_HAS_STD_ATOMIC)

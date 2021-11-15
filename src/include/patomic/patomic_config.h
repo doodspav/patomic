@@ -27,10 +27,23 @@
     #define PATOMIC_HAVE_LONG_LONG 0
 #endif
 
-/* 'inline' keyword is available */
-/* requires: C99 */
-#ifndef PATOMIC_HAVE_INLINE
-    #define PATOMIC_HAVE_INLINE 0
+/* '__forceinline' keyword is available */
+/* requires: Microsoft compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_FORCEINLINE
+    #define PATOMIC_HAVE_FORCEINLINE 0
+#endif
+
+/* '__attribute__((always_inline)) is available to use without 'inline' */
+/* requires: Clang (and maybe other non-GCC GNU compatible compilers) */
+#ifndef PATOMIC_HAVE_ALWAYS_INLINE_ATTR
+    #define PATOMIC_HAVE_ALWAYS_INLINE_ATTR 0
+#endif
+
+/* 'inline __attribute__((always_inline))' is available */
+/* requires: 'inline' keyword and GNU compatible(-ish) compiler */
+/* note: TCC supports this, but doesn't define __GNUC__ */
+#ifndef PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR
+    #define PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR 0
 #endif
 
 /* '_Alignof' and '_Alignas' keywords are available */
@@ -41,6 +54,7 @@
 
 /* <stdatomic.h> header and '_Atomic' keyword are available */
 /* requires: C11 and __STD_NO_ATOMICS__ to not be defined */
+/* note: currently MSVC defines __STD_NO_ATOMICS__ */
 #ifndef PATOMIC_HAVE_STD_ATOMIC
     #define PATOMIC_HAVE_STD_ATOMIC 0
 #endif
