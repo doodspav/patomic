@@ -115,8 +115,6 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src/include>"
 )
 
-target_compile_features(patomic_patomic PUBLIC c_std_90)
-
 # ---- Enable IPO when not Debug ----
 
 include(CheckIPOSupported)
