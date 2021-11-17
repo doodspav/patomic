@@ -10,6 +10,24 @@
 #endif
 #define PATOMIC_HAVE_TWOS_COMPL (-INT_MAX != INT_MIN)
 
+/* x86 based platform */
+#ifndef PATOMIC_HAVE_X86
+#if defined(i386)          || defined(__i386)    || defined(__i386__) || \
+    defined(__i486__)      || defined(__i586__)  || defined(__i686__) || \
+    defined(__IA32__)      ||                                            \
+    defined(_M_I86)        || defined(_M_IX86)   || defined(_M_I386)  || \
+    defined(__X86__)       || defined(_X86_)     ||                      \
+    defined(__I86__)       || defined(__386)     ||                      \
+    defined(__THW_INTEL__) || defined(__INTEL__) ||                      \
+    defined(__amd64__)     || defined(__amd64)   ||                      \
+    defined(__x86_64__)    || defined(__x86_64)  ||                      \
+    defined(_M_AMD64)      || defined(_M_X64)
+    #define PATOMIC_HAVE_X86 1
+#else
+    #define PATOMIC_HAVE_X86 0
+#endif
+#endif
+
 
 /*
  * The following macros are defined in '_patomic_config.h' which is generated
