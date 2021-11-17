@@ -74,3 +74,10 @@ check_c_source_compiles(
     COMPILER_HAS_SYS_MMAN_MMAP_MPROTECT
 )
 zero_if_blank(COMPILER_HAS_SYS_MMAN_MMAP_MPROTECT)
+
+check_c_source_compiles(
+    "__attribute__((sysv_abi)) int inc(int x) { return ++x; } \n\
+     int main(void) { return inc(0); }"
+    COMPILER_HAS_SYSV_ABI_ATTR
+)
+zero_if_blank(COMPILER_HAS_SYSV_ABI_ATTR)

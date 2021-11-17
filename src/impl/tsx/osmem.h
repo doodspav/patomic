@@ -44,7 +44,8 @@ patomic_tsx_osmem_protect_rx(
 )
 {
     DWORD old;
-    return (int) VirtualProtect(addr, size, PAGE_EXECUTE_READ, &old);
+    BOOL res = VirtualProtect(addr, size, PAGE_EXECUTE_READ, &old);
+    return (res == 0) ? 0 : 1;
 }
 
 static void
@@ -97,7 +98,7 @@ patomic_tsx_osmem_free(
     PATOMIC_IGNORE_UNUSED(munmap(addr, size));
 }
 
-#else
+#else  /* No OS memory functions detected */
 
 static void *
 patomic_tsx_osmem_alloc_rw(

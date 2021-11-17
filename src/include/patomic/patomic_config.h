@@ -100,5 +100,11 @@
     #define PATOMIC_HAVE_SYS_MMAN_MMAP_MPROTECT 0
 #endif
 
+/* __attribute__((sysv_abi)) is available */
+/* requires: GNU compatible(-ish) compile and Sys-V platform */
+#ifndef PATOMIC_HAVE_SYSV_ABI_ATTR
+    #define PATOMIC_HAVE_SYSV_ABI_ATTR 0
+#endif
+
 
 #endif  /* !PATOMIC_PATOMIC_CONFIG_H */

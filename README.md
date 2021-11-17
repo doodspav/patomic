@@ -72,6 +72,8 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
 | `PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL` | `<memoryapi.h>` `Virtual` functions |
+| `PATOMIC_HAVE_SYS_MMAN_MMAP_MPROTECT` | `<sys/mman.h>` with `mmap` and `mprotect`|
+| `PATOMIC_HAVE_SYSV_ABI_ATTR` | `__attribute__((sysv_abi))` |
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
 | `PATOMIC_HAVE_X86` | x86 specific code (any width) |
 | `PATOMIC_HAVE_X86_64` | 64bit x86 specific code |
