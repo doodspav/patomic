@@ -94,5 +94,11 @@
     #define PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL 0
 #endif
 
+/* <sys/mman.h> is header available and provides 'm(un)map' and 'mprotect' */
+/* requires: POSIX 2001 compliant platform */
+#ifndef PATOMIC_HAVE_SYS_MMAN_MMAP_MPROTECT
+    #define PATOMIC_HAVE_SYS_MMAN_MMAP_MPROTECT 0
+#endif
+
 
 #endif  /* !PATOMIC_PATOMIC_CONFIG_H */

@@ -54,7 +54,23 @@ check_c_source_compiles(
         DWORD old; \n\
         (void) VirtualProtect(m, 4, PAGE_EXECUTE_READ, &old); \n\
         (void) VirtualFree(m, 0, MEM_DECOMMIT|MEM_RELEASE); \n\
+        return 0; \n\
      }"
     COMPILER_HAS_WIN32_MEMORYAPI_VIRTUAL
 )
 zero_if_blank(COMPILER_HAS_WIN32_MEMORYAPI_VIRTUAL)
+
+check_c_source_compiles(
+    "#include <stddef.h> \n\
+     #include <sys/mman.h> \n\
+     #ifndef MAP_ANONYMOUS \n\
+        #define MAP_ANONYMOUS MAP_ANON \n\
+     #endif \n\
+     int main(void) { \n\
+        void* m = mmap(NULL, 4, PROT_READ | PROT_WRITE, MAP_ANONYMOUS, -1, 0); \n\
+        (void) mprotect(m, 4, PROT_READ | PROT_EXEC); \n\
+        return munmap(m, 4); \n\
+     }"
+    COMPILER_HAS_SYS_MMAN_MMAP_MPROTECT
+)
+zero_if_blank(COMPILER_HAS_SYS_MMAN_MMAP_MPROTECT)

@@ -6,18 +6,12 @@
 
 #include <stddef.h>
 
-/* feature check for use in tsx.c */
-#undef PATOMIC_IMPL_TSX_OSMEM_DEFINED
-
 
 /*
  * OSMEM:
  * - alloc_rw
  * - protect_rx
  * - free
- *
- * NOTE:
- * - only available if PATOMIC_IMPL_TSX_OSMEM_DEFINED is defined
  */
 
 #if PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL
@@ -32,14 +26,12 @@
 #define _WIN32_WINNT 0x0501
 #define WIN32_LEAN_AND_MEAN
 
-#define PATOMIC_IMPL_TSX_OSMEM_DEFINED
-
 #include <Windows.h>
 #include <memoryapi.h>
 
 static void *
 patomic_tsx_osmem_alloc_rw(
-        size_t size
+    size_t size
 )
 {
     return VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -47,8 +39,8 @@ patomic_tsx_osmem_alloc_rw(
 
 static int
 patomic_tsx_osmem_protect_rx(
-        void *addr,
-        size_t size
+    void *addr,
+    size_t size
 )
 {
     DWORD old;
@@ -57,12 +49,84 @@ patomic_tsx_osmem_protect_rx(
 
 static void
 patomic_tsx_osmem_free(
-        void *addr,
-        size_t size
+    void *addr,
+    size_t size
 )
 {
     PATOMIC_IGNORE_UNUSED(size);
     PATOMIC_IGNORE_UNUSED(VirtualFree(addr, 0, MEM_DECOMMIT | MEM_RELEASE));
+}
+
+#elif PATOMIC_HAVE_SYS_MMAN_MMAP_MPROTECT
+
+#include <sys/mman.h>
+
+#ifndef MAP_ANONYMOUS
+    #define MAP_ANONYMOUS MAP_ANON
+#endif
+
+static void *
+patomic_tsx_osmem_alloc_rw(
+    size_t size
+)
+{
+    void *addr = mmap(
+        NULL, size,
+        PROT_READ | PROT_WRITE, MAP_ANONYMOUS,
+        -1, 0
+    );
+    return (addr == MAP_FAILED) ? NULL : addr;
+}
+
+static int
+patomic_tsx_osmem_protect_rx(
+    void *addr,
+    size_t size
+)
+{
+    int res = mprotect(addr, size, PROT_READ | PROT_EXEC);
+    return (res == 0) ? 1 : 0;
+}
+
+static void
+patomic_tsx_osmem_free(
+    void *addr,
+    size_t size
+)
+{
+    PATOMIC_IGNORE_UNUSED(munmap(addr, size));
+}
+
+#else
+
+static void *
+patomic_tsx_osmem_alloc_rw(
+        size_t size
+)
+{
+    PATOMIC_IGNORE_UNUSED(size);
+    return NULL;
+}
+
+static int
+patomic_tsx_osmem_protect_rx(
+        void *addr,
+        size_t size
+)
+{
+    PATOMIC_IGNORE_UNUSED(addr);
+    PATOMIC_IGNORE_UNUSED(size);
+    return 0;
+}
+
+static void
+patomic_tsx_osmem_free(
+        void *addr,
+        size_t size
+)
+{
+    PATOMIC_IGNORE_UNUSED(addr);
+    PATOMIC_IGNORE_UNUSED(size);
 }
 
 #endif
