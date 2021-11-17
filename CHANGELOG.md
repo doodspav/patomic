@@ -10,6 +10,7 @@ increment the `minor` version for breaking changes.
 ### Added
 - config macro for win32 `<memoryapi.h>` Virtual functions
 - config macro for x86 target (enabled on 16bit, 32bit, and 64bit)
+- config macro for 64bit x86 target
 
 ## [0.1.2] [Patch] - 2021-11-15
 ### Changed

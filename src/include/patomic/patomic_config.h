@@ -28,6 +28,17 @@
 #endif
 #endif
 
+/* 64bit x86 platform */
+#ifndef PATOMIC_HAVE_X86_64
+#if PATOMIC_HAVE_X86 &&                          \
+    (defined(__amd64__)  || defined(__amd64)  || \
+     defined(__x86_64__) || defined(__x86_64) || \
+     defined(_M_AMD64)   || defined(_M_X64))
+    #define PATOMIC_HAVE_X86_64 1
+#else
+    #define PATOMIC_HAVE_X86_64 0
+#endif
+#endif
 
 /*
  * The following macros are defined in '_patomic_config.h' which is generated
