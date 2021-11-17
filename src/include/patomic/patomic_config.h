@@ -59,5 +59,11 @@
     #define PATOMIC_HAVE_STD_ATOMIC 0
 #endif
 
+/* <memoryapi.h> header available and provides Virtual functions */
+/* requires: compiler with WinAPI support (also Windows XP or higher) */
+#ifndef PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL
+    #define PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL 0
+#endif
+
 
 #endif  /* !PATOMIC_PATOMIC_CONFIG_H */

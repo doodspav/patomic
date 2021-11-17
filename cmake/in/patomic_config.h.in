@@ -32,5 +32,10 @@
     #define PATOMIC_HAVE_STD_ATOMIC @COMPILER_HAS_STD_ATOMIC@
 #endif
 
+/* <memoryapi.h> header available and provides Virtual functions */
+#ifndef PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL
+    #define PATOMIC_HAVE_WIN32_MEMORYAPI_VIRTUAL @COMPILER_HAS_WIN32_MEMORYAPI_VIRTUAL@
+#endif
+
 
 #endif  /* !PATOMIC_CONFIG_H */

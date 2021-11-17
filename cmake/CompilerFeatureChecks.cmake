@@ -45,3 +45,16 @@ check_c_source_compiles(
     COMPILER_HAS_STD_ATOMIC
 )
 zero_if_blank(COMPILER_HAS_STD_ATOMIC)
+
+check_c_source_compiles(
+    "#include <Windows.h> \n\
+     #include <memoryapi.h> \n\
+     int main(void) { \n\
+        void* m = VirtualAlloc(NULL, 4, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE); \n\
+        DWORD old; \n\
+        (void) VirtualProtect(m, 4, PAGE_EXECUTE_READ, &old); \n\
+        (void) VirtualFree(m, 0, MEM_DECOMMIT|MEM_RELEASE); \n\
+     }"
+    COMPILER_HAS_WIN32_MEMORYAPI_VIRTUAL
+)
+zero_if_blank(COMPILER_HAS_WIN32_MEMORYAPI_VIRTUAL)
