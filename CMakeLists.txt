@@ -55,6 +55,10 @@ add_library(
     src/impl/tsx/tsx.h
     src/impl/tsx/tsx.c
     src/impl/tsx/osmem.h
+    # src/impl/tsx/abi
+    src/impl/tsx/abi/abi.h
+    src/impl/tsx/abi/types.h
+    src/impl/tsx/abi/sysv.h
     # src/impl/gnu
     src/impl/gnu/gnu.h
     src/impl/gnu/gnu.c
