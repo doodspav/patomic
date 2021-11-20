@@ -10,6 +10,7 @@ increment the `minor` version for breaking changes.
 ### Added
 - config macro checking for `<immintrin.h>` and RTM intrinsic availability
 - config macro checking for cpuid intrinsic (MS and GNU)
+- full TSX implementation (supporting widths up to 16384 bytes)
 
 ## [0.1.2] [Patch] - 2021-11-15
 ### Changed

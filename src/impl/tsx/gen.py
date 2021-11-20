@@ -1,16 +1,18 @@
 from __future__ import print_function
 
+import sys
+
 
 def _get_prologue(name):
     name = "_".join(name.upper().split())
-    template = "#ifndef PATOMIC_IMPL_TSX_PP_%s_H\n"
-    template += "#define PATOMIC_IMPL_TSX_PP_%s_H\n\n"
+    template = "#ifndef PATOMIC_IMPL_TSX_%s_H\n"
+    template += "#define PATOMIC_IMPL_TSX_%s_H\n\n"
     return template % (name, name)
 
 
 def _get_epilogue(name):
     name = "_".join(name.upper().split())
-    template = "\n#endif  /* !PATOMIC_IMPL_TSX_PP_%s_H */\n"
+    template = "\n#endif  /* !PATOMIC_IMPL_TSX_%s_H */\n"
     return template % (name,)
 
 
@@ -23,9 +25,10 @@ def create_repeat(n):
 
     content = _get_prologue(name)
     content += _get_warning()
-    content += "#define PATOMIC_TSX_REPEAT_N %s\n\n" % n
+    content += "#define PATOMIC_TSX_REPEAT_N %s\n" % n
+    content += "#define PATOMIC_TSX_REPEAT_N_1 %s\n\n" % (n + 1,)
     content += "#define PATOMIC_TSX_REPEAT(def) \\\n"
-    for i in range(n - 1):
+    for i in range(n):
         content += "    def(%s) \\\n" % (i + 1,)
     content += "\n"
     content += _get_epilogue(name)
@@ -39,5 +42,26 @@ def create_repeat(n):
 
 
 if __name__ == "__main__":
-    repeats = 0x4000
+    """
+    Call like: python gen.py n
+    """
+    error = "You must provide a single integer argument >= 2"
+
+    if len(sys.argv) != 2:
+        raise RuntimeError(error)
+
+    repeats = None
+    try:
+        repeats = int(sys.argv[1])
+    except ValueError:
+        try:
+            repeats = int(sys.argv[1], 16)
+        except ValueError:
+            pass
+    if repeats is None:
+        raise RuntimeError(error)
+
+    if not repeats >= 2:
+        raise RuntimeError(error)
+
     create_repeat(repeats)
