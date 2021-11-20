@@ -37,5 +37,15 @@
     #define PATOMIC_HAVE_IMMINTRIN_RTM @COMPILER_HAS_IMMINTRIN_RTM@
 #endif
 
+/* <intrin.h> header and '__cpuid(ex)' intrinsics are available */
+#ifndef PATOMIC_HAVE_INTRIN_CPUID
+    #define PATOMIC_HAVE_INTRIN_CPUID @COMPILER_HAS_INTRIN_CPUID@
+#endif
+
+/* <cpuid.h> header and  '__cpuid(_count)' intrinsics are available */
+#ifndef PATOMIC_HAVE_CPUID_CPUID
+    #define PATOMIC_HAVE_CPUID_CPUID @COMPILER_HAS_CPUID_CPUID@
+#endif
+
 
 #endif  /* !PATOMIC_CONFIG_H */

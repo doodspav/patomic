@@ -28,7 +28,7 @@
 #endif
 
 /* '__forceinline' keyword is available */
-/* requires: Microsoft compatible(-ish) compiler */
+/* requires: MS compatible(-ish) compiler */
 #ifndef PATOMIC_HAVE_FORCEINLINE
     #define PATOMIC_HAVE_FORCEINLINE 0
 #endif
@@ -63,6 +63,18 @@
 /* requires: supporting compiler and x86 target */
 #ifndef PATOMIC_HAVE_IMMINTRIN_RTM
     #define PATOMIC_HAVE_IMMINTRIN_RTM 0
+#endif
+
+/* <intrin.h> header and '__cpuid(ex)' intrinsics are available */
+/* requires: MS compatible(-ish) compiler and x86 target */
+#ifndef PATOMIC_HAVE_INTRIN_CPUID
+    #define PATOMIC_HAVE_INTRIN_CPUID 0
+#endif
+
+/* <cpuid.h> header and  '__cpuid(_count)' intrinsics are available */
+/* requires: GNU compatible(-ish) compiler and x86 target */
+#ifndef PATOMIC_HAVE_CPUID_CPUID
+    #define PATOMIC_HAVE_CPUID_CPUID 0
 #endif
 
 

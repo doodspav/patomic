@@ -56,3 +56,29 @@ check_c_source_compiles(
     COMPILER_HAS_IMMINTRIN_RTM
 )
 zero_if_blank(COMPILER_HAS_IMMINTRIN_RTM)
+
+check_c_source_compiles(
+    "#include <intrin.h> \n\
+     int main(void) { \n\
+         int ex[4]; \n\
+         __cpuid(ex, 0); \n\
+         __cpuidex(ex, 0, 0); \n\
+         (void) ex; \n\
+         return 0; \n\
+     }"
+    COMPILER_HAS_INTRIN_CPUID
+)
+zero_if_blank(COMPILER_HAS_INTRIN_CPUID)
+
+check_c_source_compiles(
+    "#include <cpuid.h> \n\
+     int main(void) { \n\
+         unsigned int ex[4]; \n\
+         __cpuid(0, ex[0], ex[1], ex[2], ex[3]); \n\
+         __cpuid_count(0, 0, ex[0], ex[1], ex[2], ex[3]); \n\
+         (void) ex; \n\
+         return 0; \n\
+     }"
+    COMPILER_HAS_CPUID_CPUID
+)
+zero_if_blank(COMPILER_HAS_CPUID_CPUID)
