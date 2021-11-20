@@ -59,5 +59,11 @@
     #define PATOMIC_HAVE_STD_ATOMIC 0
 #endif
 
+/* <immintrin.h> header and RTM intrinsics are available */
+/* requires: supporting compiler and x86 target */
+#ifndef PATOMIC_HAVE_IMMINTRIN_RTM
+    #define PATOMIC_HAVE_IMMINTRIN_RTM 0
+#endif
+
 
 #endif  /* !PATOMIC_PATOMIC_CONFIG_H */

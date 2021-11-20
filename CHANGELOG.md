@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
+## [Unreleased] [Minor]
+### Added
+- config macro checking for `<immintrin.h>` and RTM intrinsic availability
+
 ## [0.1.2] [Patch] - 2021-11-15
 ### Changed
 - moved all feature macros from `have_*_.h` into new `patomic_config.h`

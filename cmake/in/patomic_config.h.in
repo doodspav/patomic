@@ -32,5 +32,10 @@
     #define PATOMIC_HAVE_STD_ATOMIC @COMPILER_HAS_STD_ATOMIC@
 #endif
 
+/* <immintrin.h> header and RTM intrinsics are available */
+#ifndef PATOMIC_HAVE_IMMINTRIN_RTM
+    #define PATOMIC_HAVE_IMMINTRIN_RTM @COMPILER_HAS_IMMINTRIN_RTM@
+#endif
+
 
 #endif  /* !PATOMIC_CONFIG_H */

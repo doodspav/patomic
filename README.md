@@ -71,6 +71,7 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR` | `inline __attribute__((always_inline)` |
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
+| `PATOMIC_HAVE_IMMINTRIN_RTM` | `<immintrin.h>` and RTM intrinsics |
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
 
 Their implementations can be found in `/src/include/patomic/patomic_config.h`.

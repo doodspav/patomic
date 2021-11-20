@@ -45,3 +45,14 @@ check_c_source_compiles(
     COMPILER_HAS_STD_ATOMIC
 )
 zero_if_blank(COMPILER_HAS_STD_ATOMIC)
+
+check_c_source_compiles(
+    "#include <immintrin.h> \n\
+     int main(void) { \n\
+         unsigned status; \n\
+         if ((status = _xbegin()) == _XBEGIN_STARTED) { _xend(); } \n\
+         return (int) status; \n\
+     }"
+    COMPILER_HAS_IMMINTRIN_RTM
+)
+zero_if_blank(COMPILER_HAS_IMMINTRIN_RTM)
