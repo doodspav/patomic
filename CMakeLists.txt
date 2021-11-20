@@ -54,6 +54,8 @@ add_library(
     # src/impl/tsx
     src/impl/tsx/tsx.h
     src/impl/tsx/tsx.c
+    src/impl/tsx/repeat.h
+    src/impl/tsx/gen.py
     # src/impl/gnu
     src/impl/gnu/gnu.h
     src/impl/gnu/gnu.c
