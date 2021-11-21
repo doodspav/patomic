@@ -65,13 +65,13 @@
     #define PATOMIC_HAVE_IMMINTRIN_RTM 0
 #endif
 
-/* <intrin.h> header and '__cpuid(ex)' intrinsics are available */
+/* <intrin.h> header and '__cpuid(ex)' and '__(read|write)eflags intrinsics are available */
 /* requires: MS compatible(-ish) compiler and x86 target */
-#ifndef PATOMIC_HAVE_INTRIN_CPUID
-    #define PATOMIC_HAVE_INTRIN_CPUID 0
+#ifndef PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
+    #define PATOMIC_HAVE_INTRIN_EFLAGS_CPUID 0
 #endif
 
-/* <cpuid.h> header and  '__cpuid(_count)' intrinsics are available */
+/* <cpuid.h> header and  '__cpuid(_count)' and '__get_cpuid_max' intrinsics are available */
 /* requires: GNU compatible(-ish) compiler and x86 target */
 #ifndef PATOMIC_HAVE_CPUID_CPUID
     #define PATOMIC_HAVE_CPUID_CPUID 0

@@ -37,12 +37,12 @@
     #define PATOMIC_HAVE_IMMINTRIN_RTM @COMPILER_HAS_IMMINTRIN_RTM@
 #endif
 
-/* <intrin.h> header and '__cpuid(ex)' intrinsics are available */
-#ifndef PATOMIC_HAVE_INTRIN_CPUID
-    #define PATOMIC_HAVE_INTRIN_CPUID @COMPILER_HAS_INTRIN_CPUID@
+/* <intrin.h> header and '__cpuid(ex)' and '__(read|write)eflags intrinsics are available */
+#ifndef PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
+    #define PATOMIC_HAVE_INTRIN_EFLAGS_CPUID @COMPILER_HAS_INTRIN_EFLAGS_CPUID@
 #endif
 
-/* <cpuid.h> header and  '__cpuid(_count)' intrinsics are available */
+/* <cpuid.h> header and  '__cpuid(_count)' and '__get_cpuid_max' intrinsics are available */
 #ifndef PATOMIC_HAVE_CPUID_CPUID
     #define PATOMIC_HAVE_CPUID_CPUID @COMPILER_HAS_CPUID_CPUID@
 #endif
