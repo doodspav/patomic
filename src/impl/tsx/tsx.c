@@ -9,7 +9,7 @@ static const patomic_explicit_t patomic_explicit_NULL;
 
 
 #if PATOMIC_HAVE_IMMINTRIN_RTM && \
-    (PATOMIC_HAVE_INTRIN_CPUID || PATOMIC_HAVE_CPUID_CPUID)
+    (PATOMIC_HAVE_INTRIN_EFLAGS_CPUID || PATOMIC_HAVE_CPUID_CPUID)
 
 #include <immintrin.h>
 #include <stddef.h>
@@ -17,7 +17,7 @@ static const patomic_explicit_t patomic_explicit_NULL;
 
 #include "repeat.h"
 
-#if PATOMIC_HAVE_INTRIN_CPUID
+#if PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
 #include <intrin.h>
 
 static int
@@ -25,10 +25,22 @@ patomic_tsx_supports_rtm(void)
 {
     int ex[4];
     int a=0, b=1;
+    long id_bit = 0x200000;
+    /* need to check if cpuid is available */
+    /* but can't write __readeflags' return type */
+    /* depends on 32bit/64bit and would need extra checking */
+    /* eok = ((r() | m) && ((w(r() ^ m), r()) | m)) ? 0 : 1; */
+    int eok = ((__readeflags() | id_bit) && \
+        ((__writeeflags(__readeflags() ^ id_bit), __readeflags()) | id_bit)) ? \
+        0 : 1;
+    /* set eflags back to original value (and check eok) */
+    __writeeflags(__readeflags() ^ id_bit);
+    if (!eok) { return 0; }
+    /* check for rtm using cpuid */
     __cpuid(ex, 0);
     if (ex[a] < 0x7) { return 0; }
     __cpuidex(ex, 0x7, 0x0);
-    return (int)(((unsigned)ex[b]) & 0x800u);
+    return (((unsigned)ex[b]) & 0x800u) != 0;
 }
 
 #elif PATOMIC_HAVE_CPUID_CPUID
@@ -38,10 +50,11 @@ static int
 patomic_tsx_supports_rtm(void)
 {
     unsigned int eax, ebx, ecx, edx;
+    if (__get_cpuid_max(0x0, &eax) == 0) { return 0; }
     __cpuid(0, eax, ebx, ecx, edx);
     if (eax < 0x7) { return 0; }
     __cpuid_count(0x7, 0x0, eax, ebx, ecx, edx);
-    return (int)(ebx & 0x800u);
+    return (ebx & 0x800u) != 0;
 }
 
 #else

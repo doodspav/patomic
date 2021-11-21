@@ -72,8 +72,9 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
 | `PATOMIC_HAVE_IMMINTRIN_RTM` | `<immintrin.h>` and RTM intrinsics |
+| `PATOMIC_HAVE_INTRIN_EFLAGS | `<intrin.h>` and `__(read/write)eflags` intrinsics|
 | `PATOMIC_HAVE_INTRIN_CPUID` | `<intrin.h>` and `__cpuid(ex)` intrinsics |
-| `PATOMIC_HAVE_CPUID_CPUID` | `<cpuid.h>` and `__cpuid(_count)` intrinsics |
+| `PATOMIC_HAVE_CPUID_CPUID` | `<cpuid.h>`, and `__cpuid(_count)`and `__get_cpuid_max` intrinsics |
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
 
 Their implementations can be found in `/src/include/patomic/patomic_config.h`.

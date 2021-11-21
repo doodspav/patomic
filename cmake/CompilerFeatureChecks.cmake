@@ -63,21 +63,25 @@ check_c_source_compiles(
     "#include <intrin.h> \n\
      int main(void) { \n\
          int ex[4]; \n\
+         __writeeflags(__readeflags()); \n\
          __cpuid(ex, 0); \n\
          __cpuidex(ex, 0, 0); \n\
          (void) ex; \n\
          return 0; \n\
      }"
-    COMPILER_HAS_INTRIN_CPUID
+    COMPILER_HAS_INTRIN_EFLAGS_CPUID
 )
-zero_if_blank(COMPILER_HAS_INTRIN_CPUID)
+zero_if_blank(COMPILER_HAS_INTRIN_EFLAGS_CPUID)
 
 check_c_source_compiles(
     "#include <cpuid.h> \n\
      int main(void) { \n\
          unsigned int ex[4]; \n\
-         __cpuid(0, ex[0], ex[1], ex[2], ex[3]); \n\
-         __cpuid_count(0, 0, ex[0], ex[1], ex[2], ex[3]); \n\
+         ex[0] = __get_cpuid_max(0x0, &ex[1]); \n\
+         if (ex[0] != 0) { \n\
+             __cpuid(0, ex[0], ex[1], ex[2], ex[3]); \n\
+             __cpuid_count(0, 0, ex[0], ex[1], ex[2], ex[3]); \n\
+         } \n\
          (void) ex; \n\
          return 0; \n\
      }"
