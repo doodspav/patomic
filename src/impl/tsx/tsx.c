@@ -168,7 +168,9 @@ patomic_tsx_get_cmpxchg_fp(
     size_t width
 )
 {
-    if (width == 0 || width > PATOMIC_TSX_REPEAT_N) { return NULL; }
+    if (width == 0 || width > PATOMIC_TSX_REPEAT_N ||
+        !patomic_tsx_supports_rtm())
+    { return NULL; }
     else { return patomic_tsx_fps_cmpxchg_weak[width - 1]; }
 }
 
@@ -177,7 +179,9 @@ patomic_tsx_get_explicit_cmpxchg_fp(
     size_t width
 )
 {
-    if (width == 0 || width > PATOMIC_TSX_REPEAT_N) { return NULL; }
+    if (width == 0 || width > PATOMIC_TSX_REPEAT_N ||
+        !patomic_tsx_supports_rtm())
+    { return NULL; }
     else { return patomic_tsx_fps_explicit_cmpxchg_weak[width - 1]; }
 }
 
