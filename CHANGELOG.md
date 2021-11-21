@@ -11,6 +11,7 @@ increment the `minor` version for breaking changes.
 - config macro checking for `<immintrin.h>` and RTM intrinsic availability
 - config macro checking for cpuid intrinsic (MS and GNU)
 - full TSX implementation (supporting widths up to 16384 bytes)
+- CMake auto-adds `-mrtm` flag if supported
 
 ## [0.1.2] [Patch] - 2021-11-15
 ### Changed

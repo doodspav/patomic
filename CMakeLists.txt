@@ -62,6 +62,19 @@ add_library(
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
+# ---- Add Compiler Flags ----
+
+include(CheckCCompilerFlag)
+
+check_c_compiler_flag(
+    "-mrtm"
+    COMPILER_ACCEPTS_FLAG_MRTM
+)
+if(COMPILER_ACCEPTS_FLAG_MRTM)
+    target_compile_options(patomic_patomic PRIVATE -mrtm)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mrtm")
+endif()
+
 # ---- Export library ----
 
 include(GenerateExportHeader)

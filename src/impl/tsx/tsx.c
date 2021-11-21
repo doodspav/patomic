@@ -61,7 +61,7 @@ patomic_tsx_cmpxchg_weak_impl(
     void *obj = (void *) vobj;
 
     /* attempt single cmpxchg transaction */
-    if ((status = _xbegin()) == _XBEGIN_STARTED)
+    if (_xbegin() == _XBEGIN_STARTED)
     {
         res = memcmp(obj, expected, n);
         if (res != 0) { _xabort(0); }
