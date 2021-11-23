@@ -37,6 +37,7 @@ add_library(
     src/include/patomic/macros/ignore_unused.h
     src/include/patomic/macros/static_assert.h
     # src/patomic
+    src/patomic/patomic_version.c
     # src/patomic/types
     src/patomic/types/memory_order.c
     # src/impl

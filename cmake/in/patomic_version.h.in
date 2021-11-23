@@ -1,10 +1,27 @@
 #ifndef PATOMIC_VERSION_H
 #define PATOMIC_VERSION_H
 
+#include <patomic/patomic_export.h>
+
 #define PATOMIC_VERSION "@patomic_VERSION@"
 
 #define PATOMIC_VERSION_MAJOR @patomic_VERSION_MAJOR@
 #define PATOMIC_VERSION_MINOR @patomic_VERSION_MINOR@
 #define PATOMIC_VERSION_PATCH @patomic_VERSION_PATCH@
+
+PATOMIC_EXPORT int
+patomic_version_major(void);
+
+PATOMIC_EXPORT int
+patomic_version_minor(void);
+
+PATOMIC_EXPORT int
+patomic_version_patch(void);
+
+PATOMIC_EXPORT int
+patomic_version_compatible_with(
+    int major,
+    int minor
+);
 
 #endif  /* !PATOMIC_VERSION_H */
