@@ -1,6 +1,8 @@
 #ifndef PATOMIC_MEMORY_ORDER_H
 #define PATOMIC_MEMORY_ORDER_H
 
+#include <patomic/patomic_export.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,68 +25,20 @@ typedef enum {
 } patomic_memory_order_t;
 
 
-static int
-patomic_is_valid_order(int order)
-{
-    switch (order)
-    {
-        case patomic_RELAXED:
-        case patomic_CONSUME:
-        case patomic_ACQUIRE:
-        case patomic_RELEASE:
-        case patomic_ACQ_REL:
-        case patomic_SEQ_CST: return 1;
-        default: return 0;
-    }
-}
+PATOMIC_EXPORT int
+patomic_is_valid_order(int order);
 
-static int
-patomic_is_valid_store_order(int order)
-{
-    switch (order)
-    {
-        case patomic_RELAXED:
-        case patomic_RELEASE:
-        case patomic_SEQ_CST: return 1;
-        default: return 0;
-    }
-}
+PATOMIC_EXPORT int
+patomic_is_valid_store_order(int order);
 
-static int
-patomic_is_valid_load_order(int order)
-{
-    switch (order)
-    {
-        case patomic_RELAXED:
-        case patomic_CONSUME:
-        case patomic_ACQUIRE:
-        case patomic_SEQ_CST: return 1;
-        default: return 0;
-    }
-}
+PATOMIC_EXPORT int
+patomic_is_valid_load_order(int order);
 
-static int
-patomic_is_valid_fail_order(int succ, int fail)
-{
-    if ((fail > succ)
-        || !patomic_is_valid_order(succ)
-        || !patomic_is_valid_order(fail)
-        || (fail == patomic_RELEASE)
-        || (fail == patomic_ACQ_REL))
-    { return 0; }
-    else { return 1; }
-}
+PATOMIC_EXPORT int
+patomic_is_valid_fail_order(int succ, int fail);
 
-static int
-patomic_cmpxchg_fail_order(int succ)
-{
-    switch (succ)
-    {
-        case patomic_RELEASE:
-        case patomic_ACQ_REL: return patomic_ACQUIRE;
-        default: return succ;
-    }
-}
+PATOMIC_EXPORT int
+patomic_cmpxchg_fail_order(int succ);
 
 
 #ifdef __cplusplus
