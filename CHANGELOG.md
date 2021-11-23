@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
-## [Unreleased] [Minor]
+## [0.2.0] [Minor] - 2021-11-23
 ### Added
 - exported version functions corresponding to macros
 - function definitions are marked `PATOMIC_FORCE_INLINE`
