@@ -6,6 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
+## [Unreleased] [Patch]
+### Added
+- `HelperFunctionsTest` test suite (for version and memory order functions)
+### Changed
+- `patomic_version_*` functions no longer marked `PATOMIC_FORCE_INLINE`
+  (if inlining is needed, use the `PATOMIC_VERSION_*` macros provided)
+### Fixed
+- `patomic_version.h` declarations now wrapped in `extern "C" {}` in C++
+  (caused linker errors when compiling with C++)
+
 ## [0.2.0] [Minor] - 2021-11-23
 ### Added
 - exported version functions corresponding to macros

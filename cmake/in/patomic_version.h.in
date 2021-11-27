@@ -9,6 +9,10 @@
 #define PATOMIC_VERSION_MINOR @patomic_VERSION_MINOR@
 #define PATOMIC_VERSION_PATCH @patomic_VERSION_PATCH@
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PATOMIC_EXPORT int
 patomic_version_major(void);
 
@@ -23,5 +27,9 @@ patomic_version_compatible_with(
     int major,
     int minor
 );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* !PATOMIC_VERSION_H */
