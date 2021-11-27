@@ -46,6 +46,12 @@
     #define PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR 0
 #endif
 
+/* '__inline__ __attribute__((always_inline))' is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR
+    #define PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR 0
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 /* requires: C11 */
 #ifndef PATOMIC_HAVE_ALIGNOF

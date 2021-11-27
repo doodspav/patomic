@@ -34,6 +34,14 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_INLINE_ALWAYS_INLINE_ATTR)
 
 check_c_source_compiles(
+     "__inline__ __attribute__((always_inline)) static \n\
+      int inc(int x) { return ++x; } \n\
+      int main(void) { return inc(0); }"
+     COMPILER_HAS_GNU_INLINE_ALWAYS_INLINE_ATTR
+)
+zero_if_blank(COMPILER_HAS_GNU_INLINE_ALWAYS_INLINE_ATTR)
+
+check_c_source_compiles(
     "int main(void) { _Alignas(_Alignof(int)) int x = 0; return x; }"
     COMPILER_HAS_ALIGNOF
 )

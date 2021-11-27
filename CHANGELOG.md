@@ -9,9 +9,12 @@ increment the `minor` version for breaking changes.
 ## [Unreleased] [Patch]
 ### Added
 - `HelperFunctionsTest` test suite (for version and memory order functions)
+- `PATOMIC_GNU_INLINE_ALWAYS_INLINE_ATTR` config macro
 ### Changed
 - `patomic_version_*` functions no longer marked `PATOMIC_FORCE_INLINE`
   (if inlining is needed, use the `PATOMIC_VERSION_*` macros provided)
+- `PATOMIC_FORCE_INLINE` can now use `__inline__` instead of `inline` if
+  available
 ### Fixed
 - `patomic_version.h` declarations now wrapped in `extern "C" {}` in C++
   (caused linker errors when compiling with C++)
