@@ -23,7 +23,13 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 #include <patomic/macros/ignore_unused.h>
 
 #if !PATOMIC_HAVE_ALIGNOF
-    #define _Alignof(t) sizeof(t)
+    #if PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR
+        #define _Alignof(t) __alignof__(t)
+    #elif PPATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
+        #define _Alignof(t) __alignof(t)
+    #else
+        #define _Alignof(t) sizeof(t)
+    #endif
 #endif
 
 /* hide/show anything */

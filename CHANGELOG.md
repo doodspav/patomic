@@ -6,10 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
-## [Unreleased]
+## [Unreleased] [Patch]
 ### Added
 - `PATOMIC_MAX_CACHE_LINE_SIZE` macro in `align.h`
 - corresponding `patomic_max_cache_line_size` function in `align.h`/`align.c`
+- config macros to check for MS/GNU alignment extensions
+### Changed
+- `std` implementation now checks for MS/GNU alignment extensions before
+  defaulting to using `sizeof` in place of `_Alignof`
 
 ## [0.2.1] [Patch] - 2021-11-27
 ### Added

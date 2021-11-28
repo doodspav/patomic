@@ -56,6 +56,18 @@
     #define PATOMIC_HAVE_ALIGNOF 0
 #endif
 
+/* '__alignof' keyword and '__declspec(align(#))' are available */
+/* requires: MS compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
+    #define PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC 0
+#endif
+
+/* '__alignof__' keyword and '__attribute__((aligned(#)))' are available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR
+    #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR 0
+#endif
+
 /* <stdatomic.h> header and '_Atomic' keyword are available */
 /* requires: C11 and __STD_NO_ATOMICS__ to not be defined */
 /* note: currently MSVC defines __STD_NO_ATOMICS__ */

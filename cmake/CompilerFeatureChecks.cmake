@@ -48,6 +48,23 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_ALIGNOF)
 
 check_c_source_compiles(
+    "int main(void) { \n\
+        int y = 0;
+        __declspec(align(1)) int x; \n\
+        x = __alignof(int); return x + y; }"
+    COMPILER_HAS_MS_ALIGNOF_ALIGN_DSPC
+)
+zero_if_blank(COMPILER_HAS_MS_ALIGNOF_ALIGN_DSPC)
+
+check_c_source_compiles(
+    "int main(void) { \n\
+        __attribute__((aligned(__alignof__(int)))) int x; \n\
+        x = 0; return x; }"
+    COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR
+)
+zero_if_blank(COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR)
+
+check_c_source_compiles(
     "#include <stdatomic.h> \n\
      int main(void) { return (int)sizeof(_Atomic(int)); }"
     COMPILER_HAS_STD_ATOMIC
