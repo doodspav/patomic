@@ -5,9 +5,7 @@
 #include <limits.h>
 
 /* integer representation is two's complement */
-#ifdef PATOMIC_HAVE_TWOS_COMPL
-    #undef PATOMIC_HAVE_TWOS_COMPL
-#endif
+#undef PATOMIC_HAVE_TWOS_COMPL
 #define PATOMIC_HAVE_TWOS_COMPL (-INT_MAX != INT_MIN)
 
 

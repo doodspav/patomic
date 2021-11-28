@@ -39,6 +39,7 @@ add_library(
     # src/patomic
     src/patomic/patomic_version.c
     # src/patomic/types
+    src/patomic/types/align.c
     src/patomic/types/memory_order.c
     # src/impl
     src/impl/register.h

@@ -2,6 +2,11 @@
 #include <gtest/gtest.h>
 
 
+TEST(HelperFunctionsTest, max_cache_line_size)
+{
+    ASSERT_EQ(patomic_max_cache_line_size(), PATOMIC_MAX_CACHE_LINE_SIZE);
+}
+
 TEST(HelperFunctionsTest, version_major)
 {
     ASSERT_EQ(patomic_version_major(), PATOMIC_VERSION_MAJOR);
