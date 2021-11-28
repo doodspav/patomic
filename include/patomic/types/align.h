@@ -61,7 +61,7 @@ patomic_max_cache_line_size(void);
 
 
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif /* !PATOMIC_ALIGN_H */

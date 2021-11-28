@@ -57,7 +57,7 @@ patomic_nonnull_ops_count_explicit(
 
 
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif  /* !PATOMIC_PATOMIC_H */

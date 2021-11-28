@@ -27,7 +27,7 @@ typedef enum {
 } patomic_impl_id_t;
 
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif  /* !PATOMIC_IDS_H */

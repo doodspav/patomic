@@ -12,7 +12,7 @@ typedef enum {
 } patomic_options_t;
 
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif  /* !PATOMIC_OPTIONS_H */

@@ -6,8 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
-## [Unreleased] [Patch]
+## [Unreleased] [Minor]
 ### Added
+- transaction helper types in new transaction.h including `flag_t`, `config_t`,
+  `status_t`, and `result_t` (with appropriate name prefixes)
 - `PATOMIC_MAX_CACHE_LINE_SIZE` macro in `align.h`
 - corresponding `patomic_max_cache_line_size` function in `align.h`/`align.c`
 - config macros to check for MS/GNU alignment extensions

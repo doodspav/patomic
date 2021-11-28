@@ -29,7 +29,7 @@ patomic_version_compatible_with(
 );
 
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif  /* !PATOMIC_VERSION_H */

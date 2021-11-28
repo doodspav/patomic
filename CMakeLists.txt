@@ -26,6 +26,7 @@ add_library(
     include/patomic/types/options.h
     include/patomic/types/ops.h
     include/patomic/types/ids.h
+    include/patomic/types/transaction.h
     # src
     src/patomic.c
     # src/include/patomic
