@@ -10,6 +10,7 @@ increment the `minor` version for breaking changes.
 ### Added
 - transaction helper types in new transaction.h including `flag_t`, `config_t`,
   `status_t`, and `result_t` (with appropriate name prefixes)
+- transaction ops types in ops.h with extension of `flag_ops` and `special_ops`
 - `PATOMIC_MAX_CACHE_LINE_SIZE` macro in `align.h`
 - corresponding `patomic_max_cache_line_size` function in `align.h`/`align.c`
 - config macros to check for MS/GNU alignment extensions

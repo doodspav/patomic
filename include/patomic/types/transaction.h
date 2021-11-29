@@ -10,8 +10,8 @@ extern "C" {
 
 /*
  * TRANSACTION FLAG
- * - used to cause an abort in a live transaction if modified
- * - both flag ops (set, reset) are lock-free atomic (like all ops)
+ * - used to cause an abort in a live transaction if modified by reading from it
+ *   at the start of each transaction
  *
  * - padded_flag_holder is available for C90/99 since no alignment utilities
  *   are provided in these standard revisions
@@ -31,20 +31,9 @@ typedef struct {
     unsigned char _padding_post[PATOMIC_MAX_CACHE_LINE_SIZE];
 } patomic_transaction_padded_flag_holder_t;
 
-typedef void (* patomic_transaction_flag_set_t) \
-    (patomic_transaction_flag_t *);
-
-typedef void (* patomic_transaction_flag_reset_t) \
-    (patomic_transaction_flag_t *);
-
-typedef struct {
-    patomic_transaction_flag_set_t fp_set;
-    patomic_transaction_flag_reset_t fp_reset;
-} patomic_transaction_flag_ops_t;
-
 
 /*
- * TRANSACTION CONFIG#
+ * TRANSACTION CONFIG
  * - width: size in bytes of objects to operate on
  * - attempts: number of attempts to make committing atomic transaction
  * - fallback_attempts: number of attempts to make commit fallback atomic
@@ -62,7 +51,7 @@ typedef struct {
     size_t fallback_attempts;
     const patomic_transaction_flag_t *flag;
     const patomic_transaction_flag_t *fallback_flag;
-};
+} patomic_transaction_config_t;
 
 /*
  * TRANSACTION STATUS

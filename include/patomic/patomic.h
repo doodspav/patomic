@@ -8,6 +8,7 @@
 #include <patomic/types/ops.h>
 #include <patomic/types/options.h>
 #include <patomic/types/memory_order.h>
+#include <patomic/types/transaction.h>
 
 #include <patomic/patomic_export.h>
 #include <patomic/patomic_version.h>
