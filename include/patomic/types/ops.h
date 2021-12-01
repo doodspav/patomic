@@ -124,84 +124,121 @@ typedef void (* patomic_opsig_explicit_void_noarg_t) \
  * - result-out-param
  * - config
  *
- * - (except for flag - its only param is the flag)
+ * - (except for flag and raw)
  */
 
-typedef void (* patomic_opsig_transaction_store_t) \
-    (volatile void *obj,                           \
-     const void *desired,                          \
-     patomic_transaction_result_t *result,         \
+typedef patomic_transaction_result_t      \
+    (* patomic_opsig_transaction_store_t) \
+    (volatile void *obj,                  \
+     const void *desired,                 \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_load_t) \
-    (const volatile void *obj,                    \
-     void *ret,                                   \
-     patomic_transaction_result_t *result,        \
+typedef patomic_transaction_result_t     \
+    (* patomic_opsig_transaction_load_t) \
+    (const volatile void *obj,           \
+     void *ret,                          \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_exchange_t) \
-    (volatile void *obj,                              \
-     const void *desired,                             \
-     void *ret,                                       \
-     patomic_transaction_result_t *result,            \
+typedef patomic_transaction_result_t         \
+    (* patomic_opsig_transaction_exchange_t) \
+    (volatile void *obj,                     \
+     const void *desired,                    \
+     void *ret,                              \
      patomic_transaction_config_t config);
 
-typedef int (* patomic_opsig_transaction_cmpxchg_t) \
-    (volatile void *obj,                            \
-     void *expected,                                \
-     const void *desired,                           \
-     patomic_transaction_result_t *result,          \
+typedef patomic_transaction_result_wfb_t    \
+    (* patomic_opsig_transaction_cmpxchg_t) \
+    (volatile void *obj,                    \
+     void *expected,                        \
+     const void *desired,                   \
+     int *ret,                              \
+     patomic_transaction_config_wfb_t config);
+
+typedef patomic_transaction_result_t     \
+    (* patomic_opsig_transaction_test_t) \
+    (const volatile void *obj,           \
+     size_t offset,                      \
+     int *ret,                           \
      patomic_transaction_config_t config);
 
-typedef int (* patomic_opsig_transaction_test_t) \
-    (const volatile void *obj,                   \
-     size_t offset,                              \
-     patomic_transaction_result_t *result,       \
+typedef patomic_transaction_result_t            \
+    (* patomic_opsig_transaction_test_modify_t) \
+    (volatile void *obj,                        \
+     size_t offset,                             \
+     int *ret,                                  \
      patomic_transaction_config_t config);
 
-typedef int (* patomic_opsig_transaction_test_modify_t) \
-    (volatile void *obj,                                \
-     size_t offset,                                     \
-     patomic_transaction_result_t *result,              \
+typedef patomic_transaction_result_t      \
+    (* patomic_opsig_transaction_fetch_t) \
+    (volatile void *obj,                  \
+     const void *arg,                     \
+     void *ret,                           \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_fetch_t) \
-    (volatile void *obj,                           \
-     const void *arg,                              \
-     void *ret,                                    \
-     patomic_transaction_result_t *result,         \
+typedef patomic_transaction_result_t            \
+    (* patomic_opsig_transaction_fetch_noarg_t) \
+    (volatile void *obj,                        \
+     void *ret,                                 \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_fetch_noarg_t) \
-    (volatile void *obj,                                 \
-     void *ret,                                          \
-     patomic_transaction_result_t *result,               \
+typedef patomic_transaction_result_t     \
+    (* patomic_opsig_transaction_void_t) \
+    (volatile void *obj,                 \
+     const void *arg,                    \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_void_t) \
-    (volatile void *obj,                          \
-     const void *arg,                             \
-     patomic_transaction_result_t *result,        \
+typedef patomic_transaction_result_t           \
+    (* patomic_opsig_transaction_void_noarg_t) \
+    (volatile void *obj,                       \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_void_noarg_t) \
-    (volatile void *obj,                                \
-     patomic_transaction_result_t *result,              \
+/* NOTE: config.width applies to both sets of params */
+typedef patomic_transaction_result_wfb_t           \
+    (* patomic_opsig_transaction_double_cmpxchg_t) \
+    (volatile void *obj_a,                         \
+     volatile void *obj_b,                         \
+     void *expected_a,                             \
+     void *expected_b,                             \
+     const void *desired_a,                        \
+     const void *desired_b,                        \
+     patomic_transaction_config_wfb_t);
+
+/* NOTE: size of cxs array is obtained from config.width */
+typedef patomic_transaction_result_wfb_t      \
+    (* patomic_opsig_transaction_n_cmpxchg_t) \
+    (patomic_transaction_cmpxchg_t *cxs,
+     patomic_transaction_config_wfb_t config);
+
+typedef patomic_transaction_result_t        \
+    (* patomic_opsig_transaction_generic_t) \
+    (void (* fn) (void *),                  \
+     void *ctx,                             \
      patomic_transaction_config_t config);
 
-typedef void (* patomic_opsig_transaction_flag_t) \
-    (patomic_transaction_flag_t *);
+typedef patomic_transaction_result_wfb_t        \
+    (* patomic_opsig_transaction_generic_wfb_t) \
+    (void (* fn) (void *),                      \
+     void *ctx,                                 \
+     void (* fallback_fn) (void *),             \
+     void *fallback_ctx,                        \
+     patomic_transaction_config_wfb_t config);
+
+typedef void (* patomic_opsig_transaction_flag_t) (patomic_transaction_flag_t *);
+
+typedef unsigned long (* patomic_opsig_transaction_tbegin_t) (void);
+
+typedef void (* patomic_opsig_transaction_tabort_t) (void);
+
+typedef void (* patomic_opsig_transaction_tcommit_t) (void);
+
+typedef int (* patomic_opsig_transaction_ttest_t) (void);
 
 
 /*
  * OP STRUCTS
- * - implicit: each operation is a function pointer (fp)
- *             without a memory order parameter (implicit)
- * - explicit: each operation is a function pointer (fp)
- *             with an explicit memory order parameter
- * - transaction: each operation is a function pointer (fp)
- *                with either a transaction result and config,
- *                or a flag
+ * - implicit: no extra parameters or special return type
+ * - explicit: memory order parameter
+ * - transaction: tconfig parameter, tresult return type (except flag and raw)
  */
 
 #undef PATOMIC_DEFINE_ARITHMETIC_OPS_STRUCT
@@ -259,8 +296,20 @@ typedef struct {
 } patomic_ops_transaction_flag_t;
 
 typedef struct {
-    char _todo;
+    patomic_opsig_transaction_double_cmpxchg_t fp_double_cmpxchg_weak;
+    patomic_opsig_transaction_double_cmpxchg_t fp_double_cmpxchg_strong;
+    patomic_opsig_transaction_n_cmpxchg_t fp_n_cmpxchg_weak;
+    patomic_opsig_transaction_n_cmpxchg_t fp_n_cmpxchg_strong;
+    patomic_opsig_transaction_generic_t fp_generic;
+    patomic_opsig_transaction_generic_wfb_t fp_generic_wfb;
 } patomic_ops_transaction_special_t;
+
+typedef struct {
+    patomic_opsig_transaction_tbegin_t fp_tbegin;
+    patomic_opsig_transaction_tabort_t fp_tabort;
+    patomic_opsig_transaction_tcommit_t fp_tcommit;
+    patomic_opsig_transaction_ttest_t fp_ttest;
+} patomic_ops_transaction_raw_t;
 
 #undef PATOMIC_DEFINE_OPS_STRUCTS
 #define PATOMIC_DEFINE_OPS_STRUCTS(opsig_kind, ops_kind)        \
@@ -304,8 +353,9 @@ typedef struct {
     patomic_ops_transaction_arithmetic_t signed_ops;
     patomic_ops_transaction_arithmetic_t unsigned_ops;
     /* extra ops not available in implicit/explicit */
-    patomic_ops_transaction_flag_t flag_ops;
     patomic_ops_transaction_special_t special_ops;
+    patomic_ops_transaction_flag_t flag_ops;
+    patomic_ops_transaction_raw_t raw_ops;
 } patomic_ops_transaction_t;
 
 

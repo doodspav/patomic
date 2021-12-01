@@ -10,10 +10,10 @@ extern "C" {
 
 /*
  * TRANSACTION FLAG
- * - used to cause an abort in a live transaction if modified by reading from it
- *   at the start of each transaction
+ * - used to trigger an abort in a live transaction if modified, by reading from
+ *   it at the start of each transaction
  *
- * - padded_flag_holder is available for C90/99 since no alignment utilities
+ * - padded_flag_holder is intended for C90/99 since no alignment utilities
  *   are provided in these standard revisions
  * - it ensures the flag variable has its own cache line to avoid false
  *   sharing (which may cause a live transaction to unexpectedly abort)
@@ -33,6 +33,19 @@ typedef struct {
 
 
 /*
+ * TRANSACTION CMPXCHG
+ * - used in n_cmpxchg to pass multiple memory locations
+ */
+
+typedef struct {
+    size_t width;
+    volatile void *obj;
+    void *expected;
+    const void *desired;
+} patomic_transaction_cmpxchg_t;
+
+
+/*
  * TRANSACTION CONFIG
  * - width: size in bytes of objects to operate on
  * - attempts: number of attempts to make committing atomic transaction
@@ -43,7 +56,16 @@ typedef struct {
  *
  * - flag and fallback_flag may point to the same object, or be NULL (in which
  *   case a locally allocated flag is used)
+ *
+ * - wfb: with fallback
+ * - dwfb: double (for double cmpxchg) with fallback
  */
+
+typedef struct {
+    size_t width;
+    size_t attempts;
+    const patomic_transaction_flag_t *flag;
+} patomic_transaction_config_t;
 
 typedef struct {
     size_t width;
@@ -51,45 +73,46 @@ typedef struct {
     size_t fallback_attempts;
     const patomic_transaction_flag_t *flag;
     const patomic_transaction_flag_t *fallback_flag;
-} patomic_transaction_config_t;
+} patomic_transaction_config_wfb_t;
+
 
 /*
  * TRANSACTION STATUS
  * - success: the atomic operation was committed
- * - failure: the fallback atomic operation was committed
- * - aborted: no atomic operation was committed
+ * - aborted: the atomic operation was not committed
  */
 
 typedef enum {
-    patomic_transaction_SUCCESS,
-    patomic_transaction_FAILURE,
-    patomic_transaction_ABORTED
+    patomic_TSUCCESS = 0
+    ,patomic_TABORTED = 1
 } patomic_transaction_status_t;
 
 
 /*
  * TRANSACTION RESULT
- * - status: see above
+ * - status: status obtained in final attempt at atomic operation
+ * - fallback_status: status obtained in final attempt at fallback atomic
+ *   operation
  * - attempts_made: how many attempts were made to commit the atomic operation
  * - fallback_attempts_made: how many attempts were made to commit the fallback
  *   atomic operation
  *
- * - the (fallback_)attempts members can be used to determine if the memory
- *   region being operated on is under a lot of contention (this can cause
- *   repeated transaction aborts)
+ * - fallback_status will default to TSUCCESS if fallback_attempts_made is 0
  *
- * - if status is success, fallback_attempts_made will be 0
- * - if status is failure, attempts_made will equal the attempts value from the
- *   config
- * - if status is aborted, attempts_made and fallback_attempts_made will be
- *   equal to their respective config values
+ * - wfb: with fallback
  */
 
 typedef struct {
     patomic_transaction_status_t status;
     size_t attempts_made;
-    size_t fallback_attempts_made;
 } patomic_transaction_result_t;
+
+typedef struct {
+    patomic_transaction_status_t status;
+    patomic_transaction_status_t fallback_status;
+    size_t attempts_made;
+    size_t fallback_attempts_made;
+} patomic_transaction_result_wfb_t;
 
 #ifdef __cplusplus
 }  /* extern "C" */
