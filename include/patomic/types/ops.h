@@ -209,12 +209,14 @@ typedef patomic_transaction_result_wfb_t      \
     (patomic_transaction_cmpxchg_t *cxs,
      patomic_transaction_config_wfb_t config);
 
+/* NOTE: config.width is ignored */
 typedef patomic_transaction_result_t        \
     (* patomic_opsig_transaction_generic_t) \
     (void (* fn) (void *),                  \
      void *ctx,                             \
      patomic_transaction_config_t config);
 
+/* NOTE: config.width is ignored */
 typedef patomic_transaction_result_wfb_t        \
     (* patomic_opsig_transaction_generic_wfb_t) \
     (void (* fn) (void *),                      \
@@ -225,9 +227,9 @@ typedef patomic_transaction_result_wfb_t        \
 
 typedef void (* patomic_opsig_transaction_flag_t) (patomic_transaction_flag_t *);
 
-typedef unsigned long (* patomic_opsig_transaction_tbegin_t) (void);
+typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (void);
 
-typedef void (* patomic_opsig_transaction_tabort_t) (void);
+typedef void (* patomic_opsig_transaction_tabort_t) (unsigned char reason);
 
 typedef void (* patomic_opsig_transaction_tcommit_t) (void);
 

@@ -80,12 +80,28 @@ typedef struct {
  * TRANSACTION STATUS
  * - success: the atomic operation was committed
  * - aborted: the atomic operation was not committed
+ *
+ * - explicit: tabort was explicitly called by the user with a reason
+ * - conflict: memory conflict with another thread
+ * - capacity: transaction used too much memory
+ * - nested: abort occurred in inner nested transaction
+ * - debug: abort caused by debug trap
+ * - int: abort caused by interrupt
  */
 
 typedef enum {
-    patomic_TSUCCESS = 0
+     patomic_TSUCCESS = 0
     ,patomic_TABORTED = 1
+    ,patomic_TABORT_EXPLICIT = 0x2u  | 1u
+    ,patomic_TABORT_CONFLICT = 0x4u  | 1u
+    ,patomic_TABORT_CAPACITY = 0x8u  | 1u
+    ,patomic_TABORT_NESTED   = 0x10u | 1u
+    ,patomic_TABORT_DEBUG    = 0x20u | 1u
+    ,patomic_TABORT_INT      = 0x40u | 1u
 } patomic_transaction_status_t;
+
+/* value is 0 if tabort was not explicitly called by the user */
+#define PATOMIC_TABORT_REASON(x) (((unsigned int)(x) << 8u) & 0xFFu)
 
 
 /*
@@ -103,13 +119,13 @@ typedef enum {
  */
 
 typedef struct {
-    patomic_transaction_status_t status;
+    unsigned int status;
     size_t attempts_made;
 } patomic_transaction_result_t;
 
 typedef struct {
-    patomic_transaction_status_t status;
-    patomic_transaction_status_t fallback_status;
+    unsigned int status;
+    unsigned int fallback_status;
     size_t attempts_made;
     size_t fallback_attempts_made;
 } patomic_transaction_result_wfb_t;
