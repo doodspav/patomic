@@ -12,6 +12,7 @@ extern "C" {
  * TRANSACTION FLAG
  * - used to trigger an abort in a live transaction if modified, by reading from
  *   it at the start of each transaction
+ * - any modification to any memory in the same cache line should cause an abort
  *
  * - padded_flag_holder is intended for C90/99 since no alignment utilities
  *   are provided in these standard revisions
@@ -58,7 +59,6 @@ typedef struct {
  *   case a locally allocated flag is used)
  *
  * - wfb: with fallback
- * - dwfb: double (for double cmpxchg) with fallback
  */
 
 typedef struct {
@@ -89,6 +89,7 @@ typedef struct {
  * - int: abort caused by interrupt
  */
 
+/* Note: status can take up to 8 bits (of minimum 16bit uint) */
 typedef enum {
      patomic_TSUCCESS = 0
     ,patomic_TABORTED = 1
@@ -100,8 +101,12 @@ typedef enum {
     ,patomic_TABORT_INT      = 0x40u | 1u
 } patomic_transaction_status_t;
 
-/* value is 0 if tabort was not explicitly called by the user */
-#define PATOMIC_TABORT_REASON(x) (((unsigned int)(x) << 8u) & 0xFFu)
+/* Note: reason can take up to 8 bits (of minimum 16bit uint) */
+/* Note: value will be 0 if not (x & patomic_TABORT_EXPLICIT) */
+PATOMIC_EXPORT unsigned char
+patomic_transaction_abort_reason(
+    unsigned int status
+);
 
 
 /*

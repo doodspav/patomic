@@ -42,6 +42,7 @@ add_library(
     # src/patomic/types
     src/patomic/types/align.c
     src/patomic/types/memory_order.c
+    src/patomic/types/transaction.c
     # src/impl
     src/impl/register.h
     # src/impl/null

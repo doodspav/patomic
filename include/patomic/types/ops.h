@@ -225,10 +225,18 @@ typedef patomic_transaction_result_wfb_t        \
      void *fallback_ctx,                        \
      patomic_transaction_config_wfb_t config);
 
-typedef void (* patomic_opsig_transaction_flag_t) (patomic_transaction_flag_t *);
+typedef int (* patomic_opsig_transaction_flag_test_t) \
+    (const patomic_transaction_flag_t *);
+
+typedef int (* patomic_opsig_transaction_flag_test_and_set_t) \
+    (patomic_transaction_flag_t *);
+
+typedef void (* patomic_opsig_transaction_flag_clear_t) \
+    (patomic_transaction_flag_t *);
 
 typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (void);
 
+/* Note: only first 8bits of reason will be used */
 typedef void (* patomic_opsig_transaction_tabort_t) (unsigned char reason);
 
 typedef void (* patomic_opsig_transaction_tcommit_t) (void);
@@ -293,8 +301,9 @@ typedef int (* patomic_opsig_transaction_ttest_t) (void);
     } patomic_##ops_kind##_xchg_t
 
 typedef struct {
-    patomic_opsig_transaction_flag_t fp_set;
-    patomic_opsig_transaction_flag_t fp_reset;
+    patomic_opsig_transaction_flag_test_t fp_test;
+    patomic_opsig_transaction_flag_test_and_set_t fp_test_and_set;
+    patomic_opsig_transaction_flag_clear_t fp_clear;
 } patomic_ops_transaction_flag_t;
 
 typedef struct {
