@@ -1101,3 +1101,20 @@ patomic_impl_create_explicit_std(
 }
 
 #endif
+
+#include <patomic/macros/ignore_unused.h>
+
+static const patomic_transaction_t patomic_transaction_NULL;
+
+patomic_transaction_t
+patomic_impl_create_transaction_std(
+    int options
+)
+{
+    patomic_transaction_t ret;
+    PATOMIC_IGNORE_UNUSED(options);
+    ret = patomic_transaction_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
+}

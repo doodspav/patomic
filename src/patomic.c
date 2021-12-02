@@ -213,6 +213,7 @@ PATOMIC_DEFINE_COMBINE(combine_explicit, patomic_explicit_t)
 
 static const patomic_t patomic_NULL;
 static const patomic_explicit_t patomic_explicit_NULL;
+static const patomic_transaction_t patomic_transaction_NULL;
 
 #define SHOW(x) x
 #define HIDE(x)
@@ -265,6 +266,22 @@ static const patomic_explicit_t patomic_explicit_NULL;
 
 PATOMIC_DEFINE_CREATE(SHOW_P, SHOW, _, e)
 PATOMIC_DEFINE_CREATE(HIDE_P, HIDE, _explicit_, e_explicit)
+
+patomic_transaction_t
+patomic_create_transaction(
+    int options,
+    int impl_id_argc,
+    ...
+)
+{
+    patomic_transaction_t ret;
+    (void) options;
+    (void) impl_id_argc;
+    ret = patomic_transaction_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
+}
 
 
 #define PATOMIC_DEFINE_NONNULL_COUNT(cntk, type)            \

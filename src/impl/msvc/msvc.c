@@ -9,6 +9,7 @@
 
 static const patomic_t patomic_NULL;
 static const patomic_explicit_t patomic_explicit_NULL;
+static const patomic_transaction_t patomic_transaction_NULL;
 
 #include "generic_uint.h"
 
@@ -997,3 +998,16 @@ patomic_impl_create_explicit_msvc(
 }
 
 #endif  /* defined(PATOMIC_DEFINE_IL) */
+
+patomic_transaction_t
+patomic_impl_create_transaction_msvc(
+    int options
+)
+{
+    patomic_transaction_t ret;
+    PATOMIC_IGNORE_UNUSED(options);
+    ret = patomic_transaction_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
+}

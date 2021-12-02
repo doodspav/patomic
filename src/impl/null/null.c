@@ -5,6 +5,7 @@
 
 static const patomic_t patomic_NULL;
 static const patomic_explicit_t patomic_explicit_NULL;
+static const patomic_transaction_t patomic_transaction_NULL;
 
 patomic_t
 patomic_impl_create_null(
@@ -33,6 +34,19 @@ patomic_impl_create_explicit_null(
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(options);
     ret = patomic_explicit_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
+}
+
+patomic_transaction_t
+patomic_impl_create_transaction_null(
+    int options
+)
+{
+    patomic_transaction_t ret;
+    PATOMIC_IGNORE_UNUSED(options);
+    ret = patomic_transaction_NULL;
     ret.align.recommended = 1;
     ret.align.minimum = 1;
     return ret;

@@ -28,6 +28,13 @@ typedef struct {
     patomic_align_t align;
 } patomic_explicit_t;
 
+typedef struct {
+    patomic_ops_transaction_t ops;
+    patomic_align_t align;
+    patomic_transaction_recommended_t recommended;
+    patomic_transaction_safe_string_t sstring;
+} patomic_transaction_t;
+
 
 PATOMIC_EXPORT patomic_t
 patomic_create(
@@ -45,6 +52,14 @@ patomic_create_explicit(
     int impl_id_argc,
     ...
 );
+
+PATOMIC_EXPORT patomic_transaction_t
+patomic_create_transaction(
+    int options,
+    int impl_id_argc,
+    ...
+);
+
 
 PATOMIC_EXPORT int
 patomic_nonnull_ops_count(
