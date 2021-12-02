@@ -198,10 +198,10 @@ typedef patomic_transaction_result_wfb_t           \
     (* patomic_opsig_transaction_double_cmpxchg_t) \
     (volatile void *obj_a,                         \
      volatile void *obj_b,                         \
-     void *expected_a,                             \
-     void *expected_b,                             \
-     const void *desired_a,                        \
-     const void *desired_b,                        \
+     void *expected_nullable_a,                    \
+     void *expected_nullable_b,                    \
+     const void *desired_nullable_a,               \
+     const void *desired_nullable_b,               \
      patomic_transaction_config_wfb_t);
 
 /* NOTE: size of cxs array is obtained from config.width */

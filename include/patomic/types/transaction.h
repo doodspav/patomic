@@ -10,6 +10,7 @@ extern "C" {
 
 /*
  * TRANSACTION FLAG
+ *
  * - used to trigger an abort in a live transaction if modified, by reading from
  *   it at the start of each transaction
  * - any modification to any memory in the same cache line should cause an abort
@@ -35,6 +36,7 @@ typedef struct {
 
 /*
  * TRANSACTION CMPXCHG
+ *
  * - used in n_cmpxchg to pass multiple memory locations
  * - expected and desired may be NULL
  *
@@ -46,13 +48,14 @@ typedef struct {
 typedef struct {
     size_t width;
     volatile void *obj;
-    void *expected;
-    const void *desired;
+    void *expected_nullable;
+    const void *desired_nullable;
 } patomic_transaction_cmpxchg_t;
 
 
 /*
  * TRANSACTION CONFIG
+ *
  * - width: size in bytes of objects to operate on
  * - attempts: number of attempts to make committing atomic transaction
  * - fallback_attempts: number of attempts to make commit fallback atomic
@@ -83,6 +86,7 @@ typedef struct {
 
 /*
  * TRANSACTION STATUS
+ *
  * - success: the atomic operation was committed
  * - aborted: the atomic operation was not committed
  *
@@ -116,6 +120,7 @@ patomic_transaction_abort_reason(
 
 /*
  * TRANSACTION RESULT
+ *
  * - status: status obtained in final attempt at atomic operation
  * - fallback_status: status obtained in final attempt at fallback atomic
  *   operation
