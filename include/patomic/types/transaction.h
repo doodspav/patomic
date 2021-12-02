@@ -145,6 +145,45 @@ typedef struct {
     size_t fallback_attempts_made;
 } patomic_transaction_result_wfb_t;
 
+
+/*
+ * TRANSACTION RECOMMENDED
+ *
+ * - recommended limits for transactions
+ *
+ * - max_rmw_memory (3N): test transaction reads N bytes from contiguous block A,
+ *   compares them N bytes from contiguous block B, and writes them to
+ *   contiguous block C. N is the maximum value tested where the transaction
+ *   did not fail. max_rmw_memory is the TOTAL memory capacity in all three
+ *   contiguous blocks (i.e. 3N).
+ * - max_load_memory (2N): test transaction reads N bytes from a contiguous
+ *   block A into a contiguous block B. N is the maximum value tested where the
+ *   transaction did not fail. max_load_memory is the TOTAL memory capacity in
+ *   both contiguous blocks (i.e. 2N).
+ *
+ * - min_rmw_attempts: the number of attempts taken for the max_rmw_memory test
+ *   transaction to succeed
+ * - min_load_attempts: the number of attempts taken for the max_load_memory
+ *   test transaction to succeed
+ *
+ * - rmw models cmpxchg's success path (load, cmp, store)
+ * - load models cmpxchg's failure path (load)
+ * - the tests are run at least once per program execution
+ * - implementations may cache the result of each test
+ *
+ * WARNING:
+ * - the tests are run under sterile conditions with no memory contention
+ * - they represent the best possible outcome, which may not be achievable in
+ *   real world scenarios
+ */
+
+typedef struct {
+    size_t max_rmw_memory;
+    size_t max_load_memory;
+    size_t min_rmw_attempts;
+    size_t min_load_attempts;
+} patomic_transaction_recommended_t;
+
 #ifdef __cplusplus
 }  /* extern "C" */
 #endif

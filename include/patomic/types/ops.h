@@ -207,7 +207,7 @@ typedef patomic_transaction_result_wfb_t           \
 /* NOTE: size of cxs array is obtained from config.width */
 typedef patomic_transaction_result_wfb_t      \
     (* patomic_opsig_transaction_n_cmpxchg_t) \
-    (patomic_transaction_cmpxchg_t *cxs,
+    (const patomic_transaction_cmpxchg_t *cxs,
      patomic_transaction_config_wfb_t config);
 
 /* NOTE: config.width is ignored */
