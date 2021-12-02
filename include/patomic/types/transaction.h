@@ -36,6 +36,11 @@ typedef struct {
 /*
  * TRANSACTION CMPXCHG
  * - used in n_cmpxchg to pass multiple memory locations
+ * - expected and desired may be NULL
+ *
+ * - if expected is NULL, no comparison (and write-back) is performed
+ * - if desired is NULL, no value is stored to obj
+ * - setting both to NULL would be a little pointless
  */
 
 typedef struct {

@@ -192,6 +192,7 @@ typedef patomic_transaction_result_t           \
     (volatile void *obj,                       \
      patomic_transaction_config_t config);
 
+/* NOTE: expected and desired may be NULL - check transaction cmpxchg docs */
 /* NOTE: config.width applies to both sets of params */
 typedef patomic_transaction_result_wfb_t           \
     (* patomic_opsig_transaction_double_cmpxchg_t) \
