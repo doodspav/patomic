@@ -184,6 +184,36 @@ typedef struct {
     size_t min_load_attempts;
 } patomic_transaction_recommended_t;
 
+
+/*
+ * TRANSACTION STRING
+ *
+ * - these functions are direct counterparts to the string.h versions, with
+ *   identical semantics and constraints
+ * - the string.h versions may use instructions which may cause a transactional
+ *   abort (e.g. vzeroupper on x86_64 in memcmp)
+ * - these counterparts are guaranteed to not cause an abort due to the usage
+ *   of such instructions (although they may still cause an abort for other
+ *   reasons, such as accessing too much memory)
+ *
+ * - required: value of 1 or 0
+ * - 1: string.h variants may cause a transactional abort
+ * - 0: string.h variants are safe to use (in which case these variants will
+ *   point to those variants)
+ *
+ * WARNING:
+ * - these functions are NOT atomic (which is why they're here and not in ops.h)
+ * - they're designed to be used inside a transaction
+ */
+
+typedef struct {
+    int required;
+    void * (* fp_memcpy) (void *dst, const void *src, size_t len);
+    void * (* fp_memmove) (void *dst, const void *src, size_t len);
+    void * (* fp_memset) (void *dst, int value, size_t len);
+    int (* fp_memcmp) (const void *lhs, const void *rhs, size_t len);
+} patomic_transaction_string_t;
+
 #ifdef __cplusplus
 }  /* extern "C" */
 #endif
