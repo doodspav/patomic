@@ -67,4 +67,7 @@ patomic_impl_register[] = {
     }
 };
 
+#define PATOMIC_IMPL_REGISTER_SIZE \
+    ((sizeof patomic_impl_register) / sizeof(patomic_impl_t))
+
 #endif  /* !PATOMIC_REGISTER_H */
