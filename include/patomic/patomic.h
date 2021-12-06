@@ -61,12 +61,14 @@ patomic_create_transaction(
 );
 
 
-PATOMIC_EXPORT int
+/* WARNING: will be removed in version 1.0.0 */
+PATOMIC_DEPRECATED_EXPORT int
 patomic_nonnull_ops_count(
     patomic_ops_t const *const ops
 );
 
-PATOMIC_EXPORT int
+/* WARNING: will be removed in version 1.0.0 */
+PATOMIC_DEPRECATED_EXPORT int
 patomic_nonnull_ops_count_explicit(
     patomic_ops_explicit_t const *const ops
 );
