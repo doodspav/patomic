@@ -22,6 +22,7 @@ add_library(
     include/patomic/patomic.h
     # include/types
     include/patomic/types/align.h
+    include/patomic/types/feature_check.h
     include/patomic/types/memory_order.h
     include/patomic/types/options.h
     include/patomic/types/ops.h
@@ -41,6 +42,7 @@ add_library(
     src/patomic/patomic_version.c
     # src/patomic/types
     src/patomic/types/align.c
+    src/patomic/types/feature_check.c
     src/patomic/types/memory_order.c
     src/patomic/types/transaction.c
     # src/impl
