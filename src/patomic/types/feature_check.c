@@ -88,14 +88,14 @@
     }                                                                      \
     while (0)
 
-#define PATOMIC_UNSET_OPCAT_FLAG(ops, cats, and_or)            \
-    do {                                                       \
-        if ((cats & patomic_opcat_FLAG)                        \
-            && ((ops->flag_ops.fp_test != NULL)         and_or \
-                (ops->flag_ops.fp_test_and_set != NULL) and_or \
-                (ops->flag_ops.fp_clear)))                     \
-        { cats ^= patomic_opcat_FLAG; }                        \
-    }                                                          \
+#define PATOMIC_UNSET_OPCAT_FLAG(ops, cats, and_or)        \
+    do {                                                   \
+        if ((cats & patomic_opcat_FLAG)                    \
+            && ((ops->flag_ops.fp_test != NULL)     and_or \
+                (ops->flag_ops.fp_test_set != NULL) and_or \
+                (ops->flag_ops.fp_clear)))                 \
+        { cats ^= patomic_opcat_FLAG; }                    \
+    }                                                      \
     while (0)
 
 #define PATOMIC_UNSET_OPCAT_RAW(ops, cats, and_or)       \
@@ -319,9 +319,9 @@ patomic_feature_check_any_transaction(
     PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_generic, kinds, GENERIC);     \
     PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_generic_wfb, kinds, GENERIC_WFB)
 
-#define PATOMIC_UNSET_OPKINDS_FLAG(ops, kinds)                                \
-    PATOMIC_CHK_UNSET_OPKIND(ops->flag_ops.fp_test, kinds, TEST);             \
-    PATOMIC_CHK_UNSET_OPKIND(ops->flag_ops.fp_test_and_set, kinds, TEST_SET); \
+#define PATOMIC_UNSET_OPKINDS_FLAG(ops, kinds)                            \
+    PATOMIC_CHK_UNSET_OPKIND(ops->flag_ops.fp_test, kinds, TEST);         \
+    PATOMIC_CHK_UNSET_OPKIND(ops->flag_ops.fp_test_set, kinds, TEST_SET); \
     PATOMIC_CHK_UNSET_OPKIND(ops->flag_ops.fp_clear, kinds, CLEAR)
 
 #define PATOMIC_UNSET_OPKINDS_RAW(ops, kinds)                          \

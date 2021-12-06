@@ -238,7 +238,7 @@ patomic_is_pow2(
         PATOMIC_CCOPY_IF_NULL(i, dst, src, ops.special_ops.fp_generic_wfb);    \
         /* flag */                                                             \
         PATOMIC_CCOPY_IF_NULL(i, dst, src, ops.flag_ops.fp_test);              \
-        PATOMIC_CCOPY_IF_NULL(i, dst, src, ops.flag_ops.fp_test_and_set);      \
+        PATOMIC_CCOPY_IF_NULL(i, dst, src, ops.flag_ops.fp_test_set);          \
         PATOMIC_CCOPY_IF_NULL(i, dst, src, ops.flag_ops.fp_clear);             \
         /* raw */                                                              \
         PATOMIC_CCOPY_IF_NULL(i, dst, src, ops.raw_ops.fp_tbegin);             \

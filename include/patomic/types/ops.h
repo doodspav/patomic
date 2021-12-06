@@ -229,7 +229,7 @@ typedef patomic_transaction_result_wfb_t        \
 typedef int (* patomic_opsig_transaction_flag_test_t) \
     (const patomic_transaction_flag_t *);
 
-typedef int (* patomic_opsig_transaction_flag_test_and_set_t) \
+typedef int (* patomic_opsig_transaction_flag_test_set_t) \
     (patomic_transaction_flag_t *);
 
 typedef void (* patomic_opsig_transaction_flag_clear_t) \
@@ -303,7 +303,7 @@ typedef int (* patomic_opsig_transaction_ttest_t) (void);
 
 typedef struct {
     patomic_opsig_transaction_flag_test_t fp_test;
-    patomic_opsig_transaction_flag_test_and_set_t fp_test_and_set;
+    patomic_opsig_transaction_flag_test_set_t fp_test_set;
     patomic_opsig_transaction_flag_clear_t fp_clear;
 } patomic_ops_transaction_flag_t;
 
