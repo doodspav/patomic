@@ -61,7 +61,8 @@ typedef enum {
  * - there are no fetch opkinds; instead use the regular opkind version with a
  *   fetch opcat (_F)
  *
- * - Note: multiple opkinds not within the same category may have the same value
+ * Note:
+ * - multiple opkinds not within the same category may have the same value
  * - the corresponding opcat must also be provided for context
  */
 
@@ -74,11 +75,12 @@ typedef enum {
     ,patomic_opkind_EXCHANGE = 0x1
     ,patomic_opkind_CMPXCHG_WEAK   = 0x2
     ,patomic_opkind_CMPXCHG_STRONG = 0x4
-    /* bitwise and flag (except compl) */
+    /* bitwise and flag */
     ,patomic_opkind_TEST = 0x1
     ,patomic_opkind_TEST_SET   = 0x2
     ,patomic_opkind_TEST_RESET = 0x4
-    ,patomic_opkind_TEST_COMPL = 0x8
+    ,patomic_opkind_TEST_COMPL = 0x8  /* bitwise only */
+    ,patomic_opkind_CLEAR = patomic_opkind_TEST_RESET
     /* binary */
     ,patomic_opkind_OR  = 0x1
     ,patomic_opkind_XOR = 0x2
@@ -152,20 +154,60 @@ patomic_feature_check_all_transaction(
 
 PATOMIC_EXPORT unsigned int
 patomic_feature_check_any(
-        const patomic_ops_t *ops,
-        unsigned int opcats
+    const patomic_ops_t *ops,
+    unsigned int opcats
 );
 
 PATOMIC_EXPORT unsigned int
 patomic_feature_check_any_explicit(
-        const patomic_ops_explicit_t *ops,
-        unsigned int opcats
+    const patomic_ops_explicit_t *ops,
+    unsigned int opcats
 );
 
 PATOMIC_EXPORT unsigned int
 patomic_feature_check_any_transaction(
-        const patomic_ops_transaction_t *ops,
-        unsigned int opcats
+    const patomic_ops_transaction_t *ops,
+    unsigned int opcats
+);
+
+
+/*
+ * FEATURE LEAF
+ *
+ * - opcat: any single opcat_t flag that has a single bit set
+ * - opkinds: one or more opkind_t flags combined
+ *
+ * - unsets all the operations set in opkinds which aren't available in the set
+ *   opcat, and returns the result (i.e. 0 if all the operations in the category
+ *   are supported)
+ * - invalid operations are ignored and remain set
+ *
+ * WARNING:
+ * - opcat MUST NOT have more than 1 bit set
+ * - this means you cannot pass opcat_t labels which combine multiple other
+ *   labels, such as BIT, ARI, IMPLICIT, etc...
+ * - if assertions are enabled, this will be asserted
+ */
+
+PATOMIC_EXPORT unsigned int
+patomic_feature_check_leaf(
+    const patomic_ops_t *ops,
+    patomic_opcat_t opcat, 
+    unsigned int opkinds
+);
+
+PATOMIC_EXPORT unsigned int
+patomic_feature_check_leaf_explicit(
+    const patomic_ops_explicit_t *ops,
+    patomic_opcat_t opcat,
+    unsigned int opkinds
+);
+
+PATOMIC_EXPORT unsigned int
+patomic_feature_check_leaf_transaction(
+    const patomic_ops_transaction_t *ops,
+    patomic_opcat_t opcat,
+    unsigned int opkinds
 );
 
 
