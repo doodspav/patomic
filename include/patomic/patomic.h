@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #include <patomic/types/align.h>
+#include <patomic/types/feature_check.h>
 #include <patomic/types/ids.h>
 #include <patomic/types/ops.h>
 #include <patomic/types/options.h>
@@ -64,13 +65,13 @@ patomic_create_transaction(
 /* WARNING: will be removed in version 1.0.0 */
 PATOMIC_DEPRECATED_EXPORT int
 patomic_nonnull_ops_count(
-    patomic_ops_t const *const ops
+    const patomic_ops_t *ops
 );
 
 /* WARNING: will be removed in version 1.0.0 */
 PATOMIC_DEPRECATED_EXPORT int
 patomic_nonnull_ops_count_explicit(
-    patomic_ops_explicit_t const *const ops
+    const patomic_ops_explicit_t *ops
 );
 
 

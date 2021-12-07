@@ -272,20 +272,80 @@ patomic_is_pow2(
 
 #define PATOMIC_COPY_ALIGN(dst, src)                              \
     do {                                                          \
-        /* recommended is a power of 2 */                         \
-        assert(patomic_is_pow2((dst)->align.recommended));        \
-        assert(patomic_is_pow2((src)->align.recommended));        \
-        /* minimum is a power of 2 */                             \
-        assert(patomic_is_pow2((dst)->align.minimum));            \
-        assert(patomic_is_pow2((src)->align.minimum));            \
-        /* recommended >= minimum */                              \
-        assert((dst)->align.recommended >= (dst)->align.minimum); \
-        assert((src)->align.recommended >= (src)->align.minimum); \
-                                                                  \
-        /* copy over */                                           \
         PATOMIC_SET_MAX(dst, src, align.recommended);             \
         PATOMIC_SET_MIN(dst, src, align.minimum);                 \
         PATOMIC_SET_MIN(dst, src, align.size_within);             \
+    }                                                             \
+    while (0)
+
+
+/* T: transaction */
+#define PATOMIC_T_OPS_CHECKS(obj)                                      \
+    do {                                                               \
+        /* either tbegin/commit/test are all available, or none are */ \
+        /* tabort is exempt from this rule but: */                     \
+        /* tabort cannot be present without the rest */                \
+        unsigned int flags = patomic_opkind_TBEGIN  |                  \
+                             patomic_opkind_TCOMMIT |                  \
+                             patomic_opkind_TTEST;                     \
+        unsigned int result = patomic_feature_check_leaf_transaction(  \
+            &((obj)->ops),                                             \
+            patomic_opcat_RAW,                                         \
+            flags | patomic_opkind_TABORT                              \
+        );                                                             \
+        assert((result == patomic_opkind_TABORT)  /* all but TABORT */ \
+               || (result == 0)  /* all (including TABORT) */          \
+               || (result == flags));  /* none */                      \
+        /* set flags to all transaction opcats except RAW */           \
+        /* since we just check RAW ops above */                        \
+        flags = patomic_opcat_TRANSACTION;                             \
+        flags &= ~((unsigned int) patomic_opcat_RAW);                  \
+        /* if they're available, all other ops MUST be available */    \
+        if (result == 0)                                               \
+        {                                                              \
+            assert(patomic_feature_check_all_transaction(              \
+                &((obj)->ops),                                         \
+                flags                                                  \
+            ));                                                        \
+        }                                                              \
+        /* otherwise, all other ops MUST NOT be available */           \
+        else                                                           \
+        {                                                              \
+            assert(flags == patomic_feature_check_any_transaction(     \
+                &((obj)->ops),                                         \
+                flags                                                  \
+            ));                                                        \
+        }                                                              \
+    }                                                                  \
+    while (0)
+
+/* T: transaction */
+#define PATOMIC_T_EXTRAS_CHECKS(obj)                                       \
+    do {                                                                   \
+        /* if we have ops, no extras can be 0 or NULL */                   \
+        /* sstring.required may or may not be set */                       \
+        /* otherwise, everything must be 0 or NULL (including required) */ \
+        int ops_set = (obj)->ops.raw_ops.fp_tbegin != NULL;                \
+        /* recommended */                                                  \
+        assert(ops_set == ((obj)->recommended.max_rmw_memory != 0));       \
+        assert(ops_set == ((obj)->recommended.max_load_memory != 0));      \
+        assert(ops_set == ((obj)->recommended.min_rmw_attempts != 0));     \
+        assert(ops_set == ((obj)->recommended.min_load_attempts != 0));    \
+        /* sstring */                                                      \
+        assert(ops_set == ((obj)->sstring.fp_memcpy != NULL));             \
+        assert(ops_set == ((obj)->sstring.fp_memmove != NULL));            \
+        assert(ops_set == ((obj)->sstring.fp_memset != NULL));             \
+        assert(ops_set == ((obj)->sstring.fp_memcmp != NULL));             \
+        /* special case for sstring.required */                            \
+        if (!ops_set) { assert((obj)->sstring.required == 0); }            \
+    }                                                                      \
+    while (0)
+
+#define PATOMIC_ALIGN_CHECKS(obj)                                 \
+    do {                                                          \
+        assert(patomic_is_pow2((obj)->align.recommended));        \
+        assert(patomic_is_pow2((obj)->align.minimum));            \
+        assert((obj)->align.recommended >= (obj)->align.minimum); \
     }                                                             \
     while (0)
 
@@ -297,6 +357,8 @@ patomic_combine(
 )
 {
     int i = 0;
+
+    PATOMIC_ALIGN_CHECKS(src);
 
     PATOMIC_COPY_COUNT_IET_OPS(dst, src, i);
 
@@ -311,6 +373,8 @@ patomic_combine_explicit(
 {
     int i = 0;
 
+    PATOMIC_ALIGN_CHECKS(src);
+
     PATOMIC_COPY_COUNT_IET_OPS(dst, src, i);
 
     if (i != 0) { PATOMIC_COPY_ALIGN(dst, src); }
@@ -323,6 +387,10 @@ patomic_combine_transaction(
 )
 {
     int i = 0;
+
+    PATOMIC_T_OPS_CHECKS(dst);
+    PATOMIC_T_EXTRAS_CHECKS(dst);
+    PATOMIC_ALIGN_CHECKS(dst);
 
     PATOMIC_COPY_COUNT_IET_OPS(dst, src, i);
     PATOMIC_COPY_COUNT_T_OPS(dst, src, i);
