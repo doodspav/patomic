@@ -57,6 +57,7 @@ typedef struct {
 #define PATOMIC_MAX_CACHE_LINE_SIZE 128
 
 /* Note: this may return a value <= to the macro value (always a power of 2) */
+/* the value will always be at least as large as a cache line */
 PATOMIC_EXPORT size_t
 patomic_cache_line_size(void);
 
