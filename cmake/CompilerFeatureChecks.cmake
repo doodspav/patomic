@@ -42,6 +42,20 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_GNU_INLINE_ALWAYS_INLINE_ATTR)
 
 check_c_source_compiles(
+    "__attribute__((noinline)) static int inc(int x) { return ++x; } \n\
+     int main(void) { return inc(0); }"
+    COMPILER_HAS_NOINLINE_ATTR
+)
+zero_if_blank(COMPILER_HAS_NOINLINE_ATTR)
+
+check_c_source_compiles(
+    "__declspec(noinline) static int inc(int x) { return ++x; } \n\
+     int main(void) { return inc(0); }"
+    COMPILER_HAS_NOINLINE_DSPC
+)
+zero_if_blank(COMPILER_HAS_NOINLINE_DSPC)
+
+check_c_source_compiles(
     "int main(void) { _Alignas(_Alignof(int)) int x = 0; return x; }"
     COMPILER_HAS_ALIGNOF
 )

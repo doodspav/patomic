@@ -50,6 +50,18 @@
     #define PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR 0
 #endif
 
+/* '__attribute__((noinline))' is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_NOINLINE_ATTR
+    #define PATOMIC_HAVE_NOINLINE_ATTR 0
+#endif
+
+/* '__declspec(noinline)' is available */
+/* requires: Microsoft compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_NOINLINE_DSPC
+    #define PATOMIC_HAVE_NOINLINE_DSPC 0
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 /* requires: C11 */
 #ifndef PATOMIC_HAVE_ALIGNOF

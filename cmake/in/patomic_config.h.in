@@ -27,6 +27,16 @@
     #define PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR @COMPILER_HAS_GNU_INLINE_ALWAYS_INLINE_ATTR@
 #endif
 
+/* '__attribute__((noinline))' is available */
+#ifndef PATOMIC_HAVE_NOINLINE_ATTR
+    #define PATOMIC_HAVE_NOINLINE_ATTR @COMPILER_HAS_NOINLINE_ATTR@
+#endif
+
+/* '__declspec(noinline)' is available */
+#ifndef PATOMIC_HAVE_NOINLINE_DSPC
+    #define PATOMIC_HAVE_NOINLINE_DSPC @COMPILER_HAS_NOINLINE_DSPC@
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 #ifndef PATOMIC_HAVE_ALIGNOF
     #define PATOMIC_HAVE_ALIGNOF @COMPILER_HAS_ALIGNOF@
