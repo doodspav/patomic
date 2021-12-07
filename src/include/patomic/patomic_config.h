@@ -62,6 +62,24 @@
     #define PATOMIC_HAVE_NOINLINE_DSPC 0
 #endif
 
+/* '_Noreturn' keyword is available */
+/* requires: C11 */
+#ifndef PATOMIC_HAVE_NORETURN
+    #define PATOMIC_HAVE_NORETURN 0
+#endif
+
+/* '__declspec(noreturn)' is available */
+/* requires: Microsoft compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_NORETURN_DSPC
+    #define PATOMIC_HAVE_NORETURN_DSPC 0
+#endif
+
+/* '__attribute__((noreturn))' is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_NORETURN_ATTR
+    #define PATOMIC_HAVE_NORETURN_ATTR 0
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 /* requires: C11 */
 #ifndef PATOMIC_HAVE_ALIGNOF

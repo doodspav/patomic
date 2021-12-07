@@ -56,6 +56,27 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_NOINLINE_DSPC)
 
 check_c_source_compiles(
+    "_Noreturn static void loop(void) { while (1); } \n\
+     int main(void) { loop(); }"
+    COMPILER_HAS_NORETURN
+)
+zero_if_blank(COMPILER_HAS_NORETURN)
+
+check_c_source_compiles(
+    "__declspec(noreturn) static void loop(void) { while (1); } \n\
+     int main(void) { loop(); }"
+    COMPILER_HAS_NORETURN_DSPC
+)
+zero_if_blank(COMPILER_HAS_NORETURN_DSPC)
+
+check_c_source_compiles(
+    "__attribute__((noreturn)) static void loop(void) { while (1); } \n\
+     int main(void) { loop(); }"
+    COMPILER_HAS_NORETURN_ATTR
+)
+zero_if_blank(COMPILER_HAS_NORETURN_ATTR)
+
+check_c_source_compiles(
     "int main(void) { _Alignas(_Alignof(int)) int x = 0; return x; }"
     COMPILER_HAS_ALIGNOF
 )

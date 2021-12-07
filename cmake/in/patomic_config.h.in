@@ -37,6 +37,21 @@
     #define PATOMIC_HAVE_NOINLINE_DSPC @COMPILER_HAS_NOINLINE_DSPC@
 #endif
 
+/* '_Noreturn' keyword is available */
+#ifndef PATOMIC_HAVE_NORETURN
+    #define PATOMIC_HAVE_NORETURN @COMPILER_HAS_NORETURN@
+#endif
+
+/* '__declspec(noreturn)' is available */
+#ifndef PATOMIC_HAVE_NORETURN_DSPC
+    #define PATOMIC_HAVE_NORETURN_DSPC @COMPILER_HAS_NORETURN_DSPC@
+#endif
+
+/* '__attribute__((noreturn))' is available */
+#ifndef PATOMIC_HAVE_NORETURN_ATTR
+    #define PATOMIC_HAVE_NORETURN_ATTR @COMPILER_HAS_NORETURN_ATTR@
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 #ifndef PATOMIC_HAVE_ALIGNOF
     #define PATOMIC_HAVE_ALIGNOF @COMPILER_HAS_ALIGNOF@

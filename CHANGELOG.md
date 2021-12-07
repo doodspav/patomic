@@ -9,6 +9,7 @@ increment the `minor` version for breaking changes.
 ## [Unreleased] [Patch]
 ### Added
 - `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
+- `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)
 
 ## [0.2.2] [Minor] - 2021-12-07
 ### Added

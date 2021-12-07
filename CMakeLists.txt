@@ -38,6 +38,7 @@ add_library(
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/ignore_unused.h
     src/include/patomic/macros/noinline.h
+    src/include/patomic/macros/noreturn.h
     src/include/patomic/macros/static_assert.h
     # src/patomic
     src/patomic/patomic_version.c
