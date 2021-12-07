@@ -71,6 +71,8 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR` | `inline __attribute__((always_inline)` |
 | `PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR` | `__inline__ __attribute__((always_inline))` |
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
+| `PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DPSC` | `__alignof` and `__declspec(align(#))` |
+| `PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR` | `__alignof__` and `__attribute__((aligned(#)))` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
 

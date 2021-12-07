@@ -23,7 +23,13 @@ static const patomic_ops_explicit_t patomic_ops_explicit_NULL;
 #include <patomic/macros/ignore_unused.h>
 
 #if !PATOMIC_HAVE_ALIGNOF
-    #define _Alignof(t) sizeof(t)
+    #if PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR
+        #define _Alignof(t) __alignof__(t)
+    #elif PPATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
+        #define _Alignof(t) __alignof(t)
+    #else
+        #define _Alignof(t) sizeof(t)
+    #endif
 #endif
 
 /* hide/show anything */
@@ -1095,3 +1101,20 @@ patomic_impl_create_explicit_std(
 }
 
 #endif
+
+#include <patomic/macros/ignore_unused.h>
+
+static const patomic_transaction_t patomic_transaction_NULL;
+
+patomic_transaction_t
+patomic_impl_create_transaction_std(
+    int options
+)
+{
+    patomic_transaction_t ret;
+    PATOMIC_IGNORE_UNUSED(options);
+    ret = patomic_transaction_NULL;
+    ret.align.recommended = 1;
+    ret.align.minimum = 1;
+    return ret;
+}

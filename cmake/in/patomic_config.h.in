@@ -32,6 +32,16 @@
     #define PATOMIC_HAVE_ALIGNOF @COMPILER_HAS_ALIGNOF@
 #endif
 
+/* '__alignof' keyword and '__declspec(align(#))' are available */
+#ifndef PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
+    #define PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC @COMPILER_HAS_MS_ALIGNOF_ALIGN_DSPC@
+#endif
+
+/* '__alignof__' keyword and '__attribute__((aligned(#)))' are available */
+#ifndef PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR
+    #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR @COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR@
+#endif
+
 /* <stdatomic.h> header and '_Atomic' keyword are available */
 #ifndef PATOMIC_HAVE_STD_ATOMIC
     #define PATOMIC_HAVE_STD_ATOMIC @COMPILER_HAS_STD_ATOMIC@

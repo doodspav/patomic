@@ -5,9 +5,7 @@
 #include <limits.h>
 
 /* integer representation is two's complement */
-#ifdef PATOMIC_HAVE_TWOS_COMPL
-    #undef PATOMIC_HAVE_TWOS_COMPL
-#endif
+#undef PATOMIC_HAVE_TWOS_COMPL
 #define PATOMIC_HAVE_TWOS_COMPL (-INT_MAX != INT_MIN)
 
 
@@ -56,6 +54,18 @@
 /* requires: C11 */
 #ifndef PATOMIC_HAVE_ALIGNOF
     #define PATOMIC_HAVE_ALIGNOF 0
+#endif
+
+/* '__alignof' keyword and '__declspec(align(#))' are available */
+/* requires: MS compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
+    #define PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC 0
+#endif
+
+/* '__alignof__' keyword and '__attribute__((aligned(#)))' are available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR
+    #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR 0
 #endif
 
 /* <stdatomic.h> header and '_Atomic' keyword are available */

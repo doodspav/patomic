@@ -4,10 +4,12 @@
 #include <stddef.h>
 
 #include <patomic/types/align.h>
+#include <patomic/types/feature_check.h>
 #include <patomic/types/ids.h>
 #include <patomic/types/ops.h>
 #include <patomic/types/options.h>
 #include <patomic/types/memory_order.h>
+#include <patomic/types/transaction.h>
 
 #include <patomic/patomic_export.h>
 #include <patomic/patomic_version.h>
@@ -27,6 +29,13 @@ typedef struct {
     patomic_align_t align;
 } patomic_explicit_t;
 
+typedef struct {
+    patomic_ops_transaction_t ops;
+    patomic_align_t align;
+    patomic_transaction_recommended_t recommended;
+    patomic_transaction_safe_string_t sstring;
+} patomic_transaction_t;
+
 
 PATOMIC_EXPORT patomic_t
 patomic_create(
@@ -45,19 +54,29 @@ patomic_create_explicit(
     ...
 );
 
-PATOMIC_EXPORT int
-patomic_nonnull_ops_count(
-    patomic_ops_t const *const ops
+PATOMIC_EXPORT patomic_transaction_t
+patomic_create_transaction(
+    int options,
+    int impl_id_argc,
+    ...
 );
 
-PATOMIC_EXPORT int
+
+/* WARNING: will be removed in version 1.0.0 */
+PATOMIC_DEPRECATED_EXPORT int
+patomic_nonnull_ops_count(
+    const patomic_ops_t *ops
+);
+
+/* WARNING: will be removed in version 1.0.0 */
+PATOMIC_DEPRECATED_EXPORT int
 patomic_nonnull_ops_count_explicit(
-    patomic_ops_explicit_t const *const ops
+    const patomic_ops_explicit_t *ops
 );
 
 
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif  /* !PATOMIC_PATOMIC_H */

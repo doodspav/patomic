@@ -2,6 +2,7 @@
 #define PATOMIC_ALIGN_H
 
 #include <stddef.h>
+#include <patomic/patomic_export.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,8 +51,19 @@ typedef struct {
     size_t size_within;
 } patomic_align_t;
 
+/* represents the maximum cache line size in all known hardware */
+/* WARNING: changing this constitutes an ABI break */
+#undef PATOMIC_MAX_CACHE_LINE_SIZE
+#define PATOMIC_MAX_CACHE_LINE_SIZE 128
+
+/* Note: this may return a value <= to the macro value (always a power of 2) */
+/* the value will always be at least as large as a cache line */
+PATOMIC_EXPORT size_t
+patomic_cache_line_size(void);
+
+
 #ifdef __cplusplus
-}
+}  /* extern "C" */
 #endif
 
 #endif /* !PATOMIC_ALIGN_H */
