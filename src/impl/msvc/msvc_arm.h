@@ -4,7 +4,6 @@
 #if defined(_MSC_VER)
 #if defined(_M_ARM) || defined(_M_ARM64)
 
-#include <assert.h>
 #include <limits.h>
 #include <string.h>
 

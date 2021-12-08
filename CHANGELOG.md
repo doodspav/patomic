@@ -8,8 +8,12 @@ increment the `minor` version for breaking changes.
 
 ## [Unreleased] [Patch]
 ### Added
+- `patomic_assert` and `patomic_always_assert` for internal use
+- `patomic_assert` supports `NDEBUG` (and can be overridden with `NNDEBUG`)
 - `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
 - `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)
+### Changed
+- replace all uses of `assert` with `patomic_assert` and `patomic_assert_always`
 
 ## [0.2.2] [Minor] - 2021-12-07
 ### Added

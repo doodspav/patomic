@@ -40,8 +40,12 @@ add_library(
     src/include/patomic/macros/noinline.h
     src/include/patomic/macros/noreturn.h
     src/include/patomic/macros/static_assert.h
+    # src/include/patomic/stdlib
+    src/include/patomic/stdlib/assert.h
     # src/patomic
     src/patomic/patomic_version.c
+    # src/patomic/stdlib
+    src/patomic/stdlib/assert.c
     # src/patomic/types
     src/patomic/types/align.c
     src/patomic/types/feature_check.c

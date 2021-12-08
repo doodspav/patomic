@@ -1,7 +1,6 @@
 #include <patomic/types/feature_check.h>
 #include <patomic/macros/force_inline.h>
-
-#include <assert.h>
+#include <patomic/stdlib/assert.h>
 
 
 #define PATOMIC_UNSET_OPCAT_LDST(ops, cats, and_or) \
@@ -352,7 +351,7 @@ patomic_feature_check_leaf(
 )
 {
     if ((opcat == 0) || (opkinds == 0)) { return opkinds; }
-    assert(patomic_is_pow2_or_zero(opcat));
+    patomic_assert_always(patomic_is_pow2_or_zero(opcat));
 
     switch (opcat)
     {
@@ -375,7 +374,7 @@ patomic_feature_check_leaf(
         case patomic_opcat_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcat_TRANSACTION:
-            assert("combined opcats" && 0);
+            patomic_assert_always("combined opcats" && 0);
             break;
 
         case patomic_opcat_SPEC:
@@ -396,7 +395,7 @@ patomic_feature_check_leaf_explicit(
 )
 {
     if ((opcat == 0) || (opkinds == 0)) { return opkinds; }
-    assert(patomic_is_pow2_or_zero(opcat));
+    patomic_assert_always(patomic_is_pow2_or_zero(opcat));
 
     switch (opcat)
     {
@@ -419,7 +418,7 @@ patomic_feature_check_leaf_explicit(
         case patomic_opcat_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcat_TRANSACTION:
-            assert("combined opcats" && 0);
+            patomic_assert_always("combined opcats" && 0);
             break;
 
         case patomic_opcat_SPEC:
@@ -440,7 +439,7 @@ patomic_feature_check_leaf_transaction(
 )
 {
     if ((opcat == 0) || (opkinds == 0)) { return opkinds; }
-    assert(patomic_is_pow2_or_zero(opcat));
+    patomic_assert_always(patomic_is_pow2_or_zero(opcat));
 
     switch (opcat)
     {
@@ -467,7 +466,7 @@ patomic_feature_check_leaf_transaction(
         case patomic_opcat_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcat_TRANSACTION:
-            assert("combined opcats" && 0);
+            patomic_assert_always("combined opcats" && 0);
             break;
 
         case patomic_opcat_NONE:

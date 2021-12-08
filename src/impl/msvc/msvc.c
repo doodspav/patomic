@@ -1,9 +1,9 @@
 #include "msvc.h"
 
-#include <assert.h>
 #include <stddef.h>
 
 #include <patomic/patomic.h>
+#include <patomic/stdlib/assert.h>
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
 
@@ -75,36 +75,36 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
  * - store (y)
  * - load (y)
  */
-#define PATOMIC_DEFINE_STORE_OPS(width, name, order, vis) \
-    static PATOMIC_FORCE_INLINE void                      \
-    patomic_opimpl_store_##name(                          \
-        volatile void *obj                                \
-        ,const void *desired                              \
-   vis(_,int order)                                       \
-    )                                                     \
-    {                                                     \
-        assert(patomic_is_valid_store_order(order));      \
-        patomic_il_store_##width(                         \
-            obj,                                          \
-            desired,                                      \
-            order                                         \
-        );                                                \
+#define PATOMIC_DEFINE_STORE_OPS(width, name, order, vis)    \
+    static PATOMIC_FORCE_INLINE void                         \
+    patomic_opimpl_store_##name(                             \
+        volatile void *obj                                   \
+        ,const void *desired                                 \
+   vis(_,int order)                                          \
+    )                                                        \
+    {                                                        \
+        patomic_assert(patomic_is_valid_store_order(order)); \
+        patomic_il_store_##width(                            \
+            obj,                                             \
+            desired,                                         \
+            order                                            \
+        );                                                   \
     }
 
-#define PATOMIC_DEFINE_LOAD_OPS(width, name, order, vis)  \
-    static PATOMIC_FORCE_INLINE void                      \
-    patomic_opimpl_load_##name(                           \
-        const volatile void *obj                          \
-   vis(_,int order)                                       \
-        ,void *ret                                        \
-    )                                                     \
-    {                                                     \
-        assert(patomic_is_valid_load_order(order));       \
-        patomic_il_load_##width(                          \
-            obj,                                          \
-            order,                                        \
-            ret                                           \
-        );                                                \
+#define PATOMIC_DEFINE_LOAD_OPS(width, name, order, vis)    \
+    static PATOMIC_FORCE_INLINE void                        \
+    patomic_opimpl_load_##name(                             \
+        const volatile void *obj                            \
+   vis(_,int order)                                         \
+        ,void *ret                                          \
+    )                                                       \
+    {                                                       \
+        patomic_assert(patomic_is_valid_load_order(order)); \
+        patomic_il_load_##width(                            \
+            obj,                                            \
+            order,                                          \
+            ret                                             \
+        );                                                  \
     }
 
 
@@ -123,7 +123,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                         \
     )                                                                      \
     {                                                                      \
-        assert(patomic_is_valid_order(order));                             \
+        patomic_assert(patomic_is_valid_order(order));                     \
         patomic_il_exchange_##width(                                       \
             obj,                                                           \
             desired,                                                       \
@@ -142,8 +142,8 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     {                                                                      \
         inv(int succ = order;)                                             \
         inv(int fail = patomic_cmpxchg_fail_order(order);)                 \
-        assert(patomic_is_valid_order(succ));                              \
-        assert(patomic_is_valid_fail_order(succ, fail));                   \
+        patomic_assert(patomic_is_valid_order(succ));                      \
+        patomic_assert(patomic_is_valid_fail_order(succ, fail));           \
         return patomic_il_compare_exchange_##width(                        \
             obj,                                                           \
             expected,                                                      \
@@ -191,9 +191,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         patomic_uint##width##_t mask;                        \
         patomic_uint##width##_t val;                         \
         /* assertions */                                     \
-        assert(offset >= 0);                                 \
-        assert(width > offset);                              \
-        assert(patomic_is_valid_load_order(order));          \
+        patomic_assert(offset >= 0);                         \
+        patomic_assert(width > offset);                      \
+        patomic_assert(patomic_is_valid_load_order(order));  \
         /* setup mask */                                     \
         PATOMIC_UINT_SET_TO_ONE(width, mask);                \
         mask = PATOMIC_UINT_SHL(width, mask, offset);        \
@@ -222,9 +222,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         int succ;                                                   \
         int fail;                                                   \
         /* assertions */                                            \
-        assert(offset >= 0);                                        \
-        assert(width > offset);                                     \
-        assert(patomic_is_valid_order(order));                      \
+        patomic_assert(offset >= 0);                                \
+        patomic_assert(width > offset);                             \
+        patomic_assert(patomic_is_valid_order(order));              \
         /* setup memory orders and mask */                          \
         PATOMIC_UINT_SET_TO_ONE(width, mask);                       \
         mask = PATOMIC_UINT_SHL(width, mask, offset);               \
@@ -260,9 +260,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                 \
     )                                                               \
     {                                                               \
-        assert(offset >= 0);                                        \
-        assert(width > offset);                                     \
-        assert(patomic_is_valid_order(order));                      \
+        patomic_assert(offset >= 0);                                \
+        patomic_assert(width > offset);                             \
+        patomic_assert(patomic_is_valid_order(order));              \
         return patomic_il_bit_test_and_set_##width(                 \
             obj,                                                    \
             offset,                                                 \
@@ -276,9 +276,9 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
    vis(_,int order)                                                 \
     )                                                               \
     {                                                               \
-        assert(offset >= 0);                                        \
-        assert(width > offset);                                     \
-        assert(patomic_is_valid_order(order));                      \
+        patomic_assert(offset >= 0);                                \
+        patomic_assert(width > offset);                             \
+        patomic_assert(patomic_is_valid_order(order));              \
         return patomic_il_bit_test_and_reset_##width(               \
             obj,                                                    \
             offset,                                                 \
@@ -331,7 +331,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        assert(patomic_is_valid_order(order));                            \
+        patomic_assert(patomic_is_valid_order(order));                    \
         patomic_il_or_##width(                                            \
             obj,                                                          \
             arg,                                                          \
@@ -363,7 +363,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        assert(patomic_is_valid_order(order));                            \
+        patomic_assert(patomic_is_valid_order(order));                    \
         patomic_il_xor_##width(                                           \
             obj,                                                          \
             arg,                                                          \
@@ -395,7 +395,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                        \
     )                                                                     \
     {                                                                     \
-        assert(patomic_is_valid_order(order));                            \
+        patomic_assert(patomic_is_valid_order(order));                    \
         patomic_il_and_##width(                                           \
             obj,                                                          \
             arg,                                                          \
@@ -435,7 +435,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         unsigned char *begin;                                             \
         unsigned char const *const end = (unsigned char *)(&desired + 1); \
         /* assertion */                                                   \
-        assert(patomic_is_valid_order(order));                            \
+        patomic_assert(patomic_is_valid_order(order));                    \
         /* setup memory orders */                                         \
         succ = order;                                                     \
         fail = patomic_cmpxchg_fail_order(order);                         \
@@ -511,7 +511,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         ,void *ret                                                          \
     )                                                                       \
     {                                                                       \
-        assert(patomic_is_valid_order(order));                              \
+        patomic_assert(patomic_is_valid_order(order));                      \
         patomic_il_exchange_add_##width(                                    \
             obj,                                                            \
             arg,                                                            \
@@ -544,7 +544,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
     )                                                                       \
     {                                                                       \
         patomic_uint##width##_t arg_val;                                    \
-        assert(patomic_is_valid_order(order));                              \
+        patomic_assert(patomic_is_valid_order(order));                      \
         PATOMIC_IGNORE_UNUSED(memcpy(&arg_val, arg, sizeof arg_val));       \
         /* negation - msvc only supports 2's complement */                  \
         arg_val = PATOMIC_UINT_NEG(width, arg_val);                         \
@@ -578,7 +578,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         , void *ret                                                         \
     )                                                                       \
     {                                                                       \
-        assert(patomic_is_valid_order(order));                              \
+        patomic_assert(patomic_is_valid_order(order));                      \
         patomic_il_increment_##width(                                       \
             obj,                                                            \
             order,                                                          \
@@ -606,7 +606,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         , void *ret                                                         \
     )                                                                       \
     {                                                                       \
-        assert(patomic_is_valid_order(order));                              \
+        patomic_assert(patomic_is_valid_order(order));                      \
         patomic_il_decrement_##width(                                       \
             obj,                                                            \
             order,                                                          \
@@ -640,7 +640,7 @@ PATOMIC_DEFINE_IL(long, __int32, 32)
         int succ;                                                           \
         int fail;                                                           \
         /* assertion */                                                     \
-        assert(patomic_is_valid_order(order));                              \
+        patomic_assert(patomic_is_valid_order(order));                      \
         /* setup memory orders */                                           \
         succ = order;                                                       \
         fail = patomic_cmpxchg_fail_order(order);                           \
@@ -848,7 +848,7 @@ patomic_create_ops(
 )
 {
     patomic_ops_t ret;
-    assert(patomic_is_valid_order((int) order));
+    patomic_assert_always(patomic_is_valid_order((int) order));
 
     switch (byte_width)
     {
@@ -939,8 +939,8 @@ patomic_impl_create_msvc(
     /* patomic_il_load_128 is NOT const safe */
     if (byte_width == 16)
     {
-        assert(ret.ops.fp_load == NULL);
-        assert(ret.ops.bitwise_ops.fp_test == NULL);
+        patomic_assert_always(ret.ops.fp_load == NULL);
+        patomic_assert_always(ret.ops.bitwise_ops.fp_test == NULL);
     }
     return ret;
 }
@@ -958,8 +958,8 @@ patomic_impl_create_explicit_msvc(
     /* patomic_il_load_128 is NOT const safe */
     if (byte_width == 16)
     {
-        assert(ret.ops.fp_load == NULL);
-        assert(ret.ops.bitwise_ops.fp_test == NULL);
+        patomic_assert_always(ret.ops.fp_load == NULL);
+        patomic_assert_always(ret.ops.bitwise_ops.fp_test == NULL);
     }
     return ret;
 }

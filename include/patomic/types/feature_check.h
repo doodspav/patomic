@@ -186,7 +186,7 @@ patomic_feature_check_any_transaction(
  * - opcat MUST NOT have more than 1 bit set
  * - this means you cannot pass opcat_t labels which combine multiple other
  *   labels, such as BIT, ARI, IMPLICIT, etc...
- * - if assertions are enabled, this will be asserted
+ * - this will always be asserted (even if NDEBUG is defined)
  */
 
 PATOMIC_EXPORT unsigned int

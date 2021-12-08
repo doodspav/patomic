@@ -1,6 +1,6 @@
 #include <patomic/patomic.h>
+#include <patomic/stdlib/assert.h>
 
-#include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -14,9 +14,9 @@ patomic_find_impl(
     patomic_impl_id_t id
 )
 {
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(begin <= end);
+    patomic_assert_always(begin != NULL);
+    patomic_assert_always(end != NULL);
+    patomic_assert_always(begin <= end);
 
     while (begin != end)
     {
@@ -37,9 +37,9 @@ patomic_sort_impls(
     int is_swapped, cmp_gt;
     patomic_impl_t temp;
 
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(begin <= end);
+    patomic_assert_always(begin != NULL);
+    patomic_assert_always(end != NULL);
+    patomic_assert_always(begin <= end);
 
     size = end - begin;
     if (size == 0) { return; }
@@ -51,7 +51,7 @@ patomic_sort_impls(
         /* j = [0..n-i-1] */
         for (inner_idx = 0; inner_idx < (size - outer_idx - 1); ++inner_idx)
         {
-            assert(inner_idx < (size - 1));
+            patomic_assert_always(inner_idx < (size - 1));
             cmp_gt = begin[inner_idx].id > begin[inner_idx + 1].id;
             if (cmp_gt)
             {
@@ -89,12 +89,13 @@ patomic_fill_impl_array(
     patomic_impl_t const *const impls_end = \
         impls_begin + PATOMIC_IMPL_REGISTER_SIZE;
 
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(begin <= end);
-    assert(argc >= 0);
-    assert(PATOMIC_IMPL_REGISTER_SIZE == (size_t) (end - begin));
-    assert(PATOMIC_IMPL_REGISTER_SIZE == (size_t) (impls_end - impls_begin));
+    patomic_assert_always(begin != NULL);
+    patomic_assert_always(end != NULL);
+    patomic_assert_always(begin <= end);
+    patomic_assert_always(argc >= 0);
+    patomic_assert_always(PATOMIC_IMPL_REGISTER_SIZE == (size_t) (end - begin));
+    patomic_assert_always(PATOMIC_IMPL_REGISTER_SIZE == \
+        (size_t) (impls_end - impls_begin));
 
     /* copy over impls found using impl_id values from argv */
     /* ignore (or assert on) duplicate and invalid impl_id values */
@@ -104,11 +105,11 @@ patomic_fill_impl_array(
         id = va_arg(argv, patomic_impl_id_t);
         tmp = patomic_find_impl(impls_begin, impls_end, id);
         /* check valid id (i.e. impl with that id exists) */
-        assert(tmp != impls_end);
+        patomic_assert_always(tmp != impls_end);
         if (tmp == impls_end) { continue; }
         /* check duplicate id (i.e. did we already copy it over) */
         tmp2 = patomic_find_impl(begin, it, id);
-        assert(tmp2 == it);
+        patomic_assert_always(tmp2 == it);
         if (tmp2 != it) { continue; }
         /* copy over unique valid impl */
         *it++ = *tmp;
@@ -139,7 +140,7 @@ patomic_fill_impl_array(
             *it++ = *tmp;
         }
     }
-    assert(it == end);
+    patomic_assert_always(it == end);
 
     /* sort impls again (not including argv impls if they were prioritised) */
     if (options & (int) patomic_options_PRIORITISE_ARG_IDS)
@@ -259,7 +260,9 @@ patomic_is_pow2(
         /* sstring */                                                  \
         /* transaction implementations are all hardware based */       \
         /* two implementations on the same hardware is unlikely */     \
-        assert(!((dst)->sstring.required && (src)->sstring.required)); \
+        patomic_assert_always(                                         \
+            !((dst)->sstring.required && (src)->sstring.required)      \
+        );                                                             \
         if ((src)->sstring.required)                                   \
         {                                                              \
             PATOMIC_COPY_IF_NULL(dst, src, sstring.fp_memcpy);         \
@@ -293,60 +296,76 @@ patomic_is_pow2(
             patomic_opcat_RAW,                                         \
             flags | patomic_opkind_TABORT                              \
         );                                                             \
-        assert((result == patomic_opkind_TABORT)  /* all but TABORT */ \
-               || (result == 0)  /* all (including TABORT) */          \
-               || (result == flags));  /* none */                      \
+        patomic_assert_always(                                         \
+            (result == patomic_opkind_TABORT)  /* all but TABORT */    \
+            || (result == 0)      /* all (except TABORT) */            \
+            || (result == flags)  /* none */                           \
+        );                                                             \
         /* set flags to all transaction opcats except RAW */           \
-        /* since we just check RAW ops above */                        \
+        /* since we just checked RAW ops above */                      \
         flags = patomic_opcat_TRANSACTION;                             \
         flags &= ~((unsigned int) patomic_opcat_RAW);                  \
-        /* if they're available, all other ops MUST be available */    \
+        /* remove tabort since we only care the other RAW ops */       \
+        result &= ~((unsigned int) patomic_opkind_TABORT);             \
+        /* if they were available, all other ops MUST be too */        \
         if (result == 0)                                               \
         {                                                              \
-            assert(patomic_feature_check_all_transaction(              \
-                &((obj)->ops),                                         \
-                flags                                                  \
+            /* all available if 0 is returned */                       \
+            patomic_assert_always(                                     \
+                0 == patomic_feature_check_all_transaction(            \
+                    &((obj)->ops),                                     \
+                    flags                                              \
             ));                                                        \
         }                                                              \
         /* otherwise, all other ops MUST NOT be available */           \
         else                                                           \
         {                                                              \
-            assert(flags == patomic_feature_check_any_transaction(     \
-                &((obj)->ops),                                         \
-                flags                                                  \
+            /* nothing is available if no bits removed from flags */   \
+            patomic_assert_always(                                     \
+                flags == patomic_feature_check_any_transaction(        \
+                    &((obj)->ops),                                     \
+                    flags                                              \
             ));                                                        \
         }                                                              \
     }                                                                  \
     while (0)
 
 /* T: transaction */
-#define PATOMIC_T_EXTRAS_CHECKS(obj)                                       \
-    do {                                                                   \
-        /* if we have ops, no extras can be 0 or NULL */                   \
-        /* sstring.required may or may not be set */                       \
-        /* otherwise, everything must be 0 or NULL (including required) */ \
-        int ops_set = (obj)->ops.raw_ops.fp_tbegin != NULL;                \
-        /* recommended */                                                  \
-        assert(ops_set == ((obj)->recommended.max_rmw_memory != 0));       \
-        assert(ops_set == ((obj)->recommended.max_load_memory != 0));      \
-        assert(ops_set == ((obj)->recommended.min_rmw_attempts != 0));     \
-        assert(ops_set == ((obj)->recommended.min_load_attempts != 0));    \
-        /* sstring */                                                      \
-        assert(ops_set == ((obj)->sstring.fp_memcpy != NULL));             \
-        assert(ops_set == ((obj)->sstring.fp_memmove != NULL));            \
-        assert(ops_set == ((obj)->sstring.fp_memset != NULL));             \
-        assert(ops_set == ((obj)->sstring.fp_memcmp != NULL));             \
-        /* special case for sstring.required */                            \
-        if (!ops_set) { assert((obj)->sstring.required == 0); }            \
-    }                                                                      \
+#define PATOMIC_T_EXTRAS_CHECKS(obj)                                           \
+    do {                                                                       \
+        /* if we have ops, no extras can be 0 or NULL */                       \
+        /* sstring.required may or may not be set */                           \
+        /* otherwise, everything must be 0 or NULL (including required) */     \
+        int ops_set = (obj)->ops.raw_ops.fp_tbegin != NULL;                    \
+        /* recommended */                                                      \
+        patomic_assert_always(                                                 \
+            ops_set == ((obj)->recommended.max_rmw_memory != 0)                \
+        );                                                                     \
+        patomic_assert_always(                                                 \
+            ops_set == ((obj)->recommended.max_load_memory != 0)               \
+        );                                                                     \
+        patomic_assert_always(                                                 \
+            ops_set == ((obj)->recommended.min_rmw_attempts != 0)              \
+        );                                                                     \
+        patomic_assert_always(                                                 \
+            ops_set == ((obj)->recommended.min_load_attempts != 0)             \
+        );                                                                     \
+        /* sstring */                                                          \
+        patomic_assert_always(ops_set == ((obj)->sstring.fp_memcpy != NULL));  \
+        patomic_assert_always(ops_set == ((obj)->sstring.fp_memmove != NULL)); \
+        patomic_assert_always(ops_set == ((obj)->sstring.fp_memset != NULL));  \
+        patomic_assert_always(ops_set == ((obj)->sstring.fp_memcmp != NULL));  \
+        /* special case for sstring.required */                                \
+        if (!ops_set) { patomic_assert_always((obj)->sstring.required == 0); } \
+    }                                                                          \
     while (0)
 
-#define PATOMIC_ALIGN_CHECKS(obj)                                 \
-    do {                                                          \
-        assert(patomic_is_pow2((obj)->align.recommended));        \
-        assert(patomic_is_pow2((obj)->align.minimum));            \
-        assert((obj)->align.recommended >= (obj)->align.minimum); \
-    }                                                             \
+#define PATOMIC_ALIGN_CHECKS(obj)                                              \
+    do {                                                                       \
+        patomic_assert_always(patomic_is_pow2((obj)->align.recommended));      \
+        patomic_assert_always(patomic_is_pow2((obj)->align.minimum));          \
+        patomic_assert_always((obj)->align.recommended >= (obj)->align.minimum); \
+    }                                                                          \
     while (0)
 
 
@@ -429,7 +448,7 @@ patomic_combine_transaction(
         int i, impl_count;                                            \
                                                                       \
         va_start(impl_id_argv, impl_id_argc);                         \
-  vis_o(assert(patomic_is_valid_order((int) order));)                 \
+  vis_o(patomic_assert_always(patomic_is_valid_order((int) order));)  \
         impl_count = patomic_fill_impl_array(                         \
             &reg_copy[0],                                             \
             &reg_copy[0] + PATOMIC_IMPL_REGISTER_SIZE,                \
@@ -445,7 +464,7 @@ patomic_combine_transaction(
                                                                       \
         for (i = 0; i < impl_count; ++i)                              \
         {                                                             \
-            assert(reg_copy[i].fp_creat##fn != NULL);                 \
+            patomic_assert_always(reg_copy[i].fp_creat##fn != NULL);  \
             tmp = reg_copy[i].fp_creat##fn(                           \
          vis_wp(byte_width,_)                                         \
          vis_op(order,_)                                              \

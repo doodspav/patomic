@@ -3,8 +3,9 @@
 
 #if defined(_MSC_VER)
 
-#include <assert.h>
 #include <string.h>
+
+#include <patomic/stdlib/assert.h>
 
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
@@ -61,8 +62,8 @@ patomic_shl_128(
 )
 {
     patomic_uint128_t res = {0};
-    assert(offset >= 0);
-    assert(offset < 128);
+    patomic_assert(offset >= 0);
+    patomic_assert(offset < 128);
 
     if (offset >= 64)
     {
