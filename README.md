@@ -72,6 +72,12 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR` | `__inline__ __attribute__((always_inline))` |
 | `PATOMIC_HAVE_NOINLINE_ATTR` | `__attribute__((noinline))` |
 | `PATOMIC_HAVE_NOINLINE_DSPC` | `__declspec(noinline)` |
+| `PATOMIC_HAVE_NORETURN` | `_Noreturn` |
+| `PATOMIC_HAVE_NORETURN_DSPC` | `__declspec(noreturn)` |
+| `PATOMIC_HAVE_NORETURN_ATTR` | `__attribute__((noreturn))` |
+| `PATOMIC_HAVE_RESTRICT` | `restrict` |
+| `PATOMIC_HAVE_MS_RESTRICT` | `__restrict` |
+| `PATOMIC_HAVE_GNU_RESTRICT` | `__restrict__` |
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DPSC` | `__alignof` and `__declspec(align(#))` |
 | `PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR` | `__alignof__` and `__attribute__((aligned(#)))` |

@@ -80,6 +80,24 @@
     #define PATOMIC_HAVE_NORETURN_ATTR 0
 #endif
 
+/* 'restrict' keyword is available */
+/* requires: C99 */
+#ifndef PATOMIC_HAVE_RESTRICT
+    #define PATOMIC_HAVE_RESTRICT 0
+#endif
+
+/* '__restrict' keyword is available */
+/* requires: MS compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_MS_RESTRICT
+    #define PATOMIC_HAVE_MS_RESTRICT 0
+#endif
+
+/* '__restrict__' keyword is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_RESTRICT
+    #define PATOMIC_HAVE_GNU_RESTRICT 0
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 /* requires: C11 */
 #ifndef PATOMIC_HAVE_ALIGNOF

@@ -77,6 +77,27 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_NORETURN_ATTR)
 
 check_c_source_compiles(
+    "static void inc(int *restrict p) { ++(*p); } \n\
+     int main(void) { int i = 0; inc(&i); return i; }"
+    COMPILER_HAS_RESTRICT
+)
+zero_if_blank(COMPILER_HAS_RESTRICT)
+
+check_c_source_compiles(
+    "static void inc(int *__restrict p) { ++(*p); } \n\
+     int main(void) { int i = 0; inc(&i); return i; }"
+    COMPILER_HAS_MS_RESTRICT
+)
+zero_if_blank(COMPILER_HAS_MS_RESTRICT)
+
+check_c_source_compiles(
+    "static void inc(int *__restrict__ p) { ++(*p); } \n\
+     int main(void) { int i = 0; inc(&i); return i; }"
+    COMPILER_HAS_GNU_RESTRICT
+)
+zero_if_blank(COMPILER_HAS_GNU_RESTRICT)
+
+check_c_source_compiles(
     "int main(void) { _Alignas(_Alignof(int)) int x = 0; return x; }"
     COMPILER_HAS_ALIGNOF
 )

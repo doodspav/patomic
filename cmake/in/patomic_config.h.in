@@ -52,6 +52,21 @@
     #define PATOMIC_HAVE_NORETURN_ATTR @COMPILER_HAS_NORETURN_ATTR@
 #endif
 
+/* 'restrict' keyword is available */
+#ifndef PATOMIC_HAVE_RESTRICT
+    #define PATOMIC_HAVE_RESTRICT @COMPILER_HAS_RESTRICT@
+#endif
+
+/* '__restrict' keyword is available */
+#ifndef PATOMIC_HAVE_MS_RESTRICT
+    #define PATOMIC_HAVE_MS_RESTRICT @COMPILER_HAS_MS_RESTRICT@
+#endif
+
+/* '__restrict__' keyword is available */
+#ifndef PATOMIC_HAVE_GNU_RESTRICT
+    #define PATOMIC_HAVE_GNU_RESTRICT @COMPILER_HAS_GNU_RESTRICT@
+#endif
+
 /* '_Alignof' and '_Alignas' keywords are available */
 #ifndef PATOMIC_HAVE_ALIGNOF
     #define PATOMIC_HAVE_ALIGNOF @COMPILER_HAS_ALIGNOF@
