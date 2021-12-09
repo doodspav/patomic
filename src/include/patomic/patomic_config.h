@@ -116,6 +116,19 @@
     #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR 0
 #endif
 
+/* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
+/* requires: C99 (optional) */
+#ifndef PATOMIC_HAVE_STD_INT_UINTPTR
+    #define PATOMIC_HAVE_STD_INT_UINTPTR 0
+#endif
+
+/* 'uintptr_t' available in <stddef.h> */
+/* requires: old compiler versions not supporting <stdint.h> (pre-C99) */
+/* note: MSVC puts uintptr_t in here in old versions */
+#ifndef PATOMIC_HAVE_STD_DEF_UINTPTR
+    #define PATOMIC_HAVE_STD_DEF_UINTPTR 0
+#endif
+
 /* <stdatomic.h> header and '_Atomic' keyword are available */
 /* requires: C11 and __STD_NO_ATOMICS__ to not be defined */
 /* note: currently MSVC defines __STD_NO_ATOMICS__ */

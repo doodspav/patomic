@@ -82,6 +82,16 @@
     #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR @COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR@
 #endif
 
+/* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
+#ifndef PATOMIC_HAVE_STD_INT_UINTPTR
+    #define PATOMIC_HAVE_STD_INT_UINTPTR @COMPILER_HAS_STD_INT_UINTPTR@
+#endif
+
+/* 'uintptr_t' available in <stddef.h> */
+#ifndef PATOMIC_HAVE_STD_DEF_UINTPTR
+    #define PATOMIC_HAVE_STD_DEF_UINTPTR @COMPILER_HAS_STD_DEF_UINTPTR@
+#endif
+
 /* <stdatomic.h> header and '_Atomic' keyword are available */
 #ifndef PATOMIC_HAVE_STD_ATOMIC
     #define PATOMIC_HAVE_STD_ATOMIC @COMPILER_HAS_STD_ATOMIC@

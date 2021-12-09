@@ -44,6 +44,8 @@ add_library(
     # src/include/patomic/stdlib
     src/include/patomic/stdlib/assert.h
     src/include/patomic/stdlib/string.h
+    # src/include/patomic/types
+    src/include/patomic/types/intptr.h
     # src/patomic
     src/patomic/patomic_version.c
     # src/patomic/stdlib

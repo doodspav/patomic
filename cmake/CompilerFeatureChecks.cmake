@@ -121,6 +121,20 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR)
 
 check_c_source_compiles(
+    "#include <stdint.h> \n\
+     int main(void) { uintptr_t x = 0; return (int)x; }"
+    COMPILER_HAS_STD_INT_UINTPTR
+)
+zero_if_blank(COMPILER_HAS_STD_INT_UINTPTR)
+
+check_c_source_compiles(
+    "#include <stddef.h> \n\
+     int main(void) { uintptr_t x = 0; return (int)x; }"
+    COMPILER_HAS_STD_DEF_UINTPTR
+)
+zero_if_blank(COMPILER_HAS_STD_DEF_UINTPTR)
+
+check_c_source_compiles(
     "#include <stdatomic.h> \n\
      int main(void) { return (int)sizeof(_Atomic(int)); }"
     COMPILER_HAS_STD_ATOMIC

@@ -14,6 +14,7 @@ increment the `minor` version for breaking changes.
 - `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
 - `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)
 - `PATOMIC_RESTRICT` macro and corresponding config macros (MS/GNU/STD)
+- `patomic_(u)intptr_t` type in `intptr.h` and corresponding config macros
 - disabled warning `C4710` on msvc in presets (could not inline function)
 ### Changed
 - replace all uses of `assert` with `patomic_assert` and `patomic_assert_always`
