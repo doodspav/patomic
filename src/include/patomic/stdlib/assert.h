@@ -1,9 +1,9 @@
-#ifdef PATOMIC_ASSERT_H
-    #undef PATOMIC_ASSERT_H
+#ifdef PATOMIC_STDLIB_ASSERT_H
+    #undef PATOMIC_STDLIB_ASSERT_H
     #undef patomic_assert
     #undef patomic_assert_always
 #endif
-#define PATOMIC_ASSERT_H
+#define PATOMIC_STDLIB_ASSERT_H
 
 #include <patomic/patomic_export.h>
 

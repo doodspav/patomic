@@ -1,6 +1,6 @@
 #ifndef PATOMIC_RESTRICT
 
-#include <patomic/patomic_config.h
+#include <patomic/patomic_config.h>
 
 #if PATOMIC_HAVE_RESTRICT
     #define PATOMIC_RESTRICT restrict

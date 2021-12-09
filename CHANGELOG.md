@@ -9,6 +9,7 @@ increment the `minor` version for breaking changes.
 ## [Unreleased] [Patch]
 ### Added
 - `patomic_assert` and `patomic_always_assert` for internal use
+- `patomic_` versions of `string.h` functions for internal use
 - `patomic_assert` supports `NDEBUG` (and can be overridden with `NNDEBUG`)
 - `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
 - `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)

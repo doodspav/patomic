@@ -43,10 +43,12 @@ add_library(
     src/include/patomic/macros/static_assert.h
     # src/include/patomic/stdlib
     src/include/patomic/stdlib/assert.h
+    src/include/patomic/stdlib/string.h
     # src/patomic
     src/patomic/patomic_version.c
     # src/patomic/stdlib
     src/patomic/stdlib/assert.c
+    src/patomic/stdlib/string.c
     # src/patomic/types
     src/patomic/types/align.c
     src/patomic/types/feature_check.c

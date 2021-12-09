@@ -23,7 +23,7 @@
 
 
 static void
-patomic_assert_xprint(
+patomic_assert_fxprint(
     FILE *stream,
     const char *expr,
     const char *file,
@@ -63,7 +63,7 @@ __patomic_assert_fail(
     int _;
     _ = setvbuf(stderr, NULL, _IONBF, 0);
     PATOMIC_IGNORE_UNUSED(_);
-    patomic_assert_xprint(stderr, expr, file, func, line);
+    patomic_assert_fxprint(stderr, expr, file, func, line);
     _ = fflush(stderr);
     PATOMIC_IGNORE_UNUSED(_);
     abort();
