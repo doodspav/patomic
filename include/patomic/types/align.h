@@ -51,6 +51,7 @@ typedef struct {
     size_t size_within;
 } patomic_align_t;
 
+
 /* represents the maximum cache line size in all known hardware */
 /* WARNING: changing this constitutes an ABI break */
 #undef PATOMIC_MAX_CACHE_LINE_SIZE
@@ -60,6 +61,31 @@ typedef struct {
 /* the value will always be at least as large as a cache line */
 PATOMIC_EXPORT size_t
 patomic_cache_line_size(void);
+
+
+/*
+ * ALIGNMENT CHECKS
+ *
+ * - internal cast used MAY rely on implementation defined behaviour
+ * - this is only likely to happen if no atomic implementation is supported
+ * - realistically a uintptr type or macro will be available on any compiler
+ *   which can provide some access to an atomic implementation
+ *
+ * - if you need to be certain, implement these functions yourself, and don't
+ *   use them if no atomic implementation is available
+ */
+PATOMIC_EXPORT int
+patomic_align_meets_recommended(
+    const volatile void *ptr,
+    patomic_align_t align
+);
+
+PATOMIC_EXPORT int
+patomic_align_meets_minimum(
+    const volatile void *ptr,
+    patomic_align_t align,
+    size_t width
+);
 
 
 #ifdef __cplusplus
