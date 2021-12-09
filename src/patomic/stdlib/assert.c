@@ -1,13 +1,9 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <patomic/stdlib/assert.h>
 
 #include <patomic/macros/ignore_unused.h>
-#include <patomic/macros/noinline.h>
-#include <patomic/macros/noreturn.h>
 
 
 #undef PATOMIC_ASSERT_WIDE
@@ -56,8 +52,6 @@ patomic_assert_xprint(
 }
 
 
-PATOMIC_NOINLINE
-PATOMIC_NORETURN
 void
 __patomic_assert_fail(
     const char *expr,
@@ -67,7 +61,8 @@ __patomic_assert_fail(
 )
 {
     int _;
-    setbuf(stderr, NULL);
+    _ = setvbuf(stderr, NULL, _IONBF, 0);
+    PATOMIC_IGNORE_UNUSED(_);
     patomic_assert_xprint(stderr, expr, file, func, line);
     _ = fflush(stderr);
     PATOMIC_IGNORE_UNUSED(_);

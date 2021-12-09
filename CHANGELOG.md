@@ -13,8 +13,12 @@ increment the `minor` version for breaking changes.
 - `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
 - `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)
 - `PATOMIC_RESTRICT` macro and corresponding config macros (MS/GNU/STD)
+- disabled warning `C4710` on msvc in presets (could not inline function)
 ### Changed
 - replace all uses of `assert` with `patomic_assert` and `patomic_assert_always`
+### Fixed
+- mark all non-static functions and globals which aren't part of the public api
+  with `PATOMIC_NO_EXPORT`
 
 ## [0.2.2] [Minor] - 2021-12-07
 ### Added

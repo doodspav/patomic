@@ -5,9 +5,12 @@
 #endif
 #define PATOMIC_ASSERT_H
 
+#include <patomic/patomic_export.h>
+
 #include <patomic/macros/noinline.h>
 #include <patomic/macros/noreturn.h>
 
+PATOMIC_NO_EXPORT
 PATOMIC_NOINLINE
 PATOMIC_NORETURN
 extern void
@@ -26,5 +29,5 @@ __patomic_assert_fail(
 
 #if defined(NDEBUG) && !defined(NNDEBUG)
     #undef patomic_assert
-    #define patomic_assert(_) ((void) 0)
+    #define patomic_assert(expr) ((void) 0)
 #endif

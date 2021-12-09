@@ -4,14 +4,15 @@
 #include <stddef.h>
 
 #include <patomic/patomic.h>
+#include <patomic/patomic_export.h>
 
-patomic_t
+PATOMIC_NO_EXPORT patomic_t
 patomic_impl_create_tsx(size_t, patomic_memory_order_t, int);
 
-patomic_explicit_t
+PATOMIC_NO_EXPORT patomic_explicit_t
 patomic_impl_create_explicit_tsx(size_t, int);
 
-patomic_transaction_t
+PATOMIC_NO_EXPORT patomic_transaction_t
 patomic_impl_create_transaction_tsx(int);
 
 #endif  /* !PATOMIC_IMPL_TSX_H */
