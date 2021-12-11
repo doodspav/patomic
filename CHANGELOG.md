@@ -14,6 +14,7 @@ increment the `minor` version for breaking changes.
 - `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
 - `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)
 - `PATOMIC_RESTRICT` macro and corresponding config macros (MS/GNU/STD)
+- `PATOMIC_FUNC_NAME` macro and corresponding config macros (MS/GNU/STD)
 - `patomic_(u)intptr_t` type in `intptr.h` and corresponding config macros
 - alignment check functions (`patomic_align_meets_{recommended|minimum}`)
 - disabled warning `C4710` on msvc in presets (could not inline function)

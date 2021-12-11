@@ -11,6 +11,36 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_LONG_LONG)
 
 check_c_source_compiles(
+    "int main(void) { return __func__[0] == 0; }"
+    COMPILER_HAS_FUNC
+)
+zero_if_blank(COMPILER_HAS_FUNC)
+
+check_c_source_compiles(
+    "int main(void) { return __FUNCTION__[0] == 0; }"
+    COMPILER_HAS_GNU_FUNCTION
+)
+zero_if_blank(COMPILER_HAS_GNU_FUNCTION)
+
+check_c_source_compiles(
+    "int main(void) { return (__extension__ __FUNCTION__)[0] == 0; }"
+    COMPILER_HAS_GNU_FUNCTION_EXTN
+)
+zero_if_blank(COMPILER_HAS_GNU_FUNCTION_EXTN)
+
+check_c_source_compiles(
+    "int main(void) { return __PRETTY_FUNCTION__[0] == 0; }"
+    COMPILER_HAS_GNU_PRETTY_FUNCTION
+)
+zero_if_blank(COMPILER_HAS_GNU_PRETTY_FUNCTION)
+
+check_c_source_compiles(
+    "int main(void) { return (__extension__ __PRETTY_FUNCTION__)[0] == 0; }"
+    COMPILER_HAS_GNU_PRETTY_FUNCTION_EXTN
+)
+zero_if_blank(COMPILER_HAS_GNU_PRETTY_FUNCTION_EXTN)
+
+check_c_source_compiles(
     "__forceinline static int inc(int x) { return ++x; } \n\
      int main(void) { return inc(0); }"
     COMPILER_HAS_MS_FORCEINLINE

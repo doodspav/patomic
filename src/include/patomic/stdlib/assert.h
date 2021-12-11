@@ -7,6 +7,7 @@
 
 #include <patomic/patomic_export.h>
 
+#include <patomic/macros/func_name.h>
 #include <patomic/macros/noinline.h>
 #include <patomic/macros/noreturn.h>
 
@@ -22,10 +23,10 @@ __patomic_assert_fail(
 );
 
 #define patomic_assert_always(expr) (void)((expr) || \
-    (__patomic_assert_fail(#expr, __FILE__, "", __LINE__), 0))
+    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0))
 
 #define patomic_assert(expr) (void)((expr) || \
-    (__patomic_assert_fail(#expr, __FILE__, "", __LINE__), 0))
+    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0))
 
 #if defined(NDEBUG) && !defined(NNDEBUG)
     #undef patomic_assert

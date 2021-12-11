@@ -7,6 +7,31 @@
     #define PATOMIC_HAVE_LONG_LONG @COMPILER_HAS_LONG_LONG@
 #endif
 
+/* '__func__' identifier is available */
+#ifndef PATOMIC_HAVE_FUNC
+    #define PATOMIC_HAVE_FUNC @COMPILER_HAS_FUNC@
+#endif
+
+/* '__FUNCTION__' identifier or macro is available */
+#ifndef PATOMIC_HAVE_GNU_FUNCTION
+    #define PATOMIC_HAVE_GNU_FUNCTION @COMPILER_HAS_GNU_FUNCTION@
+#endif
+
+/* '__extension__ __FUNCTION__' identifier is available */
+#ifndef PATOMIC_HAVE_GNU_FUNCTION_EXTN
+    #define PATOMIC_HAVE_GNU_FUNCTION_EXTN @COMPILER_HAS_GNU_FUNCTION_EXTN@
+#endif
+
+/* '__PRETTY_FUNCTION__' identifier is available */
+#ifndef PATOMIC_HAVE_GNU_PRETTY_FUNCTION
+    #define PATOMIC_HAVE_GNU_PRETTY_FUNCTION @COMPILER_HAS_GNU_PRETTY_FUNCTION@
+#endif
+
+/* '__extension__ __PRETTY_FUNCTION__' identifier is available */
+#ifndef PATOMIC_HAVE_GNU_PRETTY_FUNCTION_EXTN
+    #define PATOMIC_HAVE_GNU_PRETTY_FUNCTION_EXTN @COMPILER_HAS_GNU_PRETTY_FUNCTION_EXTN@
+#endif
+
 /* '__forceinline' keyword is available */
 #ifndef PATOMIC_HAVE_MS_FORCEINLINE
     #define PATOMIC_HAVE_MS_FORCEINLINE @COMPILER_HAS_MS_FORCEINLINE@

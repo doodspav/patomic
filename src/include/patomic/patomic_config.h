@@ -25,6 +25,38 @@
     #define PATOMIC_HAVE_LONG_LONG 0
 #endif
 
+/* '__func__' identifier is available */
+/* requires: C99 */
+#ifndef PATOMIC_HAVE_FUNC
+    #define PATOMIC_HAVE_FUNC 0
+#endif
+
+/* '__FUNCTION__' identifier or macro is available */
+/* requires: most compilers will have this, including MS and GNU */
+/* note: GCC 5+ doesn't allow this with -Wpedantic (Clang does) */
+#ifndef PATOMIC_HAVE_GNU_FUNCTION
+    #define PATOMIC_HAVE_GNU_FUNCTION 0
+#endif
+
+/* '__extension__ __FUNCTION__' identifier is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_FUNCTION_EXTN
+    #define PATOMIC_HAVE_GNU_FUNCTION_EXTN 0
+#endif
+
+/* '__PRETTY_FUNCTION__' identifier is available */
+/* requires: GNU compatible(-ish) compiler */
+/* note: GCC 5+ doesn't allow this with -Wpedantic (Clang does) */
+#ifndef PATOMIC_HAVE_GNU_PRETTY_FUNCTION
+    #define PATOMIC_HAVE_GNU_PRETTY_FUNCTION 0
+#endif
+
+/* '__extension__ __PRETTY_FUNCTION__' identifier is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_PRETTY_FUNCTION_EXTN
+    #define PATOMIC_HAVE_GNU_PRETTY_FUNCTION_EXTN 0
+#endif
+
 /* '__forceinline' keyword is available */
 /* requires: Microsoft compatible(-ish) compiler */
 #ifndef PATOMIC_HAVE_MS_FORCEINLINE
@@ -87,7 +119,7 @@
 #endif
 
 /* '__restrict' keyword is available */
-/* requires: MS compatible(-ish) compiler */
+/* requires: most compilers will have this, including MS and GNU */
 #ifndef PATOMIC_HAVE_MS_RESTRICT
     #define PATOMIC_HAVE_MS_RESTRICT 0
 #endif
