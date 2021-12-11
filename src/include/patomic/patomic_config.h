@@ -27,8 +27,8 @@
 
 /* '__forceinline' keyword is available */
 /* requires: Microsoft compatible(-ish) compiler */
-#ifndef PATOMIC_HAVE_FORCEINLINE
-    #define PATOMIC_HAVE_FORCEINLINE 0
+#ifndef PATOMIC_HAVE_MS_FORCEINLINE
+    #define PATOMIC_HAVE_MS_FORCEINLINE 0
 #endif
 
 /* '__attribute__((always_inline)) is available to use without 'inline' */

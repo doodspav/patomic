@@ -13,9 +13,9 @@ zero_if_blank(COMPILER_HAS_LONG_LONG)
 check_c_source_compiles(
     "__forceinline static int inc(int x) { return ++x; } \n\
      int main(void) { return inc(0); }"
-    COMPILER_HAS_FORCEINLINE
+    COMPILER_HAS_MS_FORCEINLINE
 )
-zero_if_blank(COMPILER_HAS_FORCEINLINE)
+zero_if_blank(COMPILER_HAS_MS_FORCEINLINE)
 
 check_c_source_compiles(
     "__attribute__((always_inline)) static \n\

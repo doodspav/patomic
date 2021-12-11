@@ -8,8 +8,8 @@
 #endif
 
 /* '__forceinline' keyword is available */
-#ifndef PATOMIC_HAVE_FORCEINLINE
-    #define PATOMIC_HAVE_FORCEINLINE @COMPILER_HAS_FORCEINLINE@
+#ifndef PATOMIC_HAVE_MS_FORCEINLINE
+    #define PATOMIC_HAVE_MS_FORCEINLINE @COMPILER_HAS_MS_FORCEINLINE@
 #endif
 
 /* '__attribute__((always_inline))' is available to use without 'inline' */

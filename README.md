@@ -66,7 +66,7 @@ always be defined, either through internal or command line means).
 | Name | Guarding |
 | --- | --- |
 | `PATOMIC_HAVE_LONG_LONG` | `long long` |
-| `PATOMIC_HAVE_FORCEINLINE` | `__forceinline` |
+| `PATOMIC_HAVE_MS_FORCEINLINE` | `__forceinline` |
 | `PATOMIC_HAVE_ALWAYS_INLINE_ATTR` | `__attribute__((always_inline))` |
 | `PATOMIC_HAVE_INLINE_ALWAYS_INLINE_ATTR` | `inline __attribute__((always_inline)` |
 | `PATOMIC_HAVE_GNU_INLINE_ALWAYS_INLINE_ATTR` | `__inline__ __attribute__((always_inline))` |
