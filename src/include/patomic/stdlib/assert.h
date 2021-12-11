@@ -10,6 +10,7 @@
 #include <patomic/macros/func_name.h>
 #include <patomic/macros/noinline.h>
 #include <patomic/macros/noreturn.h>
+#include <patomic/macros/unreachable.h>
 
 PATOMIC_NO_EXPORT
 PATOMIC_NOINLINE
@@ -22,13 +23,18 @@ __patomic_assert_fail(
     unsigned int line
 );
 
-#define patomic_assert_always(expr) (void)((expr) || \
-    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0))
+#define patomic_assert_always(expr) ((void)((expr) || \
+    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
 
-#define patomic_assert(expr) (void)((expr) || \
-    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0))
+#define patomic_assert(expr) ((void)((expr) || \
+    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
+
+#define patomic_assert_unreachable(expr) ((void)((expr) || \
+    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
 
 #if defined(NDEBUG) && !defined(NNDEBUG)
     #undef patomic_assert
+    #undef patomic_assert_unreachable
     #define patomic_assert(expr) ((void) 0)
+    #define patomic_assert_unreachable(expr) ((void) PATOMIC_UNREACHABLE())
 #endif

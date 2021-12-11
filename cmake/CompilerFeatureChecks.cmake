@@ -151,6 +151,22 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR)
 
 check_c_source_compiles(
+    "int main(int argc, char **argv) { \n\
+         if (argc < 1) { __assume(0); } \n\
+         return argv[0][0]; }"
+    COMPILER_HAS_MS_ASSUME
+)
+zero_if_blank(COMPILER_HAS_MS_ASSUME)
+
+check_c_source_compiles(
+    "int main(int argc, char **argv) { \n\
+         if (argc < 1) { __builtin_unreachable(); } \n\
+         return argv[0][0]; }"
+    COMPILER_HAS_BUILTIN_UNREACHABLE
+)
+zero_if_blank(COMPILER_HAS_BUILTIN_UNREACHABLE)
+
+check_c_source_compiles(
     "#include <stdint.h> \n\
      int main(void) { uintptr_t x = 0; return (int)x; }"
     COMPILER_HAS_STD_INT_UINTPTR

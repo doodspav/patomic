@@ -42,6 +42,7 @@ add_library(
     src/include/patomic/macros/noreturn.h
     src/include/patomic/macros/restrict.h
     src/include/patomic/macros/static_assert.h
+    src/include/patomic/macros/unreachable.h
     # src/include/patomic/stdlib
     src/include/patomic/stdlib/assert.h
     src/include/patomic/stdlib/string.h

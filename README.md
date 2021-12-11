@@ -86,6 +86,8 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_ALIGNOF` | `_Alignof` |
 | `PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DPSC` | `__alignof` and `__declspec(align(#))` |
 | `PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR` | `__alignof__` and `__attribute__((aligned(#)))` |
+| `PATOMIC_HAVE_MS_ASSUME` | `__assume(int)` |
+| `PATOMIC_HAVE_BUILTIN_UNREACHABLE` | `__builtin_unreachable(void)` |
 | `PATOMIC_HAVE_STD_INT_UINTPTR` | `<stdint.h>` with `uintptr_t` |
 | `PATOMIC_HAVE_STD_DEF_UINTPTR` | `<stddef.h>` with `uintptr_t` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|

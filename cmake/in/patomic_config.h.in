@@ -107,6 +107,16 @@
     #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR @COMPILER_HAS_GNU_ALIGNOF_ALIGNED_ATTR@
 #endif
 
+/* '__assume(int)' is available */
+#ifndef PATOMIC_HAVE_MS_ASSUME
+    #define PATOMIC_HAVE_MS_ASSUME @COMPILER_HAS_MS_ASSUME@
+#endif
+
+/* '__builtin_unreachable(void)' is available */
+#ifndef PATOMIC_HAVE_BUILTIN_UNREACHABLE
+    #define PATOMIC_HAVE_BUILTIN_UNREACHABLE @COMPILER_HAS_BUILTIN_UNREACHABLE@
+#endif
+
 /* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
 #ifndef PATOMIC_HAVE_STD_INT_UINTPTR
     #define PATOMIC_HAVE_STD_INT_UINTPTR @COMPILER_HAS_STD_INT_UINTPTR@

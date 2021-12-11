@@ -148,6 +148,18 @@
     #define PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR 0
 #endif
 
+/* '__assume(int)' is available */
+/* requires: MS compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_MS_ASSUME
+    #define PATOMIC_HAVE_MS_ASSUME 0
+#endif
+
+/* '__builtin_unreachable(void)' is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_BUILTIN_UNREACHABLE
+    #define PATOMIC_HAVE_BUILTIN_UNREACHABLE 0
+#endif
+
 /* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
 /* requires: C99 (optional) */
 #ifndef PATOMIC_HAVE_STD_INT_UINTPTR

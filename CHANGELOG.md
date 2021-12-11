@@ -8,18 +8,21 @@ increment the `minor` version for breaking changes.
 
 ## [Unreleased] [Patch]
 ### Added
-- `patomic_assert` and `patomic_always_assert` for internal use
+- `patomic_assert` and `patomic_assert_{always|unreachable}` for internal use
 - `patomic_` versions of `string.h` functions for internal use
-- `patomic_assert` supports `NDEBUG` (and can be overridden with `NNDEBUG`)
-- `PATOMIC_NOINLINE` macro and corresponding config macros (MS/GNU)
-- `PATOMIC_NORETURN` macro and corresponding config macros (MS/GNU/STD)
-- `PATOMIC_RESTRICT` macro and corresponding config macros (MS/GNU/STD)
-- `PATOMIC_FUNC_NAME` macro and corresponding config macros (MS/GNU/STD)
+- `patomic_assert(_unreachable)` supports `NDEBUG`
+- macro `NNDEBUG` can be defined to override `NDEBUG` (for patomic variants)
+- following macros and corresponding config macros for internal use:
+  - `PATOMIC_NOINLINE` (MS/GNU)
+  - `PATOMIC_NORETURN` (MS/GNU/STD)
+  - `PATOMIC_RESTRICT` (MS/GNU/STD)
+  - `PATOMIC_FUNC_NAME` (MS/GNU/STD)
+  - `PATOMIC_UNREACHABLE()` (MS/GNU)
 - `patomic_(u)intptr_t` type in `intptr.h` and corresponding config macros
 - alignment check functions (`patomic_align_meets_{recommended|minimum}`)
 - disabled warning `C4710` on msvc in presets (could not inline function)
 ### Changed
-- replace all uses of `assert` with `patomic_assert` and `patomic_assert_always`
+- replace all uses of `assert` with `patomic_assert*` variants
 ### Fixed
 - mark all non-static functions and globals which aren't part of the public api
   with `PATOMIC_NO_EXPORT`
