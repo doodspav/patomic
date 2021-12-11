@@ -21,11 +21,18 @@ increment the `minor` version for breaking changes.
 - `patomic_(u)intptr_t` type in `intptr.h` and corresponding config macros
 - alignment check functions (`patomic_align_meets_{recommended|minimum}`)
 - disabled warning `C4710` on msvc in presets (could not inline function)
+- std impl ops assert that inputs are not `NULL` and are suitable aligned
 ### Changed
 - replace all uses of `assert` with `patomic_assert*` variants
+- std impl no longer unconditionally includes any non-freestanding headers
 ### Fixed
 - mark all non-static functions and globals which aren't part of the public api
   with `PATOMIC_NO_EXPORT`
+- std impl no longer requires the alignment of `_Atomic(T)` and `T` to match
+- std impl assertions in non-fetch binary or arithmetic functions now display
+  non-fetch function name in assertion errors (instead of fetch name)
+### Removed
+- fake stdatomic (`/src/include/patomic/fake/stdatomic.h`)
 
 ## [0.2.2] [Minor] - 2021-12-07
 ### Added

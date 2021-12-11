@@ -32,8 +32,6 @@ add_library(
     src/patomic.c
     # src/include/patomic
     src/include/patomic/patomic_config.h
-    # src/include/patomic/fake
-    src/include/patomic/fake/stdatomic.h
     # src/include/patomic/macros
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/func_name.h
