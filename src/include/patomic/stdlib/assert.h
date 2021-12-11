@@ -36,5 +36,6 @@ __patomic_assert_fail(
     #undef patomic_assert
     #undef patomic_assert_unreachable
     #define patomic_assert(expr) ((void) 0)
-    #define patomic_assert_unreachable(expr) ((void) PATOMIC_UNREACHABLE())
+    #define patomic_assert_unreachable(expr) ((void)((expr) || \
+        (PATOMIC_UNREACHABLE(), 0)))
 #endif

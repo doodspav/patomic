@@ -4,6 +4,7 @@
 #include <patomic/stdlib/assert.h>
 
 #include <patomic/macros/ignore_unused.h>
+#include <patomic/macros/unreachable.h>
 
 
 #undef PATOMIC_ASSERT_WIDE
@@ -67,4 +68,7 @@ __patomic_assert_fail(
     _ = fflush(stderr);
     PATOMIC_IGNORE_UNUSED(_);
     abort();
+#if !PATOMIC_UNREACHABLE_IS_VCZ
+    PATOMIC_UNREACHABLE();
+#endif
 }
