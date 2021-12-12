@@ -21,18 +21,7 @@
 #include <patomic/types/intptr.h>
 
 
-static PATOMIC_FORCE_INLINE int
-patomic_is_aligned(
-    const volatile void *ptr,
-    size_t align
-)
-{
-    /* align will always be a power of 2 */
-    patomic_uintptr_t addr = (patomic_uintptr_t) ptr;
-    return (addr & (align - 1u)) == 0;
-}
-
-
+#undef PATOMIC_ALIGNOF_IS_SIZEOF
 #if PATOMIC_HAVE_ALIGNOF
     #define patomic_alignof(t) _Alignof(t)
 #elif PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
@@ -41,7 +30,27 @@ patomic_is_aligned(
     #define patomic_alignof(t) __alignof__(t)
 #else
     #define patomic_alignof(t) sizeof(t)
+    #define PATOMIC_ALIGNOF_IS_SIZEOF
 #endif
+
+
+static PATOMIC_FORCE_INLINE int
+patomic_is_aligned(
+    const volatile void *ptr,
+    size_t align
+)
+{
+    patomic_uintptr_t addr = (patomic_uintptr_t) ptr;
+#ifdef PATOMIC_ALIGNOF_IS_SIZEOF
+    /* align might not be a power of 2 (but won't be 0) */
+    if ((align & (align - 1u)) == 0) { addr &= (align - 1u); }
+    else { addr %= align; }
+#else
+    /* align will always be a power of 2 */
+    addr &= (align - 1u);
+#endif
+    return addr == 0;
+}
 
 
 #define patomic_assert_unreachable_aligned(obj, type) \
@@ -1113,7 +1122,7 @@ patomic_is_aligned(
 #if ATOMIC_LONG_LOCK_FREE
     PATOMIC_DEFINE_OPS_CREATE_ALL(long, long, LONG_MIN)
 #endif
-#if PATOMIC_HAVE_LONG_LONG
+#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
     #if ATOMIC_LLONG_LOCK_FREE
         PATOMIC_DEFINE_OPS_CREATE_ALL(long long, llong, LLONG_MIN)
     #endif
@@ -1175,7 +1184,7 @@ patomic_create_ops(
     else if PATOMIC_SET_RET(short, short, byte_width, order, ret)
     else if PATOMIC_SET_RET(int, int, byte_width, order, ret)
     else if PATOMIC_SET_RET(long, long, byte_width, order, ret)
-#if PATOMIC_HAVE_LONG_LONG
+#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
 #if ATOMIC_LLONG_LOCK_FREE
     else if PATOMIC_SET_RET(long long, llong, byte_width, order, ret)
 #endif
@@ -1195,7 +1204,7 @@ patomic_create_ops_explicit(
     else if PATOMIC_SET_RET_EXPLICIT(short, short, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(int, int, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(long, long, byte_width, ret)
-#if PATOMIC_HAVE_LONG_LONG
+#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
 #if ATOMIC_LLONG_LOCK_FREE
     else if PATOMIC_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
 #endif
@@ -1215,7 +1224,7 @@ patomic_create_align(
     else if PATOMIC_SET_ALIGN(short, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(int, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(long, byte_width, ret.recommended)
-#if PATOMIC_HAVE_LONG_LONG
+#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
 #if ATOMIC_LLONG_LOCK_FREE
     else if PATOMIC_SET_ALIGN(long long, byte_width, ret.recommended)
 #endif
