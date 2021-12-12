@@ -16,9 +16,8 @@
 #include <patomic/macros/force_inline.h>
 
 #include <patomic/stdlib/assert.h>
+#include <patomic/stdlib/stdint.h>
 #include <patomic/stdlib/string.h>
-
-#include <patomic/types/intptr.h>
 
 
 #undef PATOMIC_ALIGNOF_IS_SIZEOF

@@ -1,5 +1,5 @@
-#ifndef PATOMIC_TYPES_INTPTR_H
-#define PATOMIC_TYPES_INTPTR_H
+#ifndef PATOMIC_STDLIB_STDINT_H
+#define PATOMIC_STDLIB_STDINT_H
 
 #include <patomic/patomic_config.h>
 
@@ -22,4 +22,4 @@
     typedef unsigned long patomic_uintptr_t;
 #endif
 
-#endif  /* !PATOMIC_TYPES_INTPTR_H */
+#endif  /* !PATOMIC_STDLIB_STDINT_H */

@@ -1,5 +1,6 @@
 #include <patomic/types/align.h>
-#include <patomic/types/intptr.h>
+
+#include <patomic/stdlib/stdint.h>
 
 
 size_t

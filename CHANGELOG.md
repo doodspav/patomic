@@ -7,6 +7,8 @@ from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
 ## [Unreleased] [Patch]
+### Changed
+- renamed `types/intptr.h` to `stdlib/stdint.h`
 ### Fixed
 - `std` implementation now also uses `ATOMIC_LLONG_IS_LOCK_FREE` in the create
   functions to make sure the corresponding functions are defined
