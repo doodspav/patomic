@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
+## [Unreleased] [Patch]
+### Fixed
+- `std` implementation now also uses `ATOMIC_LLONG_IS_LOCK_FREE` in the create
+  functions to make sure the corresponding functions are defined
+
 ## [0.3.0] [Minor] - 2021-12-11
 ### Added
 - `patomic_assert` and `patomic_assert_{always|unreachable}` for internal use

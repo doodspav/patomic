@@ -1176,7 +1176,9 @@ patomic_create_ops(
     else if PATOMIC_SET_RET(int, int, byte_width, order, ret)
     else if PATOMIC_SET_RET(long, long, byte_width, order, ret)
 #if PATOMIC_HAVE_LONG_LONG
+#if ATOMIC_LLONG_LOCK_FREE
     else if PATOMIC_SET_RET(long long, llong, byte_width, order, ret)
+#endif
 #endif
 
     return ret;
@@ -1194,7 +1196,9 @@ patomic_create_ops_explicit(
     else if PATOMIC_SET_RET_EXPLICIT(int, int, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(long, long, byte_width, ret)
 #if PATOMIC_HAVE_LONG_LONG
+#if ATOMIC_LLONG_LOCK_FREE
     else if PATOMIC_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
+#endif
 #endif
 
 return ret;
@@ -1212,7 +1216,9 @@ patomic_create_align(
     else if PATOMIC_SET_ALIGN(int, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(long, byte_width, ret.recommended)
 #if PATOMIC_HAVE_LONG_LONG
+#if ATOMIC_LLONG_LOCK_FREE
     else if PATOMIC_SET_ALIGN(long long, byte_width, ret.recommended)
+#endif
 #endif
     else { ret.recommended = 1; }
 
