@@ -10,6 +10,7 @@ increment the `minor` version for breaking changes.
 ### Fixed
 - `std` implementation now also uses `ATOMIC_LLONG_IS_LOCK_FREE` in the create
   functions to make sure the corresponding functions are defined
+- `std` implementation no longer assumes `sizeof(T)` will return a power of 2
 
 ## [0.3.0] [Minor] - 2021-12-11
 ### Added
