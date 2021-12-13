@@ -29,20 +29,24 @@
  *   - must either have the value of `sizeof(type)` or be `0`
  *
  * - do_atomic_cmpxchg_weak_explicit:
- *   - must be callable as `ok = (int) fn(obj_p, exp, des, succ, fail, bi, by);`
- *   - `bi` and `by` will be the macro parameters `bit_width` and `byte_width`
+ *   - must be callable as `x = (int) fn(t, bi, by, obj_p, exp, des, succ, fail);`
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
  *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
  *   - `exp`, `des`, `succ`, and `fail` will be the names of local identifiers
- *   - `exp` and `des` will have type (type) and (const type) respectively
- *   - `succ` and `fail` will have type (const int)
+ *   - `exp` and `des` will both have type (type)
+ *   - `des` may be const-qualified
+ *   - `succ` and `fail` will both have type (int), possibly const-qualified
  *   - `succ` will be a valid memory order, and `fail` will be a valid load
  *      memory order which will compare `<= succ`
  *
  * - do_cmp_neq:
- *   - must be callable as `do_cmp_neq(a, b)`
+ *   - must be callable as `do_cmp_neq(t, bi, by, a, b)`
  *   - the resulting expression must be of type (int)
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
  *   - `a` and `b` will be the names of local identifiers
- *   - `a` and `b` will both have type (const type)
+ *   - `a` and `b` will both have type (type), possibly const-qualified
  *
  * - do_assert:
  *   - must be callable as `do_assert(expr);`
@@ -61,7 +65,7 @@
  *   - must be callable as `do_memcpy(vptr, c_vptr, len);`
  *   - the result of the expression will not be assigned to anything
  *   - `vptr` will be of type (void*)
- *   - `c_vptr` will be of type (void*) and may be const qualified
+ *   - `c_vptr` will be of type (void*) and may be const-qualified
  *   - `len` will be of type (size_t)
  *
  * - type:
@@ -72,8 +76,8 @@
  * - atype:
  *   - the type the atomic operation will be performed on (e.g. `_Atomic(int)`)
  *   - sizeof(atype) must equal sizeof(type)
- *   - must not be const qualified
- *   - may, but need not be, volatile qualified (would be redundant)
+ *   - must not be const-qualified
+ *   - may, but need not be, volatile-qualified (would be redundant)
  *   - must not be a VLA or array of unknown size
  *
  * - fn_name:
@@ -139,10 +143,10 @@
         do_memcpy(&des_val, desired, sizeof(type));           \
         /* operation */                                       \
         while (!((int) do_atomic_cmpxchg_weak_explicit(       \
+            type, bit_width, byte_width,                      \
             (volatile atype *) obj,                           \
             exp_val, des_val,                                 \
-            succ, fail,                                       \
-            bit_width, byte_width                             \
+            succ, fail                                        \
         )));                                                  \
         /* cleanup */                                         \
         PATOMIC_IGNORE_UNUSED(scratch);                       \
@@ -183,10 +187,10 @@
         do_memcpy(&des_val, desired, sizeof(type));     \
         /* operation */                                 \
         while (!((int) do_atomic_cmpxchg_weak_explicit( \
+            type, bit_width, byte_width,                \
             (volatile atype *) obj,                     \
             exp_val, des_val,                           \
-            succ, fail,                                 \
-            bit_width, byte_width                       \
+            succ, fail                                  \
         )));                                            \
         /* cleanup */                                   \
         do_memcpy(ret, &exp_val, sizeof(type));         \
@@ -232,14 +236,18 @@
         do_memcpy(&des_val, desired, sizeof(type));                \
         /* operation */                                            \
         while (!(ret = (int) do_atomic_cmpxchg_weak_explicit(      \
+            type, bit_width, byte_width,                           \
             (volatile atype *) obj,                                \
             exp_val, des_val,                                      \
-            succ, fail,                                            \
-            bit_width, byte_width                                  \
+            succ, fail                                             \
         )))                                                        \
         {                                                          \
             /* expected was modified */                            \
-            if (do_cmp_neq(exp_val, old_val)) { break; }           \
+            if (do_cmp_neq(                                        \
+                type, bit_width, byte_width,                       \
+                exp_val, old_val                                   \
+            ))                                                     \
+            { break; }                                             \
             /* spurious fail */                                    \
             else { do_memcpy(&old_val, &exp_val, sizeof(type)); }  \
         }                                                          \
@@ -249,4 +257,3 @@
         PATOMIC_IGNORE_UNUSED(temp);                               \
         return ret != 0;                                           \
     }
-
