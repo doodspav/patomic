@@ -45,6 +45,8 @@ add_library(
     src/include/patomic/stdlib/assert.h
     src/include/patomic/stdlib/string.h
     src/include/patomic/stdlib/stdint.h
+    # src/include/patomic/wrapped
+    src/include/patomic/wrapped/cmpxchg.h
     # src/patomic
     src/patomic/patomic_version.c
     # src/patomic/stdlib
