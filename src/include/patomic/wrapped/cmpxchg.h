@@ -346,7 +346,7 @@
         do_assert_aligned(obj, atype);                          \
         do_assert(offset >= 0);                                 \
         do_assert((CHAR_BIT * sizeof(type)) > (size_t) offset); \
-        do_assert(patomic_is_valid_order(order));               \
+        do_assert(patomic_is_valid_order((int) order));         \
         /* setup */                                             \
         succ = (int) order;                                     \
         fail = patomic_cmpxchg_fail_order(succ);                \
@@ -409,7 +409,7 @@
         do_assert_aligned(obj, atype);                          \
         do_assert(offset >= 0);                                 \
         do_assert((CHAR_BIT * sizeof(type)) > (size_t) offset); \
-        do_assert(patomic_is_valid_order(order));               \
+        do_assert(patomic_is_valid_order((int) order));         \
         /* setup */                                             \
         succ = (int) order;                                     \
         fail = patomic_cmpxchg_fail_order(succ);                \
@@ -473,7 +473,7 @@
         do_assert_aligned(obj, atype);                          \
         do_assert(offset >= 0);                                 \
         do_assert((CHAR_BIT * sizeof(type)) > (size_t) offset); \
-        do_assert(patomic_is_valid_order(order));               \
+        do_assert(patomic_is_valid_order((int) order));         \
         /* setup */                                             \
         succ = (int) order;                                     \
         fail = patomic_cmpxchg_fail_order(succ);                \
@@ -511,4 +511,212 @@
             type, bit_width, byte_width,                        \
             exp_val                                             \
         ));                                                     \
+    }
+
+
+#define PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIN_FETCH_OR( \
+    bit_width, byte_width,                              \
+    do_atomic_cmpxchg_weak_explicit, do_ip_bit_or,      \
+    do_assert, do_assert_aligned, do_memcpy,            \
+    type, atype, fn_name, order, vis_p                  \
+)                                                       \
+    static PATOMIC_FORCE_INLINE void                    \
+    fn_name(                                            \
+        volatile void *obj                              \
+        ,const void *arg                                \
+ vis_p(_,int order)                                     \
+        ,void *ret                                      \
+    )                                                   \
+    {                                                   \
+        /* declarations */                              \
+        type exp_val = {0};                             \
+        type des_val;                                   \
+        type arg_val;                                   \
+        type scratch;                                   \
+        int succ;                                       \
+        int fail;                                       \
+        int temp;                                       \
+        /* assertions */                                \
+        do_assert(obj != NULL);                         \
+        do_assert(arg != NULL);                         \
+        do_assert(ret != NULL);                         \
+        do_assert_aligned(obj, atype);                  \
+        do_assert(patomic_is_valid_order((int) order)); \
+        /* setup */                                     \
+        succ = (int) order;                             \
+        fail = patomic_cmpxchg_fail_order(succ);        \
+        do_memcpy(&arg_val, arg, sizeof(type));         \
+        /* operation */                                 \
+        do {                                            \
+            des_val = exp_val;                          \
+            do_ip_bit_or(                               \
+                type, bit_width, byte_width,            \
+                des_val, arg_val                        \
+            );                                          \
+        }                                               \
+        while (!((int) do_atomic_cmpxchg_weak_explicit( \
+            type, bit_width, byte_width,                \
+            (volatile atype *) obj,                     \
+            exp_val, des_val,                           \
+            succ, fail                                  \
+        )));                                            \
+        /* cleanup */                                   \
+        PATOMIC_IGNORE_UNUSED(scratch);                 \
+        PATOMIC_IGNORE_UNUSED(temp);                    \
+        do_memcpy(ret, &exp_val, sizeof(type));         \
+    }
+
+
+#define PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIN_FETCH_XOR( \
+    bit_width, byte_width,                               \
+    do_atomic_cmpxchg_weak_explicit, do_ip_bit_xor,      \
+    do_assert, do_assert_aligned, do_memcpy,             \
+    type, atype, fn_name, order, vis_p                   \
+)                                                        \
+    static PATOMIC_FORCE_INLINE void                     \
+    fn_name(                                             \
+        volatile void *obj                               \
+        ,const void *arg                                 \
+ vis_p(_,int order)                                      \
+        ,void *ret                                       \
+    )                                                    \
+    {                                                    \
+        /* declarations */                               \
+        type exp_val = {0};                              \
+        type des_val;                                    \
+        type arg_val;                                    \
+        type scratch;                                    \
+        int succ;                                        \
+        int fail;                                        \
+        int temp;                                        \
+        /* assertions */                                 \
+        do_assert(obj != NULL);                          \
+        do_assert(arg != NULL);                          \
+        do_assert(ret != NULL);                          \
+        do_assert_aligned(obj, atype);                   \
+        do_assert(patomic_is_valid_order((int) order));  \
+        /* setup */                                      \
+        succ = (int) order;                              \
+        fail = patomic_cmpxchg_fail_order(succ);         \
+        do_memcpy(&arg_val, arg, sizeof(type));          \
+        /* operation */                                  \
+        do {                                             \
+            des_val = exp_val;                           \
+            do_ip_bit_xor(                               \
+                type, bit_width, byte_width,             \
+                des_val, arg_val                         \
+            );                                           \
+        }                                                \
+        while (!((int) do_atomic_cmpxchg_weak_explicit(  \
+            type, bit_width, byte_width,                 \
+            (volatile atype *) obj,                      \
+            exp_val, des_val,                            \
+            succ, fail                                   \
+        )));                                             \
+        /* cleanup */                                    \
+        PATOMIC_IGNORE_UNUSED(scratch);                  \
+        PATOMIC_IGNORE_UNUSED(temp);                     \
+        do_memcpy(ret, &exp_val, sizeof(type));          \
+    }
+
+
+#define PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIN_FETCH_AND( \
+    bit_width, byte_width,                               \
+    do_atomic_cmpxchg_weak_explicit, do_ip_bit_and,      \
+    do_assert, do_assert_aligned, do_memcpy,             \
+    type, atype, fn_name, order, vis_p                   \
+)                                                        \
+    static PATOMIC_FORCE_INLINE void                     \
+    fn_name(                                             \
+        volatile void *obj                               \
+        ,const void *arg                                 \
+ vis_p(_,int order)                                      \
+        ,void *ret                                       \
+    )                                                    \
+    {                                                    \
+        /* declarations */                               \
+        type exp_val = {0};                              \
+        type des_val;                                    \
+        type arg_val;                                    \
+        type scratch;                                    \
+        int succ;                                        \
+        int fail;                                        \
+        int temp;                                        \
+        /* assertions */                                 \
+        do_assert(obj != NULL);                          \
+        do_assert(arg != NULL);                          \
+        do_assert(ret != NULL);                          \
+        do_assert_aligned(obj, atype);                   \
+        do_assert(patomic_is_valid_order((int) order));  \
+        /* setup */                                      \
+        succ = (int) order;                              \
+        fail = patomic_cmpxchg_fail_order(succ);         \
+        do_memcpy(&arg_val, arg, sizeof(type));          \
+        /* operation */                                  \
+        do {                                             \
+            des_val = exp_val;                           \
+            do_ip_bit_and(                               \
+                type, bit_width, byte_width,             \
+                des_val, arg_val                         \
+            );                                           \
+        }                                                \
+        while (!((int) do_atomic_cmpxchg_weak_explicit(  \
+            type, bit_width, byte_width,                 \
+            (volatile atype *) obj,                      \
+            exp_val, des_val,                            \
+            succ, fail                                   \
+        )));                                             \
+        /* cleanup */                                    \
+        PATOMIC_IGNORE_UNUSED(scratch);                  \
+        PATOMIC_IGNORE_UNUSED(temp);                     \
+        do_memcpy(ret, &exp_val, sizeof(type));          \
+    }
+
+
+#define PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIN_FETCH_NOT( \
+    bit_width, byte_width,                               \
+    do_atomic_cmpxchg_weak_explicit, do_ip_bit_not,      \
+    do_assert, do_assert_aligned, do_memcpy,             \
+    type, atype, fn_name, order, vis_p                   \
+)                                                        \
+    static PATOMIC_FORCE_INLINE void                     \
+    fn_name(                                             \
+        volatile void *obj                               \
+ vis_p(_,int order)                                      \
+        ,void *ret                                       \
+    )                                                    \
+    {                                                    \
+        /* declarations */                               \
+        type exp_val = {0};                              \
+        type des_val;                                    \
+        type scratch;                                    \
+        int succ;                                        \
+        int fail;                                        \
+        int temp;                                        \
+        /* assertions */                                 \
+        do_assert(obj != NULL);                          \
+        do_assert(ret != NULL);                          \
+        do_assert_aligned(obj, atype);                   \
+        do_assert(patomic_is_valid_order((int) order));  \
+        /* setup */                                      \
+        succ = (int) order;                              \
+        fail = patomic_cmpxchg_fail_order(succ);         \
+        /* operation */                                  \
+        do {                                             \
+            des_val = exp_val;                           \
+            do_ip_bit_not(                               \
+                type, bit_width, byte_width,             \
+                des_val                                  \
+            );                                           \
+        }                                                \
+        while (!((int) do_atomic_cmpxchg_weak_explicit(  \
+            type, bit_width, byte_width,                 \
+            (volatile atype *) obj,                      \
+            exp_val, des_val,                            \
+            succ, fail                                   \
+        )));                                             \
+        /* cleanup */                                    \
+        PATOMIC_IGNORE_UNUSED(scratch);                  \
+        PATOMIC_IGNORE_UNUSED(temp);                     \
+        do_memcpy(ret, &exp_val, sizeof(type));          \
     }
