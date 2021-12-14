@@ -10,6 +10,12 @@
 #define HIDE_P(x, y)
 #define SHOW_P(x, y) ,y
 
+#undef HIDE
+#undef SHOW
+
+#define HIDE(x)
+#define SHOW(x) x
+
 
 /*
  * MACRO PARAMETERS
