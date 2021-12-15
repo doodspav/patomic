@@ -160,10 +160,10 @@
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(const volatile atype *) ptr`
- *   - `order` will be an expression of type (int) whose value is a valid load
- *     memory order
  *   - `res` will be the name of a local identifier
  *   - `res` will have type (type)
+ *   - `order` will be an expression of type (int) whose value is a valid load
+ *     memory order
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                \
     bit_width, byte_width,                                    \
@@ -186,7 +186,7 @@
         do_assert(obj != NULL);                               \
         do_assert(ret != NULL);                               \
         do_assert_aligned(obj, atype);                        \
-        do_assert(patomic_is_valid_store_order((int) order)); \
+        do_assert(patomic_is_valid_load_order((int) order));  \
         /* operation */                                       \
         do_atomic_load_explicit(                              \
             type, bit_width, byte_width,                      \
@@ -199,5 +199,182 @@
         PATOMIC_IGNORE_UNUSED(scratch);                       \
         PATOMIC_IGNORE_UNUSED(temp);                          \
     }
+
+
+/*
+ * - do_atomic_exchange_explicit:
+ *   - must be callable as `fn(t, bi, by, obj_p, des, order, res);`
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `des` and `res` will be the names of local identifiers
+ *   - `des` will have the type (type), possibly const-qualified
+ *   - `res` will have the type (type)
+ *   - `order` will be an expression of type (int) whose value is a valid
+ *     memory order
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(      \
+    bit_width, byte_width,                              \
+    do_atomic_exchange_explicit,                        \
+    do_assert, do_assert_aligned, do_memcpy,            \
+    type, atype, fn_name, order, vis_p                  \
+)                                                       \
+    static PATOMIC_FORCE_INLINE void                    \
+    fn_name(                                            \
+        volatile void *obj                              \
+        ,const void *desired                            \
+ vis_p(_,int order)                                     \
+        ,void *ret                                      \
+    )                                                   \
+    {                                                   \
+        /* declarations */                              \
+        type des_val;                                   \
+        type ret_val;                                   \
+        type scratch;                                   \
+        int temp;                                       \
+        /* assertions */                                \
+        do_assert(obj != NULL);                         \
+        do_assert(desired != NULL);                     \
+        do_assert(ret != NULL);                         \
+        do_assert_aligned(obj, atype);                  \
+        do_assert(patomic_is_valid_order((int) order)); \
+        /* setup */                                     \
+        do_memcpy(&des_val, desired, sizeof(type));     \
+        /* operation */                                 \
+        do_atomic_exchange_explicit(                    \
+            type, bit_width, byte_width,                \
+            (volatile atype *) obj,                     \
+            des_val,                                    \
+            (int) order,                                \
+            ret_val                                     \
+        );                                              \
+        /* cleanup */                                   \
+        do_memcpy(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                 \
+        PATOMIC_IGNORE_UNUSED(temp);                    \
+    }
+
+
+/*
+ * - do_atomic_cmpxchg_weak_explicit:
+ *   - must be callable as `x = (int) fn(t, bi, by, obj_p, exp, des, succ, fail);`
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `exp` and `des` will be the names of local identifiers
+ *   - `exp` will have the type (type)
+ *   - `des` will have the type (type), possibly const-qualified
+ *   - `succ` will be an expression of type (int) whose value is a valid
+ *     memory order
+ *   - `fail` will be an expression of type (int) whose value is a valid load
+ *     memory order which  is `<= succ`
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK(      \
+    bit_width, byte_width,                                  \
+    do_atomic_cmpxchg_weak_explicit,                        \
+    do_assert, do_assert_aligned, do_memcpy,                \
+    type, atype, fn_name, order, vis_p, inv                 \
+)                                                           \
+    static PATOMIC_FORCE_INLINE int                         \
+    fn_name(                                                \
+        volatile void *obj                                  \
+        ,void *expected                                     \
+        ,const void *desired                                \
+ vis_p(_,int succ)                                          \
+ vis_p(_,int fail)                                          \
+    )                                                       \
+    {                                                       \
+        /* declarations */                                  \
+        type exp_val;                                       \
+        type des_val;                                       \
+        type scratch;                                       \
+        int ret;                                            \
+        int temp;                                           \
+    inv(int succ = (int) order;)                            \
+    inv(int fail = patomic_cmpxchg_fail_order(succ);)       \
+        /* assertions */                                    \
+        do_assert(obj != NULL);                             \
+        do_assert(expected != NULL);                        \
+        do_assert(desired != NULL);                         \
+        do_assert_aligned(obj, atype);                      \
+        do_assert(patomic_is_valid_order(succ));            \
+        do_assert(patomic_is_valid_fail_order(succ, fail)); \
+        /* setup */                                         \
+        do_memcpy(&des_val, desired, sizeof(type));         \
+        do_memcpy(&exp_val, expected, sizeof(type));        \
+        /* operation */                                     \
+        ret = (int) do_atomic_cmpxchg_weak_explicit(        \
+            type, bit_width, byte_width,                    \
+            (volatile atype *) obj,                         \
+            exp_val, des_val,                               \
+            succ, fail                                      \
+        );                                                  \
+        /* cleanup */                                       \
+        PATOMIC_IGNORE_UNUSED(scratch);                     \
+        PATOMIC_IGNORE_UNUSED(temp);                        \
+        return ret != 0;                                    \
+    }
+
+
+/*
+ * - do_atomic_cmpxchg_strong_explicit:
+ *   - must be callable as `x = (int) fn(t, bi, by, obj_p, exp, des, succ, fail);`
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `exp` and `des` will be the names of local identifiers
+ *   - `exp` will have the type (type)
+ *   - `des` will have the type (type), possibly const-qualified
+ *   - `succ` will be an expression of type (int) whose value is a valid
+ *     memory order
+ *   - `fail` will be an expression of type (int) whose value is a valid load
+ *     memory order which  is `<= succ`
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_STRONG(    \
+    bit_width, byte_width,                                  \
+    do_atomic_cmpxchg_strong_explicit,                      \
+    do_assert, do_assert_aligned, do_memcpy,                \
+    type, atype, fn_name, order, vis_p, inv                 \
+)                                                           \
+    static PATOMIC_FORCE_INLINE int                         \
+    fn_name(                                                \
+        volatile void *obj                                  \
+        ,void *expected                                     \
+        ,const void *desired                                \
+ vis_p(_,int succ)                                          \
+ vis_p(_,int fail)                                          \
+    )                                                       \
+    {                                                       \
+        /* declarations */                                  \
+        type exp_val;                                       \
+        type des_val;                                       \
+        type scratch;                                       \
+        int ret;                                            \
+        int temp;                                           \
+    inv(int succ = (int) order;)                            \
+    inv(int fail = patomic_cmpxchg_fail_order(succ);)       \
+        /* assertions */                                    \
+        do_assert(obj != NULL);                             \
+        do_assert(expected != NULL);                        \
+        do_assert(desired != NULL);                         \
+        do_assert_aligned(obj, atype);                      \
+        do_assert(patomic_is_valid_order(succ));            \
+        do_assert(patomic_is_valid_fail_order(succ, fail)); \
+        /* setup */                                         \
+        do_memcpy(&des_val, desired, sizeof(type));         \
+        do_memcpy(&exp_val, expected, sizeof(type));        \
+        /* operation */                                     \
+        ret = (int) do_atomic_cmpxchg_strong_explicit(      \
+            type, bit_width, byte_width,                    \
+            (volatile atype *) obj,                         \
+            exp_val, des_val,                               \
+            succ, fail                                      \
+        );                                                  \
+        /* cleanup */                                       \
+        PATOMIC_IGNORE_UNUSED(scratch);                     \
+        PATOMIC_IGNORE_UNUSED(temp);                        \
+        return ret != 0;                                    \
+    }
+
 
 #endif  /* !PATOMIC_PATOMIC_WRAPPED_DIRECT_H */

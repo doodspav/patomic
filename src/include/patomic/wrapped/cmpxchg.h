@@ -369,6 +369,8 @@
             ))                                                     \
             { break; }                                             \
             /* spurious fail */                                    \
+            /* use memcpy instead of assignment operation */       \
+            /* in case op compares bitwise instead of by value */  \
             else { do_memcpy(&old_val, &exp_val, sizeof(type)); }  \
         }                                                          \
         /* cleanup */                                              \
