@@ -109,6 +109,7 @@
 /*
  * - do_atomic_store_explicit:
  *   - must be callable as `fn(t, bi, by, obj_p, des, order);`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
@@ -157,6 +158,7 @@
 /*
  * - do_atomic_load_explicit:
  *   - must be callable as `fn(t, bi, by, obj_p, order, res);`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(const volatile atype *) ptr`
@@ -204,6 +206,7 @@
 /*
  * - do_atomic_exchange_explicit:
  *   - must be callable as `fn(t, bi, by, obj_p, des, order, res);`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
@@ -257,17 +260,21 @@
 
 /*
  * - do_atomic_cmpxchg_weak_explicit:
- *   - must be callable as `x = (int) fn(t, bi, by, obj_p, exp, des, succ, fail);`
+ *   - must be callable as `fn(t, bi, by, obj_p, exp, des, succ, fail, ok);`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
- *   - `exp` and `des` will be the names of local identifiers
+ *   - `exp`, `des`, and `ok` will be the names of local identifiers
  *   - `exp` will have the type (type)
  *   - `des` will have the type (type), possibly const-qualified
  *   - `succ` will be an expression of type (int) whose value is a valid
  *     memory order
  *   - `fail` will be an expression of type (int) whose value is a valid load
  *     memory order which  is `<= succ`
+ *   - `ok` will have type (int)
+ *   - `ok` may be uninitialised and should be set to `0` if the operation
+ *     failed or non-zero if it succeeded
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK(      \
     bit_width, byte_width,                                  \
@@ -288,7 +295,7 @@
         type exp_val;                                       \
         type des_val;                                       \
         type scratch;                                       \
-        int ret;                                            \
+        int ret = 0;                                        \
         int temp;                                           \
     inv(int succ = (int) order;)                            \
     inv(int fail = patomic_cmpxchg_fail_order(succ);)       \
@@ -303,11 +310,11 @@
         do_memcpy(&des_val, desired, sizeof(type));         \
         do_memcpy(&exp_val, expected, sizeof(type));        \
         /* operation */                                     \
-        ret = (int) do_atomic_cmpxchg_weak_explicit(        \
+        do_atomic_cmpxchg_weak_explicit(                    \
             type, bit_width, byte_width,                    \
             (volatile atype *) obj,                         \
             exp_val, des_val,                               \
-            succ, fail                                      \
+            succ, fail, ret                                 \
         );                                                  \
         /* cleanup */                                       \
         PATOMIC_IGNORE_UNUSED(scratch);                     \
@@ -318,17 +325,21 @@
 
 /*
  * - do_atomic_cmpxchg_strong_explicit:
- *   - must be callable as `x = (int) fn(t, bi, by, obj_p, exp, des, succ, fail);`
+ *   - must be callable as `fn(t, bi, by, obj_p, exp, des, succ, fail, ok);`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
- *   - `exp` and `des` will be the names of local identifiers
+ *   - `exp`, `des`, and `ok` will be the names of local identifiers
  *   - `exp` will have the type (type)
  *   - `des` will have the type (type), possibly const-qualified
  *   - `succ` will be an expression of type (int) whose value is a valid
  *     memory order
  *   - `fail` will be an expression of type (int) whose value is a valid load
  *     memory order which  is `<= succ`
+ *   - `ok` will have type (int)
+ *   - `ok` may be uninitialised and should be set to `0` if the operation
+ *     failed or non-zero if it succeeded
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_STRONG(    \
     bit_width, byte_width,                                  \
@@ -349,7 +360,7 @@
         type exp_val;                                       \
         type des_val;                                       \
         type scratch;                                       \
-        int ret;                                            \
+        int ret = 0;                                        \
         int temp;                                           \
     inv(int succ = (int) order;)                            \
     inv(int fail = patomic_cmpxchg_fail_order(succ);)       \
@@ -364,16 +375,231 @@
         do_memcpy(&des_val, desired, sizeof(type));         \
         do_memcpy(&exp_val, expected, sizeof(type));        \
         /* operation */                                     \
-        ret = (int) do_atomic_cmpxchg_strong_explicit(      \
+        do_atomic_cmpxchg_strong_explicit(                  \
             type, bit_width, byte_width,                    \
             (volatile atype *) obj,                         \
             exp_val, des_val,                               \
-            succ, fail                                      \
+            succ, fail, ret                                 \
         );                                                  \
         /* cleanup */                                       \
         PATOMIC_IGNORE_UNUSED(scratch);                     \
         PATOMIC_IGNORE_UNUSED(temp);                        \
         return ret != 0;                                    \
+    }
+
+
+/*
+ * - do_atomic_bit_test_explicit:
+ *   - must be callable as `fn(t, bi, by, obj_p, offset, order, res);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(const volatile atype *) ptr`
+ *   - `offset` and `res` will be the names of local identifiers
+ *   - `offset` will have the type (int), possibly const-qualified, and will
+ *     have a value `>= 0` and `< (sizeof(type) * CHAR_BIT)`
+ *   - `order` will be an expression of type (int) whose value is a valid load
+ *     memory order
+ *   - `res` will have type (int)
+ *   - `res` may be uninitialised and should be set to the old value of the bit
+ *     being tested (zero or non-zero)
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(              \
+    bit_width, byte_width,                                      \
+    do_atomic_bit_test_explicit,                                \
+    do_assert, do_assert_aligned, do_memcpy,                    \
+    type, atype, fn_name, order, vis_p                          \
+)                                                               \
+    static PATOMIC_FORCE_INLINE int                             \
+    fn_name(                                                    \
+        const volatile void *obj                                \
+        ,int offset                                             \
+ vis_p(_,int order)                                             \
+    )                                                           \
+    {                                                           \
+        /* declarations */                                      \
+        type scratch;                                           \
+        int temp;                                               \
+        int ret;                                                \
+        /* assertions */                                        \
+        do_assert(obj != NULL);                                 \
+        do_assert_aligned(obj, atype);                          \
+        do_assert(offset >= 0);                                 \
+        do_assert((size_t) offset < (sizeof(type) * CHAR_BIT)); \
+        do_assert(patomic_is_valid_load_order((int) order));    \
+        /* operation */                                         \
+        do_atomic_bit_test_explicit(                            \
+            type, bit_width, byte_width,                        \
+            (const volatile atype *) obj,                       \
+            offset,                                             \
+            (int) order,                                        \
+            ret                                                 \
+        );                                                      \
+        /* cleanup */                                           \
+        PATOMIC_IGNORE_UNUSED(scratch);                         \
+        PATOMIC_IGNORE_UNUSED(temp);                            \
+        return ret != 0;                                        \
+    }
+
+
+/*
+ * - do_atomic_bit_test_compl:
+ *   - must be callable as `fn(t, bi, by, obj_p, offset, order, res);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `offset` and `res` will be the names of local identifiers
+ *   - `offset` will have the type (int), possibly const-qualified, and will
+ *     have a value `>= 0` and `< (sizeof(type) * CHAR_BIT)`
+ *   - `order` will be an expression of type (int) whose value is valid
+ *     memory order
+ *   - `res` will have type (int)
+ *   - `res` may be uninitialised and should be set to the old value of the bit
+ *     being tested (zero or non-zero)
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_COMPL(        \
+    bit_width, byte_width,                                      \
+    do_atomic_bit_test_compl_explicit,                          \
+    do_assert, do_assert_aligned, do_memcpy,                    \
+    type, atype, fn_name, order, vis_p                          \
+)                                                               \
+    static PATOMIC_FORCE_INLINE int                             \
+    fn_name(                                                    \
+        volatile void *obj                                      \
+        ,int offset                                             \
+ vis_p(_,int order)                                             \
+    )                                                           \
+    {                                                           \
+        /* declarations */                                      \
+        type scratch;                                           \
+        int temp;                                               \
+        int ret;                                                \
+        /* assertions */                                        \
+        do_assert(obj != NULL);                                 \
+        do_assert_aligned(obj, atype);                          \
+        do_assert(offset >= 0);                                 \
+        do_assert((size_t) offset < (sizeof(type) * CHAR_BIT)); \
+        do_assert(patomic_is_valid_order((int) order));         \
+        /* operation */                                         \
+        do_atomic_bit_test_compl_explicit(                      \
+            type, bit_width, byte_width,                        \
+            (volatile atype *) obj,                             \
+            offset,                                             \
+            (int) order,                                        \
+            ret                                                 \
+        );                                                      \
+        /* cleanup */                                           \
+        PATOMIC_IGNORE_UNUSED(scratch);                         \
+        PATOMIC_IGNORE_UNUSED(temp);                            \
+        return ret != 0;                                        \
+    }
+
+
+/*
+ * - do_atomic_bit_test_set:
+ *   - must be callable as `fn(t, bi, by, obj_p, offset, order, res);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `offset` and `res` will be the names of local identifiers
+ *   - `offset` will have the type (int), possibly const-qualified, and will
+ *     have a value `>= 0` and `< (sizeof(type) * CHAR_BIT)`
+ *   - `order` will be an expression of type (int) whose value is valid
+ *     memory order
+ *   - `res` will have type (int)
+ *   - `res` may be uninitialised and should be set to the old value of the bit
+ *     being tested (zero or non-zero)
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_SET(          \
+    bit_width, byte_width,                                      \
+    do_atomic_bit_test_set_explicit,                            \
+    do_assert, do_assert_aligned, do_memcpy,                    \
+    type, atype, fn_name, order, vis_p                          \
+)                                                               \
+    static PATOMIC_FORCE_INLINE int                             \
+    fn_name(                                                    \
+        volatile void *obj                                      \
+        ,int offset                                             \
+ vis_p(_,int order)                                             \
+    )                                                           \
+    {                                                           \
+        /* declarations */                                      \
+        type scratch;                                           \
+        int temp;                                               \
+        int ret;                                                \
+        /* assertions */                                        \
+        do_assert(obj != NULL);                                 \
+        do_assert_aligned(obj, atype);                          \
+        do_assert(offset >= 0);                                 \
+        do_assert((size_t) offset < (sizeof(type) * CHAR_BIT)); \
+        do_assert(patomic_is_valid_order((int) order));         \
+        /* operation */                                         \
+        do_atomic_bit_test_set_explicit(                        \
+            type, bit_width, byte_width,                        \
+            (volatile atype *) obj,                             \
+            offset,                                             \
+            (int) order,                                        \
+            ret                                                 \
+        );                                                      \
+        /* cleanup */                                           \
+        PATOMIC_IGNORE_UNUSED(scratch);                         \
+        PATOMIC_IGNORE_UNUSED(temp);                            \
+        return ret != 0;                                        \
+    }
+
+/*
+ * - do_atomic_bit_test_reset:
+ *   - must be callable as `fn(t, bi, by, obj_p, offset, order, res);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `offset` and `res` will be the names of local identifiers
+ *   - `offset` will have the type (int), possibly const-qualified, and will
+ *     have a value `>= 0` and `< (sizeof(type) * CHAR_BIT)`
+ *   - `order` will be an expression of type (int) whose value is valid
+ *     memory order
+ *   - `res` will have type (int)
+ *   - `res` may be uninitialised and should be set to the old value of the bit
+ *     being tested (zero or non-zero)
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_RESET(        \
+    bit_width, byte_width,                                      \
+    do_atomic_bit_test_reset_explicit,                          \
+    do_assert, do_assert_aligned, do_memcpy,                    \
+    type, atype, fn_name, order, vis_p                          \
+)                                                               \
+    static PATOMIC_FORCE_INLINE int                             \
+    fn_name(                                                    \
+        volatile void *obj                                      \
+        ,int offset                                             \
+ vis_p(_,int order)                                             \
+    )                                                           \
+    {                                                           \
+        /* declarations */                                      \
+        type scratch;                                           \
+        int temp;                                               \
+        int ret;                                                \
+        /* assertions */                                        \
+        do_assert(obj != NULL);                                 \
+        do_assert_aligned(obj, atype);                          \
+        do_assert(offset >= 0);                                 \
+        do_assert((size_t) offset < (sizeof(type) * CHAR_BIT)); \
+        do_assert(patomic_is_valid_order((int) order));         \
+        /* operation */                                         \
+        do_atomic_bit_test_reset_explicit(                      \
+            type, bit_width, byte_width,                        \
+            (volatile atype *) obj,                             \
+            offset,                                             \
+            (int) order,                                        \
+            ret                                                 \
+        );                                                      \
+        /* cleanup */                                           \
+        PATOMIC_IGNORE_UNUSED(scratch);                         \
+        PATOMIC_IGNORE_UNUSED(temp);                            \
+        return ret != 0;                                        \
     }
 
 
