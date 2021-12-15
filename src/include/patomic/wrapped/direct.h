@@ -322,6 +322,12 @@
         return ret != 0;                                    \
     }
 
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_STRONG \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG
+
 
 /*
  * - do_atomic_bit_test_explicit:
@@ -393,7 +399,7 @@
  *   - `res` may be uninitialised and should be set to the old value of the bit
  *     being tested (zero or non-zero)
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_COMPL(        \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(       \
     bit_width, byte_width,                                      \
     do_atomic_bit_test_modify_explicit,                         \
     do_assert, do_assert_aligned, do_memcpy,                    \
@@ -429,6 +435,15 @@
         PATOMIC_IGNORE_UNUSED(temp);                            \
         return ret != 0;                                        \
     }
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_COMPL \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_SET \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_RESET \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY
 
 
 #endif  /* !PATOMIC_PATOMIC_WRAPPED_DIRECT_H */
