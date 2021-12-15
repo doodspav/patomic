@@ -1,3 +1,6 @@
+#ifndef PATOMIC_PATOMIC_WRAPPED_FETCH_H
+#define PATOMIC_PATOMIC_WRAPPED_FETCH_H
+
 #include <patomic/types/memory_order.h>
 
 #include <patomic/macros/force_inline.h>
@@ -131,3 +134,5 @@
         );                                               \
         PATOMIC_IGNORE_UNUSED(val);                      \
     }
+
+#endif  /* !PATOMIC_PATOMIC_WRAPPED_FETCH_H */

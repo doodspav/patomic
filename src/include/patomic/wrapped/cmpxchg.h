@@ -1,3 +1,6 @@
+#ifndef PATOMIC_PATOMIC_WRAPPED_CMPXCHG_H
+#define PATOMIC_PATOMIC_WRAPPED_CMPXCHG_H
+
 #include <limits.h>
 #include <stddef.h>
 
@@ -1030,3 +1033,5 @@
         PATOMIC_IGNORE_UNUSED(temp);                    \
         do_memcpy(ret, &exp_val, sizeof(type));         \
     }
+
+#endif  /* !PATOMIC_PATOMIC_WRAPPED_CMPXCHG_H */
