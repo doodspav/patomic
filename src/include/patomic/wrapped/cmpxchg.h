@@ -35,32 +35,40 @@
  *   - must either have the value of `sizeof(type)` or be `0`
  *
  * - do_atomic_cmpxchg_weak_explicit:
- *   - must be callable as `x = (int) fn(t, bi, by, obj_p, exp, des, succ, fail);`
+ *   - must be callable as `fn(t, bi, by, obj_p, exp, des, succ, fail, ok);`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
- *   - `exp`, `des`, `succ`, and `fail` will be the names of local identifiers
+ *   - `exp`, `des`, `succ`, `fail`, and `ok` will be the names of local identifiers
  *   - `exp` and `des` will both have type (type)
  *   - `des` may be const-qualified
  *   - `succ` and `fail` will both have type (int), possibly const-qualified
  *   - `succ` will be a valid memory order, and `fail` will be a valid load
  *      memory order which will compare `<= succ`
+ *   - `ok` will have type (int)
+ *   - `ok` may be uninitialised and should be set to `0` if the operation
+ *     failed or non-zero if it succeeded
  *
  * - do_cmp_neq:
- *   - must be callable as `do_cmp_neq(t, bi, by, a, b)`
- *   - the resulting expression must be of type (int)
+ *   - must be callable as `do_cmp_neq(t, bi, by, a, b, r)`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
- *   - `a` and `b` will be the names of local identifiers
+ *   - `a`, `b`, and `r` will be the names of local identifiers
  *   - `a` and `b` will both have type (type), possibly const-qualified
+ *   - `r` will have type (int)
+ *   - `r` may be uninitialised and should be set to the result of the comparison
  *
  * - do_cmp_eqz:
- *   - must be callable as `do_cmp_eqz(t, bi, by, a)`
- *   - the resulting expression must be of type (int)
+ *   - must be callable as `do_cmp_eqz(t, bi, by, a, r)`
+ *   - the result of the expression will not be assigned to anything
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
- *   - `a` will be the name of a local identifier
+ *   - `a` and `r` will be the names of local identifiers
  *   - `a` will have the type (type), possibly const-qualified
+ *   - `r` will have type (int)
+ *   - `r` may be uninitialised and should be set to the result of the comparison
  *
  * - do_ip_nth_bit_mask:
  *   - must be callable as `do_ip_nth_bit_mask(t, bi, by, mask, n);`
@@ -251,6 +259,7 @@
         type scratch;                                         \
         int succ;                                             \
         int fail;                                             \
+        int ok = 0;                                           \
         int temp;                                             \
         /* assertions */                                      \
         do_assert(obj != NULL);                               \
@@ -262,12 +271,15 @@
         fail = patomic_cmpxchg_fail_order(succ);              \
         do_memcpy(&des_val, desired, sizeof(type));           \
         /* operation */                                       \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(       \
-            type, bit_width, byte_width,                      \
-            (volatile atype *) obj,                           \
-            exp_val, des_val,                                 \
-            succ, fail                                        \
-        )));                                                  \
+        do {                                                  \
+            do_atomic_cmpxchg_weak_explicit(                  \
+                type, bit_width, byte_width,                  \
+                (volatile atype *) obj,                       \
+                exp_val, des_val,                             \
+                succ, fail, ok                                \
+            );                                                \
+        }                                                     \
+        while (!ok);                                          \
         /* cleanup */                                         \
         PATOMIC_IGNORE_UNUSED(scratch);                       \
         PATOMIC_IGNORE_UNUSED(temp);                          \
@@ -294,6 +306,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -306,12 +319,15 @@
         fail = patomic_cmpxchg_fail_order(succ);        \
         do_memcpy(&des_val, desired, sizeof(type));     \
         /* operation */                                 \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        do {                                            \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
+        }                                               \
+        while (!ok);                                    \
         /* cleanup */                                   \
         do_memcpy(ret, &exp_val, sizeof(type));         \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
@@ -340,7 +356,8 @@
         type des_val;                                              \
         type scratch;                                              \
         int temp;                                                  \
-        int ret;                                                   \
+        int ret = 0;                                               \
+        int cmp = 0;                                               \
     inv(int succ = (int) order;)                                   \
     inv(int fail = patomic_cmpxchg_fail_order((int) order);)       \
         /* assertions */                                           \
@@ -355,24 +372,25 @@
         do_memcpy(&old_val, &exp_val, sizeof(type));               \
         do_memcpy(&des_val, desired, sizeof(type));                \
         /* operation */                                            \
-        while (!(ret = (int) do_atomic_cmpxchg_weak_explicit(      \
-            type, bit_width, byte_width,                           \
-            (volatile atype *) obj,                                \
-            exp_val, des_val,                                      \
-            succ, fail                                             \
-        )))                                                        \
-        {                                                          \
-            /* expected was modified */                            \
-            if (do_cmp_neq(                                        \
+        do {                                                       \
+            do_atomic_cmpxchg_weak_explicit(                       \
                 type, bit_width, byte_width,                       \
-                exp_val, old_val                                   \
-            ))                                                     \
-            { break; }                                             \
+                (volatile atype *) obj,                            \
+                exp_val, des_val,                                  \
+                succ, fail, ret                                    \
+            );                                                     \
+            do_cmp_neq(                                            \
+                type, bit_width, byte_width,                       \
+                exp_val, old_val, cmp                              \
+            );                                                     \
+            /* expected was modified */                            \
+            if (cmp) { break; }                                    \
             /* spurious fail */                                    \
             /* use memcpy instead of assignment operation */       \
             /* in case op compares bitwise instead of by value */  \
             else { do_memcpy(&old_val, &exp_val, sizeof(type)); }  \
         }                                                          \
+        while (!ret);                                              \
         /* cleanup */                                              \
         do_memcpy(expected, &exp_val, sizeof(type));               \
         PATOMIC_IGNORE_UNUSED(scratch);                            \
@@ -402,6 +420,7 @@
         type scratch;                                           \
         int succ;                                               \
         int fail;                                               \
+        int ok = 0;                                             \
         int temp;                                               \
         /* assertions */                                        \
         do_assert(obj != NULL);                                 \
@@ -423,13 +442,14 @@
                 type, bit_width, byte_width,                    \
                 des_val, mask                                   \
             );                                                  \
+            do_atomic_cmpxchg_weak_explicit(                    \
+                type, bit_width, byte_width,                    \
+                (volatile atype *) obj,                         \
+                exp_val, des_val,                               \
+                succ, fail, ok                                  \
+            );                                                  \
         }                                                       \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(         \
-            type, bit_width, byte_width,                        \
-            (volatile atype *) obj,                             \
-            exp_val, des_val,                                   \
-            succ, fail                                          \
-        )));                                                    \
+        while (!ok);                                            \
         /* cleanup */                                           \
         PATOMIC_IGNORE_UNUSED(scratch);                         \
         PATOMIC_IGNORE_UNUSED(temp);                            \
@@ -437,10 +457,11 @@
             type, bit_width, byte_width,                        \
             exp_val, mask                                       \
         );                                                      \
-        return !(do_cmp_eqz(                                    \
+        do_cmp_eqz(                                             \
             type, bit_width, byte_width,                        \
-            exp_val                                             \
-        ));                                                     \
+            exp_val, ok                                         \
+        );                                                      \
+        return !ok;                                             \
     }
 
 
@@ -465,6 +486,7 @@
         type scratch;                                           \
         int succ;                                               \
         int fail;                                               \
+        int ok = 0;                                             \
         int temp;                                               \
         /* assertions */                                        \
         do_assert(obj != NULL);                                 \
@@ -486,13 +508,14 @@
                 type, bit_width, byte_width,                    \
                 des_val, mask                                   \
             );                                                  \
+            do_atomic_cmpxchg_weak_explicit(                    \
+                type, bit_width, byte_width,                    \
+                (volatile atype *) obj,                         \
+                exp_val, des_val,                               \
+                succ, fail, ok                                  \
+            );                                                  \
         }                                                       \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(         \
-            type, bit_width, byte_width,                        \
-            (volatile atype *) obj,                             \
-            exp_val, des_val,                                   \
-            succ, fail                                          \
-        )));                                                    \
+        while (!ok);                                            \
         /* cleanup */                                           \
         PATOMIC_IGNORE_UNUSED(scratch);                         \
         PATOMIC_IGNORE_UNUSED(temp);                            \
@@ -500,10 +523,11 @@
             type, bit_width, byte_width,                        \
             exp_val, mask                                       \
         );                                                      \
-        return !(do_cmp_eqz(                                    \
+        do_cmp_eqz(                                             \
             type, bit_width, byte_width,                        \
-            exp_val                                             \
-        ));                                                     \
+            exp_val, ok                                         \
+        );                                                      \
+        return !ok;                                             \
     }
 
 
@@ -529,6 +553,7 @@
         type scratch;                                           \
         int succ;                                               \
         int fail;                                               \
+        int ok = 0;                                             \
         int temp;                                               \
         /* assertions */                                        \
         do_assert(obj != NULL);                                 \
@@ -555,13 +580,14 @@
                 type, bit_width, byte_width,                    \
                 des_val, mask_inv                               \
             );                                                  \
+            do_atomic_cmpxchg_weak_explicit(                    \
+                type, bit_width, byte_width,                    \
+                (volatile atype *) obj,                         \
+                exp_val, des_val,                               \
+                succ, fail, ok                                  \
+            );                                                  \
         }                                                       \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(         \
-            type, bit_width, byte_width,                        \
-            (volatile atype *) obj,                             \
-            exp_val, des_val,                                   \
-            succ, fail                                          \
-        )));                                                    \
+        while (!ok);                                            \
         /* cleanup */                                           \
         PATOMIC_IGNORE_UNUSED(scratch);                         \
         PATOMIC_IGNORE_UNUSED(temp);                            \
@@ -569,10 +595,11 @@
             type, bit_width, byte_width,                        \
             exp_val, mask                                       \
         );                                                      \
-        return !(do_cmp_eqz(                                    \
+        do_cmp_eqz(                                             \
             type, bit_width, byte_width,                        \
-            exp_val                                             \
-        ));                                                     \
+            exp_val, ok                                         \
+        );                                                      \
+        return !ok;                                             \
     }
 
 
@@ -597,6 +624,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -615,13 +643,14 @@
                 type, bit_width, byte_width,            \
                 des_val, arg_val                        \
             );                                          \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
         }                                               \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        while (!ok);                                    \
         /* cleanup */                                   \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
         PATOMIC_IGNORE_UNUSED(temp);                    \
@@ -650,6 +679,7 @@
         type scratch;                                    \
         int succ;                                        \
         int fail;                                        \
+        int ok = 0;                                      \
         int temp;                                        \
         /* assertions */                                 \
         do_assert(obj != NULL);                          \
@@ -668,13 +698,14 @@
                 type, bit_width, byte_width,             \
                 des_val, arg_val                         \
             );                                           \
+            do_atomic_cmpxchg_weak_explicit(             \
+                type, bit_width, byte_width,             \
+                (volatile atype *) obj,                  \
+                exp_val, des_val,                        \
+                succ, fail, ok                           \
+            );                                           \
         }                                                \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(  \
-            type, bit_width, byte_width,                 \
-            (volatile atype *) obj,                      \
-            exp_val, des_val,                            \
-            succ, fail                                   \
-        )));                                             \
+        while (!ok);                                     \
         /* cleanup */                                    \
         PATOMIC_IGNORE_UNUSED(scratch);                  \
         PATOMIC_IGNORE_UNUSED(temp);                     \
@@ -703,6 +734,7 @@
         type scratch;                                    \
         int succ;                                        \
         int fail;                                        \
+        int ok = 0;                                      \
         int temp;                                        \
         /* assertions */                                 \
         do_assert(obj != NULL);                          \
@@ -721,13 +753,14 @@
                 type, bit_width, byte_width,             \
                 des_val, arg_val                         \
             );                                           \
+            do_atomic_cmpxchg_weak_explicit(             \
+                type, bit_width, byte_width,             \
+                (volatile atype *) obj,                  \
+                exp_val, des_val,                        \
+                succ, fail, ok                           \
+            );                                           \
         }                                                \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(  \
-            type, bit_width, byte_width,                 \
-            (volatile atype *) obj,                      \
-            exp_val, des_val,                            \
-            succ, fail                                   \
-        )));                                             \
+        while (!ok);                                     \
         /* cleanup */                                    \
         PATOMIC_IGNORE_UNUSED(scratch);                  \
         PATOMIC_IGNORE_UNUSED(temp);                     \
@@ -754,6 +787,7 @@
         type scratch;                                    \
         int succ;                                        \
         int fail;                                        \
+        int ok = 0;                                      \
         int temp;                                        \
         /* assertions */                                 \
         do_assert(obj != NULL);                          \
@@ -770,13 +804,14 @@
                 type, bit_width, byte_width,             \
                 des_val                                  \
             );                                           \
+            do_atomic_cmpxchg_weak_explicit(             \
+                type, bit_width, byte_width,             \
+                (volatile atype *) obj,                  \
+                exp_val, des_val,                        \
+                succ, fail, ok                           \
+            );                                           \
         }                                                \
-        while (!((int) do_atomic_cmpxchg_weak_explicit(  \
-            type, bit_width, byte_width,                 \
-            (volatile atype *) obj,                      \
-            exp_val, des_val,                            \
-            succ, fail                                   \
-        )));                                             \
+        while (!ok);                                     \
         /* cleanup */                                    \
         PATOMIC_IGNORE_UNUSED(scratch);                  \
         PATOMIC_IGNORE_UNUSED(temp);                     \
@@ -805,6 +840,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -823,13 +859,14 @@
                 type, bit_width, byte_width, min_val,   \
                 des_val, arg_val                        \
             );                                          \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
         }                                               \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        while (!ok);                                    \
         /* cleanup */                                   \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
         PATOMIC_IGNORE_UNUSED(temp);                    \
@@ -858,6 +895,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -876,13 +914,14 @@
                 type, bit_width, byte_width, min_val,   \
                 des_val, arg_val                        \
             );                                          \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
         }                                               \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        while (!ok);                                    \
         /* cleanup */                                   \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
         PATOMIC_IGNORE_UNUSED(temp);                    \
@@ -909,6 +948,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -925,13 +965,14 @@
                 type, bit_width, byte_width, min_val,   \
                 des_val                                 \
             );                                          \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
         }                                               \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        while (!ok);                                    \
         /* cleanup */                                   \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
         PATOMIC_IGNORE_UNUSED(temp);                    \
@@ -958,6 +999,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -974,13 +1016,14 @@
                 type, bit_width, byte_width, min_val,   \
                 des_val                                 \
             );                                          \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
         }                                               \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        while (!ok);                                    \
         /* cleanup */                                   \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
         PATOMIC_IGNORE_UNUSED(temp);                    \
@@ -1007,6 +1050,7 @@
         type scratch;                                   \
         int succ;                                       \
         int fail;                                       \
+        int ok = 0;                                     \
         int temp;                                       \
         /* assertions */                                \
         do_assert(obj != NULL);                         \
@@ -1023,13 +1067,14 @@
                 type, bit_width, byte_width, min_val,   \
                 des_val                                 \
             );                                          \
+            do_atomic_cmpxchg_weak_explicit(            \
+                type, bit_width, byte_width,            \
+                (volatile atype *) obj,                 \
+                exp_val, des_val,                       \
+                succ, fail, ok                          \
+            );                                          \
         }                                               \
-        while (!((int) do_atomic_cmpxchg_weak_explicit( \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            exp_val, des_val,                           \
-            succ, fail                                  \
-        )));                                            \
+        while (!ok);                                    \
         /* cleanup */                                   \
         PATOMIC_IGNORE_UNUSED(scratch);                 \
         PATOMIC_IGNORE_UNUSED(temp);                    \
