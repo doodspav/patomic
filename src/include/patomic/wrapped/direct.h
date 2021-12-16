@@ -317,6 +317,7 @@
             succ, fail, ret                                 \
         );                                                  \
         /* cleanup */                                       \
+        do_memcpy(expected, &exp_val, sizeof(type));        \
         PATOMIC_IGNORE_UNUSED(scratch);                     \
         PATOMIC_IGNORE_UNUSED(temp);                        \
         return ret != 0;                                    \

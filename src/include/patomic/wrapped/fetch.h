@@ -71,68 +71,70 @@
  *   - must be one of HIDE_P or SHOW_P
  *   - used to hide or show memory order parameters
  *   - use SHOW_P for the explicit version of a function, and HIDE_P otherwise
- *
- * - vis:
- *   - must be one of HIDE or SHOW
- *   - must correspond to vis_p (e.g. if vis_p is HIDE_P then vis would be HIDE)
  */
 
 
-#define PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(        \
-    do_fetch_with_arg,                                   \
-    do_assert, do_assert_aligned, do_memcpy,             \
-    type, atype, fn_name, vis_p, vis                     \
-)                                                        \
-    static PATOMIC_FORCE_INLINE void                     \
-    fn_name(                                             \
-        volatile void *obj                               \
-        ,const void *arg                                 \
- vis_p(_,int order)                                      \
-    )                                                    \
-    {                                                    \
-        /* declarations */                               \
-        type val;                                        \
-        /* assertions */                                 \
-        do_assert(obj != NULL);                          \
-        do_assert(arg != NULL);                          \
-        do_assert_aligned(obj, atype);                   \
-    vis(do_assert(patomic_is_valid_order((int) order));) \
-        /* operation */                                  \
-        do_fetch_with_arg(                               \
-            obj                                          \
-            ,arg                                         \
-     vis_p(_,order)                                      \
-            ,&val                                        \
-        );                                               \
-        PATOMIC_IGNORE_UNUSED(val);                      \
+#define PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                   \
+    do_fetch_with_arg,                                              \
+    do_assert, do_assert_aligned, do_memcpy,                        \
+    type, atype, fn_name, vis_p                                     \
+)                                                                   \
+    static PATOMIC_FORCE_INLINE void                                \
+    fn_name(                                                        \
+        volatile void *obj                                          \
+        ,const void *arg                                            \
+ vis_p(_,int order)                                                 \
+    )                                                               \
+    {                                                               \
+        /* declarations */                                          \
+        type val;                                                   \
+        /* assertions */                                            \
+        do_assert(obj != NULL);                                     \
+        do_assert(arg != NULL);                                     \
+        do_assert_aligned(obj, atype);                              \
+        PATOMIC_IGNORE_UNUSED((                                     \
+            PATOMIC_IGNORE_UNUSED(0)                                \
+            vis_p(_,do_assert(patomic_is_valid_order((int) order))) \
+        ));                                                         \
+        /* operation */                                             \
+        do_fetch_with_arg(                                          \
+            obj                                                     \
+            ,arg                                                    \
+     vis_p(_,order)                                                 \
+            ,&val                                                   \
+        );                                                          \
+        PATOMIC_IGNORE_UNUSED(val);                                 \
     }
 
 
 
-#define PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(           \
-    do_fetch_noarg,                                      \
-    do_assert, do_assert_aligned, do_memcpy,             \
-    type, atype, fn_name, vis_p, vis                     \
-)                                                        \
-    static PATOMIC_FORCE_INLINE void                     \
-    fn_name(                                             \
-        volatile void *obj                               \
- vis_p(_,int order)                                      \
-    )                                                    \
-    {                                                    \
-        /* declarations */                               \
-        type val;                                        \
-        /* assertions */                                 \
-        do_assert(obj != NULL);                          \
-        do_assert_aligned(obj, atype);                   \
-    vis(do_assert(patomic_is_valid_order((int) order));) \
-        /* operation */                                  \
-        do_fetch_noarg(                                  \
-            obj                                          \
-     vis_p(_,order)                                      \
-            ,&val                                        \
-        );                                               \
-        PATOMIC_IGNORE_UNUSED(val);                      \
+#define PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                      \
+    do_fetch_noarg,                                                 \
+    do_assert, do_assert_aligned, do_memcpy,                        \
+    type, atype, fn_name, vis_p                                     \
+)                                                                   \
+    static PATOMIC_FORCE_INLINE void                                \
+    fn_name(                                                        \
+        volatile void *obj                                          \
+ vis_p(_,int order)                                                 \
+    )                                                               \
+    {                                                               \
+        /* declarations */                                          \
+        type val;                                                   \
+        /* assertions */                                            \
+        do_assert(obj != NULL);                                     \
+        do_assert_aligned(obj, atype);                              \
+        PATOMIC_IGNORE_UNUSED((                                     \
+            PATOMIC_IGNORE_UNUSED(0)                                \
+            vis_p(_,do_assert(patomic_is_valid_order((int) order))) \
+        ));                                                         \
+        /* operation */                                             \
+        do_fetch_noarg(                                             \
+            obj                                                     \
+     vis_p(_,order)                                                 \
+            ,&val                                                   \
+        );                                                          \
+        PATOMIC_IGNORE_UNUSED(val);                                 \
     }
 
 #endif  /* !PATOMIC_PATOMIC_WRAPPED_FETCH_H */

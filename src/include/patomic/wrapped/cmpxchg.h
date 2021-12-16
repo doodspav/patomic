@@ -116,7 +116,7 @@
  *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
  *     `byte_width`
  *   - `a` will be the name of a local identifier and will have type (type)
- *   - the effect should be equivalent to what `a = (type) !a` is for
+ *   - the effect should be equivalent to what `a = (type) ~a` is for
  *     integer types
  *
  * - do_ip_add:

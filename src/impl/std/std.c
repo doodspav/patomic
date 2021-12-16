@@ -19,6 +19,10 @@
 #include <patomic/stdlib/stdint.h>
 #include <patomic/stdlib/string.h>
 
+#include <patomic/wrapped/cmpxchg.h>
+#include <patomic/wrapped/direct.h>
+#include <patomic/wrapped/fetch.h>
+
 
 #undef PATOMIC_ALIGNOF_IS_SIZEOF
 #if PATOMIC_HAVE_ALIGNOF
@@ -86,52 +90,30 @@ patomic_is_aligned(
  * - store (y)
  * - load (y)
  */
-#define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis_p)               \
-    static PATOMIC_FORCE_INLINE void                                     \
-    patomic_opimpl_store_##name(                                         \
-        volatile void *obj                                               \
-        ,const void *desired                                             \
-   vis_p(_,int order)                                                    \
-    )                                                                    \
-    {                                                                    \
-        /* declarations */                                               \
-        type des_val;                                                    \
-        /* assertions */                                                 \
-        patomic_assert_unreachable(obj != NULL);                         \
-        patomic_assert_unreachable(desired != NULL);                     \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));          \
-        patomic_assert_unreachable(patomic_is_valid_store_order(order)); \
-        /* operation */                                                  \
-        patomic_ignored_memcpy(&des_val, desired, sizeof(type));         \
-        atomic_store_explicit(                                           \
-            (volatile _Atomic(type) *) obj,                              \
-            des_val,                                                     \
-            order                                                        \
-        );                                                               \
-    }
+#define patomic_do_store_e(t,i,y,p,d,o) atomic_store_explicit(p,d,o)
+#define patomic_do_load_e(t,i,y,p,o,r) r = atomic_load_explicit(p,o)
 
-#define PATOMIC_DEFINE_LOAD_OPS(type, name, order, vis_p)               \
-    static PATOMIC_FORCE_INLINE void                                    \
-    patomic_opimpl_load_##name(                                         \
-        const volatile void *obj                                        \
-   vis_p(_,int order)                                                   \
-        ,void *ret                                                      \
-    )                                                                   \
-    {                                                                   \
-        /* declarations */                                              \
-        type val;                                                       \
-        /* assertions */                                                \
-        patomic_assert_unreachable(obj != NULL);                        \
-        patomic_assert_unreachable(ret != NULL);                        \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));         \
-        patomic_assert_unreachable(patomic_is_valid_load_order(order)); \
-        /* operation */                                                 \
-        val = atomic_load_explicit(                                     \
-            (const volatile _Atomic(type) *) obj,                       \
-            order                                                       \
-        );                                                              \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                \
-    }
+#define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis_p) \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(                \
+        0, 0, patomic_do_store_e,                          \
+        patomic_assert_unreachable,                        \
+        patomic_assert_unreachable_aligned,                \
+        patomic_ignored_memcpy,                            \
+        type, _Atomic(type),                               \
+        patomic_opimpl_store_##name,                       \
+        order, vis_p                                       \
+    )
+
+#define PATOMIC_DEFINE_LOAD_OPS(type, name, order, vis_p) \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                \
+        0, 0, patomic_do_load_e,                          \
+        patomic_assert_unreachable,                       \
+        patomic_assert_unreachable_aligned,               \
+        patomic_ignored_memcpy,                           \
+        type, _Atomic(type),                              \
+        patomic_opimpl_load_##name,                       \
+        order, vis_p                                      \
+    )
 
 
 /*
@@ -140,111 +122,48 @@ patomic_is_aligned(
  * - compare_exchange_weak (y)
  * - compare_exchange_strong (y)
  */
-#define PATOMIC_DEFINE_XCHG_OPS_CREATE(type, name, order, vis_p, inv, opsk)  \
-    static PATOMIC_FORCE_INLINE void                                         \
-    patomic_opimpl_exchange_##name(                                          \
-        volatile void *obj                                                   \
-        ,const void *desired                                                 \
-   vis_p(_,int order)                                                        \
-        ,void *ret                                                           \
-    )                                                                        \
-    {                                                                        \
-        /* declarations */                                                   \
-        type val;                                                            \
-        type des_val;                                                        \
-        /* assertions */                                                     \
-        patomic_assert_unreachable(obj != NULL);                             \
-        patomic_assert_unreachable(desired != NULL);                         \
-        patomic_assert_unreachable(ret != NULL);                             \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));              \
-        patomic_assert_unreachable(patomic_is_valid_order(order));           \
-        /* operation */                                                      \
-        patomic_ignored_memcpy(&des_val, desired, sizeof(type));             \
-        val = atomic_exchange_explicit(                                      \
-            (volatile _Atomic(type) *) obj,                                  \
-            des_val,                                                         \
-            order                                                            \
-        );                                                                   \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                     \
-    }                                                                        \
-    static PATOMIC_FORCE_INLINE int                                          \
-    patomic_opimpl_cmpxchg_weak_##name(                                      \
-        volatile void *obj                                                   \
-        ,void *expected                                                      \
-        ,const void *desired                                                 \
-   vis_p(_,int succ)                                                         \
-   vis_p(_,int fail)                                                         \
-    )                                                                        \
-    {                                                                        \
-        /* declarations */                                                   \
-        type exp_val;                                                        \
-        type des_val;                                                        \
-        int ret;                                                             \
-        inv(int succ = order;)                                               \
-        inv(int fail = patomic_cmpxchg_fail_order(order);)                   \
-        /* assertions */                                                     \
-        patomic_assert_unreachable(obj != NULL);                             \
-        patomic_assert_unreachable(expected != NULL);                        \
-        patomic_assert_unreachable(desired != NULL);                         \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));              \
-        patomic_assert_unreachable(patomic_is_valid_order(succ));            \
-        patomic_assert_unreachable(patomic_is_valid_fail_order(succ, fail)); \
-        /* operation */                                                      \
-        patomic_ignored_memcpy(&exp_val, expected, sizeof(type));            \
-        patomic_ignored_memcpy(&des_val, desired, sizeof(type));             \
-        ret = (int) atomic_compare_exchange_weak_explicit(                   \
-            (volatile _Atomic(type) *) obj,                                  \
-            &exp_val,                                                        \
-            des_val,                                                         \
-            succ,                                                            \
-            fail                                                             \
-        );                                                                   \
-        patomic_ignored_memcpy(expected, &exp_val, sizeof(type));            \
-        return ret;                                                          \
-    }                                                                        \
-    static PATOMIC_FORCE_INLINE int                                          \
-    patomic_opimpl_cmpxchg_strong_##name(                                    \
-        volatile void *obj                                                   \
-        ,void *expected                                                      \
-        ,const void *desired                                                 \
-   vis_p(_,int succ)                                                         \
-   vis_p(_,int fail)                                                         \
-    )                                                                        \
-    {                                                                        \
-        /* declarations */                                                   \
-        type exp_val;                                                        \
-        type des_val;                                                        \
-        int ret;                                                             \
-        inv(int succ = order;)                                               \
-        inv(int fail = patomic_cmpxchg_fail_order(order);)                   \
-        /* assertions */                                                     \
-        patomic_assert_unreachable(obj != NULL);                             \
-        patomic_assert_unreachable(expected != NULL);                        \
-        patomic_assert_unreachable(desired != NULL);                         \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));              \
-        patomic_assert_unreachable(patomic_is_valid_order(succ));            \
-        patomic_assert_unreachable(patomic_is_valid_fail_order(succ, fail)); \
-        /* operation */                                                      \
-        patomic_ignored_memcpy(&exp_val, expected, sizeof(type));            \
-        patomic_ignored_memcpy(&des_val, desired, sizeof(type));             \
-        ret = (int) atomic_compare_exchange_weak_explicit(                   \
-            (volatile _Atomic(type) *) obj,                                  \
-            &exp_val,                                                        \
-            des_val,                                                         \
-            succ,                                                            \
-            fail                                                             \
-        );                                                                   \
-        patomic_ignored_memcpy(expected, &exp_val, sizeof(type));            \
-        return ret;                                                          \
-    }                                                                        \
-    static patomic_##opsk##_xchg_t                                           \
-    patomic_ops_xchg_create_##name(void)                                     \
-    {                                                                        \
-        patomic_##opsk##_xchg_t pao;                                         \
-        pao.fp_exchange = patomic_opimpl_exchange_##name;                    \
-        pao.fp_cmpxchg_weak = patomic_opimpl_cmpxchg_weak_##name;            \
-        pao.fp_cmpxchg_strong = patomic_opimpl_cmpxchg_strong_##name;        \
-        return pao;                                                          \
+#define patomic_do_exchange_e(t,i,b,p,d,o,r) r = atomic_exchange_explicit(p,d,o)
+#define patomic_do_cmpxchg_we(t,i,b,p,e,d,s,f,r) \
+    r = (int) atomic_compare_exchange_weak_explicit(p,&(e),d,s,f)
+#define patomic_do_cmpxchg_se(t,i,b,p,e,d,s,f,r) \
+    r = (int) atomic_compare_exchange_strong_explicit(p,&(e),d,s,f)
+
+#define PATOMIC_DEFINE_XCHG_OPS_CREATE(type, name, order, vis_p, inv, opsk) \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(                              \
+        0, 0, patomic_do_exchange_e,                                        \
+        patomic_assert_unreachable,                                         \
+        patomic_assert_unreachable_aligned,                                 \
+        patomic_ignored_memcpy,                                             \
+        type, _Atomic(type),                                                \
+        patomic_opimpl_exchange_##name,                                     \
+        order, vis_p                                                        \
+    )                                                                       \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK(                          \
+        0, 0, patomic_do_cmpxchg_we,                                        \
+        patomic_assert_unreachable,                                         \
+        patomic_assert_unreachable_aligned,                                 \
+        patomic_ignored_memcpy,                                             \
+        type, _Atomic(type),                                                \
+        patomic_opimpl_cmpxchg_weak_##name,                                 \
+        order, vis_p, inv                                                   \
+    )                                                                       \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_STRONG(                        \
+        0, 0, patomic_do_cmpxchg_se,                                        \
+        patomic_assert_unreachable,                                         \
+        patomic_assert_unreachable_aligned,                                 \
+        patomic_ignored_memcpy,                                             \
+        type, _Atomic(type),                                                \
+        patomic_opimpl_cmpxchg_strong_##name,                               \
+        order, vis_p, inv                                                   \
+    )                                                                       \
+    static patomic_##opsk##_xchg_t                                          \
+    patomic_ops_xchg_create_##name(void)                                    \
+    {                                                                       \
+        patomic_##opsk##_xchg_t pao;                                        \
+        pao.fp_exchange = patomic_opimpl_exchange_##name;                   \
+        pao.fp_cmpxchg_weak = patomic_opimpl_cmpxchg_weak_##name;           \
+        pao.fp_cmpxchg_strong = patomic_opimpl_cmpxchg_strong_##name;       \
+        return pao;                                                         \
     }
 
 
@@ -266,168 +185,61 @@ patomic_is_aligned(
  * WARNING:
  * - type MUST be an unsigned integer type
  */
-#define PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis_p)                  \
-    static PATOMIC_FORCE_INLINE int                                            \
-    patomic_opimpl_bit_test_##name(                                            \
-        const volatile void *obj                                               \
-        ,int offset                                                            \
-   vis_p(_,int order)                                                          \
-    )                                                                          \
-    {                                                                          \
-        /* declarations */                                                     \
-        type mask;                                                             \
-        type val;                                                              \
-        /* assertions */                                                       \
-        patomic_assert_unreachable(obj != NULL);                               \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));                \
-        patomic_assert_unreachable(offset >= 0);                               \
-        patomic_assert_unreachable((CHAR_BIT * sizeof(type)) > (size_t)offset);\
-        patomic_assert_unreachable(patomic_is_valid_load_order(order));        \
-        /* operation */                                                        \
-        mask = (type) (((type) 1u) << offset);                                 \
-        val = atomic_load_explicit(                                            \
-            (const volatile _Atomic(type) *) obj,                              \
-            order                                                              \
-        );                                                                     \
-        return (val & mask) != 0;                                              \
-    }
+#define patomic_do_bt_e(t,i,y,p,x,o,r)                                    \
+    scratch = (t)((t)1u << (t)(x)); scratch &= atomic_load_explicit(p,o); \
+    r = (scratch != (t)0)
+#define patomic_do_cmp_eqz(t,i,y,a,r) r = ((a) == (t)0)
+#define patomic_do_ip_nth_bit_mask(t,i,y,m,n) m = (t)((t)1u << (t)(n));
+#define patomic_do_ip_bit_or(t,i,y,a,b) a |= b
+#define patomic_do_ip_bit_xor(t,i,y,a,b) a ^= b
+#define patomic_do_ip_bit_and(t,i,y,a,b) a &= b
+#define patomic_do_ip_bit_not(t,i,y,a) a = (t)~a
 
-#define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis_p)           \
-    static PATOMIC_FORCE_INLINE int                                            \
-    patomic_opimpl_bit_test_compl_##name(                                      \
-        volatile void *obj                                                     \
-        ,int offset                                                            \
-   vis_p(_,int order)                                                          \
-    )                                                                          \
-    {                                                                          \
-        /* declarations */                                                     \
-        type expected;                                                         \
-        type desired;                                                          \
-        type mask;                                                             \
-        int succ;                                                              \
-        int fail;                                                              \
-        /* assertions */                                                       \
-        patomic_assert_unreachable(obj != NULL);                               \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));                \
-        patomic_assert_unreachable(offset >= 0);                               \
-        patomic_assert_unreachable((CHAR_BIT * sizeof(type)) > (size_t)offset);\
-        patomic_assert_unreachable(patomic_is_valid_order(order));             \
-        /* operation */                                                        \
-        /* setup memory orders and mask */                                     \
-        mask = (type) (((type) 1u) << offset);                                 \
-        succ = order;                                                          \
-        fail = patomic_cmpxchg_fail_order(order);                              \
-        /* load initial value */                                               \
-        expected = atomic_load_explicit(                                       \
-            (const volatile _Atomic(type) *) obj,                              \
-            fail                                                               \
-        );                                                                     \
-        /* cas loop */                                                         \
-        do {                                                                   \
-            /* complement bit at offset */                                     \
-            desired = expected;                                                \
-            desired ^= mask;                                                   \
-        }                                                                      \
-        while (!atomic_compare_exchange_weak_explicit(                         \
-            (volatile _Atomic(type) *) obj,                                    \
-            &expected,                                                         \
-            desired,                                                           \
-            succ,                                                              \
-            fail                                                               \
-        ));                                                                    \
-        /* return old bit value */                                             \
-        return (expected & mask) != 0;                                         \
-    }                                                                          \
-    static PATOMIC_FORCE_INLINE int                                            \
-    patomic_opimpl_bit_test_set_##name(                                        \
-        volatile void *obj                                                     \
-        ,int offset                                                            \
-   vis_p(_,int order)                                                          \
-    )                                                                          \
-    {                                                                          \
-        /* declarations */                                                     \
-        type expected;                                                         \
-        type desired;                                                          \
-        type mask;                                                             \
-        int succ;                                                              \
-        int fail;                                                              \
-        /* assertions */                                                       \
-        patomic_assert_unreachable(obj != NULL);                               \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));                \
-        patomic_assert_unreachable(offset >= 0);                               \
-        patomic_assert_unreachable((CHAR_BIT * sizeof(type)) > (size_t)offset);\
-        patomic_assert_unreachable(patomic_is_valid_order(order));             \
-        /* operation */                                                        \
-        /* setup memory orders and mask */                                     \
-        mask = (type) (((type) 1u) << offset);                                 \
-        succ = order;                                                          \
-        fail = patomic_cmpxchg_fail_order(order);                              \
-        /* load initial value */                                               \
-        expected = atomic_load_explicit(                                       \
-            (const volatile _Atomic(type) *) obj,                              \
-            fail                                                               \
-        );                                                                     \
-        /* cas loop */                                                         \
-        do {                                                                   \
-            /* set bit at offset */                                            \
-            desired = expected;                                                \
-            desired |= mask;                                                   \
-        }                                                                      \
-        while (!atomic_compare_exchange_weak_explicit(                         \
-            (volatile _Atomic(type) *) obj,                                    \
-            &expected,                                                         \
-            desired,                                                           \
-            succ,                                                              \
-            fail                                                               \
-        ));                                                                    \
-        /* return old bit value */                                             \
-        return (expected & mask) != 0;                                         \
-    }                                                                          \
-    static PATOMIC_FORCE_INLINE int                                            \
-    patomic_opimpl_bit_test_reset_##name(                                      \
-        volatile void *obj                                                     \
-        ,int offset                                                            \
-   vis_p(_,int order)                                                          \
-    )                                                                          \
-    {                                                                          \
-        /* declarations */                                                     \
-        type expected;                                                         \
-        type desired;                                                          \
-        type mask;                                                             \
-        int succ;                                                              \
-        int fail;                                                              \
-        /* assertions */                                                       \
-        patomic_assert_unreachable(obj != NULL);                               \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));                \
-        patomic_assert_unreachable(offset >= 0);                               \
-        patomic_assert_unreachable((CHAR_BIT * sizeof(type)) > (size_t)offset);\
-        patomic_assert_unreachable(patomic_is_valid_order(order));             \
-        /* operation */                                                        \
-        /* setup memory orders and mask */                                     \
-        mask = (type) (((type) 1u) << offset);                                 \
-        succ = order;                                                          \
-        fail = patomic_cmpxchg_fail_order(order);                              \
-        /* load initial value */                                               \
-        expected = atomic_load_explicit(                                       \
-            (const volatile _Atomic(type) *) obj,                              \
-            fail                                                               \
-        );                                                                     \
-        /* cas loop */                                                         \
-        do {                                                                   \
-            /* clear bit at offset */                                          \
-            desired = expected;                                                \
-            desired &= (type) (~mask);                                         \
-        }                                                                      \
-        while (!atomic_compare_exchange_weak_explicit(                         \
-            (volatile _Atomic(type) *) obj,                                    \
-            &expected,                                                         \
-            desired,                                                           \
-            succ,                                                              \
-            fail                                                               \
-        ));                                                                    \
-        /* return old bit value */                                             \
-        return (expected & mask) != 0;                                         \
-    }
+#define PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis_p) \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(                \
+        0, 0, patomic_do_bt_e,                                \
+        patomic_assert_unreachable,                           \
+        patomic_assert_unreachable_aligned,                   \
+        patomic_ignored_memcpy,                               \
+        type, _Atomic(type),                                  \
+        patomic_opimpl_bit_test_##name,                       \
+        order, vis_p                                          \
+    )
+
+#define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis_p) \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_COMPL(                \
+        0, 0, patomic_do_cmpxchg_we, patomic_do_cmp_eqz,             \
+        patomic_do_ip_nth_bit_mask,                                  \
+        patomic_do_ip_bit_and, patomic_do_ip_bit_xor,                \
+        patomic_assert_unreachable,                                  \
+        patomic_assert_unreachable_aligned,                          \
+        patomic_ignored_memcpy,                                      \
+        type, _Atomic(type),                                         \
+        patomic_opimpl_bit_test_compl_##name,                        \
+        order, vis_p                                                 \
+    )                                                                \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_SET(                  \
+        0, 0, patomic_do_cmpxchg_we, patomic_do_cmp_eqz,             \
+        patomic_do_ip_nth_bit_mask,                                  \
+        patomic_do_ip_bit_and, patomic_do_ip_bit_or,                 \
+        patomic_assert_unreachable,                                  \
+        patomic_assert_unreachable_aligned,                          \
+        patomic_ignored_memcpy,                                      \
+        type, _Atomic(type),                                         \
+        patomic_opimpl_bit_test_set_##name,                          \
+        order, vis_p                                                 \
+    )                                                                \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_RESET(                \
+        0, 0, patomic_do_cmpxchg_we, patomic_do_cmp_eqz,             \
+        patomic_do_ip_nth_bit_mask,                                  \
+        patomic_do_ip_bit_and, patomic_do_ip_bit_not,                \
+        patomic_assert_unreachable,                                  \
+        patomic_assert_unreachable_aligned,                          \
+        patomic_ignored_memcpy,                                      \
+        type, _Atomic(type),                                         \
+        patomic_opimpl_bit_test_reset_##name,                        \
+        order, vis_p                                                 \
+    )
 
 #define PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(type, name, order, vis_p, opsk) \
     PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, order, vis_p)          \
@@ -465,221 +277,83 @@ patomic_is_aligned(
  * - (fetch_)and (y)
  * - (fetch_)not (y)
  */
+#define patomic_do_or_fe(t,i,y,p,a,o,r) r = atomic_fetch_or_explicit(p,a,o)
+#define patomic_do_xor_fe(t,i,y,p,a,o,r) r = atomic_fetch_xor_explicit(p,a,o)
+#define patomic_do_and_fe(t,i,y,p,a,o,r) r = atomic_fetch_and_explicit(p,a,o)
+
 #define PATOMIC_DEFINE_BIN_OPS_CREATE(type, name, order, vis_p, opsk)     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_fetch_or_##name(                                       \
-        volatile void *obj                                                \
-        ,const void *arg                                                  \
-   vis_p(_,int order)                                                     \
-        ,void *ret                                                        \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_OR(                            \
+        0, 0, patomic_do_or_fe,                                           \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_fetch_or_##name,                                   \
+        order, vis_p                                                      \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        type arg_val;                                                     \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(arg != NULL);                          \
-        patomic_assert_unreachable(ret != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_ignored_memcpy(&arg_val, arg, sizeof(type));              \
-        val = atomic_fetch_or_explicit(                                   \
-            (volatile _Atomic(type) *) obj,                               \
-            arg_val,                                                      \
-            order                                                         \
-        );                                                                \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                  \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_fetch_xor_##name(                                      \
-        volatile void *obj                                                \
-        ,const void *arg                                                  \
-   vis_p(_,int order)                                                     \
-        ,void *ret                                                        \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_XOR(                           \
+        0, 0, patomic_do_xor_fe,                                          \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_fetch_xor_##name,                                  \
+        order, vis_p                                                      \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        type arg_val;                                                     \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(arg != NULL);                          \
-        patomic_assert_unreachable(ret != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_ignored_memcpy(&arg_val, arg, sizeof(type));              \
-        val = atomic_fetch_xor_explicit(                                  \
-            (volatile _Atomic(type) *) obj,                               \
-            arg_val,                                                      \
-            order                                                         \
-        );                                                                \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                  \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_fetch_and_##name(                                      \
-        volatile void *obj                                                \
-        ,const void *arg                                                  \
-   vis_p(_,int order)                                                     \
-        ,void *ret                                                        \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_AND(                           \
+        0, 0, patomic_do_and_fe,                                          \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_fetch_and_##name,                                  \
+        order, vis_p                                                      \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        type arg_val;                                                     \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(arg != NULL);                          \
-        patomic_assert_unreachable(ret != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_ignored_memcpy(&arg_val, arg, sizeof(type));              \
-        val = atomic_fetch_and_explicit(                                  \
-            (volatile _Atomic(type) *) obj,                               \
-            arg_val,                                                      \
-            order                                                         \
-        );                                                                \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                  \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_fetch_not_##name(                                      \
-        volatile void *obj                                                \
-   vis_p(_,int order)                                                     \
-        ,void *ret                                                        \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOT(                          \
+        0, 0, patomic_do_cmpxchg_we, patomic_do_ip_bit_not,               \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_fetch_not_##name,                                  \
+        order, vis_p                                                      \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type expected;                                                    \
-        type desired;                                                     \
-        int succ;                                                         \
-        int fail;                                                         \
-        unsigned char const *src;                                         \
-        unsigned char *begin;                                             \
-        unsigned char const *const end = (unsigned char *)(&desired + 1); \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(ret != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        /* setup memory orders */                                         \
-        succ = order;                                                     \
-        fail = patomic_cmpxchg_fail_order(order);                         \
-        /* load initial value */                                          \
-        expected = atomic_load_explicit(                                  \
-            (const volatile _Atomic(type) *) obj,                         \
-            fail                                                          \
-        );                                                                \
-        /* cas loop */                                                    \
-        do {                                                              \
-            /* "not" bytes to create desired */                           \
-            src = (unsigned char *) &expected;                            \
-            begin = (unsigned char *) &desired;                           \
-            for (; begin != end; ++begin, ++src) {                        \
-                *begin = (unsigned char ) ~(*src);                        \
-            }                                                             \
-        }                                                                 \
-        while (!atomic_compare_exchange_weak_explicit(                    \
-            (volatile _Atomic(type) *) obj,                               \
-            &expected,                                                    \
-            desired,                                                      \
-            succ,                                                         \
-            fail                                                          \
-        ));                                                               \
-        patomic_ignored_memcpy(ret, &expected, sizeof(type));             \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_or_##name(                                             \
-        volatile void *obj                                                \
-        ,const void *arg                                                  \
-   vis_p(_,int order)                                                     \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                             \
+        patomic_opimpl_fetch_or_##name,                                   \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_or_##name,                                         \
+        vis_p                                                             \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(arg != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_opimpl_fetch_or_##name(                                   \
-            obj                                                           \
-            ,arg                                                          \
-       vis_p(_,order)                                                     \
-            ,&val                                                         \
-        );                                                                \
-        PATOMIC_IGNORE_UNUSED(val);                                       \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_xor_##name(                                            \
-        volatile void *obj                                                \
-        ,const void *arg                                                  \
-   vis_p(_,int order)                                                     \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                             \
+        patomic_opimpl_fetch_xor_##name,                                  \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_xor_##name,                                        \
+        vis_p                                                             \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(arg != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_opimpl_fetch_xor_##name(                                  \
-            obj                                                           \
-            ,arg                                                          \
-       vis_p(_,order)                                                     \
-            ,&val                                                         \
-        );                                                                \
-        PATOMIC_IGNORE_UNUSED(val);                                       \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_and_##name(                                            \
-        volatile void *obj                                                \
-        ,const void *arg                                                  \
-   vis_p(_,int order)                                                     \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                             \
+        patomic_opimpl_fetch_and_##name,                                  \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_and_##name,                                        \
+        vis_p                                                             \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable(arg != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_opimpl_fetch_and_##name(                                  \
-            obj                                                           \
-            ,arg                                                          \
-       vis_p(_,order)                                                     \
-            ,&val                                                         \
-        );                                                                \
-        PATOMIC_IGNORE_UNUSED(val);                                       \
-    }                                                                     \
-    static PATOMIC_FORCE_INLINE void                                      \
-    patomic_opimpl_not_##name(                                            \
-        volatile void *obj                                                \
-   vis_p(_,int order)                                                     \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                \
+        patomic_opimpl_fetch_not_##name,                                  \
+        patomic_assert_unreachable,                                       \
+        patomic_assert_unreachable_aligned,                               \
+        patomic_ignored_memcpy,                                           \
+        type, _Atomic(type),                                              \
+        patomic_opimpl_not_##name,                                        \
+        vis_p                                                             \
     )                                                                     \
-    {                                                                     \
-        /* declarations */                                                \
-        type val;                                                         \
-        /* assertions */                                                  \
-        patomic_assert_unreachable(obj != NULL);                          \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));           \
-        patomic_assert_unreachable(patomic_is_valid_order(order));        \
-        /* operation */                                                   \
-        patomic_opimpl_fetch_not_##name(                                  \
-            obj                                                           \
-       vis_p(_,order)                                                     \
-            ,&val                                                         \
-        );                                                                \
-        PATOMIC_IGNORE_UNUSED(val);                                       \
-    }                                                                     \
     static patomic_##opsk##_binary_t                                      \
     patomic_ops_binary_create_##name(void)                                \
     {                                                                     \
@@ -704,273 +378,105 @@ patomic_is_aligned(
  * - (fetch_)dec (y)
  * - (fetch_)neg (y)
  */
+#define patomic_do_add_fe(t,i,y,m,p,a,o,r) r=atomic_fetch_add_explicit(p,a,o)
+#define patomic_do_sub_fe(t,i,y,m,p,a,o,r) r=atomic_fetch_sub_explicit(p,a,o)
+#define patomic_do_inc_fe(t,i,y,m,p,o,r) r=atomic_fetch_add_explicit(p,(t)1u,o)
+#define patomic_do_dec_fe(t,i,y,m,p,o,r) r=atomic_fetch_sub_explicit(p,(t)1u,o)
+#define patomic_do_ip_neg(t,i,y,m,a) a = (t)( \
+    ((t)(m) == (t)0) ? -(a)                   \
+                     : ((t)(m) == (a)) ? (a) : -(a))
+
 #define PATOMIC_DEFINE_ARI_OPS_CREATE(type, name, order, vis_p, opsk, min) \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_fetch_add_##name(                                       \
-        volatile void *obj                                                 \
-        ,const void *arg                                                   \
-   vis_p(_,int order)                                                      \
-        ,void *ret                                                         \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_ADD(                            \
+        0, 0, patomic_do_add_fe,                                           \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_fetch_add_##name,                                   \
+        order, vis_p, min                                                  \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        type arg_val;                                                      \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(arg != NULL);                           \
-        patomic_assert_unreachable(ret != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_ignored_memcpy(&arg_val, arg, sizeof(type));               \
-        val = atomic_fetch_add_explicit(                                   \
-            (volatile _Atomic(type) *) obj,                                \
-            arg_val,                                                       \
-            order                                                          \
-        );                                                                 \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                   \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_fetch_sub_##name(                                       \
-        volatile void *obj                                                 \
-        ,const void *arg                                                   \
-   vis_p(_,int order)                                                      \
-        ,void *ret                                                         \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_SUB(                            \
+        0, 0, patomic_do_sub_fe,                                           \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_fetch_sub_##name,                                   \
+        order, vis_p, min                                                  \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        type arg_val;                                                      \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(arg != NULL);                           \
-        patomic_assert_unreachable(ret != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_ignored_memcpy(&arg_val, arg, sizeof(type));               \
-        val = atomic_fetch_sub_explicit(                                   \
-            (volatile _Atomic(type) *) obj,                                \
-            arg_val,                                                       \
-            order                                                          \
-        );                                                                 \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                   \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_fetch_inc_##name(                                       \
-        volatile void *obj                                                 \
-   vis_p(_,int order)                                                      \
-        ,void *ret                                                         \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_INC(                            \
+        0, 0, patomic_do_inc_fe,                                           \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_fetch_inc_##name,                                   \
+        order, vis_p, min                                                  \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(ret != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        val = atomic_fetch_add_explicit(                                   \
-            (volatile _Atomic(type) *) obj,                                \
-            (type) 1,                                                      \
-            order                                                          \
-        );                                                                 \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                   \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_fetch_dec_##name(                                       \
-        volatile void *obj                                                 \
-   vis_p(_,int order)                                                      \
-        ,void *ret                                                         \
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_DEC(                            \
+        0, 0, patomic_do_dec_fe,                                           \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_fetch_dec_##name,                                   \
+        order, vis_p, min                                                  \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(ret != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        val = atomic_fetch_sub_explicit(                                   \
-            (volatile _Atomic(type) *) obj,                                \
-            (type) 1,                                                      \
-            order                                                          \
-        );                                                                 \
-        patomic_ignored_memcpy(ret, &val, sizeof(type));                   \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_fetch_neg_##name(                                       \
-        volatile void *obj                                                 \
-   vis_p(_,int order)                                                      \
-        ,void *ret                                                         \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NEG(                           \
+        0, 0, patomic_do_cmpxchg_we, patomic_do_ip_neg,                    \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_fetch_neg_##name,                                   \
+        order, vis_p, min                                                  \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type expected;                                                     \
-        type desired;                                                      \
-        int succ;                                                          \
-        int fail;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(ret != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        /* setup memory orders */                                          \
-        succ = order;                                                      \
-        fail = patomic_cmpxchg_fail_order(order);                          \
-        /* load initial value */                                           \
-        expected = atomic_load_explicit(                                   \
-            (const volatile _Atomic(type) *) obj,                          \
-            fail                                                           \
-        );                                                                 \
-        /* cas loop */                                                     \
-        do {                                                               \
-            /* unsigned */                                                 \
-            if ((type) (min) == (type) 0) { desired = (type) -expected; }  \
-            /* signed */                                                   \
-            else {                                                         \
-                /* twos complement */                                      \
-                if (PATOMIC_HAVE_TWOS_COMPL) {                             \
-                    /* -INT_MIN is UB but also equal to INT_MIN */         \
-                    if ((type) (min) == expected) {                        \
-                        /* value would be the same after negation */       \
-                        /* we just need to enforce memory order */         \
-                        if (succ > fail) {                                 \
-                            PATOMIC_IGNORE_UNUSED(                         \
-                                atomic_fetch_or_explicit(                  \
-                                    (volatile _Atomic(type) *) obj,        \
-                                    (type) 0,                              \
-                                    succ                                   \
-                            ));                                            \
-                        }                                                  \
-                        break;                                             \
-                    }                                                      \
-                    /* not INT_MIN so fine to negate */                    \
-                    else { desired = (type) -expected; }                   \
-                }                                                          \
-                /* not twos complement so fine to negate */                \
-                else { desired = (type) -expected; }                       \
-            }                                                              \
-        }                                                                  \
-        while (!atomic_compare_exchange_weak_explicit(                     \
-            (volatile _Atomic(type) *) obj,                                \
-            &expected,                                                     \
-            desired,                                                       \
-            succ,                                                          \
-            fail                                                           \
-        ));                                                                \
-        patomic_ignored_memcpy(ret, &expected, sizeof(type));              \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_add_##name(                                             \
-        volatile void *obj                                                 \
-        ,const void *arg                                                   \
-   vis_p(_,int order)                                                      \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                              \
+        patomic_opimpl_fetch_add_##name,                                   \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_add_##name,                                         \
+        vis_p                                                              \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(arg != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_opimpl_fetch_add_##name(                                   \
-            obj                                                            \
-            ,arg                                                           \
-       vis_p(_,order)                                                      \
-            ,&val                                                          \
-        );                                                                 \
-        PATOMIC_IGNORE_UNUSED(val);                                        \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_sub_##name(                                             \
-        volatile void *obj                                                 \
-        ,const void *arg                                                   \
-   vis_p(_,int order)                                                      \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                              \
+        patomic_opimpl_fetch_sub_##name,                                   \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_sub_##name,                                         \
+        vis_p                                                              \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable(arg != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_opimpl_fetch_sub_##name(                                   \
-            obj                                                            \
-            ,arg                                                           \
-       vis_p(_,order)                                                      \
-            ,&val                                                          \
-        );                                                                 \
-        PATOMIC_IGNORE_UNUSED(val);                                        \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_inc_##name(                                             \
-        volatile void *obj                                                 \
-   vis_p(_,int order)                                                      \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                 \
+        patomic_opimpl_fetch_inc_##name,                                   \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_inc_##name,                                         \
+        vis_p                                                              \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_opimpl_fetch_inc_##name(                                   \
-            obj                                                            \
-       vis_p(_,order)                                                      \
-            ,&val                                                          \
-        );                                                                 \
-        PATOMIC_IGNORE_UNUSED(val);                                        \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_dec_##name(                                             \
-        volatile void *obj                                                 \
-   vis_p(_,int order)                                                      \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                 \
+        patomic_opimpl_fetch_dec_##name,                                   \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_dec_##name,                                         \
+        vis_p                                                              \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_opimpl_fetch_dec_##name(                                   \
-            obj                                                            \
-       vis_p(_,order)                                                      \
-            ,&val                                                          \
-        );                                                                 \
-        PATOMIC_IGNORE_UNUSED(val);                                        \
-    }                                                                      \
-    static PATOMIC_FORCE_INLINE void                                       \
-    patomic_opimpl_neg_##name(                                             \
-        volatile void *obj                                                 \
-   vis_p(_,int order)                                                      \
+    PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                 \
+        patomic_opimpl_fetch_neg_##name,                                   \
+        patomic_assert_unreachable,                                        \
+        patomic_assert_unreachable_aligned,                                \
+        patomic_ignored_memcpy,                                            \
+        type, _Atomic(type),                                               \
+        patomic_opimpl_neg_##name,                                         \
+        vis_p                                                              \
     )                                                                      \
-    {                                                                      \
-        /* declarations */                                                 \
-        type val;                                                          \
-        /* assertions */                                                   \
-        patomic_assert_unreachable(obj != NULL);                           \
-        patomic_assert_unreachable_aligned(obj, _Atomic(type));            \
-        patomic_assert_unreachable(patomic_is_valid_order(order));         \
-        /* operation */                                                    \
-        patomic_opimpl_fetch_neg_##name(                                   \
-            obj                                                            \
-       vis_p(_,order)                                                      \
-            ,&val                                                          \
-        );                                                                 \
-        PATOMIC_IGNORE_UNUSED(val);                                        \
-    }                                                                      \
     static patomic_##opsk##_arithmetic_t                                   \
     patomic_ops_arithmetic_create_##name(void)                             \
     {                                                                      \
