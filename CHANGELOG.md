@@ -7,8 +7,15 @@ from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
 ## [Unreleased] [Patch]
+### Added
+- `wrapped` macro implementations of all ops:
+  - `fetch.h` wraps `fetch_op` to define `op`
+  - `direct.h` wraps an atomic operation to define that same operation
+  - `cmpxchg.h` wraps `cmpxchg_weak_explicit` to define any other operation
 ### Changed
 - renamed `types/intptr.h` to `stdlib/stdint.h`
+- `std` implementation now uses `wrapped` macros instead of defining whole
+  functions directly
 ### Fixed
 - `std` implementation now also uses `ATOMIC_LLONG_IS_LOCK_FREE` in the create
   functions to make sure the corresponding functions are defined
