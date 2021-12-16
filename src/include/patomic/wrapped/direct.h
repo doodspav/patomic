@@ -500,13 +500,13 @@
         PATOMIC_IGNORE_UNUSED(temp);                            \
     }
 
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_OR \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_OR \
     PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG
 
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_XOR \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_XOR \
     PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG
 
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_AND \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_AND \
     PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG
 
 
@@ -522,7 +522,7 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_NOT( \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOT(     \
     bit_width, byte_width,                              \
     do_atomic_fetch_not_explicit,                       \
     do_assert, do_assert_aligned, do_memcpy,            \
