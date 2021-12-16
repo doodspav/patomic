@@ -276,7 +276,7 @@
  *   - `ok` may be uninitialised and should be set to `0` if the operation
  *     failed or non-zero if it succeeded
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(           \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_CMPXCHG(      \
     bit_width, byte_width,                                  \
     do_atomic_cmpxchg_explicit,                             \
     do_assert, do_assert_aligned, do_memcpy,                \
@@ -323,10 +323,10 @@
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK \
-    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_CMPXCHG
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_STRONG \
-    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_CMPXCHG
 
 
 /*
@@ -393,13 +393,13 @@
  *   - `offset` and `res` will be the names of local identifiers
  *   - `offset` will have the type (int), possibly const-qualified, and will
  *     have a value `>= 0` and `< (sizeof(type) * CHAR_BIT)`
- *   - `order` will be an expression of type (int) whose value is valid
+ *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  *   - `res` will have type (int)
  *   - `res` may be uninitialised and should be set to the old value of the bit
  *     being tested (zero or non-zero)
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(       \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_BIT_TEST_MODIFY(  \
     bit_width, byte_width,                                      \
     do_atomic_bit_test_modify_explicit,                         \
     do_assert, do_assert_aligned, do_memcpy,                    \
@@ -437,13 +437,125 @@
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_COMPL \
-    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_BIT_TEST_MODIFY
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_SET \
-    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_BIT_TEST_MODIFY
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_RESET \
-    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_BIT_TEST_MODIFY
+
+
+/*
+ * - do_atomic_binary_op_fetch_arg_explicit:
+ *   - must be callable as `fn(t, bi, by, obj_p, arg, order, ret);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `arg` and `ret` will be the names of local identifiers
+ *   - `arg` will have the type (int), possibly const-qualified
+ *   - `ret` will have type (type) and may be uninitialised
+ *   - `order` will be an expression of type (int) whose value is a valid
+ *     memory order
+ */
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG( \
+    bit_width, byte_width,                                      \
+    do_atomic_binary_op_fetch_arg_explicit,                     \
+    do_assert, do_assert_aligned, do_memcpy,                    \
+    type, atype, fn_name, order, vis_p                          \
+)                                                               \
+    static PATOMIC_FORCE_INLINE void                            \
+    fn_name(                                                    \
+        volatile void *obj                                      \
+        ,const void *arg                                        \
+ vis_p(_,int order)                                             \
+        ,void *ret                                              \
+    )                                                           \
+    {                                                           \
+        /* declarations */                                      \
+        type arg_val;                                           \
+        type ret_val;                                           \
+        type scratch;                                           \
+        int temp;                                               \
+        /* assertions */                                        \
+        do_assert(obj != NULL);                                 \
+        do_assert(arg != NULL);                                 \
+        do_assert(ret != NULL);                                 \
+        do_assert_aligned(obj, atype);                          \
+        do_assert(patomic_is_valid_order((int) order));         \
+        /* setup */                                             \
+        do_memcpy(&arg_val, arg, sizeof(type));                 \
+        /* operation */                                         \
+        do_atomic_binary_op_fetch_arg_explicit(                 \
+            type, bit_width, byte_width,                        \
+            (volatile atype *) obj,                             \
+            arg_val,                                            \
+            (int) order,                                        \
+            ret_val                                             \
+        );                                                      \
+        /* cleanup */                                           \
+        do_memcpy(ret, &ret_val, sizeof(type));                 \
+        PATOMIC_IGNORE_UNUSED(scratch);                         \
+        PATOMIC_IGNORE_UNUSED(temp);                            \
+    }
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_OR \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_XOR \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_AND \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG
+
+
+/*
+ * - do_atomic_fetch_not_explicit:
+ *   - must be callable as `fn(t, bi, by, obj_p, order, ret);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, and `by` will be the macro parameters `type`, `bit_width`, and
+ *     `byte_width`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `ret` will be the name of a local identifier
+ *   - `ret` will have type (type) and may be uninitialised
+ *   - `order` will be an expression of type (int) whose value is a valid
+ *     memory order
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIN_FETCH_NOT( \
+    bit_width, byte_width,                              \
+    do_atomic_fetch_not_explicit,                       \
+    do_assert, do_assert_aligned, do_memcpy,            \
+    type, atype, fn_name, order, vis_p                  \
+)                                                       \
+    static PATOMIC_FORCE_INLINE void                    \
+    fn_name(                                            \
+        volatile void *obj                              \
+ vis_p(_,int order)                                     \
+        ,void *ret                                      \
+    )                                                   \
+    {                                                   \
+        /* declarations */                              \
+        type ret_val;                                   \
+        type scratch;                                   \
+        int temp;                                       \
+        /* assertions */                                \
+        do_assert(obj != NULL);                         \
+        do_assert(ret != NULL);                         \
+        do_assert_aligned(obj, atype);                  \
+        do_assert(patomic_is_valid_order((int) order)); \
+        /* operation */                                 \
+        do_atomic_fetch_not_explicit(                   \
+            type, bit_width, byte_width,                \
+            (volatile atype *) obj,                     \
+            (int) order,                                \
+            ret_val                                     \
+        );                                              \
+        /* cleanup */                                   \
+        do_memcpy(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                 \
+        PATOMIC_IGNORE_UNUSED(temp);                    \
+    }
 
 
 #endif  /* !PATOMIC_PATOMIC_WRAPPED_DIRECT_H */

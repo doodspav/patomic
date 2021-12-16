@@ -767,7 +767,7 @@
         do_memcpy(ret, &exp_val, sizeof(type));          \
     }
 
-
+/* TODO: remove bin from binary defines */
 #define PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIN_FETCH_NOT( \
     bit_width, byte_width,                               \
     do_atomic_cmpxchg_weak_explicit, do_ip_bit_not,      \
