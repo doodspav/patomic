@@ -558,4 +558,122 @@
     }
 
 
+/*
+ * - do_atomic_arithmetic_op_fetch_arg_explicit:
+ *   - must be callable as `fn(t, bi, by, mv, obj_p, arg, order, ret);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, `by`, and `mv` will be the macro parameters `type`,
+ *     `bit_width`, `byte_width`, and `min_val`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `arg` and `ret` will be the names of local identifiers
+ *   - `arg` will have the type (int), possibly const-qualified
+ *   - `ret` will have type (type) and may be uninitialised
+ *   - `order` will be an expression of type (int) whose value is a valid
+ *     memory order
+ */
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_ARG( \
+    bit_width, byte_width,                                          \
+    do_atomic_arithmetic_op_fetch_arg_explicit,                     \
+    do_assert, do_assert_aligned, do_memcpy,                        \
+    type, atype, fn_name, order, vis_p, min_val                     \
+)                                                                   \
+    static PATOMIC_FORCE_INLINE void                                \
+    fn_name(                                                        \
+        volatile void *obj                                          \
+        ,const void *arg                                            \
+ vis_p(_,int order)                                                 \
+        ,void *ret                                                  \
+    )                                                               \
+    {                                                               \
+        /* declarations */                                          \
+        type arg_val;                                               \
+        type ret_val;                                               \
+        type scratch;                                               \
+        int temp;                                                   \
+        /* assertions */                                            \
+        do_assert(obj != NULL);                                     \
+        do_assert(arg != NULL);                                     \
+        do_assert(ret != NULL);                                     \
+        do_assert_aligned(obj, atype);                              \
+        do_assert(patomic_is_valid_order((int) order));             \
+        /* setup */                                                 \
+        do_memcpy(&arg_val, arg, sizeof(type));                     \
+        /* operation */                                             \
+        do_atomic_arithmetic_op_fetch_arg_explicit(                 \
+            type, bit_width, byte_width, min_val,                   \
+            (volatile atype *) obj,                                 \
+            arg_val,                                                \
+            (int) order,                                            \
+            ret_val                                                 \
+        );                                                          \
+        /* cleanup */                                               \
+        do_memcpy(ret, &ret_val, sizeof(type));                     \
+        PATOMIC_IGNORE_UNUSED(scratch);                             \
+        PATOMIC_IGNORE_UNUSED(temp);                                \
+    }
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_ADD \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_ARG
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_SUB \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_ARG
+
+
+/*
+ * - do_atomic_arithmetic_op_fetch_void_explicit:
+ *   - must be callable as `fn(t, bi, by, mv, obj_p, order, ret);`
+ *   - the result of the expression will not be assigned to anything
+ *   - `t`, `bi`, `by`, and `mv` will be the macro parameters `type`,
+ *     `bit_width`, `byte_width`, and `min_val`
+ *   - `obj_p` will be an expression of the form `(volatile atype *) ptr`
+ *   - `ret` will be the name of a local identifier
+ *   - `ret` will have type (type) and may be uninitialised
+ *   - `order` will be an expression of type (int) whose value is a valid
+ *     memory order
+ */
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_VOID( \
+    bit_width, byte_width,                                           \
+    do_atomic_arithmetic_op_fetch_void_explicit,                     \
+    do_assert, do_assert_aligned, do_memcpy,                         \
+    type, atype, fn_name, order, vis_p, min_val                      \
+)                                                                    \
+    static PATOMIC_FORCE_INLINE void                                 \
+    fn_name(                                                         \
+        volatile void *obj                                           \
+ vis_p(_,int order)                                                  \
+        ,void *ret                                                   \
+    )                                                                \
+    {                                                                \
+        /* declarations */                                           \
+        type ret_val;                                                \
+        type scratch;                                                \
+        int temp;                                                    \
+        /* assertions */                                             \
+        do_assert(obj != NULL);                                      \
+        do_assert(ret != NULL);                                      \
+        do_assert_aligned(obj, atype);                               \
+        do_assert(patomic_is_valid_order((int) order));              \
+        /* operation */                                              \
+        do_atomic_arithmetic_op_fetch_void_explicit(                 \
+            type, bit_width, byte_width, min_val,                    \
+            (volatile atype *) obj,                                  \
+            (int) order,                                             \
+            ret_val                                                  \
+        );                                                           \
+        /* cleanup */                                                \
+        do_memcpy(ret, &ret_val, sizeof(type));                      \
+        PATOMIC_IGNORE_UNUSED(scratch);                              \
+        PATOMIC_IGNORE_UNUSED(temp);                                 \
+    }
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_INC \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_VOID
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_DEC \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_VOID
+
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NEG \
+    PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_VOID
+
+
 #endif  /* !PATOMIC_PATOMIC_WRAPPED_DIRECT_H */
