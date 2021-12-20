@@ -45,8 +45,8 @@
 
 /* '__extension__ long long' is available as a type */
 /* requires: GNU compatible(-ish) compiler */
-#ifndef PATOMIC_HAVE_LONG_LONG_EXT
-    #define PATOMIC_HAVE_LONG_LONG_EXT 0
+#ifndef PATOMIC_HAVE_LONG_LONG_EXTN
+    #define PATOMIC_HAVE_LONG_LONG_EXTN 0
 #endif
 
 /* '__int128' is available as a type */

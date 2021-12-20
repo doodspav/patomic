@@ -8,8 +8,8 @@
 #endif
 
 /* '__extension__ long long' is available as a type */
-#ifndef PATOMIC_HAVE_LONG_LONG_EXT
-    #define PATOMIC_HAVE_LONG_LONG_EXT @COMPILER_HAS_LONG_LONG_EXTN@
+#ifndef PATOMIC_HAVE_LONG_LONG_EXTN
+    #define PATOMIC_HAVE_LONG_LONG_EXTN @COMPILER_HAS_LONG_LONG_EXTN@
 #endif
 
 /* '__int128' is available as a type */

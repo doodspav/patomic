@@ -17,6 +17,9 @@
 #elif PATOMIC_HAVE_LONG_LONG
     typedef signed long long   patomic_intptr_t;
     typedef unsigned long long patomic_uintptr_t;
+#elif PATOMIC_HAVE_LONG_LONG_EXTN
+    __extension__ typedef signed long long   patomic_intptr_t;
+    __extension__ typedef unsigned long long patomic_uintptr_t;
 #else
     typedef signed long   patomic_intptr_t;
     typedef unsigned long patomic_uintptr_t;
