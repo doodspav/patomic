@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
+## [Unreleased] [Patch]
+### Added
+- following config macros for internal use:
+  - `PATOMIC_HAVE_GNU_SYNC`
+  - `PATOMIC_HAVE_GNU_ATOMIC`
+  - `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` for `N` in `[1, 2, 4, 8, 16]`
+
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added
 - `wrapped` macro implementations of all ops:

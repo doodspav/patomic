@@ -2,6 +2,18 @@
 #define PATOMIC_PATOMIC_CONFIG_H
 
 
+/*
+ * The following macros should never be modified unless cross-compiling for a
+ * target platform which would not define them to have the same value as the
+ * host platform
+ *
+ * Changing these macros incorrectly WILL result in a library which exhibits
+ * undefined behaviour and will likely function incorrectly.
+ *
+ * For this reason, they cannot be overridden via compiler flags; they can only
+ * be explicitly modified in this file.
+ */
+
 #include <limits.h>
 
 /* integer representation is two's complement */
@@ -10,11 +22,17 @@
 
 
 /*
+ * The following macros may be modified and overridden safely. At worst, this
+ * may cause a compile-time warning/error or limit runtime functionality
+ * exposed by the library.
+ *
  * The following macros are defined in '_patomic_config.h' which is generated
- * by CMake at build time.
- * If you do not use CMake to build this project, comment out the '#include'
- * and modify the macro values.
- * The 'requires:' comments are to be taken as helpful hints.
+ * by CMake at build time. If you do not use CMake to build this project,
+ * comment out the '#include' and modify the macros manually (or set them via
+ * compiler flags).
+ *
+ * The 'requires:' comments are to be taken as helpful hints when modifying or
+ * overriding these macros.
  */
 
 #include <patomic/_patomic_config.h>
@@ -178,6 +196,79 @@
 /* note: currently MSVC defines __STD_NO_ATOMICS__ */
 #ifndef PATOMIC_HAVE_STD_ATOMIC
     #define PATOMIC_HAVE_STD_ATOMIC 0
+#endif
+
+/* '__sync' builtins are available */
+/* requires: GNU compatible(-ish) compiler */
+/* note: check the PATOMIC_HAVE_GNU_SYNC_LOCK_FREE macros */
+#ifndef PATOMIC_HAVE_GNU_SYNC
+    #define PATOMIC_HAVE_GNU_SYNC 0
+#endif
+
+/* '__atomic' builtins and '__ATOMIC' constants are available */
+/* requires: GNU compatible (-ish) compiler */
+#ifndef PATOMIC_HAVE_GNU_ATOMIC
+    #define PATOMIC_HAVE_GNU_ATOMIC 0
+#endif
+
+
+/*
+ * The following macros may be modified or overridden, and in same cases it may
+ * be required, but extreme caution should be taken when doing so.
+ *
+ * Changing these macros incorrectly may result in this library not working as
+ * expected in some situations (e.g. due to calling a function that isn't lock
+ * free), or may prevent this library from compiling.
+ */
+
+/* GNU builtin __sync op for sizeof(type) == 1 is lock-free */
+/* note: this must be modified/overridden to use __sync with GCC < 4.4 */
+#ifndef PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_1
+    #if PATOMIC_HAVE_GNU_SYNC && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1)
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_1 __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1
+    #else
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_1 0
+    #endif
+#endif
+
+/* GNU builtin __sync op for sizeof(type) == 2 is lock-free */
+/* note: this must be modified/overridden to use __sync with GCC < 4.4 */
+#ifndef PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_2
+    #if PATOMIC_HAVE_GNU_SYNC && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_2 __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
+    #else
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_2 0
+    #endif
+#endif
+
+/* GNU builtin __sync op for sizeof(type) == 4 is lock-free */
+/* note: this must be modified/overridden to use __sync with GCC < 4.4 */
+#ifndef PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_4
+    #if PATOMIC_HAVE_GNU_SYNC && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_4 __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+    #else
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_4 0
+    #endif
+#endif
+
+/* GNU builtin __sync op for sizeof(type) == 8 is lock-free */
+/* note: this must be modified/overridden to use __sync with GCC < 4.4 */
+#ifndef PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_8
+    #if PATOMIC_HAVE_GNU_SYNC && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_8 __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
+    #else
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_8 0
+    #endif
+#endif
+
+/* GNU builtin __sync op for sizeof(type) == 16 is lock-free */
+/* note: this must be modified/overridden to use __sync with GCC < 4.4 */
+#ifndef PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_16
+    #if PATOMIC_HAVE_GNU_SYNC && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16)
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_16 __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16
+    #else
+        #define PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_16 0
+    #endif
 #endif
 
 

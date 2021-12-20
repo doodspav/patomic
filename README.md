@@ -91,6 +91,9 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_STD_INT_UINTPTR` | `<stdint.h>` with `uintptr_t` |
 | `PATOMIC_HAVE_STD_DEF_UINTPTR` | `<stddef.h>` with `uintptr_t` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
+| `PATOMIC_HAVE_GNU_SYNC` | `__sync` |
+| `PATOMIC_HAVE_GNU_ATOMIC` | `__atomic` and `__ATOMIC` |
+| `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` | `__sync` is lock-free for `sizeof(type) == N` |
 | `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
 
 Their implementations can be found in `/src/include/patomic/patomic_config.h`.

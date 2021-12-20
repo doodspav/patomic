@@ -132,5 +132,15 @@
     #define PATOMIC_HAVE_STD_ATOMIC @COMPILER_HAS_STD_ATOMIC@
 #endif
 
+/* '__sync' builtins are available */
+#ifndef PATOMIC_HAVE_GNU_SYNC
+    #define PATOMIC_HAVE_GNU_SYNC @COMPILER_HAS_GNU_SYNC@
+#endif
+
+/* '__atomic' builtins and '__ATOMIC' constants are available */
+#ifndef PATOMIC_HAVE_GNU_ATOMIC
+    #define PATOMIC_HAVE_GNU_ATOMIC @COMPILER_HAS_GNU_ATOMIC@
+#endif
+
 
 #endif  /* !PATOMIC_CONFIG_H */

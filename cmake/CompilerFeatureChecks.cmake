@@ -186,3 +186,21 @@ check_c_source_compiles(
     COMPILER_HAS_STD_ATOMIC
 )
 zero_if_blank(COMPILER_HAS_STD_ATOMIC)
+
+check_c_source_compiles(
+    "int main(void) { \n\
+         int x = 0; \n\
+         return (int) __sync_fetch_and_add(&x, 1); }"
+    COMPILER_HAS_GNU_SYNC
+)
+zero_if_blank(COMPILER_HAS_GNU_SYNC)
+
+check_c_source_compiles(
+    "int main(void) { \n\
+         int x = 1; \n\
+         int y = 0; \n\
+         __atomic_store(&y, &x, __ATOMIC_SEQ_CST); \n\
+         (void) __atomic_fetch_add(&x, 5, __ATOMIC_ACQ_REL); \n\
+         return __atomic_load_n(&x, __ATOMIC_ACQUIRE); }"
+    COMPILER_HAS_GNU_ATOMIC
+)
