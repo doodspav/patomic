@@ -196,6 +196,12 @@
     #define PATOMIC_HAVE_BUILTIN_UNREACHABLE 0
 #endif
 
+/* '__builtin_expect(long, long)' is available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_BUILTIN_EXPECT
+    #define PATOMIC_HAVE_BUILTIN_EXPECT 0
+#endif
+
 /* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
 /* requires: C99 (optional) */
 #ifndef PATOMIC_HAVE_STD_INT_UINTPTR

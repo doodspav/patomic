@@ -185,6 +185,14 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_BUILTIN_UNREACHABLE)
 
 check_c_source_compiles(
+    "int main(int argc, char **argv) { \n\
+         if (__builtin_expect(argc < 1, 0)) { return -1; } \n\
+         else { return argv[0][0]; } }"
+    COMPILER_HAS_BUILTIN_EXPECT
+)
+zero_if_blank(COMPILER_HAS_BUILTIN_EXPECT)
+
+check_c_source_compiles(
     "#include <stdint.h> \n\
      int main(void) { uintptr_t x = 0; return (int)x; }"
     COMPILER_HAS_STD_INT_UINTPTR

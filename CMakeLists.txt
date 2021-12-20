@@ -36,6 +36,7 @@ add_library(
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/func_name.h
     src/include/patomic/macros/ignore_unused.h
+    src/include/patomic/macros/likely_unlikely.h
     src/include/patomic/macros/noinline.h
     src/include/patomic/macros/noreturn.h
     src/include/patomic/macros/restrict.h

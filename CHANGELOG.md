@@ -15,6 +15,9 @@ increment the `minor` version for breaking changes.
   - `PATOMIC_HAVE_LONG_LONG_EXTN`
   - `PATOMIC_HAVE_MS_INT128`
   - `PATOMIC_HAVE_MS_INT128_EXTN`
+- following macros and corresponding config macros for internal use:
+  - `PATOMIC_LIKELY`
+  - `PATOMIC_UNLIKELY`
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added

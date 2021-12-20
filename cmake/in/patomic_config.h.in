@@ -132,6 +132,11 @@
     #define PATOMIC_HAVE_BUILTIN_UNREACHABLE @COMPILER_HAS_BUILTIN_UNREACHABLE@
 #endif
 
+/* '__builtin_expect(long, long)' is available */
+#ifndef PATOMIC_HAVE_BUILTIN_EXPECT
+    #define PATOMIC_HAVE_BUILTIN_EXPECT @COMPILER_HAS_BUILTIN_EXPECT@
+#endif
+
 /* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
 #ifndef PATOMIC_HAVE_STD_INT_UINTPTR
     #define PATOMIC_HAVE_STD_INT_UINTPTR @COMPILER_HAS_STD_INT_UINTPTR@
