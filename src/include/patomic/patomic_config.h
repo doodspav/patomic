@@ -43,6 +43,24 @@
     #define PATOMIC_HAVE_LONG_LONG 0
 #endif
 
+/* '__extension__ long long' is available as a type */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_LONG_LONG_EXT
+    #define PATOMIC_HAVE_LONG_LONG_EXT 0
+#endif
+
+/* '__int128' is available as a type */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_MS_INT128
+    #define PATOMIC_HAVE_MS_INT128 0
+#endif
+
+/* '__extension__ __int128' is available as a type */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_MS_INT128_EXTN
+    #define PATOMIC_HAVE_MS_INT128_EXTN 0
+#endif
+
 /* '__func__' identifier is available */
 /* requires: C99 */
 #ifndef PATOMIC_HAVE_FUNC

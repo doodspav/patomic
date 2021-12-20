@@ -7,6 +7,21 @@
     #define PATOMIC_HAVE_LONG_LONG @COMPILER_HAS_LONG_LONG@
 #endif
 
+/* '__extension__ long long' is available as a type */
+#ifndef PATOMIC_HAVE_LONG_LONG_EXT
+    #define PATOMIC_HAVE_LONG_LONG_EXT @COMPILER_HAS_LONG_LONG_EXTN@
+#endif
+
+/* '__int128' is available as a type */
+#ifndef PATOMIC_HAVE_MS_INT128
+    #define PATOMIC_HAVE_MS_INT128 @COMPILER_HAS_MS_INT128@
+#endif
+
+/* '__extension__ __int128' is available as a type */
+#ifndef PATOMIC_HAVE_MS_INT128_EXTN
+    #define PATOMIC_HAVE_MS_INT128_EXTN @COMPILER_HAS_MS_INT128_EXTN@
+#endif
+
 /* '__func__' identifier is available */
 #ifndef PATOMIC_HAVE_FUNC
     #define PATOMIC_HAVE_FUNC @COMPILER_HAS_FUNC@

@@ -11,6 +11,24 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_LONG_LONG)
 
 check_c_source_compiles(
+    "int main(void) { __extension__ long long x = 0; return (int)x; }"
+    COMPILER_HAS_LONG_LONG_EXTN
+)
+zero_if_blank(COMPILER_HAS_LONG_LONG_EXTN)
+
+check_c_source_compiles(
+    "int main(void) { __int128 x = 0; return (int)x; }"
+    COMPILER_HAS_MS_INT128
+)
+zero_if_blank(COMPILER_HAS_MS_INT128)
+
+check_c_source_compiles(
+    "int main(void) { __extension__ __int128 x = 0; return (int)x; }"
+    COMPILER_HAS_MS_INT128_EXTN
+)
+zero_if_blank(COMPILER_HAS_MS_INT128_EXTN)
+
+check_c_source_compiles(
     "int main(void) { return __func__[0] == 0; }"
     COMPILER_HAS_FUNC
 )

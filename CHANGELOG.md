@@ -12,6 +12,9 @@ increment the `minor` version for breaking changes.
   - `PATOMIC_HAVE_GNU_SYNC`
   - `PATOMIC_HAVE_GNU_ATOMIC`
   - `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` for `N` in `[1, 2, 4, 8, 16]`
+  - `PATOMIC_HAVE_LONG_LONG_EXTN`
+  - `PATOMIC_HAVE_MS_INT128`
+  - `PATOMIC_HAVE_MS_INT128_EXTN`
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added

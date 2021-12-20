@@ -66,6 +66,9 @@ always be defined, either through internal or command line means).
 | Name | Guarding |
 | --- | --- |
 | `PATOMIC_HAVE_LONG_LONG` | `long long` |
+| `PATOMIC_HAVE_LONG_LONG_EXTN` | `__extension__ long long` |
+| `PATOMIC_HAVE_MS_INT128` | `__int128` |
+| `PATOMIC_HAVE_MS_INT128_EXTN` | `__extension__ __int128` |
 | `PATOMIC_HAVE_FUNC` | `__func__` |
 | `PATOMIC_HAVE_GNU_FUNCTION` | `__FUNCTION__` |
 | `PATOMIC_HAVE_GNU_FUNCTION_EXTN` | `__extension__ __FUNCTION__` |
