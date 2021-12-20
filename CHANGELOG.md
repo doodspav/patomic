@@ -18,6 +18,7 @@ increment the `minor` version for breaking changes.
 - following macros and corresponding config macros for internal use:
   - `PATOMIC_LIKELY`
   - `PATOMIC_UNLIKELY`
+- alignment helpers in `stdalign.h`
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added
