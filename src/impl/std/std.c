@@ -512,38 +512,47 @@
 #endif
 
 
-#define PATOMIC_SET_RET(type, name, width, order, ret)              \
-        (((width) == sizeof(type)) &&                               \
-         ((width) == sizeof(_Atomic(type))))                        \
-    {                                                               \
-        switch (order)                                              \
-        {                                                           \
-            case patomic_RELAXED:                                   \
-                (ret) = patomic_ops_create_##name##_relaxed();      \
-                break;                                              \
-            case patomic_CONSUME:                                   \
-            case patomic_ACQUIRE:                                   \
-                (ret) = patomic_ops_create_##name##_acquire();      \
-                break;                                              \
-            case patomic_RELEASE:                                   \
-                (ret) = patomic_ops_create_##name##_release();      \
-                break;                                              \
-            case patomic_ACQ_REL:                                   \
-                (ret) = patomic_ops_create_##name##_acq_rel();      \
-                break;                                              \
-            case patomic_SEQ_CST:                                   \
-                (ret) = patomic_ops_create_##name##_seq_cst();      \
-                break;                                              \
-            default:                                                \
-                patomic_assert_always("invalid memory order" && 0); \
-        }                                                           \
+#define PATOMIC_SET_RET(type, name, width, order, ret)                  \
+        (((width) == sizeof(type)) &&                                   \
+         ((width) == sizeof(_Atomic(type))))                            \
+    {                                                                   \
+        _Atomic(type) obj;                                              \
+        if (atomic_is_lock_free(&obj))                                  \
+        {                                                               \
+            switch (order)                                              \
+            {                                                           \
+                case patomic_RELAXED:                                   \
+                    (ret) = patomic_ops_create_##name##_relaxed();      \
+                    break;                                              \
+                case patomic_CONSUME:                                   \
+                case patomic_ACQUIRE:                                   \
+                    (ret) = patomic_ops_create_##name##_acquire();      \
+                    break;                                              \
+                case patomic_RELEASE:                                   \
+                    (ret) = patomic_ops_create_##name##_release();      \
+                    break;                                              \
+                case patomic_ACQ_REL:                                   \
+                    (ret) = patomic_ops_create_##name##_acq_rel();      \
+                    break;                                              \
+                case patomic_SEQ_CST:                                   \
+                    (ret) = patomic_ops_create_##name##_seq_cst();      \
+                    break;                                              \
+                default:                                                \
+                    patomic_assert_always("invalid memory order" && 0); \
+            }                                                           \
+        }                                                               \
+        PATOMIC_IGNORE_UNUSED(obj);                                     \
     }
 
-#define PATOMIC_SET_RET_EXPLICIT(type, name, width, ret) \
-        (((width) == sizeof(type)) &&                    \
-         ((width) == sizeof(_Atomic(type))))             \
-    {                                                    \
-        (ret) = patomic_ops_create_##name##_explicit();  \
+#define PATOMIC_SET_RET_EXPLICIT(type, name, width, ret)    \
+        (((width) == sizeof(type)) &&                       \
+         ((width) == sizeof(_Atomic(type))))                \
+    {                                                       \
+        _Atomic(type) obj;                                  \
+        if (atomic_is_lock_free(&obj)) {                    \
+            (ret) = patomic_ops_create_##name##_explicit(); \
+        }                                                   \
+        PATOMIC_IGNORE_UNUSED(obj);                         \
     }
 
 #define PATOMIC_SET_ALIGN(type, width, member)          \
@@ -589,7 +598,7 @@ patomic_create_ops_explicit(
     else if PATOMIC_SET_RET_EXPLICIT(patomic_llong_unsigned , llong, byte_width, ret)
 #endif
 
-return ret;
+    return ret;
 }
 
 static patomic_align_t

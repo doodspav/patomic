@@ -34,6 +34,8 @@ increment the `minor` version for breaking changes.
   available (by virtue of the fact that it now uses `patomic_llong_(un)signed`
   from `stdint.h` rather than `(unsigned) long long` directly)
 - `std` implementation now properly does 2s complement checks for `neg` op
+- `std` implementation now does runtime `atomic_is_lock_free` checks in
+  addition to the compile-time macro checks
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added
