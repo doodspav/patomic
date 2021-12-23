@@ -19,6 +19,9 @@ increment the `minor` version for breaking changes.
   - `PATOMIC_LIKELY`
   - `PATOMIC_UNLIKELY`
 - alignment helpers in `stdalign.h`
+### Changed
+- removed `do_assert`, `do_assert_aligned`, and `do_memcpy` parameters from
+  wrapped macros; now use overrideable default macros from `wrapped/do.h`
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added

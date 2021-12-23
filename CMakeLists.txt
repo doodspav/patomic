@@ -51,6 +51,7 @@ add_library(
     src/include/patomic/wrapped/cmpxchg.h
     src/include/patomic/wrapped/direct.h
     src/include/patomic/wrapped/fetch.h
+    src/include/patomic/wrapped/do.h
     # src/patomic
     src/patomic/patomic_version.c
     # src/patomic/stdlib

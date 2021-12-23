@@ -13,63 +13,11 @@
 #include <stdatomic.h>
 #include <stddef.h>
 
-#include <patomic/macros/force_inline.h>
-
 #include <patomic/stdlib/assert.h>
-#include <patomic/stdlib/stdint.h>
-#include <patomic/stdlib/string.h>
 
 #include <patomic/wrapped/cmpxchg.h>
 #include <patomic/wrapped/direct.h>
 #include <patomic/wrapped/fetch.h>
-
-
-#undef PATOMIC_ALIGNOF_IS_SIZEOF
-#if PATOMIC_HAVE_ALIGNOF
-    #define patomic_alignof(t) _Alignof(t)
-#elif PATOMIC_HAVE_MS_ALIGNOF_ALIGN_DSPC
-    #define patomic_alignof(t) __alignof(t)
-#elif PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR
-    #define patomic_alignof(t) __alignof__(t)
-#else
-    #define patomic_alignof(t) sizeof(t)
-    #define PATOMIC_ALIGNOF_IS_SIZEOF
-#endif
-
-
-static PATOMIC_FORCE_INLINE int
-patomic_is_aligned(
-    const volatile void *ptr,
-    size_t align
-)
-{
-    patomic_uintptr_t addr = (patomic_uintptr_t) ptr;
-#ifdef PATOMIC_ALIGNOF_IS_SIZEOF
-    /* align might not be a power of 2 (but won't be 0) */
-    if ((align & (align - 1u)) == 0) { addr &= (align - 1u); }
-    else { addr %= align; }
-#else
-    /* align will always be a power of 2 */
-    addr &= (align - 1u);
-#endif
-    return addr == 0;
-}
-
-
-#define patomic_assert_unreachable_aligned(obj, type) \
-    patomic_assert_unreachable(patomic_is_aligned(obj, patomic_alignof(type)))
-
-#define patomic_ignored_memcpy(dst, src, sz) \
-    PATOMIC_IGNORE_UNUSED(patomic_memcpy(dst, src, sz))
-
-
-/* hide/show anything */
-#define HIDE(x)
-#define SHOW(x) x
-
-/* hide/show function param with leading comma */
-#define HIDE_P(x, y)
-#define SHOW_P(x, y) ,y
 
 
 /*
@@ -96,9 +44,6 @@ patomic_is_aligned(
 #define PATOMIC_DEFINE_STORE_OPS(type, name, order, vis_p) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(                \
         0, 0, patomic_do_store_e,                          \
-        patomic_assert_unreachable,                        \
-        patomic_assert_unreachable_aligned,                \
-        patomic_ignored_memcpy,                            \
         type, _Atomic(type),                               \
         patomic_opimpl_store_##name,                       \
         order, vis_p                                       \
@@ -107,9 +52,6 @@ patomic_is_aligned(
 #define PATOMIC_DEFINE_LOAD_OPS(type, name, order, vis_p) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                \
         0, 0, patomic_do_load_e,                          \
-        patomic_assert_unreachable,                       \
-        patomic_assert_unreachable_aligned,               \
-        patomic_ignored_memcpy,                           \
         type, _Atomic(type),                              \
         patomic_opimpl_load_##name,                       \
         order, vis_p                                      \
@@ -131,27 +73,18 @@ patomic_is_aligned(
 #define PATOMIC_DEFINE_XCHG_OPS_CREATE(type, name, order, vis_p, inv, opsk) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(                              \
         0, 0, patomic_do_exchange_e,                                        \
-        patomic_assert_unreachable,                                         \
-        patomic_assert_unreachable_aligned,                                 \
-        patomic_ignored_memcpy,                                             \
         type, _Atomic(type),                                                \
         patomic_opimpl_exchange_##name,                                     \
         order, vis_p                                                        \
     )                                                                       \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK(                          \
         0, 0, patomic_do_cmpxchg_we,                                        \
-        patomic_assert_unreachable,                                         \
-        patomic_assert_unreachable_aligned,                                 \
-        patomic_ignored_memcpy,                                             \
         type, _Atomic(type),                                                \
         patomic_opimpl_cmpxchg_weak_##name,                                 \
         order, vis_p, inv                                                   \
     )                                                                       \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_STRONG(                        \
         0, 0, patomic_do_cmpxchg_se,                                        \
-        patomic_assert_unreachable,                                         \
-        patomic_assert_unreachable_aligned,                                 \
-        patomic_ignored_memcpy,                                             \
         type, _Atomic(type),                                                \
         patomic_opimpl_cmpxchg_strong_##name,                               \
         order, vis_p, inv                                                   \
@@ -198,9 +131,6 @@ patomic_is_aligned(
 #define PATOMIC_DEFINE_BIT_TEST_OPS(type, name, order, vis_p) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(                \
         0, 0, patomic_do_bt_e,                                \
-        patomic_assert_unreachable,                           \
-        patomic_assert_unreachable_aligned,                   \
-        patomic_ignored_memcpy,                               \
         type, _Atomic(type),                                  \
         patomic_opimpl_bit_test_##name,                       \
         order, vis_p                                          \
@@ -211,9 +141,6 @@ patomic_is_aligned(
         0, 0, patomic_do_cmpxchg_we, patomic_do_cmp_eqz,             \
         patomic_do_ip_nth_bit_mask,                                  \
         patomic_do_ip_bit_and, patomic_do_ip_bit_xor,                \
-        patomic_assert_unreachable,                                  \
-        patomic_assert_unreachable_aligned,                          \
-        patomic_ignored_memcpy,                                      \
         type, _Atomic(type),                                         \
         patomic_opimpl_bit_test_compl_##name,                        \
         order, vis_p                                                 \
@@ -222,9 +149,6 @@ patomic_is_aligned(
         0, 0, patomic_do_cmpxchg_we, patomic_do_cmp_eqz,             \
         patomic_do_ip_nth_bit_mask,                                  \
         patomic_do_ip_bit_and, patomic_do_ip_bit_or,                 \
-        patomic_assert_unreachable,                                  \
-        patomic_assert_unreachable_aligned,                          \
-        patomic_ignored_memcpy,                                      \
         type, _Atomic(type),                                         \
         patomic_opimpl_bit_test_set_##name,                          \
         order, vis_p                                                 \
@@ -233,9 +157,6 @@ patomic_is_aligned(
         0, 0, patomic_do_cmpxchg_we, patomic_do_cmp_eqz,             \
         patomic_do_ip_nth_bit_mask,                                  \
         patomic_do_ip_bit_and, patomic_do_ip_bit_not,                \
-        patomic_assert_unreachable,                                  \
-        patomic_assert_unreachable_aligned,                          \
-        patomic_ignored_memcpy,                                      \
         type, _Atomic(type),                                         \
         patomic_opimpl_bit_test_reset_##name,                        \
         order, vis_p                                                 \
@@ -284,72 +205,48 @@ patomic_is_aligned(
 #define PATOMIC_DEFINE_BIN_OPS_CREATE(type, name, order, vis_p, opsk)     \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_OR(                            \
         0, 0, patomic_do_or_fe,                                           \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_fetch_or_##name,                                   \
         order, vis_p                                                      \
     )                                                                     \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_XOR(                           \
         0, 0, patomic_do_xor_fe,                                          \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_fetch_xor_##name,                                  \
         order, vis_p                                                      \
     )                                                                     \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_AND(                           \
         0, 0, patomic_do_and_fe,                                          \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_fetch_and_##name,                                  \
         order, vis_p                                                      \
     )                                                                     \
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOT(                          \
         0, 0, patomic_do_cmpxchg_we, patomic_do_ip_bit_not,               \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_fetch_not_##name,                                  \
         order, vis_p                                                      \
     )                                                                     \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                             \
         patomic_opimpl_fetch_or_##name,                                   \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_or_##name,                                         \
         vis_p                                                             \
     )                                                                     \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                             \
         patomic_opimpl_fetch_xor_##name,                                  \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_xor_##name,                                        \
         vis_p                                                             \
     )                                                                     \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                             \
         patomic_opimpl_fetch_and_##name,                                  \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_and_##name,                                        \
         vis_p                                                             \
     )                                                                     \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                \
         patomic_opimpl_fetch_not_##name,                                  \
-        patomic_assert_unreachable,                                       \
-        patomic_assert_unreachable_aligned,                               \
-        patomic_ignored_memcpy,                                           \
         type, _Atomic(type),                                              \
         patomic_opimpl_not_##name,                                        \
         vis_p                                                             \
@@ -389,90 +286,60 @@ patomic_is_aligned(
 #define PATOMIC_DEFINE_ARI_OPS_CREATE(type, name, order, vis_p, opsk, min) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_ADD(                            \
         0, 0, patomic_do_add_fe,                                           \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_fetch_add_##name,                                   \
         order, vis_p, min                                                  \
     )                                                                      \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_SUB(                            \
         0, 0, patomic_do_sub_fe,                                           \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_fetch_sub_##name,                                   \
         order, vis_p, min                                                  \
     )                                                                      \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_INC(                            \
         0, 0, patomic_do_inc_fe,                                           \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_fetch_inc_##name,                                   \
         order, vis_p, min                                                  \
     )                                                                      \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_DEC(                            \
         0, 0, patomic_do_dec_fe,                                           \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_fetch_dec_##name,                                   \
         order, vis_p, min                                                  \
     )                                                                      \
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NEG(                           \
         0, 0, patomic_do_cmpxchg_we, patomic_do_ip_neg,                    \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_fetch_neg_##name,                                   \
         order, vis_p, min                                                  \
     )                                                                      \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                              \
         patomic_opimpl_fetch_add_##name,                                   \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_add_##name,                                         \
         vis_p                                                              \
     )                                                                      \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_WITH_ARG(                              \
         patomic_opimpl_fetch_sub_##name,                                   \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_sub_##name,                                         \
         vis_p                                                              \
     )                                                                      \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                 \
         patomic_opimpl_fetch_inc_##name,                                   \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_inc_##name,                                         \
         vis_p                                                              \
     )                                                                      \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                 \
         patomic_opimpl_fetch_dec_##name,                                   \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_dec_##name,                                         \
         vis_p                                                              \
     )                                                                      \
     PATOMIC_WRAPPED_FETCH_DEFINE_OP_NOARG(                                 \
         patomic_opimpl_fetch_neg_##name,                                   \
-        patomic_assert_unreachable,                                        \
-        patomic_assert_unreachable_aligned,                                \
-        patomic_ignored_memcpy,                                            \
         type, _Atomic(type),                                               \
         patomic_opimpl_neg_##name,                                         \
         vis_p                                                              \
@@ -627,10 +494,8 @@ patomic_is_aligned(
 #if ATOMIC_LONG_LOCK_FREE
     PATOMIC_DEFINE_OPS_CREATE_ALL(long, long, LONG_MIN)
 #endif
-#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
-    #if ATOMIC_LLONG_LOCK_FREE
-        PATOMIC_DEFINE_OPS_CREATE_ALL(long long, llong, LLONG_MIN)
-    #endif
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
+    PATOMIC_DEFINE_OPS_CREATE_ALL(long long, llong, LLONG_MIN)
 #endif
 
 
@@ -668,11 +533,11 @@ patomic_is_aligned(
         (ret) = patomic_ops_create_##name##_explicit();  \
     }
 
-#define PATOMIC_SET_ALIGN(type, width, member)     \
-        (((width) == sizeof(type)) &&              \
-         ((width) == sizeof(_Atomic(type))))       \
-    {                                              \
-        (member) = patomic_alignof(_Atomic(type)); \
+#define PATOMIC_SET_ALIGN(type, width, member)          \
+        (((width) == sizeof(type)) &&                   \
+         ((width) == sizeof(_Atomic(type))))            \
+    {                                                   \
+        (member) = patomic_alignof_type(_Atomic(type)); \
     }
 
 
@@ -689,10 +554,8 @@ patomic_create_ops(
     else if PATOMIC_SET_RET(short, short, byte_width, order, ret)
     else if PATOMIC_SET_RET(int, int, byte_width, order, ret)
     else if PATOMIC_SET_RET(long, long, byte_width, order, ret)
-#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
-#if ATOMIC_LLONG_LOCK_FREE
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
     else if PATOMIC_SET_RET(long long, llong, byte_width, order, ret)
-#endif
 #endif
 
     return ret;
@@ -709,10 +572,8 @@ patomic_create_ops_explicit(
     else if PATOMIC_SET_RET_EXPLICIT(short, short, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(int, int, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(long, long, byte_width, ret)
-#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
-#if ATOMIC_LLONG_LOCK_FREE
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
     else if PATOMIC_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
-#endif
 #endif
 
 return ret;
@@ -729,10 +590,8 @@ patomic_create_align(
     else if PATOMIC_SET_ALIGN(short, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(int, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(long, byte_width, ret.recommended)
-#if PATOMIC_HAVE_LONG_LONG && defined(ATOMIC_LLONG_LOCK_FREE)
-#if ATOMIC_LLONG_LOCK_FREE
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
     else if PATOMIC_SET_ALIGN(long long, byte_width, ret.recommended)
-#endif
 #endif
     else { ret.recommended = 1; }
 
