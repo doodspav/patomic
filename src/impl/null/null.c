@@ -3,9 +3,6 @@
 #include <patomic/patomic.h>
 #include <patomic/macros/ignore_unused.h>
 
-static const patomic_t patomic_NULL;
-static const patomic_explicit_t patomic_explicit_NULL;
-static const patomic_transaction_t patomic_transaction_NULL;
 
 patomic_t
 patomic_impl_create_null(
@@ -14,11 +11,10 @@ patomic_impl_create_null(
     int options
 )
 {
-    patomic_t ret;
+    patomic_t ret = {0};
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(order);
     PATOMIC_IGNORE_UNUSED(options);
-    ret = patomic_NULL;
     ret.align.recommended = 1;
     ret.align.minimum = 1;
     return ret;
@@ -30,10 +26,9 @@ patomic_impl_create_explicit_null(
     int options
 )
 {
-    patomic_explicit_t ret;
+    patomic_explicit_t ret = {0};
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(options);
-    ret = patomic_explicit_NULL;
     ret.align.recommended = 1;
     ret.align.minimum = 1;
     return ret;
@@ -44,9 +39,8 @@ patomic_impl_create_transaction_null(
     int options
 )
 {
-    patomic_transaction_t ret;
+    patomic_transaction_t ret = {0};
     PATOMIC_IGNORE_UNUSED(options);
-    ret = patomic_transaction_NULL;
     ret.align.recommended = 1;
     ret.align.minimum = 1;
     return ret;
