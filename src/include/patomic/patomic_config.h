@@ -16,9 +16,27 @@
 
 #include <limits.h>
 
-/* integer representation is two's complement */
-#undef PATOMIC_HAVE_TWOS_COMPL
-#define PATOMIC_HAVE_TWOS_COMPL (-INT_MAX != INT_MIN)
+/* integer representation is sign-magnitude */
+#undef PATOMIC_HAVE_IR_SIGN_MAGNITUDE
+#define PATOMIC_HAVE_IR_SIGN_MAGNITUDE \
+    ((-INT_MAX == INT_MIN) && ((-1 & 1) != 0))
+
+/* integer representation is ones-complement */
+#undef PATOMIC_HAVE_IR_ONES_COMPL
+#define PATOMIC_HAVE_IR_ONES_COMPL \
+    ((-INT_MAX == INT_MIN) && ((-1 & 1) == 0))
+
+/* integer representation is twos-complement */
+#undef PATOMIC_HAVE_IR_TWOS_COMPL
+#define PATOMIC_HAVE_IR_TWOS_COMPL \
+    (-INT_MAX != INT_MIN)
+
+/* check exactly one representation is supported */
+#if (PATOMIC_HAVE_IR_SIGN_MAGNITUDE + \
+     PATOMIC_HAVE_IR_ONES_COMPL     + \
+     PATOMIC_HAVE_IR_TWOS_COMPL) != 1
+    #error Multiple integer representations supported
+#endif
 
 
 /*

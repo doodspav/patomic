@@ -13,6 +13,8 @@
 #include <stdatomic.h>
 #include <stddef.h>
 
+#include <patomic/macros/likely_unlikely.h>
+
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/stdint.h>
 
@@ -287,10 +289,10 @@
 #define patomic_do_sub_fe(t,i,y,m,p,a,o,r) r=atomic_fetch_sub_explicit(p,a,o)
 #define patomic_do_inc_fe(t,i,y,m,p,o,r) r=atomic_fetch_add_explicit(p,(t)1u,o)
 #define patomic_do_dec_fe(t,i,y,m,p,o,r) r=atomic_fetch_sub_explicit(p,(t)1u,o)
-#if PATOMIC_HAVE_TWOS_COMPL
-    #define patomic_do_ip_neg(t,i,y,m,a)                            \
-        if ( ((t)(m) == (t)0) ||   /* t is unsigned */              \
-             ((t)(m) != (a)) )     /* t is signed but a != T_MIN */ \
+#if PATOMIC_HAVE_IR_TWOS_COMPL
+    #define patomic_do_ip_neg(t,i,y,m,a)                                      \
+        if ( ((t)(m) == (t)0) ||             /* t is unsigned */              \
+             PATOMIC_LIKELY((t)(m) != (a)) ) /* t is signed but a != T_MIN */ \
         { a = (t)(-(a)); }
 #else
     #define patomic_do_ip_neg(t,i,y,m,a) a = (t)(-(a))

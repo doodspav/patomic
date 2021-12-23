@@ -15,6 +15,8 @@ increment the `minor` version for breaking changes.
   - `PATOMIC_HAVE_LONG_LONG_EXTN`
   - `PATOMIC_HAVE_MS_INT128`
   - `PATOMIC_HAVE_MS_INT128_EXTN`
+  - `PATOMIC_HAVE_IR_SIGN_MAGNITUDE`
+  - `PATOMIC_HAVE_IR_ONES_COMPL`
 - following macros and corresponding config macros for internal use:
   - `PATOMIC_LIKELY`
   - `PATOMIC_UNLIKELY`
@@ -36,6 +38,7 @@ increment the `minor` version for breaking changes.
 - `std` implementation now properly does 2s complement checks for `neg` op
 - `std` implementation now does runtime `atomic_is_lock_free` checks in
   addition to the compile-time macro checks
+- renamed `PATOMIC_HAVE_TWOS_COMPL` to `PATOMIC_HAVE_IR_TWOS_COMPL`
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added

@@ -98,7 +98,9 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_GNU_SYNC` | `__sync` |
 | `PATOMIC_HAVE_GNU_ATOMIC` | `__atomic` and `__ATOMIC` |
 | `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` | `__sync` is lock-free for `sizeof(type) == N` |
-| `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
+| `PATOMIC_HAVE_IR_SIGN_MAGNITUDE` | integer representation is sign-magnitude |
+| `PATOMIC_HAVE_IR_ONES_COMPL` | integer representation is ones-complement |
+| `PATOMIC_HAVE_IR_TWOS_COMPL` | integer representation is twos-complement |
 
 Their implementations can be found in `/src/include/patomic/patomic_config.h`.
 
