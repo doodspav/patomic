@@ -19,9 +19,21 @@ increment the `minor` version for breaking changes.
   - `PATOMIC_LIKELY`
   - `PATOMIC_UNLIKELY`
 - alignment helpers in `stdalign.h`
+- typedefs for `char`, `short`, `int`, and `long` in `stdint.h` of the form
+  `patomic_TYPE_(un)signed`
+- conditionally existing typedefs for `long long` and `__int128` with the same
+  naming scheme
+- macros `PATOMIC_STDINT_HAVE_LLONG/I128` to check if the conditional typedefs
+  are available
 ### Changed
 - removed `do_assert`, `do_assert_aligned`, and `do_memcpy` parameters from
   wrapped macros; now use overrideable default macros from `wrapped/do.h`
+- `patomic_(u)intptr_t` now checks for 128bit type before checking for
+  `(unsigned) long long`
+- `std` implementation can now use `__extension__ (unsigned) long long` if it's
+  available (by virtue of the fact that it now uses `patomic_llong_(un)signed`
+  from `stdint.h` rather than `(unsigned) long long` directly)
+- `std` implementation now properly does 2s complement checks for `neg` op
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added

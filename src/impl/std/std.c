@@ -14,10 +14,18 @@
 #include <stddef.h>
 
 #include <patomic/stdlib/assert.h>
+#include <patomic/stdlib/stdint.h>
 
 #include <patomic/wrapped/cmpxchg.h>
 #include <patomic/wrapped/direct.h>
 #include <patomic/wrapped/fetch.h>
+
+
+#if PATOMIC_STDINT_HAVE_LLONG && defined(LLONG_MIN)
+    #define PATOMIC_IMPL_STD_HAVE_LLONG 1
+#else
+    #define PATOMIC_IMPL_STD_HAVE_LLONG 0
+#endif
 
 
 /*
@@ -279,9 +287,14 @@
 #define patomic_do_sub_fe(t,i,y,m,p,a,o,r) r=atomic_fetch_sub_explicit(p,a,o)
 #define patomic_do_inc_fe(t,i,y,m,p,o,r) r=atomic_fetch_add_explicit(p,(t)1u,o)
 #define patomic_do_dec_fe(t,i,y,m,p,o,r) r=atomic_fetch_sub_explicit(p,(t)1u,o)
-#define patomic_do_ip_neg(t,i,y,m,a) a = (t)( \
-    ((t)(m) == (t)0) ? -(a)                   \
-                     : ((t)(m) == (a)) ? (a) : -(a))
+#if PATOMIC_HAVE_TWOS_COMPL
+    #define patomic_do_ip_neg(t,i,y,m,a)                            \
+        if ( ((t)(m) == (t)0) ||   /* t is unsigned */              \
+             ((t)(m) != (a)) )     /* t is signed but a != T_MIN */ \
+        { a = (t)(-(a)); }
+#else
+    #define patomic_do_ip_neg(t,i,y,m,a) a = (t)(-(a))
+#endif
 
 #define PATOMIC_DEFINE_ARI_OPS_CREATE(type, name, order, vis_p, opsk, min) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_ADD(                            \
@@ -372,91 +385,91 @@
  * - rsc: only {relaxed, seq_cst} orders
  * - explicit: explicit
  */
-#define PATOMIC_DEFINE_OPS_CREATE_CA(type, name, order, vis_p, inv, opsk, min)      \
-    /* no store in consume/acquire */                                               \
-    PATOMIC_DEFINE_LOAD_OPS(unsigned type, u##name, order, vis_p)                   \
-    PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis_p, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(unsigned type, u##name, order, vis_p, opsk)  \
-    PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk)       \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk, 0u)   \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis_p, opsk, min)    \
-    static patomic_##opsk##_t                                                       \
-    patomic_ops_create_##name(void)                                                 \
-    {                                                                               \
-        patomic_##opsk##_t pao;                                                     \
-        pao.fp_store = NULL;                                                        \
-        pao.fp_load = patomic_opimpl_load_u##name;                                  \
-        pao.xchg_ops = patomic_ops_xchg_create_u##name();                           \
-        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                     \
-        pao.binary_ops = patomic_ops_binary_create_u##name();                       \
-        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                 \
-        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                   \
-        return pao;                                                                 \
+#define PATOMIC_DEFINE_OPS_CREATE_CA(type, name, order, vis_p, inv, opsk, min)        \
+    /* no store in consume/acquire */                                                 \
+    PATOMIC_DEFINE_LOAD_OPS(type##_unsigned, u##name, order, vis_p)                   \
+    PATOMIC_DEFINE_XCHG_OPS_CREATE(type##_unsigned, u##name, order, vis_p, inv, opsk) \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(type##_unsigned, u##name, order, vis_p, opsk)  \
+    PATOMIC_DEFINE_BIN_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk)       \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk, 0u)   \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_signed, s##name, order, vis_p, opsk, min)    \
+    static patomic_##opsk##_t                                                         \
+    patomic_ops_create_##name(void)                                                   \
+    {                                                                                 \
+        patomic_##opsk##_t pao;                                                       \
+        pao.fp_store = NULL;                                                          \
+        pao.fp_load = patomic_opimpl_load_u##name;                                    \
+        pao.xchg_ops = patomic_ops_xchg_create_u##name();                             \
+        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                       \
+        pao.binary_ops = patomic_ops_binary_create_u##name();                         \
+        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                   \
+        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                     \
+        return pao;                                                                   \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_R(type, name, order, vis_p, inv, opsk, min)       \
-    PATOMIC_DEFINE_STORE_OPS(unsigned type, u##name, order, vis_p)                  \
-    /* no load in release */                                                        \
-    PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis_p, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(unsigned type, u##name, order, vis_p, opsk)   \
-    PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk)       \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk, 0u)   \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis_p, opsk, min)    \
-    static patomic_##opsk##_t                                                       \
-    patomic_ops_create_##name(void)                                                 \
-    {                                                                               \
-        patomic_##opsk##_t pao;                                                     \
-        pao.fp_store = patomic_opimpl_store_u##name;                                \
-        pao.fp_load = NULL;                                                         \
-        pao.xchg_ops = patomic_ops_xchg_create_u##name();                           \
-        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                     \
-        pao.binary_ops = patomic_ops_binary_create_u##name();                       \
-        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                 \
-        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                   \
-        return pao;                                                                 \
+#define PATOMIC_DEFINE_OPS_CREATE_R(type, name, order, vis_p, inv, opsk, min)         \
+    PATOMIC_DEFINE_STORE_OPS(type##_unsigned, u##name, order, vis_p)                  \
+    /* no load in release */                                                          \
+    PATOMIC_DEFINE_XCHG_OPS_CREATE(type##_unsigned, u##name, order, vis_p, inv, opsk) \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(type##_unsigned, u##name, order, vis_p, opsk)   \
+    PATOMIC_DEFINE_BIN_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk)       \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk, 0u)   \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_signed, s##name, order, vis_p, opsk, min)    \
+    static patomic_##opsk##_t                                                         \
+    patomic_ops_create_##name(void)                                                   \
+    {                                                                                 \
+        patomic_##opsk##_t pao;                                                       \
+        pao.fp_store = patomic_opimpl_store_u##name;                                  \
+        pao.fp_load = NULL;                                                           \
+        pao.xchg_ops = patomic_ops_xchg_create_u##name();                             \
+        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                       \
+        pao.binary_ops = patomic_ops_binary_create_u##name();                         \
+        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                   \
+        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                     \
+        return pao;                                                                   \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_AR(type, name, order, vis_p, inv, opsk, min)      \
-    /* no store/load in acq_rel */                                                  \
-    PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis_p, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(unsigned type, u##name, order, vis_p, opsk)   \
-    PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk)       \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk, 0u)   \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis_p, opsk, min)    \
-    static patomic_##opsk##_t                                                       \
-    patomic_ops_create_##name(void)                                                 \
-    {                                                                               \
-        patomic_##opsk##_t pao;                                                     \
-        pao.fp_store = NULL;                                                        \
-        pao.fp_load = NULL;                                                         \
-        pao.xchg_ops = patomic_ops_xchg_create_u##name();                           \
-        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                     \
-        pao.binary_ops = patomic_ops_binary_create_u##name();                       \
-        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                 \
-        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                   \
-        return pao;                                                                 \
+#define PATOMIC_DEFINE_OPS_CREATE_AR(type, name, order, vis_p, inv, opsk, min)        \
+    /* no store/load in acq_rel */                                                    \
+    PATOMIC_DEFINE_XCHG_OPS_CREATE(type##_unsigned, u##name, order, vis_p, inv, opsk) \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_ANY(type##_unsigned, u##name, order, vis_p, opsk)   \
+    PATOMIC_DEFINE_BIN_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk)       \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk, 0u)   \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_signed, s##name, order, vis_p, opsk, min)    \
+    static patomic_##opsk##_t                                                         \
+    patomic_ops_create_##name(void)                                                   \
+    {                                                                                 \
+        patomic_##opsk##_t pao;                                                       \
+        pao.fp_store = NULL;                                                          \
+        pao.fp_load = NULL;                                                           \
+        pao.xchg_ops = patomic_ops_xchg_create_u##name();                             \
+        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                       \
+        pao.binary_ops = patomic_ops_binary_create_u##name();                         \
+        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                   \
+        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                     \
+        return pao;                                                                   \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_RSC(type, name, order, vis_p, inv, opsk, min)     \
-    PATOMIC_DEFINE_STORE_OPS(unsigned type, u##name, order, vis_p)                  \
-    PATOMIC_DEFINE_LOAD_OPS(unsigned type, u##name, order, vis_p)                   \
-    PATOMIC_DEFINE_XCHG_OPS_CREATE(unsigned type, u##name, order, vis_p, inv, opsk) \
-    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(unsigned type, u##name, order, vis_p, opsk)  \
-    PATOMIC_DEFINE_BIN_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk)       \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(unsigned type, u##name, order, vis_p, opsk, 0u)   \
-    PATOMIC_DEFINE_ARI_OPS_CREATE(signed type, s##name, order, vis_p, opsk, min)    \
-    static patomic_##opsk##_t                                                       \
-    patomic_ops_create_##name(void)                                                 \
-    {                                                                               \
-        patomic_##opsk##_t pao;                                                     \
-        pao.fp_store = patomic_opimpl_store_u##name;                                \
-        pao.fp_load = patomic_opimpl_load_u##name;                                  \
-        pao.xchg_ops = patomic_ops_xchg_create_u##name();                           \
-        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                     \
-        pao.binary_ops = patomic_ops_binary_create_u##name();                       \
-        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                 \
-        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                   \
-        return pao;                                                                 \
+#define PATOMIC_DEFINE_OPS_CREATE_RSC(type, name, order, vis_p, inv, opsk, min)       \
+    PATOMIC_DEFINE_STORE_OPS(type##_unsigned, u##name, order, vis_p)                  \
+    PATOMIC_DEFINE_LOAD_OPS(type##_unsigned, u##name, order, vis_p)                   \
+    PATOMIC_DEFINE_XCHG_OPS_CREATE(type##_unsigned, u##name, order, vis_p, inv, opsk) \
+    PATOMIC_DEFINE_BIT_OPS_CREATE_NRAR(type##_unsigned, u##name, order, vis_p, opsk)  \
+    PATOMIC_DEFINE_BIN_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk)       \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_unsigned, u##name, order, vis_p, opsk, 0u)   \
+    PATOMIC_DEFINE_ARI_OPS_CREATE(type##_signed, s##name, order, vis_p, opsk, min)    \
+    static patomic_##opsk##_t                                                         \
+    patomic_ops_create_##name(void)                                                   \
+    {                                                                                 \
+        patomic_##opsk##_t pao;                                                       \
+        pao.fp_store = patomic_opimpl_store_u##name;                                  \
+        pao.fp_load = patomic_opimpl_load_u##name;                                    \
+        pao.xchg_ops = patomic_ops_xchg_create_u##name();                             \
+        pao.bitwise_ops = patomic_ops_bitwise_create_u##name();                       \
+        pao.binary_ops = patomic_ops_binary_create_u##name();                         \
+        pao.unsigned_ops = patomic_ops_arithmetic_create_u##name();                   \
+        pao.signed_ops = patomic_ops_arithmetic_create_s##name();                     \
+        return pao;                                                                   \
     }
 
 
@@ -483,19 +496,19 @@
 
 
 #if ATOMIC_CHAR_LOCK_FREE
-    PATOMIC_DEFINE_OPS_CREATE_ALL(char, char, SCHAR_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_char, char, SCHAR_MIN)
 #endif
 #if ATOMIC_SHORT_LOCK_FREE
-    PATOMIC_DEFINE_OPS_CREATE_ALL(short, short, SHRT_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_short, short, SHRT_MIN)
 #endif
 #if ATOMIC_INT_LOCK_FREE
-    PATOMIC_DEFINE_OPS_CREATE_ALL(int, int, INT_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_int, int, INT_MIN)
 #endif
 #if ATOMIC_LONG_LOCK_FREE
-    PATOMIC_DEFINE_OPS_CREATE_ALL(long, long, LONG_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_long, long, LONG_MIN)
 #endif
-#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
-    PATOMIC_DEFINE_OPS_CREATE_ALL(long long, llong, LLONG_MIN)
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_IMPL_STD_HAVE_LLONG
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_llong, llong, LLONG_MIN)
 #endif
 
 
@@ -554,8 +567,8 @@ patomic_create_ops(
     else if PATOMIC_SET_RET(short, short, byte_width, order, ret)
     else if PATOMIC_SET_RET(int, int, byte_width, order, ret)
     else if PATOMIC_SET_RET(long, long, byte_width, order, ret)
-#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
-    else if PATOMIC_SET_RET(long long, llong, byte_width, order, ret)
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_IMPL_STD_HAVE_LLONG
+    else if PATOMIC_SET_RET(patomic_llong_unsigned , llong, byte_width, order, ret)
 #endif
 
     return ret;
@@ -572,8 +585,8 @@ patomic_create_ops_explicit(
     else if PATOMIC_SET_RET_EXPLICIT(short, short, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(int, int, byte_width, ret)
     else if PATOMIC_SET_RET_EXPLICIT(long, long, byte_width, ret)
-#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
-    else if PATOMIC_SET_RET_EXPLICIT(long long, llong, byte_width, ret)
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_IMPL_STD_HAVE_LLONG
+    else if PATOMIC_SET_RET_EXPLICIT(patomic_llong_unsigned , llong, byte_width, ret)
 #endif
 
 return ret;
@@ -590,8 +603,8 @@ patomic_create_align(
     else if PATOMIC_SET_ALIGN(short, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(int, byte_width, ret.recommended)
     else if PATOMIC_SET_ALIGN(long, byte_width, ret.recommended)
-#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_HAVE_LONG_LONG
-    else if PATOMIC_SET_ALIGN(long long, byte_width, ret.recommended)
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_IMPL_STD_HAVE_LLONG
+    else if PATOMIC_SET_ALIGN(patomic_llong_unsigned, byte_width, ret.recommended)
 #endif
     else { ret.recommended = 1; }
 
