@@ -497,11 +497,10 @@
     static PATOMIC_FORCE_INLINE int                                     \
     patomic_impl_is_lock_free_##name(void)                              \
     {                                                                   \
-        type##_unsigned obj;                                            \
+        type obj = {0};                                                 \
         int ret;                                                        \
-        const size_t tsize = sizeof(type##_unsigned);                   \
-        if (__atomic_always_lock_free(tsize, &obj)) { ret = 1; }        \
-        else { ret = (int)__atomic_is_lock_free(tsize, &obj); }         \
+        if (__atomic_always_lock_free(sizeof(type), &obj)) { ret = 1; } \
+        else { ret = (int) __atomic_is_lock_free(sizeof(type), &obj); } \
         PATOMIC_IGNORE_UNUSED(obj);                                     \
         return ret != 0;                                                \
     }
@@ -528,7 +527,7 @@
         type, name##_explicit, order, SHOW_P, HIDE, ops_explicit, min      \
     )                                                                      \
     PATOMIC_DEFINE_IS_LOCK_FREE(                                           \
-        type, name                                                         \
+        type##_unsigned, name                                              \
     )
 
 
