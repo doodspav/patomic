@@ -84,6 +84,7 @@ add_library(
     # src/impl/gnu
     src/impl/gnu/gnu.h
     src/impl/gnu/gnu.c
+    src/impl/gnu/gnu_atomic.h
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
