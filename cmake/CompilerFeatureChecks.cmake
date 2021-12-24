@@ -230,3 +230,4 @@ check_c_source_compiles(
          return __atomic_load_n(&x, __ATOMIC_ACQUIRE); }"
     COMPILER_HAS_GNU_ATOMIC
 )
+zero_if_blank(COMPILER_HAS_GNU_ATOMIC)

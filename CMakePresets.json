@@ -17,7 +17,7 @@
       "name": "ansi-flags",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function",
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
         "CMAKE_C_STANDARD": "90",
         "CMAKE_C_STANDARD_REQUIRED": "TRUE",
         "CMAKE_C_EXTENSIONS": "OFF"
