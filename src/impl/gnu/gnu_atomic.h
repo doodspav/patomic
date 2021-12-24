@@ -493,16 +493,17 @@
     }
 
 
-#define PATOMIC_DEFINE_IS_LOCK_FREE(type, name)                         \
-    static PATOMIC_FORCE_INLINE int                                     \
-    patomic_impl_is_lock_free_##name(void)                              \
-    {                                                                   \
-        type obj = {0};                                                 \
-        int ret;                                                        \
-        if (__atomic_always_lock_free(sizeof(type), &obj)) { ret = 1; } \
-        else { ret = (int) __atomic_is_lock_free(sizeof(type), &obj); } \
-        PATOMIC_IGNORE_UNUSED(obj);                                     \
-        return ret != 0;                                                \
+#define PATOMIC_DEFINE_IS_LOCK_FREE(type, name)                      \
+    static PATOMIC_FORCE_INLINE int                                  \
+    patomic_impl_is_lock_free_##name(void)                           \
+    {                                                                \
+        type##_unsigned obj = {0};                                   \
+        int ret = 0;                                                 \
+        if (__atomic_always_lock_free(sizeof(type##_unsigned), &obj) \
+            || __atomic_is_lock_free(sizeof(type##_unsigned), &obj)) \
+        { ret = 1; }                                                 \
+        PATOMIC_IGNORE_UNUSED(obj);                                  \
+        return ret;                                                  \
     }
 
 
@@ -527,7 +528,7 @@
         type, name##_explicit, order, SHOW_P, HIDE, ops_explicit, min      \
     )                                                                      \
     PATOMIC_DEFINE_IS_LOCK_FREE(                                           \
-        type##_unsigned, name                                              \
+        type, name                                                         \
     )
 
 
