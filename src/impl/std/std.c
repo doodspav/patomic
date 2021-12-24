@@ -9,13 +9,13 @@
 #if PATOMIC_HAVE_STD_ATOMIC
 
 
-#include <limits.h>
 #include <stdatomic.h>
 #include <stddef.h>
 
 #include <patomic/macros/likely_unlikely.h>
 
 #include <patomic/stdlib/assert.h>
+#include <patomic/stdlib/limits.h>
 #include <patomic/stdlib/stdint.h>
 
 #include <patomic/wrapped/cmpxchg.h>
@@ -23,7 +23,7 @@
 #include <patomic/wrapped/fetch.h>
 
 
-#if PATOMIC_STDINT_HAVE_LLONG && defined(LLONG_MIN)
+#if PATOMIC_STDINT_HAVE_LLONG && defined(PATOMIC_LLONG_MIN)
     #define PATOMIC_IMPL_STD_HAVE_LLONG 1
 #else
     #define PATOMIC_IMPL_STD_HAVE_LLONG 0
@@ -510,7 +510,7 @@
     PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_long, long, LONG_MIN)
 #endif
 #if ATOMIC_LLONG_LOCK_FREE && PATOMIC_IMPL_STD_HAVE_LLONG
-    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_llong, llong, LLONG_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_llong, llong, PATOMIC_LLONG_MIN)
 #endif
 
 

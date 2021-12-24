@@ -8,13 +8,13 @@
 #if PATOMIC_HAVE_GNU_ATOMIC
 
 
-#include <limits.h>
 #include <stddef.h>
 
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
 #include <patomic/macros/likely_unlikely.h>
 
+#include <patomic/stdlib/limits.h>
 #include <patomic/stdlib/stdint.h>
 
 #include <patomic/wrapped/cmpxchg.h>
@@ -27,21 +27,13 @@
 #endif
 
 
-/* assumes twos-complement representation with same signed/unsigned range */
-#if PATOMIC_STDINT_HAVE_I128 && !defined(INT128_MIN)
-    #define UINT128_MAX ((patomic_i128_unsigned)((patomic_i128_signed)(-1)))
-    #define INT128_MAX  ((patomic_i128_signed)(UINT128_MAX >> 1u))
-    #define INT128_MIN  ((patomic_i128_signed)((-INT128_MAX) - 1))
-#endif
-
-
-#if PATOMIC_STDINT_HAVE_LLONG && defined(LLONG_MIN)
+#if PATOMIC_STDINT_HAVE_LLONG && defined(PATOMIC_LLONG_MIN)
     #define PATOMIC_IMPL_GNU_HAVE_LLONG 1
 #else
     #define PATOMIC_IMPL_GNU_HAVE_LLONG 0
 #endif
 
-#if PATOMIC_STDINT_HAVE_I128 && defined(INT128_MIN)
+#if PATOMIC_STDINT_HAVE_I128 && defined(PATOMIC_INT128_MIN)
     #define PATOMIC_IMPL_GNU_HAVE_I128 1
 #else
     #define PATOMIC_IMPL_GNU_HAVE_I128 0
@@ -537,10 +529,10 @@ PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_short, short, SHRT_MIN)
 PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_int, int, INT_MIN)
 PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_long, long, LONG_MIN)
 #if PATOMIC_IMPL_GNU_HAVE_LLONG
-    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_llong, llong, LLONG_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_llong, llong, PATOMIC_LLONG_MIN)
 #endif
 #if PATOMIC_IMPL_GNU_HAVE_I128
-    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_i128, 128, INT128_MIN)
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_i128, 128, PATOMIC_INT128_MIN)
 #endif
 
 
