@@ -105,6 +105,7 @@ configure_file(
 )
 
 include(cmake/CompilerFeatureChecks.cmake)
+include(cmake/CompilerTypeSizeChecks.cmake)
 configure_file(
     cmake/in/patomic_config.h.in
     src/include/patomic/_patomic_config.h

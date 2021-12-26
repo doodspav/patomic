@@ -20,6 +20,7 @@ increment the `minor` version for breaking changes.
 - following macros and corresponding config macros for internal use:
   - `PATOMIC_LIKELY`
   - `PATOMIC_UNLIKELY`
+  - `PATOMIC_SIZEOF_{T}` for `T` in `[char, short, int, long, long long, __int128]`
 - alignment helpers in `stdalign.h`
 - typedefs for `char`, `short`, `int`, and `long` in `stdint.h` of the form
   `patomic_TYPE_(un)signed`

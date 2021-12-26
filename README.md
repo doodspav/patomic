@@ -101,6 +101,7 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_IR_SIGN_MAGNITUDE` | integer representation is sign-magnitude |
 | `PATOMIC_HAVE_IR_ONES_COMPL` | integer representation is ones-complement |
 | `PATOMIC_HAVE_IR_TWOS_COMPL` | integer representation is twos-complement |
+| `PATOMIC_SIZEOF_{T}` | value of `sizeof(T)` (or `0` if `T` not supported) |
 
 Their implementations can be found in `/src/include/patomic/patomic_config.h`.
 

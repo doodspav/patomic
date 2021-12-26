@@ -2,6 +2,36 @@
 #define PATOMIC_CONFIG_H
 
 
+/* sizeof(char) */
+#ifndef PATOMIC_SIZEOF_CHAR
+    #define PATOMIC_SIZEOF_CHAR @COMPILER_SIZEOF_CHAR@
+#endif
+
+/* sizeof(short) */
+#ifndef PATOMIC_SIZEOF_SHORT
+    #define PATOMIC_SIZEOF_SHORT @COMPILER_SIZEOF_SHORT@
+#endif
+
+/* sizeof(int) */
+#ifndef PATOMIC_SIZEOF_INT
+    #define PATOMIC_SIZEOF_INT @COMPILER_SIZEOF_INT@
+#endif
+
+/* sizeof(long) */
+#ifndef PATOMIC_SIZEOF_LONG
+    #define PATOMIC_SIZEOF_LONG @COMPILER_SIZEOF_LONG@
+#endif
+
+/* sizeof(long long) OR sizeof(__extension__ long long) OR 0 */
+#ifndef PATOMIC_SIZEOF_LLONG
+    #define PATOMIC_SIZEOF_LLONG @COMPILER_SIZEOF_LLONG@
+#endif
+
+/* sizeof(__int128) OR sizeof(__extension__ __int128) OR 0 */
+#ifndef PATOMIC_SIZEOF_I128
+    #define PATOMIC_SIZEOF_I128 @COMPILER_SIZEOF_I128@
+#endif
+
 /* 'long long' is a fundamental type */
 #ifndef PATOMIC_HAVE_LONG_LONG
     #define PATOMIC_HAVE_LONG_LONG @COMPILER_HAS_LONG_LONG@

@@ -1,3 +1,5 @@
+include(CheckCSourceCompiles)
+
 function(zero_if_blank var)
     if(${var} STREQUAL "")
         set(${var} 0 PARENT_SCOPE)
