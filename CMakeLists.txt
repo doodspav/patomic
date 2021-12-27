@@ -44,6 +44,7 @@ add_library(
     src/include/patomic/macros/unreachable.h
     # src/include/patomic/stdlib
     src/include/patomic/stdlib/assert.h
+    src/include/patomic/stdlib/cpuid.h
     src/include/patomic/stdlib/limits.h
     src/include/patomic/stdlib/stdalign.h
     src/include/patomic/stdlib/string.h
@@ -57,6 +58,7 @@ add_library(
     src/patomic/patomic_version.c
     # src/patomic/stdlib
     src/patomic/stdlib/assert.c
+    src/patomic/stdlib/cpuid.c
     src/patomic/stdlib/stdalign.c
     src/patomic/stdlib/string.c
     # src/patomic/types
