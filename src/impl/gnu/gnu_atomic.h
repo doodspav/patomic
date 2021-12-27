@@ -14,7 +14,9 @@
 #include <patomic/macros/ignore_unused.h>
 #include <patomic/macros/likely_unlikely.h>
 
+#include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/limits.h>
+#include <patomic/stdlib/stdalign.h>
 #include <patomic/stdlib/stdint.h>
 
 #include <patomic/wrapped/cmpxchg.h>
@@ -534,6 +536,119 @@ PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_long, long, LONG_MIN)
 #if PATOMIC_IMPL_GNU_HAVE_I128
     PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_i128, 128, PATOMIC_INT128_MIN)
 #endif
+
+
+#define PATOMIC_SET_RET(type, name, width, order, ret)                  \
+        ((width) == sizeof(type))                                       \
+    {                                                                   \
+        if (patomic_impl_is_lock_free_##name())                         \
+        {                                                               \
+            switch (order)                                              \
+            {                                                           \
+                case patomic_RELAXED:                                   \
+                    (ret) = patomic_ops_create_##name##_relaxed();      \
+                    break;                                              \
+                case patomic_CONSUME:                                   \
+                case patomic_ACQUIRE:                                   \
+                    (ret) = patomic_ops_create_##name##_acquire();      \
+                    break;                                              \
+                case patomic_RELEASE:                                   \
+                    (ret) = patomic_ops_create_##name##_release();      \
+                    break;                                              \
+                case patomic_ACQ_REL:                                   \
+                    (ret) = patomic_ops_create_##name##_acq_rel();      \
+                    break;                                              \
+                case patomic_SEQ_CST:                                   \
+                    (ret) = patomic_ops_create_##name##_seq_cst();      \
+                    break;                                              \
+                default:                                                \
+                    patomic_assert_always("invalid memory order" && 0); \
+            }                                                           \
+        }                                                               \
+    }
+
+#define PATOMIC_SET_RET_EXPLICIT(type, name, width, ret)    \
+        ((width) == sizeof(type))                           \
+    {                                                       \
+        if (patomic_impl_is_lock_free_##name())             \
+        {                                                   \
+            (ret) = patomic_ops_create_##name##_explicit(); \
+        }                                                   \
+    }
+
+#define PATOMIC_SET_ALIGN(type, width, member) \
+        ((width) == sizeof(type))              \
+    {                                          \
+        (member) = patomic_alignof_type(type); \
+    }
+
+
+static patomic_ops_t
+patomic_create_ops(
+    size_t byte_width,
+    patomic_memory_order_t order
+)
+{
+    patomic_ops_t ret = {0};
+    patomic_assert_always(patomic_is_valid_order((int) order));
+
+    if PATOMIC_SET_RET(char, char, byte_width, order, ret)
+    else if PATOMIC_SET_RET(short, short, byte_width, order, ret)
+    else if PATOMIC_SET_RET(int, int, byte_width, order, ret)
+    else if PATOMIC_SET_RET(long, long, byte_width, order, ret)
+#if PATOMIC_IMPL_GNU_HAVE_LLONG
+    else if PATOMIC_SET_RET(patomic_llong_signed, llong, byte_width, order, ret)
+#endif
+#if PATOMIC_IMPL_GNU_HAVE_I128
+    else if PATOMIC_SET_RET(patomic_i128_signed, 128, byte_width, order, ret)
+#endif
+
+    return ret;
+}
+
+static patomic_ops_explicit_t
+patomic_create_ops_explicit(
+    size_t byte_width
+)
+{
+    patomic_ops_explicit_t ret = {0};
+
+    if PATOMIC_SET_RET_EXPLICIT(char, char, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(short, short, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(int, int, byte_width, ret)
+    else if PATOMIC_SET_RET_EXPLICIT(long, long, byte_width, ret)
+#if PATOMIC_IMPL_GNU_HAVE_LLONG
+    else if PATOMIC_SET_RET_EXPLICIT(patomic_llong_signed, llong, byte_width, ret)
+#endif
+#if PATOMIC_IMPL_GNU_HAVE_I128
+    else if PATOMIC_SET_RET_EXPLICIT(patomic_i128_signed, 128, byte_width, ret)
+#endif
+
+    return ret;
+}
+
+static patomic_align_t
+patomic_create_align(
+    size_t byte_width
+)
+{
+    patomic_align_t ret = {0};
+
+    if PATOMIC_SET_ALIGN(char, byte_width, ret.recommended)
+    else if PATOMIC_SET_ALIGN(short, byte_width, ret.recommended)
+    else if PATOMIC_SET_ALIGN(int, byte_width, ret.recommended)
+    else if PATOMIC_SET_ALIGN(long, byte_width, ret.recommended)
+#if PATOMIC_IMPL_GNU_HAVE_LLONG
+    else if PATOMIC_SET_ALIGN(patomic_llong_signed, byte_width, ret.recommended)
+#endif
+#if PATOMIC_IMPL_GNU_HAVE_I128
+    else if PATOMIC_SET_ALIGN(patomic_i128_signed, byte_width, ret.recommended)
+#endif
+    else { ret.recommended = 1; }
+
+    ret.minimum = ret.recommended;
+    return ret;
+}
 
 
 #endif  /* PATOMIC_HAVE_GNU_ATOMIC */
