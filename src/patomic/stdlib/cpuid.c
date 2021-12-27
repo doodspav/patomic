@@ -64,7 +64,7 @@ __patomic_cpuid_max(
     else
     {
         int ex[4];
-        __cpuid((int) leaf, ex);
+        __cpuid(ex, (int) leaf);
         return (unsigned int) ex[0];
     }
 #elif PATOMIC_HAVE_CPUID_CPUID
@@ -93,7 +93,7 @@ __patomic_cpuid(
             (int) *eax, (int) *ebx,
             (int) *ecx, (int) *edx
         };
-        __cpuid((int) leaf, ex);
+        __cpuid(ex, (int) leaf);
         *eax = ex[0]; *ebx = ex[1];
         *ecx = ex[2]; *edx = ex[3];
         return 1;
@@ -125,7 +125,7 @@ __patomic_cpuidex(
             (int) *eax, (int) *ebx,
             (int) *ecx, (int) *edx
         };
-        __cpuidex((int) leaf, (int) subleaf, ex);
+        __cpuidex(ex, (int) leaf, (int) subleaf);
         *eax = ex[0]; *ebx = ex[1];
         *ecx = ex[2]; *edx = ex[3];
         return 1;

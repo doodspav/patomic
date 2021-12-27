@@ -32,6 +32,7 @@ increment the `minor` version for breaking changes.
   are available
 - `gnu` implementation can now fall back to `__sync` if it's available and
   `__atomic` isn't
+- cpuid helpers in `cpuid.h`
 ### Changed
 - removed `do_assert`, `do_assert_aligned`, and `do_memcpy` parameters from
   wrapped macros; now use overrideable default macros from `wrapped/do.h`
