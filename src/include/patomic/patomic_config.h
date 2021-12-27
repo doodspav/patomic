@@ -219,9 +219,21 @@
 #endif
 
 /* '__atomic' builtins and '__ATOMIC' constants are available */
-/* requires: GNU compatible (-ish) compiler */
+/* requires: GNU compatible(-ish) compiler */
 #ifndef PATOMIC_HAVE_GNU_ATOMIC
     #define PATOMIC_HAVE_GNU_ATOMIC 0
+#endif
+
+/* <intrin.h> header and '__cpuid(ex)' and '__(read|write)eflags intrinsics are available */
+/* requires: MS compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
+    #define PATOMIC_HAVE_INTRIN_EFLAGS_CPUID 0
+#endif
+
+/* <cpuid.h> header and  '__cpuid(_count)' and '__get_cpuid_max' intrinsics are available */
+/* requires: GNU compatible(-ish) compiler */
+#ifndef PATOMIC_HAVE_CPUID_CPUID
+    #define PATOMIC_HAVE_CPUID_CPUID 0
 #endif
 
 

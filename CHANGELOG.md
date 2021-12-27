@@ -17,6 +17,8 @@ increment the `minor` version for breaking changes.
   - `PATOMIC_HAVE_MS_INT128_EXTN`
   - `PATOMIC_HAVE_IR_SIGN_MAGNITUDE`
   - `PATOMIC_HAVE_IR_ONES_COMPL`
+  - `PATOMIC_HAVE_INTRIN_EFLAGS_CPUID`
+  - `PATOMIC_HAVE_CPUID_CPUID`
 - following macros and corresponding config macros for internal use:
   - `PATOMIC_LIKELY`
   - `PATOMIC_UNLIKELY`
@@ -28,6 +30,8 @@ increment the `minor` version for breaking changes.
   naming scheme
 - macros `PATOMIC_STDINT_HAVE_LLONG/I128` to check if the conditional typedefs
   are available
+- `gnu` implementation can now fall back to `__sync` if it's available and
+  `__atomic` isn't
 ### Changed
 - removed `do_assert`, `do_assert_aligned`, and `do_memcpy` parameters from
   wrapped macros; now use overrideable default macros from `wrapped/do.h`

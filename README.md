@@ -98,6 +98,8 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_GNU_SYNC` | `__sync` |
 | `PATOMIC_HAVE_GNU_ATOMIC` | `__atomic` and `__ATOMIC` |
 | `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` | `__sync` is lock-free for `sizeof(type) == N` |
+| `PATOMIC_HAVE_INTRIN_EFLAGS_CPUID` | `<intrin.h>` with `__cpuid(ex)` and `__(read/write)eflags` |
+| `PATOMIC_HAVE_CPUID_CPUID` | `<cpuid.h>` with `__cpuid(_count)` and `__get_cpuid_max` |
 | `PATOMIC_HAVE_IR_SIGN_MAGNITUDE` | integer representation is sign-magnitude |
 | `PATOMIC_HAVE_IR_ONES_COMPL` | integer representation is ones-complement |
 | `PATOMIC_HAVE_IR_TWOS_COMPL` | integer representation is twos-complement |
