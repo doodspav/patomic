@@ -396,7 +396,7 @@
 #if (PATOMIC_HAVE_IR_SIGN_MAGNITUDE + \
      PATOMIC_HAVE_IR_ONES_COMPL     + \
      PATOMIC_HAVE_IR_TWOS_COMPL) != 1
-#error "Multiple integer representations supported"
+    #error "Multiple integer representations supported"
 #endif
 
 
