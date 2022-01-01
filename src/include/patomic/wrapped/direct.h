@@ -9,18 +9,7 @@
 #include <patomic/macros/force_inline.h>
 #include <patomic/macros/ignore_unused.h>
 
-
-#undef HIDE_P
-#undef SHOW_P
-
-#define HIDE_P(x, y)
-#define SHOW_P(x, y) ,y
-
-#undef HIDE
-#undef SHOW
-
-#define HIDE(x)
-#define SHOW(x) x
+#include <patomic/wrapped/do.h>
 
 
 /*
@@ -33,26 +22,6 @@
  * - byte_width:
  *   - must be an int literal
  *   - must either have the value of `sizeof(type)` or be `0`
- *
- * - do_assert:
- *   - must be callable as `do_assert(expr);`
- *   - `expr` will be an expression of type (int)
- *   - the result of the expression will not be assigned to anything
- *   - standard assertion
- *
- * - do_assert_aligned:
- *   - must be callable as `do_assert_aligned(cv_vptr, TYPE);`
- *   - `cv_vptr` will be an expression of type (void*), possibly cv-qualified
- *   - `TYPE` will represent a valid type identifier
- *   - the result of the expression will not be assigned to anything
- *   - asserts that `cv_vptr` meets the alignment required by `TYPE`
- *
- * - do_memcpy:
- *   - must be callable as `do_memcpy(vptr, c_vptr, len);`
- *   - `vptr` will be an expression of type (void*)
- *   - `c_vptr` will be an expression of type (void*), possibly const-qualified
- *   - `len` will be an expression of type (size_t)
- *   - the result of the expression will not be assigned to anything
  *
  * - type:
  *   - the non-qualified version of `atype` (e.g. `int`)
@@ -118,40 +87,39 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     store memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(               \
-    bit_width, byte_width,                                    \
-    do_atomic_store_explicit,                                 \
-    do_assert, do_assert_aligned, do_memcpy,                  \
-    type, atype, fn_name, order, vis_p                        \
-)                                                             \
-    static PATOMIC_FORCE_INLINE void                          \
-    fn_name(                                                  \
-        volatile void *obj                                    \
-        ,const void *desired                                  \
- vis_p(_,int order)                                           \
-    )                                                         \
-    {                                                         \
-        /* declarations */                                    \
-        type des_val;                                         \
-        type scratch;                                         \
-        int temp;                                             \
-        /* assertions */                                      \
-        do_assert(obj != NULL);                               \
-        do_assert(desired != NULL);                           \
-        do_assert_aligned(obj, atype);                        \
-        do_assert(patomic_is_valid_store_order((int) order)); \
-        /* setup */                                           \
-        do_memcpy(&des_val, desired, sizeof(type));           \
-        /* operation */                                       \
-        do_atomic_store_explicit(                             \
-            type, bit_width, byte_width,                      \
-            (volatile atype *) obj,                           \
-            des_val,                                          \
-            (int) order                                       \
-        );                                                    \
-        /* cleanup */                                         \
-        PATOMIC_IGNORE_UNUSED(scratch);                       \
-        PATOMIC_IGNORE_UNUSED(temp);                          \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(                               \
+    bit_width, byte_width,                                                    \
+    do_atomic_store_explicit,                                                 \
+    type, atype, fn_name, order, vis_p                                        \
+)                                                                             \
+    static PATOMIC_FORCE_INLINE void                                          \
+    fn_name(                                                                  \
+        volatile void *obj                                                    \
+        ,const void *desired                                                  \
+ vis_p(_,int order)                                                           \
+    )                                                                         \
+    {                                                                         \
+        /* declarations */                                                    \
+        type des_val;                                                         \
+        type scratch;                                                         \
+        int temp;                                                             \
+        /* assertions */                                                      \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                               \
+        PATOMIC_WRAPPED_DO_ASSERT(desired != NULL);                           \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                        \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_store_order((int) order)); \
+        /* setup */                                                           \
+        PATOMIC_WRAPPED_DO_MEMCPY(&des_val, desired, sizeof(type));           \
+        /* operation */                                                       \
+        do_atomic_store_explicit(                                             \
+            type, bit_width, byte_width,                                      \
+            (volatile atype *) obj,                                           \
+            des_val,                                                          \
+            (int) order                                                       \
+        );                                                                    \
+        /* cleanup */                                                         \
+        PATOMIC_IGNORE_UNUSED(scratch);                                       \
+        PATOMIC_IGNORE_UNUSED(temp);                                          \
     }
 
 
@@ -167,39 +135,38 @@
  *   - `order` will be an expression of type (int) whose value is a valid load
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                \
-    bit_width, byte_width,                                    \
-    do_atomic_load_explicit,                                  \
-    do_assert, do_assert_aligned, do_memcpy,                  \
-    type, atype, fn_name, order, vis_p                        \
-)                                                             \
-    static PATOMIC_FORCE_INLINE void                          \
-    fn_name(                                                  \
-        const volatile void *obj                              \
- vis_p(_,int order)                                           \
-        ,void *ret                                            \
-    )                                                         \
-    {                                                         \
-        /* declarations */                                    \
-        type ret_val;                                         \
-        type scratch;                                         \
-        int temp;                                             \
-        /* assertions */                                      \
-        do_assert(obj != NULL);                               \
-        do_assert(ret != NULL);                               \
-        do_assert_aligned(obj, atype);                        \
-        do_assert(patomic_is_valid_load_order((int) order));  \
-        /* operation */                                       \
-        do_atomic_load_explicit(                              \
-            type, bit_width, byte_width,                      \
-            (const volatile atype *) obj,                     \
-            (int) order,                                      \
-            ret_val                                           \
-        );                                                    \
-        /* cleanup */                                         \
-        do_memcpy(ret, &ret_val, sizeof(type));               \
-        PATOMIC_IGNORE_UNUSED(scratch);                       \
-        PATOMIC_IGNORE_UNUSED(temp);                          \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                               \
+    bit_width, byte_width,                                                   \
+    do_atomic_load_explicit,                                                 \
+    type, atype, fn_name, order, vis_p                                       \
+)                                                                            \
+    static PATOMIC_FORCE_INLINE void                                         \
+    fn_name(                                                                 \
+        const volatile void *obj                                             \
+ vis_p(_,int order)                                                          \
+        ,void *ret                                                           \
+    )                                                                        \
+    {                                                                        \
+        /* declarations */                                                   \
+        type ret_val;                                                        \
+        type scratch;                                                        \
+        int temp;                                                            \
+        /* assertions */                                                     \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                              \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                              \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                       \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_load_order((int) order)); \
+        /* operation */                                                      \
+        do_atomic_load_explicit(                                             \
+            type, bit_width, byte_width,                                     \
+            (const volatile atype *) obj,                                    \
+            (int) order,                                                     \
+            ret_val                                                          \
+        );                                                                   \
+        /* cleanup */                                                        \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &ret_val, sizeof(type));              \
+        PATOMIC_IGNORE_UNUSED(scratch);                                      \
+        PATOMIC_IGNORE_UNUSED(temp);                                         \
     }
 
 
@@ -216,45 +183,44 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(      \
-    bit_width, byte_width,                              \
-    do_atomic_exchange_explicit,                        \
-    do_assert, do_assert_aligned, do_memcpy,            \
-    type, atype, fn_name, order, vis_p                  \
-)                                                       \
-    static PATOMIC_FORCE_INLINE void                    \
-    fn_name(                                            \
-        volatile void *obj                              \
-        ,const void *desired                            \
- vis_p(_,int order)                                     \
-        ,void *ret                                      \
-    )                                                   \
-    {                                                   \
-        /* declarations */                              \
-        type des_val;                                   \
-        type ret_val;                                   \
-        type scratch;                                   \
-        int temp;                                       \
-        /* assertions */                                \
-        do_assert(obj != NULL);                         \
-        do_assert(desired != NULL);                     \
-        do_assert(ret != NULL);                         \
-        do_assert_aligned(obj, atype);                  \
-        do_assert(patomic_is_valid_order((int) order)); \
-        /* setup */                                     \
-        do_memcpy(&des_val, desired, sizeof(type));     \
-        /* operation */                                 \
-        do_atomic_exchange_explicit(                    \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            des_val,                                    \
-            (int) order,                                \
-            ret_val                                     \
-        );                                              \
-        /* cleanup */                                   \
-        do_memcpy(ret, &ret_val, sizeof(type));         \
-        PATOMIC_IGNORE_UNUSED(scratch);                 \
-        PATOMIC_IGNORE_UNUSED(temp);                    \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(                      \
+    bit_width, byte_width,                                              \
+    do_atomic_exchange_explicit,                                        \
+    type, atype, fn_name, order, vis_p                                  \
+)                                                                       \
+    static PATOMIC_FORCE_INLINE void                                    \
+    fn_name(                                                            \
+        volatile void *obj                                              \
+        ,const void *desired                                            \
+ vis_p(_,int order)                                                     \
+        ,void *ret                                                      \
+    )                                                                   \
+    {                                                                   \
+        /* declarations */                                              \
+        type des_val;                                                   \
+        type ret_val;                                                   \
+        type scratch;                                                   \
+        int temp;                                                       \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(desired != NULL);                     \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                  \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order((int) order)); \
+        /* setup */                                                     \
+        PATOMIC_WRAPPED_DO_MEMCPY(&des_val, desired, sizeof(type));     \
+        /* operation */                                                 \
+        do_atomic_exchange_explicit(                                    \
+            type, bit_width, byte_width,                                \
+            (volatile atype *) obj,                                     \
+            des_val,                                                    \
+            (int) order,                                                \
+            ret_val                                                     \
+        );                                                              \
+        /* cleanup */                                                   \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                                 \
+        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 
@@ -276,51 +242,50 @@
  *   - `ok` may be uninitialised and should be set to `0` if the operation
  *     failed or non-zero if it succeeded
  */
-#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_CMPXCHG(      \
-    bit_width, byte_width,                                  \
-    do_atomic_cmpxchg_explicit,                             \
-    do_assert, do_assert_aligned, do_memcpy,                \
-    type, atype, fn_name, order, vis_p, inv                 \
-)                                                           \
-    static PATOMIC_FORCE_INLINE int                         \
-    fn_name(                                                \
-        volatile void *obj                                  \
-        ,void *expected                                     \
-        ,const void *desired                                \
- vis_p(_,int succ)                                          \
- vis_p(_,int fail)                                          \
-    )                                                       \
-    {                                                       \
-        /* declarations */                                  \
-        type exp_val;                                       \
-        type des_val;                                       \
-        type scratch;                                       \
-        int ret = 0;                                        \
-        int temp;                                           \
-    inv(int succ = (int) order;)                            \
-    inv(int fail = patomic_cmpxchg_fail_order(succ);)       \
-        /* assertions */                                    \
-        do_assert(obj != NULL);                             \
-        do_assert(expected != NULL);                        \
-        do_assert(desired != NULL);                         \
-        do_assert_aligned(obj, atype);                      \
-        do_assert(patomic_is_valid_order(succ));            \
-        do_assert(patomic_is_valid_fail_order(succ, fail)); \
-        /* setup */                                         \
-        do_memcpy(&des_val, desired, sizeof(type));         \
-        do_memcpy(&exp_val, expected, sizeof(type));        \
-        /* operation */                                     \
-        do_atomic_cmpxchg_explicit(                         \
-            type, bit_width, byte_width,                    \
-            (volatile atype *) obj,                         \
-            exp_val, des_val,                               \
-            succ, fail, ret                                 \
-        );                                                  \
-        /* cleanup */                                       \
-        do_memcpy(expected, &exp_val, sizeof(type));        \
-        PATOMIC_IGNORE_UNUSED(scratch);                     \
-        PATOMIC_IGNORE_UNUSED(temp);                        \
-        return ret != 0;                                    \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_CMPXCHG(                      \
+    bit_width, byte_width,                                                  \
+    do_atomic_cmpxchg_explicit,                                             \
+    type, atype, fn_name, order, vis_p, inv                                 \
+)                                                                           \
+    static PATOMIC_FORCE_INLINE int                                         \
+    fn_name(                                                                \
+        volatile void *obj                                                  \
+        ,void *expected                                                     \
+        ,const void *desired                                                \
+ vis_p(_,int succ)                                                          \
+ vis_p(_,int fail)                                                          \
+    )                                                                       \
+    {                                                                       \
+        /* declarations */                                                  \
+        type exp_val;                                                       \
+        type des_val;                                                       \
+        type scratch;                                                       \
+        int ret = 0;                                                        \
+        int temp;                                                           \
+    inv(int succ = (int) order;)                                            \
+    inv(int fail = patomic_cmpxchg_fail_order(succ);)                       \
+        /* assertions */                                                    \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
+        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                        \
+        PATOMIC_WRAPPED_DO_ASSERT(desired != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                      \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order(succ));            \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_fail_order(succ, fail)); \
+        /* setup */                                                         \
+        PATOMIC_WRAPPED_DO_MEMCPY(&des_val, desired, sizeof(type));         \
+        PATOMIC_WRAPPED_DO_MEMCPY(&exp_val, expected, sizeof(type));        \
+        /* operation */                                                     \
+        do_atomic_cmpxchg_explicit(                                         \
+            type, bit_width, byte_width,                                    \
+            (volatile atype *) obj,                                         \
+            exp_val, des_val,                                               \
+            succ, fail, ret                                                 \
+        );                                                                  \
+        /* cleanup */                                                       \
+        PATOMIC_WRAPPED_DO_MEMCPY(expected, &exp_val, sizeof(type));        \
+        PATOMIC_IGNORE_UNUSED(scratch);                                     \
+        PATOMIC_IGNORE_UNUSED(temp);                                        \
+        return ret != 0;                                                    \
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG_WEAK \
@@ -346,41 +311,40 @@
  *   - `res` may be uninitialised and should be set to the old value of the bit
  *     being tested (zero or non-zero)
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(              \
-    bit_width, byte_width,                                      \
-    do_atomic_bit_test_explicit,                                \
-    do_assert, do_assert_aligned, do_memcpy,                    \
-    type, atype, fn_name, order, vis_p                          \
-)                                                               \
-    static PATOMIC_FORCE_INLINE int                             \
-    fn_name(                                                    \
-        const volatile void *obj                                \
-        ,int offset                                             \
- vis_p(_,int order)                                             \
-    )                                                           \
-    {                                                           \
-        /* declarations */                                      \
-        type scratch;                                           \
-        int temp;                                               \
-        int ret;                                                \
-        /* assertions */                                        \
-        do_assert(obj != NULL);                                 \
-        do_assert_aligned(obj, atype);                          \
-        do_assert(offset >= 0);                                 \
-        do_assert((size_t) offset < (sizeof(type) * CHAR_BIT)); \
-        do_assert(patomic_is_valid_load_order((int) order));    \
-        /* operation */                                         \
-        do_atomic_bit_test_explicit(                            \
-            type, bit_width, byte_width,                        \
-            (const volatile atype *) obj,                       \
-            offset,                                             \
-            (int) order,                                        \
-            ret                                                 \
-        );                                                      \
-        /* cleanup */                                           \
-        PATOMIC_IGNORE_UNUSED(scratch);                         \
-        PATOMIC_IGNORE_UNUSED(temp);                            \
-        return ret != 0;                                        \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(                             \
+    bit_width, byte_width,                                                     \
+    do_atomic_bit_test_explicit,                                               \
+    type, atype, fn_name, order, vis_p                                         \
+)                                                                              \
+    static PATOMIC_FORCE_INLINE int                                            \
+    fn_name(                                                                   \
+        const volatile void *obj                                               \
+        ,int offset                                                            \
+ vis_p(_,int order)                                                            \
+    )                                                                          \
+    {                                                                          \
+        /* declarations */                                                     \
+        type scratch;                                                          \
+        int temp;                                                              \
+        int ret;                                                               \
+        /* assertions */                                                       \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                                \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(offset >= 0);                                \
+        PATOMIC_WRAPPED_DO_ASSERT((size_t)offset < (sizeof(type) * CHAR_BIT)); \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_load_order((int) order));   \
+        /* operation */                                                        \
+        do_atomic_bit_test_explicit(                                           \
+            type, bit_width, byte_width,                                       \
+            (const volatile atype *) obj,                                      \
+            offset,                                                            \
+            (int) order,                                                       \
+            ret                                                                \
+        );                                                                     \
+        /* cleanup */                                                          \
+        PATOMIC_IGNORE_UNUSED(scratch);                                        \
+        PATOMIC_IGNORE_UNUSED(temp);                                           \
+        return ret != 0;                                                       \
     }
 
 
@@ -400,41 +364,40 @@
  *   - `res` may be uninitialised and should be set to the old value of the bit
  *     being tested (zero or non-zero)
  */
-#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_BIT_TEST_MODIFY(  \
-    bit_width, byte_width,                                      \
-    do_atomic_bit_test_modify_explicit,                         \
-    do_assert, do_assert_aligned, do_memcpy,                    \
-    type, atype, fn_name, order, vis_p                          \
-)                                                               \
-    static PATOMIC_FORCE_INLINE int                             \
-    fn_name(                                                    \
-        volatile void *obj                                      \
-        ,int offset                                             \
- vis_p(_,int order)                                             \
-    )                                                           \
-    {                                                           \
-        /* declarations */                                      \
-        type scratch;                                           \
-        int temp;                                               \
-        int ret;                                                \
-        /* assertions */                                        \
-        do_assert(obj != NULL);                                 \
-        do_assert_aligned(obj, atype);                          \
-        do_assert(offset >= 0);                                 \
-        do_assert((size_t) offset < (sizeof(type) * CHAR_BIT)); \
-        do_assert(patomic_is_valid_order((int) order));         \
-        /* operation */                                         \
-        do_atomic_bit_test_modify_explicit(                     \
-            type, bit_width, byte_width,                        \
-            (volatile atype *) obj,                             \
-            offset,                                             \
-            (int) order,                                        \
-            ret                                                 \
-        );                                                      \
-        /* cleanup */                                           \
-        PATOMIC_IGNORE_UNUSED(scratch);                         \
-        PATOMIC_IGNORE_UNUSED(temp);                            \
-        return ret != 0;                                        \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_OP_BIT_TEST_MODIFY(                 \
+    bit_width, byte_width,                                                     \
+    do_atomic_bit_test_modify_explicit,                                        \
+    type, atype, fn_name, order, vis_p                                         \
+)                                                                              \
+    static PATOMIC_FORCE_INLINE int                                            \
+    fn_name(                                                                   \
+        volatile void *obj                                                     \
+        ,int offset                                                            \
+ vis_p(_,int order)                                                            \
+    )                                                                          \
+    {                                                                          \
+        /* declarations */                                                     \
+        type scratch;                                                          \
+        int temp;                                                              \
+        int ret;                                                               \
+        /* assertions */                                                       \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                                \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(offset >= 0);                                \
+        PATOMIC_WRAPPED_DO_ASSERT((size_t)offset < (sizeof(type) * CHAR_BIT)); \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order((int) order));        \
+        /* operation */                                                        \
+        do_atomic_bit_test_modify_explicit(                                    \
+            type, bit_width, byte_width,                                       \
+            (volatile atype *) obj,                                            \
+            offset,                                                            \
+            (int) order,                                                       \
+            ret                                                                \
+        );                                                                     \
+        /* cleanup */                                                          \
+        PATOMIC_IGNORE_UNUSED(scratch);                                        \
+        PATOMIC_IGNORE_UNUSED(temp);                                           \
+        return ret != 0;                                                       \
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_COMPL \
@@ -460,45 +423,44 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG( \
-    bit_width, byte_width,                                      \
-    do_atomic_binary_op_fetch_arg_explicit,                     \
-    do_assert, do_assert_aligned, do_memcpy,                    \
-    type, atype, fn_name, order, vis_p                          \
-)                                                               \
-    static PATOMIC_FORCE_INLINE void                            \
-    fn_name(                                                    \
-        volatile void *obj                                      \
-        ,const void *arg                                        \
- vis_p(_,int order)                                             \
-        ,void *ret                                              \
-    )                                                           \
-    {                                                           \
-        /* declarations */                                      \
-        type arg_val;                                           \
-        type ret_val;                                           \
-        type scratch;                                           \
-        int temp;                                               \
-        /* assertions */                                        \
-        do_assert(obj != NULL);                                 \
-        do_assert(arg != NULL);                                 \
-        do_assert(ret != NULL);                                 \
-        do_assert_aligned(obj, atype);                          \
-        do_assert(patomic_is_valid_order((int) order));         \
-        /* setup */                                             \
-        do_memcpy(&arg_val, arg, sizeof(type));                 \
-        /* operation */                                         \
-        do_atomic_binary_op_fetch_arg_explicit(                 \
-            type, bit_width, byte_width,                        \
-            (volatile atype *) obj,                             \
-            arg_val,                                            \
-            (int) order,                                        \
-            ret_val                                             \
-        );                                                      \
-        /* cleanup */                                           \
-        do_memcpy(ret, &ret_val, sizeof(type));                 \
-        PATOMIC_IGNORE_UNUSED(scratch);                         \
-        PATOMIC_IGNORE_UNUSED(temp);                            \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_BINARY_OP_FETCH_ARG(         \
+    bit_width, byte_width,                                              \
+    do_atomic_binary_op_fetch_arg_explicit,                             \
+    type, atype, fn_name, order, vis_p                                  \
+)                                                                       \
+    static PATOMIC_FORCE_INLINE void                                    \
+    fn_name(                                                            \
+        volatile void *obj                                              \
+        ,const void *arg                                                \
+ vis_p(_,int order)                                                     \
+        ,void *ret                                                      \
+    )                                                                   \
+    {                                                                   \
+        /* declarations */                                              \
+        type arg_val;                                                   \
+        type ret_val;                                                   \
+        type scratch;                                                   \
+        int temp;                                                       \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(arg != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                  \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order((int) order)); \
+        /* setup */                                                     \
+        PATOMIC_WRAPPED_DO_MEMCPY(&arg_val, arg, sizeof(type));         \
+        /* operation */                                                 \
+        do_atomic_binary_op_fetch_arg_explicit(                         \
+            type, bit_width, byte_width,                                \
+            (volatile atype *) obj,                                     \
+            arg_val,                                                    \
+            (int) order,                                                \
+            ret_val                                                     \
+        );                                                              \
+        /* cleanup */                                                   \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                                 \
+        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_OR \
@@ -523,39 +485,38 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOT(     \
-    bit_width, byte_width,                              \
-    do_atomic_fetch_not_explicit,                       \
-    do_assert, do_assert_aligned, do_memcpy,            \
-    type, atype, fn_name, order, vis_p                  \
-)                                                       \
-    static PATOMIC_FORCE_INLINE void                    \
-    fn_name(                                            \
-        volatile void *obj                              \
- vis_p(_,int order)                                     \
-        ,void *ret                                      \
-    )                                                   \
-    {                                                   \
-        /* declarations */                              \
-        type ret_val;                                   \
-        type scratch;                                   \
-        int temp;                                       \
-        /* assertions */                                \
-        do_assert(obj != NULL);                         \
-        do_assert(ret != NULL);                         \
-        do_assert_aligned(obj, atype);                  \
-        do_assert(patomic_is_valid_order((int) order)); \
-        /* operation */                                 \
-        do_atomic_fetch_not_explicit(                   \
-            type, bit_width, byte_width,                \
-            (volatile atype *) obj,                     \
-            (int) order,                                \
-            ret_val                                     \
-        );                                              \
-        /* cleanup */                                   \
-        do_memcpy(ret, &ret_val, sizeof(type));         \
-        PATOMIC_IGNORE_UNUSED(scratch);                 \
-        PATOMIC_IGNORE_UNUSED(temp);                    \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOT(                     \
+    bit_width, byte_width,                                              \
+    do_atomic_fetch_not_explicit,                                       \
+    type, atype, fn_name, order, vis_p                                  \
+)                                                                       \
+    static PATOMIC_FORCE_INLINE void                                    \
+    fn_name(                                                            \
+        volatile void *obj                                              \
+ vis_p(_,int order)                                                     \
+        ,void *ret                                                      \
+    )                                                                   \
+    {                                                                   \
+        /* declarations */                                              \
+        type ret_val;                                                   \
+        type scratch;                                                   \
+        int temp;                                                       \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                  \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order((int) order)); \
+        /* operation */                                                 \
+        do_atomic_fetch_not_explicit(                                   \
+            type, bit_width, byte_width,                                \
+            (volatile atype *) obj,                                     \
+            (int) order,                                                \
+            ret_val                                                     \
+        );                                                              \
+        /* cleanup */                                                   \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                                 \
+        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 
@@ -572,45 +533,44 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_ARG( \
-    bit_width, byte_width,                                          \
-    do_atomic_arithmetic_op_fetch_arg_explicit,                     \
-    do_assert, do_assert_aligned, do_memcpy,                        \
-    type, atype, fn_name, order, vis_p, min_val                     \
-)                                                                   \
-    static PATOMIC_FORCE_INLINE void                                \
-    fn_name(                                                        \
-        volatile void *obj                                          \
-        ,const void *arg                                            \
- vis_p(_,int order)                                                 \
-        ,void *ret                                                  \
-    )                                                               \
-    {                                                               \
-        /* declarations */                                          \
-        type arg_val;                                               \
-        type ret_val;                                               \
-        type scratch;                                               \
-        int temp;                                                   \
-        /* assertions */                                            \
-        do_assert(obj != NULL);                                     \
-        do_assert(arg != NULL);                                     \
-        do_assert(ret != NULL);                                     \
-        do_assert_aligned(obj, atype);                              \
-        do_assert(patomic_is_valid_order((int) order));             \
-        /* setup */                                                 \
-        do_memcpy(&arg_val, arg, sizeof(type));                     \
-        /* operation */                                             \
-        do_atomic_arithmetic_op_fetch_arg_explicit(                 \
-            type, bit_width, byte_width, min_val,                   \
-            (volatile atype *) obj,                                 \
-            arg_val,                                                \
-            (int) order,                                            \
-            ret_val                                                 \
-        );                                                          \
-        /* cleanup */                                               \
-        do_memcpy(ret, &ret_val, sizeof(type));                     \
-        PATOMIC_IGNORE_UNUSED(scratch);                             \
-        PATOMIC_IGNORE_UNUSED(temp);                                \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_ARG(     \
+    bit_width, byte_width,                                              \
+    do_atomic_arithmetic_op_fetch_arg_explicit,                         \
+    type, atype, fn_name, order, vis_p, min_val                         \
+)                                                                       \
+    static PATOMIC_FORCE_INLINE void                                    \
+    fn_name(                                                            \
+        volatile void *obj                                              \
+        ,const void *arg                                                \
+ vis_p(_,int order)                                                     \
+        ,void *ret                                                      \
+    )                                                                   \
+    {                                                                   \
+        /* declarations */                                              \
+        type arg_val;                                                   \
+        type ret_val;                                                   \
+        type scratch;                                                   \
+        int temp;                                                       \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(arg != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                  \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order((int) order)); \
+        /* setup */                                                     \
+        PATOMIC_WRAPPED_DO_MEMCPY(&arg_val, arg, sizeof(type));         \
+        /* operation */                                                 \
+        do_atomic_arithmetic_op_fetch_arg_explicit(                     \
+            type, bit_width, byte_width, min_val,                       \
+            (volatile atype *) obj,                                     \
+            arg_val,                                                    \
+            (int) order,                                                \
+            ret_val                                                     \
+        );                                                              \
+        /* cleanup */                                                   \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                                 \
+        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_ADD \
@@ -632,39 +592,38 @@
  *   - `order` will be an expression of type (int) whose value is a valid
  *     memory order
  */
-#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_VOID( \
-    bit_width, byte_width,                                           \
-    do_atomic_arithmetic_op_fetch_void_explicit,                     \
-    do_assert, do_assert_aligned, do_memcpy,                         \
-    type, atype, fn_name, order, vis_p, min_val                      \
-)                                                                    \
-    static PATOMIC_FORCE_INLINE void                                 \
-    fn_name(                                                         \
-        volatile void *obj                                           \
- vis_p(_,int order)                                                  \
-        ,void *ret                                                   \
-    )                                                                \
-    {                                                                \
-        /* declarations */                                           \
-        type ret_val;                                                \
-        type scratch;                                                \
-        int temp;                                                    \
-        /* assertions */                                             \
-        do_assert(obj != NULL);                                      \
-        do_assert(ret != NULL);                                      \
-        do_assert_aligned(obj, atype);                               \
-        do_assert(patomic_is_valid_order((int) order));              \
-        /* operation */                                              \
-        do_atomic_arithmetic_op_fetch_void_explicit(                 \
-            type, bit_width, byte_width, min_val,                    \
-            (volatile atype *) obj,                                  \
-            (int) order,                                             \
-            ret_val                                                  \
-        );                                                           \
-        /* cleanup */                                                \
-        do_memcpy(ret, &ret_val, sizeof(type));                      \
-        PATOMIC_IGNORE_UNUSED(scratch);                              \
-        PATOMIC_IGNORE_UNUSED(temp);                                 \
+#define PATOMIC_WRAPPED_DIRECT_IMPL_DEFINE_ARITHMETIC_OP_FETCH_VOID(    \
+    bit_width, byte_width,                                              \
+    do_atomic_arithmetic_op_fetch_void_explicit,                        \
+    type, atype, fn_name, order, vis_p, min_val                         \
+)                                                                       \
+    static PATOMIC_FORCE_INLINE void                                    \
+    fn_name(                                                            \
+        volatile void *obj                                              \
+ vis_p(_,int order)                                                     \
+        ,void *ret                                                      \
+    )                                                                   \
+    {                                                                   \
+        /* declarations */                                              \
+        type ret_val;                                                   \
+        type scratch;                                                   \
+        int temp;                                                       \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atype);                  \
+        PATOMIC_WRAPPED_DO_ASSERT(patomic_is_valid_order((int) order)); \
+        /* operation */                                                 \
+        do_atomic_arithmetic_op_fetch_void_explicit(                    \
+            type, bit_width, byte_width, min_val,                       \
+            (volatile atype *) obj,                                     \
+            (int) order,                                                \
+            ret_val                                                     \
+        );                                                              \
+        /* cleanup */                                                   \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &ret_val, sizeof(type));         \
+        PATOMIC_IGNORE_UNUSED(scratch);                                 \
+        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_INC \

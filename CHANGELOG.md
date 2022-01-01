@@ -6,12 +6,45 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 from `1.0.0` onwards. Releases before that with a version matching `0.y.z` may
 increment the `minor` version for breaking changes.
 
-## [Unreleased] [Patch]
+## [0.4.0] [Minor] - 2021-12-29
 ### Added
 - following config macros for internal use:
   - `PATOMIC_HAVE_GNU_SYNC`
   - `PATOMIC_HAVE_GNU_ATOMIC`
   - `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` for `N` in `[1, 2, 4, 8, 16]`
+  - `PATOMIC_HAVE_LONG_LONG_EXTN`
+  - `PATOMIC_HAVE_MS_INT128`
+  - `PATOMIC_HAVE_MS_INT128_EXTN`
+  - `PATOMIC_HAVE_IR_SIGN_MAGNITUDE`
+  - `PATOMIC_HAVE_IR_ONES_COMPL`
+  - `PATOMIC_HAVE_INTRIN_EFLAGS_CPUID`
+  - `PATOMIC_HAVE_CPUID_CPUID`
+- following macros and corresponding config macros for internal use:
+  - `PATOMIC_LIKELY`
+  - `PATOMIC_UNLIKELY`
+  - `PATOMIC_SIZEOF_{T}` for `T` in `[char, short, int, long, long long, __int128]`
+- alignment helpers in `stdalign.h`
+- typedefs for `char`, `short`, `int`, and `long` in `stdint.h` of the form
+  `patomic_TYPE_(un)signed`
+- conditionally existing typedefs for `long long` and `__int128` with the same
+  naming scheme
+- macros `PATOMIC_STDINT_HAVE_LLONG/I128` to check if the conditional typedefs
+  are available
+- `gnu` implementation can now fall back to `__sync` if it's available and
+  `__atomic` isn't
+- cpuid helpers in `cpuid.h`
+### Changed
+- removed `do_assert`, `do_assert_aligned`, and `do_memcpy` parameters from
+  wrapped macros; now use overrideable default macros from `wrapped/do.h`
+- `patomic_(u)intptr_t` now checks for 128bit type before checking for
+  `(unsigned) long long`
+- `std` implementation can now use `__extension__ (unsigned) long long` if it's
+  available (by virtue of the fact that it now uses `patomic_llong_(un)signed`
+  from `stdint.h` rather than `(unsigned) long long` directly)
+- `std` implementation now properly does 2s complement checks for `neg` op
+- `std` implementation now does runtime `atomic_is_lock_free` checks in
+  addition to the compile-time macro checks
+- renamed `PATOMIC_HAVE_TWOS_COMPL` to `PATOMIC_HAVE_IR_TWOS_COMPL`
 
 ## [0.3.1] [Patch] - 2021-12-16
 ### Added

@@ -66,6 +66,9 @@ always be defined, either through internal or command line means).
 | Name | Guarding |
 | --- | --- |
 | `PATOMIC_HAVE_LONG_LONG` | `long long` |
+| `PATOMIC_HAVE_LONG_LONG_EXTN` | `__extension__ long long` |
+| `PATOMIC_HAVE_MS_INT128` | `__int128` |
+| `PATOMIC_HAVE_MS_INT128_EXTN` | `__extension__ __int128` |
 | `PATOMIC_HAVE_FUNC` | `__func__` |
 | `PATOMIC_HAVE_GNU_FUNCTION` | `__FUNCTION__` |
 | `PATOMIC_HAVE_GNU_FUNCTION_EXTN` | `__extension__ __FUNCTION__` |
@@ -88,13 +91,19 @@ always be defined, either through internal or command line means).
 | `PATOMIC_HAVE_GNU_ALIGNOF_ALIGNED_ATTR` | `__alignof__` and `__attribute__((aligned(#)))` |
 | `PATOMIC_HAVE_MS_ASSUME` | `__assume(int)` |
 | `PATOMIC_HAVE_BUILTIN_UNREACHABLE` | `__builtin_unreachable(void)` |
+| `PATOMIC_HAVE_BUILTIN_EXPECT` | `__builtin_expect(long, long)` |
 | `PATOMIC_HAVE_STD_INT_UINTPTR` | `<stdint.h>` with `uintptr_t` |
 | `PATOMIC_HAVE_STD_DEF_UINTPTR` | `<stddef.h>` with `uintptr_t` |
 | `PATOMIC_HAVE_STD_ATOMIC` | `_Atomic` and `<stdatomic.h>`|
 | `PATOMIC_HAVE_GNU_SYNC` | `__sync` |
 | `PATOMIC_HAVE_GNU_ATOMIC` | `__atomic` and `__ATOMIC` |
 | `PATOMIC_HAVE_GNU_SYNC_LOCK_FREE_{N}` | `__sync` is lock-free for `sizeof(type) == N` |
-| `PATOMIC_HAVE_TWOS_COMPL` | `-INT_MIN` (UB if 2s compl) |
+| `PATOMIC_HAVE_INTRIN_EFLAGS_CPUID` | `<intrin.h>` with `__cpuid(ex)` and `__(read/write)eflags` |
+| `PATOMIC_HAVE_CPUID_CPUID` | `<cpuid.h>` with `__cpuid(_count)` and `__get_cpuid_max` |
+| `PATOMIC_HAVE_IR_SIGN_MAGNITUDE` | integer representation is sign-magnitude |
+| `PATOMIC_HAVE_IR_ONES_COMPL` | integer representation is ones-complement |
+| `PATOMIC_HAVE_IR_TWOS_COMPL` | integer representation is twos-complement |
+| `PATOMIC_SIZEOF_{T}` | value of `sizeof(T)` (or `0` if `T` not supported) |
 
 Their implementations can be found in `/src/include/patomic/patomic_config.h`.
 

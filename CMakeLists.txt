@@ -5,7 +5,7 @@ include(cmake/InSourceGuard.cmake)
 
 project(
     patomic
-    VERSION 0.3.1
+    VERSION 0.4.0
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
@@ -36,6 +36,7 @@ add_library(
     src/include/patomic/macros/force_inline.h
     src/include/patomic/macros/func_name.h
     src/include/patomic/macros/ignore_unused.h
+    src/include/patomic/macros/likely_unlikely.h
     src/include/patomic/macros/noinline.h
     src/include/patomic/macros/noreturn.h
     src/include/patomic/macros/restrict.h
@@ -43,16 +44,22 @@ add_library(
     src/include/patomic/macros/unreachable.h
     # src/include/patomic/stdlib
     src/include/patomic/stdlib/assert.h
+    src/include/patomic/stdlib/cpuid.h
+    src/include/patomic/stdlib/limits.h
+    src/include/patomic/stdlib/stdalign.h
     src/include/patomic/stdlib/string.h
     src/include/patomic/stdlib/stdint.h
     # src/include/patomic/wrapped
     src/include/patomic/wrapped/cmpxchg.h
     src/include/patomic/wrapped/direct.h
     src/include/patomic/wrapped/fetch.h
+    src/include/patomic/wrapped/do.h
     # src/patomic
     src/patomic/patomic_version.c
     # src/patomic/stdlib
     src/patomic/stdlib/assert.c
+    src/patomic/stdlib/cpuid.c
+    src/patomic/stdlib/stdalign.c
     src/patomic/stdlib/string.c
     # src/patomic/types
     src/patomic/types/align.c
@@ -80,6 +87,8 @@ add_library(
     # src/impl/gnu
     src/impl/gnu/gnu.h
     src/impl/gnu/gnu.c
+    src/impl/gnu/gnu_atomic.h
+    src/impl/gnu/gnu_sync.h
 )
 add_library(patomic::patomic ALIAS patomic_patomic)
 
@@ -99,6 +108,7 @@ configure_file(
 )
 
 include(cmake/CompilerFeatureChecks.cmake)
+include(cmake/CompilerTypeSizeChecks.cmake)
 configure_file(
     cmake/in/patomic_config.h.in
     src/include/patomic/_patomic_config.h

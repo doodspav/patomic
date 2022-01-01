@@ -2,9 +2,54 @@
 #define PATOMIC_CONFIG_H
 
 
+/* sizeof(char) */
+#ifndef PATOMIC_SIZEOF_CHAR
+    #define PATOMIC_SIZEOF_CHAR @COMPILER_SIZEOF_CHAR@
+#endif
+
+/* sizeof(short) */
+#ifndef PATOMIC_SIZEOF_SHORT
+    #define PATOMIC_SIZEOF_SHORT @COMPILER_SIZEOF_SHORT@
+#endif
+
+/* sizeof(int) */
+#ifndef PATOMIC_SIZEOF_INT
+    #define PATOMIC_SIZEOF_INT @COMPILER_SIZEOF_INT@
+#endif
+
+/* sizeof(long) */
+#ifndef PATOMIC_SIZEOF_LONG
+    #define PATOMIC_SIZEOF_LONG @COMPILER_SIZEOF_LONG@
+#endif
+
+/* sizeof(long long) OR sizeof(__extension__ long long) OR 0 */
+#ifndef PATOMIC_SIZEOF_LLONG
+    #define PATOMIC_SIZEOF_LLONG @COMPILER_SIZEOF_LLONG@
+#endif
+
+/* sizeof(__int128) OR sizeof(__extension__ __int128) OR 0 */
+#ifndef PATOMIC_SIZEOF_I128
+    #define PATOMIC_SIZEOF_I128 @COMPILER_SIZEOF_I128@
+#endif
+
 /* 'long long' is a fundamental type */
 #ifndef PATOMIC_HAVE_LONG_LONG
     #define PATOMIC_HAVE_LONG_LONG @COMPILER_HAS_LONG_LONG@
+#endif
+
+/* '__extension__ long long' is available as a type */
+#ifndef PATOMIC_HAVE_LONG_LONG_EXTN
+    #define PATOMIC_HAVE_LONG_LONG_EXTN @COMPILER_HAS_LONG_LONG_EXTN@
+#endif
+
+/* '__int128' is available as a type */
+#ifndef PATOMIC_HAVE_MS_INT128
+    #define PATOMIC_HAVE_MS_INT128 @COMPILER_HAS_MS_INT128@
+#endif
+
+/* '__extension__ __int128' is available as a type */
+#ifndef PATOMIC_HAVE_MS_INT128_EXTN
+    #define PATOMIC_HAVE_MS_INT128_EXTN @COMPILER_HAS_MS_INT128_EXTN@
 #endif
 
 /* '__func__' identifier is available */
@@ -117,6 +162,11 @@
     #define PATOMIC_HAVE_BUILTIN_UNREACHABLE @COMPILER_HAS_BUILTIN_UNREACHABLE@
 #endif
 
+/* '__builtin_expect(long, long)' is available */
+#ifndef PATOMIC_HAVE_BUILTIN_EXPECT
+    #define PATOMIC_HAVE_BUILTIN_EXPECT @COMPILER_HAS_BUILTIN_EXPECT@
+#endif
+
 /* <stdint.h> header available and 'uintptr_t' available in <stdint.h> */
 #ifndef PATOMIC_HAVE_STD_INT_UINTPTR
     #define PATOMIC_HAVE_STD_INT_UINTPTR @COMPILER_HAS_STD_INT_UINTPTR@
@@ -140,6 +190,16 @@
 /* '__atomic' builtins and '__ATOMIC' constants are available */
 #ifndef PATOMIC_HAVE_GNU_ATOMIC
     #define PATOMIC_HAVE_GNU_ATOMIC @COMPILER_HAS_GNU_ATOMIC@
+#endif
+
+/* <intrin.h> header and '__cpuid(ex)' and '__(read|write)eflags intrinsics are available */
+#ifndef PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
+    #define PATOMIC_HAVE_INTRIN_EFLAGS_CPUID @COMPILER_HAS_INTRIN_EFLAGS_CPUID@
+#endif
+
+/* <cpuid.h> header and  '__cpuid(_count)' and '__get_cpuid_max' intrinsics are available */
+#ifndef PATOMIC_HAVE_CPUID_CPUID
+    #define PATOMIC_HAVE_CPUID_CPUID @COMPILER_HAS_CPUID_CPUID@
 #endif
 
 

@@ -1,3 +1,5 @@
+include(CheckCSourceCompiles)
+
 function(zero_if_blank var)
     if(${var} STREQUAL "")
         set(${var} 0 PARENT_SCOPE)
@@ -9,6 +11,24 @@ check_c_source_compiles(
     COMPILER_HAS_LONG_LONG
 )
 zero_if_blank(COMPILER_HAS_LONG_LONG)
+
+check_c_source_compiles(
+    "int main(void) { __extension__ long long x = 0; return (int)x; }"
+    COMPILER_HAS_LONG_LONG_EXTN
+)
+zero_if_blank(COMPILER_HAS_LONG_LONG_EXTN)
+
+check_c_source_compiles(
+    "int main(void) { __int128 x = 0; return (int)x; }"
+    COMPILER_HAS_MS_INT128
+)
+zero_if_blank(COMPILER_HAS_MS_INT128)
+
+check_c_source_compiles(
+    "int main(void) { __extension__ __int128 x = 0; return (int)x; }"
+    COMPILER_HAS_MS_INT128_EXTN
+)
+zero_if_blank(COMPILER_HAS_MS_INT128_EXTN)
 
 check_c_source_compiles(
     "int main(void) { return __func__[0] == 0; }"
@@ -167,6 +187,14 @@ check_c_source_compiles(
 zero_if_blank(COMPILER_HAS_BUILTIN_UNREACHABLE)
 
 check_c_source_compiles(
+    "int main(int argc, char **argv) { \n\
+         if (__builtin_expect(argc < 1, 0)) { return -1; } \n\
+         else { return argv[0][0]; } }"
+    COMPILER_HAS_BUILTIN_EXPECT
+)
+zero_if_blank(COMPILER_HAS_BUILTIN_EXPECT)
+
+check_c_source_compiles(
     "#include <stdint.h> \n\
      int main(void) { uintptr_t x = 0; return (int)x; }"
     COMPILER_HAS_STD_INT_UINTPTR
@@ -204,3 +232,35 @@ check_c_source_compiles(
          return __atomic_load_n(&x, __ATOMIC_ACQUIRE); }"
     COMPILER_HAS_GNU_ATOMIC
 )
+zero_if_blank(COMPILER_HAS_GNU_ATOMIC)
+
+check_c_source_compiles(
+    "#include <intrin.h> \n\
+     int main(void) { \n\
+         int ex[4]; \n\
+         __writeeflags(__readeflags()); \n\
+         __cpuid(ex, 0); \n\
+         __cpuidex(ex, 0, 0); \n\
+         (void) ex; \n\
+         return 0; \n\
+     }"
+    COMPILER_HAS_INTRIN_EFLAGS_CPUID
+)
+zero_if_blank(COMPILER_HAS_INTRIN_EFLAGS_CPUID)
+
+check_c_source_compiles(
+        "#include <cpuid.h> \n\
+         int main(void) { \n\
+             unsigned int ex[4]; \n\
+             /* GCC uses unsigned int and Clang uses int */ \n\
+             ex[0] = (unsigned int) __get_cpuid_max(0x0, &ex[1]); \n\
+             if (ex[0] != 0) { \n\
+                 __cpuid(0, ex[0], ex[1], ex[2], ex[3]); \n\
+                 __cpuid_count(0, 0, ex[0], ex[1], ex[2], ex[3]); \n\
+             } \n\
+             (void) ex; \n\
+             return 0; \n\
+         }"
+    COMPILER_HAS_CPUID_CPUID
+)
+zero_if_blank(COMPILER_HAS_CPUID_CPUID)

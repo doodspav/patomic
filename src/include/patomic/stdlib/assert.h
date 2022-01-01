@@ -26,16 +26,17 @@ __patomic_assert_fail(
 #define patomic_assert_always(expr) ((void)((expr) || \
     (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
 
-#define patomic_assert(expr) ((void)((expr) || \
-    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
-
-#define patomic_assert_unreachable(expr) ((void)((expr) || \
-    (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
+#if defined(NDEBUG) && !defined(NNDEBUG)
+    #define patomic_assert(expr) ((void) 0)
+#else
+    #define patomic_assert(expr) ((void)((expr) || \
+        (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
+#endif
 
 #if defined(NDEBUG) && !defined(NNDEBUG)
-    #undef patomic_assert
-    #undef patomic_assert_unreachable
-    #define patomic_assert(expr) ((void) 0)
     #define patomic_assert_unreachable(expr) ((void)((expr) || \
         (PATOMIC_UNREACHABLE(), 0)))
+#else
+    #define patomic_assert_unreachable(expr) ((void)((expr) || \
+        (__patomic_assert_fail(#expr, __FILE__, PATOMIC_FUNC_NAME, __LINE__), 0)))
 #endif
