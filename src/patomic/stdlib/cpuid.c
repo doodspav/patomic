@@ -13,6 +13,9 @@
 #endif
 
 
+/* technically the below value is INT32_MIN which will overflow int       */
+/* apparently this will promote the literal's type to long (or long long) */
+/* either way, this is how both GNU's and MS's __cpuid examples do it     */
 #define PATOMIC_CPUID_MAX_LEAF 0x80000000
 
 
@@ -60,7 +63,7 @@ __patomic_cpuid_max(
     leaf &= PATOMIC_CPUID_MAX_LEAF;
 
 #if PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
-    if (!patomic_ms_cpuid_is_supported()) { return 0; }
+    if (!patomic_ms_cpuid_is_supported()) { return 0u; }
     else
     {
         int ex[4];
@@ -86,18 +89,11 @@ __patomic_cpuid(
     if (max_leaf == 0 || max_leaf < leaf) { return 0; }
 
 #if PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
-    if (!patomic_ms_cpuid_is_supported()) { return 0; }
-    else
-    {
-        int ex[] = {
-            (int) *eax, (int) *ebx,
-            (int) *ecx, (int) *edx
-        };
-        __cpuid(ex, (int) leaf);
-        *eax = ex[0]; *ebx = ex[1];
-        *ecx = ex[2]; *edx = ex[3];
-        return 1;
-    }
+    int ex[4];
+    __cpuid(ex, (int) leaf);
+    *eax = ex[0]; *ebx = ex[1];
+    *ecx = ex[2]; *edx = ex[3];
+    return 1;
 #elif PATOMIC_HAVE_CPUID_CPUID
     __cpuid(leaf, *eax, *ebx, *ecx, *edx);
     return 1;
@@ -118,18 +114,11 @@ __patomic_cpuidex(
     if (max_leaf == 0 || max_leaf < leaf) { return 0; }
 
 #if PATOMIC_HAVE_INTRIN_EFLAGS_CPUID
-    if (!patomic_ms_cpuid_is_supported()) { return 0; }
-    else
-    {
-        int ex[] = {
-            (int) *eax, (int) *ebx,
-            (int) *ecx, (int) *edx
-        };
-        __cpuidex(ex, (int) leaf, (int) subleaf);
-        *eax = ex[0]; *ebx = ex[1];
-        *ecx = ex[2]; *edx = ex[3];
-        return 1;
-    }
+    int ex[4];
+    __cpuidex(ex, (int) leaf, (int) subleaf);
+    *eax = ex[0]; *ebx = ex[1];
+    *ecx = ex[2]; *edx = ex[3];
+    return 1;
 #elif PATOMIC_HAVE_CPUID_CPUID
     __cpuid_count(leaf, subleaf, *eax, *ebx, *ecx, *edx);
     return 1;
