@@ -50,7 +50,7 @@ typedef unsigned long patomic_long_unsigned;
 #elif defined(__INTPTR_TYPE__) && defined(__UINTPTR_TYPE__)
     typedef __INTPTR_TYPE__  patomic_intptr_t;
     typedef __UINTPTR_TYPE__ patomic_uintptr_t;
-#elif PPATOMIC_STDINT_HAVE_I128
+#elif PATOMIC_STDINT_HAVE_I128
     typedef patomic_i128_signed   patomic_intptr_t;
     typedef patomic_i128_unsigned patomic_uintptr_t;
 #elif PATOMIC_SPATOMIC_STDINT_HAVE_LLONG

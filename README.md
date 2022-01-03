@@ -3,7 +3,10 @@ This library provides portable access to lock-free atomic operations at runtime
 through a unified interface.  
 The goal of it is to be used in Python, however there is no reason it can't be 
 used in any other language.  
-For an overview of the codebase, look at `ARCHITECTURE.md`.
+For an overview of the codebase, look at `ARCHITECTURE.md`.  
+
+For a summary of what changes need to be made before version `1.0.0`, go to the
+`Future Development` section at the end of this document.
 
 ## Table of Contents
 <!--ts-->
@@ -18,6 +21,7 @@ For an overview of the codebase, look at `ARCHITECTURE.md`.
   * [Availability](#3-check-availability)
 * [Guarantees](#guarantees)
 * [Example](#example)
+* [Future Development](#future-development)
 <!--te-->
 
 ## Versioning
@@ -323,3 +327,86 @@ int main()
     return 0;
 }
 ```
+## Future Development
+
+Hitting `v1.0.0` is required before I can merge into the master branch. Proper
+documentation will be written once `v1.0.0` is created (in addition to updating
+this README).
+
+The following tasks need to be completed before the ABI/API can be made stable:
+- **private symbols** - come up with a proper naming convention for symbols that
+  get marked `PATOMIC_NO_EXPORT` (maybe `Zpatomic_*_` to also help with IDEs?);
+  rework any symbols marked `PATOMIC_FORCE_INLINE` but not `static`
+- **two includes** - figure out how include both from `/include` and from
+  `/src/include` and not have macros break stuff
+- **impl_ids** - should they be powers of 2 in order to be composable or not?
+  and should they have some bits reserved for the implementation type?
+- **impl_kind** - maybe add an impl kind either as the first couple of bits in
+  impl_id or as its own thing? would help prevent running out of ids so fast if
+  i decide to make them powers of 2, and would let people exclude stuff like OS
+  and library implementations easily
+- **va_args** - remove variadic params from API; it's unnecessary and the way
+  it's currently implemented doesn't lead to clean code
+- **combine** - add api to combine `ops_t` structs, possibly allowing to combine
+  multiple with a priority for each one
+- **expose more info** - have a macro and corresponding runtime functions for
+  min/max impl_id values and max width supported overall and per implementation;
+  also improve cache-line size macro and function values
+- **naming** - rethink about symbol and file/path naming in general and make
+  sure i'm happy with it
+- **options** - redo options to match how we change impl stuff and public api
+
+The following tasks aren't part of the public ABI/API, but I want to complete
+before `v1.0.0`:
+- **impl_t array order** - priorities by default will be based on index of impl
+  in the impl_t array in register.h
+- **enable/disable impl** - add a way to enable or disable specific
+  implementations with a macro at compile time; possible also add a way to
+  enable/disable all implementations of a specific kind if it's feasible to do
+  so
+- **remove "public" macros** - remove macros that are in public files but get
+  undefd and are not part of the public interface (simply used to build it); 
+  these macros can confuse IDEs and annoy me
+- **NULL fp_create** - let members in impl_t struct be NULL instead of having
+  to make a dummy function every time
+- **transaction** - add a transactional implementation using tsx, just so I can
+  make sure I'm happy with the transactional API
+
+The rest of these tasks aren't part of any ABI/API (internal or external), they
+just need them to be done before merging with the master branch:
+- **simple api** - create a simple api wrapping the current api to mimic C11's
+  `atomic_*` api (so `patomic_*` equivalents)
+- **testing** - overhaul tests to properly test for logic, atomicity, and
+  ordering separately, as well as check whether a width is supported so that the
+  test log doesn't end up with thousands of skipped tests; also add separate
+  tests for transactional implementations
+- **windows tests** - figure out why tests run so slowly on Windows
+- **presets and ci** - have CI test multiple configurations with stuff enabled
+  and disabled, not just the default config for each compiler (and ideally
+  test on multiple architectures, maybe QEMU?)
+- **build without cmake** - create a python script to collate the project into
+  a single directory (ideally with just .c files) so that people building
+  without CMake can easily compile without needing a bunch of special flags
+- **macros** - double check all macros are actually correctly named (since most
+  macros will be hidden)
+- **interlocked** - redo the msvc implementation to actually properly check for
+  the availability of the intrinsics it uses (both in software and hardware)
+- **counter** - maybe (ab)use `__COUNTER__` to let the user enable only up to N
+  implementations somehow?
+
+The following implementations are being considered:
+- C11 stdatomic.h (done)
+- GNU __atomic (done)
+- GNU __sync (done)
+- MSC _Interlocked/_interlocked (to be redone from scratch)
+- AVX/SSE (intrinsics)
+- TSX (intrinsics and inline asm)
+- TME (intrinsics and inline asm)
+- MSC inline asm
+- GNU inline asm
+- Win32 Interlocked
+- Bsd/Unix/Linux atomic(3C)
+- OSX has libkern (but deprecated)
+
+Additionally, many OSs have atomic implementations specific to the kernel. Since
+this library is buildable in freestanding, we could use these too in the future.

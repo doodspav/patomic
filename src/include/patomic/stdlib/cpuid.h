@@ -5,6 +5,7 @@
 
 /* returns 1 if cpuid supported or 0 if not supported */
 /* writes 12 byte vendor ID string to sig_out if cpuid supported */
+/* does NOT write a null terminator byte */
 PATOMIC_NO_EXPORT
 extern int
 __patomic_cpuid_sig(
