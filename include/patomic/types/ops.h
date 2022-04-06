@@ -252,54 +252,138 @@ typedef int (* patomic_opsig_transaction_ttest_t) (void);
  * - transaction: tconfig parameter, tresult return type (except flag and raw)
  */
 
-#undef PATOMIC_DEFINE_ARITHMETIC_OPS_STRUCT
-#define PATOMIC_DEFINE_ARITHMETIC_OPS_STRUCT(opsig_kind, ops_kind) \
-    typedef struct {                                               \
-        /* in place */                                             \
-        patomic_##opsig_kind##_void_t fp_add;                      \
-        patomic_##opsig_kind##_void_t fp_sub;                      \
-        patomic_##opsig_kind##_void_noarg_t fp_inc;                \
-        patomic_##opsig_kind##_void_noarg_t fp_dec;                \
-        patomic_##opsig_kind##_void_noarg_t fp_neg;                \
-        /* fetch */                                                \
-        patomic_##opsig_kind##_fetch_t fp_fetch_add;               \
-        patomic_##opsig_kind##_fetch_t fp_fetch_sub;               \
-        patomic_##opsig_kind##_fetch_noarg_t fp_fetch_inc;         \
-        patomic_##opsig_kind##_fetch_noarg_t fp_fetch_dec;         \
-        patomic_##opsig_kind##_fetch_noarg_t fp_fetch_neg;         \
-    } patomic_##ops_kind##_arithmetic_t
+/* ARITHMETIC OP STRUCTS */
 
-#undef PATOMIC_DEFINE_BINARY_OPS_STRUCT
-#define PATOMIC_DEFINE_BINARY_OPS_STRUCT(opsig_kind, ops_kind) \
-    typedef struct {                                           \
-        /* in place */                                         \
-        patomic_##opsig_kind##_void_t fp_or;                   \
-        patomic_##opsig_kind##_void_t fp_xor;                  \
-        patomic_##opsig_kind##_void_t fp_and;                  \
-        patomic_##opsig_kind##_void_noarg_t fp_not;            \
-        /* fetch */                                            \
-        patomic_##opsig_kind##_fetch_t fp_fetch_or;            \
-        patomic_##opsig_kind##_fetch_t fp_fetch_xor;           \
-        patomic_##opsig_kind##_fetch_t fp_fetch_and;           \
-        patomic_##opsig_kind##_fetch_noarg_t fp_fetch_not;     \
-    } patomic_##ops_kind##_binary_t
+typedef struct {
+    /* in place */
+    patomic_opsig_void_t fp_add;
+    patomic_opsig_void_t fp_sub;
+    patomic_opsig_void_noarg_t fp_inc;
+    patomic_opsig_void_noarg_t fp_dec;
+    patomic_opsig_void_noarg_t fp_neg;
+    /* fetch */
+    patomic_opsig_fetch_t fp_fetch_add;
+    patomic_opsig_fetch_t fp_fetch_sub;
+    patomic_opsig_fetch_noarg_t fp_fetch_inc;
+    patomic_opsig_fetch_noarg_t fp_fetch_dec;
+    patomic_opsig_fetch_noarg_t fp_fetch_neg;
+} patomic_ops_arithmetic_t;
 
-#undef PATOMIC_DEFINE_BITWISE_OPS_STRUCT
-#define PATOMIC_DEFINE_BITWISE_OPS_STRUCT(opsig_kind, ops_kind) \
-    typedef struct {                                            \
-        patomic_##opsig_kind##_test_t fp_test;                  \
-        patomic_##opsig_kind##_test_modify_t fp_test_compl;     \
-        patomic_##opsig_kind##_test_modify_t fp_test_set;       \
-        patomic_##opsig_kind##_test_modify_t fp_test_reset;     \
-    } patomic_##ops_kind##_bitwise_t
+typedef struct {
+    /* in place */
+    patomic_opsig_explicit_void_t fp_add;
+    patomic_opsig_explicit_void_t fp_sub;
+    patomic_opsig_explicit_void_noarg_t fp_inc;
+    patomic_opsig_explicit_void_noarg_t fp_dec;
+    patomic_opsig_explicit_void_noarg_t fp_neg;
+    /* fetch */
+    patomic_opsig_explicit_fetch_t fp_fetch_add;
+    patomic_opsig_explicit_fetch_t fp_fetch_sub;
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_inc;
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_dec;
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_neg;
+} patomic_ops_explicit_arithmetic_t;
 
-#undef PATOMIC_DEFINE_XCHG_OPS_STRUCT
-#define PATOMIC_DEFINE_XCHG_OPS_STRUCT(opsig_kind, ops_kind) \
-    typedef struct {                                         \
-        patomic_##opsig_kind##_exchange_t fp_exchange;       \
-        patomic_##opsig_kind##_cmpxchg_t fp_cmpxchg_weak;    \
-        patomic_##opsig_kind##_cmpxchg_t fp_cmpxchg_strong;  \
-    } patomic_##ops_kind##_xchg_t
+typedef struct {
+    /* in place */
+    patomic_opsig_transaction_void_t fp_add;
+    patomic_opsig_transaction_void_t fp_sub;
+    patomic_opsig_transaction_void_noarg_t fp_inc;
+    patomic_opsig_transaction_void_noarg_t fp_dec;
+    patomic_opsig_transaction_void_noarg_t fp_neg;
+    /* fetch */
+    patomic_opsig_transaction_fetch_t fp_fetch_add;
+    patomic_opsig_transaction_fetch_t fp_fetch_sub;
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_inc;
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_dec;
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_neg;
+} patomic_ops_transaction_arithmetic_t;
+
+/* BINARY OP STRUCTS */
+
+typedef struct {
+    /* in place */
+    patomic_opsig_void_t fp_or;
+    patomic_opsig_void_t fp_xor;
+    patomic_opsig_void_t fp_and;
+    patomic_opsig_void_noarg_t fp_not;
+    /* fetch */
+    patomic_opsig_fetch_t fp_fetch_or;
+    patomic_opsig_fetch_t fp_fetch_xor;
+    patomic_opsig_fetch_t fp_fetch_and;
+    patomic_opsig_fetch_noarg_t fp_fetch_not;
+} patomic_ops_binary_t;
+
+typedef struct {
+    /* in place */
+    patomic_opsig_explicit_void_t fp_or;
+    patomic_opsig_explicit_void_t fp_xor;
+    patomic_opsig_explicit_void_t fp_and;
+    patomic_opsig_explicit_void_noarg_t fp_not;
+    /* fetch */
+    patomic_opsig_explicit_fetch_t fp_fetch_or;
+    patomic_opsig_explicit_fetch_t fp_fetch_xor;
+    patomic_opsig_explicit_fetch_t fp_fetch_and;
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_not;
+} patomic_ops_explicit_binary_t;
+
+typedef struct {
+    /* in place */
+    patomic_opsig_transaction_void_t fp_or;
+    patomic_opsig_transaction_void_t fp_xor;
+    patomic_opsig_transaction_void_t fp_and;
+    patomic_opsig_transaction_void_noarg_t fp_not;
+    /* fetch */
+    patomic_opsig_transaction_fetch_t fp_fetch_or;
+    patomic_opsig_transaction_fetch_t fp_fetch_xor;
+    patomic_opsig_transaction_fetch_t fp_fetch_and;
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_not;
+} patomic_ops_transaction_binary_t;
+
+/* BITWISE OP STRUCTS */
+
+typedef struct {
+    patomic_opsig_test_t fp_test;
+    patomic_opsig_test_modify_t fp_test_compl;
+    patomic_opsig_test_modify_t fp_test_set;
+    patomic_opsig_test_modify_t fp_test_reset;
+} patomic_ops_bitwise_t;
+
+typedef struct {
+    patomic_opsig_explicit_test_t fp_test;
+    patomic_opsig_explicit_test_modify_t fp_test_compl;
+    patomic_opsig_explicit_test_modify_t fp_test_set;
+    patomic_opsig_explicit_test_modify_t fp_test_reset;
+} patomic_ops_explicit_bitwise_t;
+
+typedef struct {
+    patomic_opsig_transaction_test_t fp_test;
+    patomic_opsig_transaction_test_modify_t fp_test_compl;
+    patomic_opsig_transaction_test_modify_t fp_test_set;
+    patomic_opsig_transaction_test_modify_t fp_test_reset;
+} patomic_ops_transaction_bitwise_t;
+
+/* XCHG OP STRUCTS */
+
+typedef struct {
+    patomic_opsig_exchange_t fp_exchange;
+    patomic_opsig_cmpxchg_t fp_cmpxchg_weak;
+    patomic_opsig_cmpxchg_t fp_cmpxchg_strong;
+} patomic_ops_xchg_t;
+
+typedef struct {
+    patomic_opsig_explicit_exchange_t fp_exchange;
+    patomic_opsig_explicit_cmpxchg_t fp_cmpxchg_weak;
+    patomic_opsig_explicit_cmpxchg_t fp_cmpxchg_strong;
+} patomic_ops_explicit_xchg_t;
+
+typedef struct {
+    patomic_opsig_transaction_exchange_t fp_exchange;
+    patomic_opsig_transaction_cmpxchg_t fp_cmpxchg_weak;
+    patomic_opsig_transaction_cmpxchg_t fp_cmpxchg_strong;
+} patomic_ops_transaction_xchg_t;
+
+/* TRANSACTION SPECIFIC OP STRUCTS */
 
 typedef struct {
     patomic_opsig_transaction_flag_test_t fp_test;
@@ -323,15 +407,8 @@ typedef struct {
     patomic_opsig_transaction_ttest_t fp_ttest;
 } patomic_ops_transaction_raw_t;
 
-#undef PATOMIC_DEFINE_OPS_STRUCTS
-#define PATOMIC_DEFINE_OPS_STRUCTS(opsig_kind, ops_kind)        \
-    PATOMIC_DEFINE_ARITHMETIC_OPS_STRUCT(opsig_kind, ops_kind); \
-    PATOMIC_DEFINE_BINARY_OPS_STRUCT(opsig_kind, ops_kind);     \
-    PATOMIC_DEFINE_BITWISE_OPS_STRUCT(opsig_kind, ops_kind);    \
-    PATOMIC_DEFINE_XCHG_OPS_STRUCT(opsig_kind, ops_kind)
+/* COMBINED OP STRUCTS */
 
-/* implicit */
-PATOMIC_DEFINE_OPS_STRUCTS(opsig, ops);
 typedef struct {
     patomic_opsig_store_t fp_store;
     patomic_opsig_load_t fp_load;
@@ -342,8 +419,6 @@ typedef struct {
     patomic_ops_arithmetic_t unsigned_ops;
 } patomic_ops_t;
 
-/* explicit */
-PATOMIC_DEFINE_OPS_STRUCTS(opsig_explicit, ops_explicit);
 typedef struct {
     patomic_opsig_explicit_store_t fp_store;
     patomic_opsig_explicit_load_t fp_load;
@@ -354,8 +429,6 @@ typedef struct {
     patomic_ops_explicit_arithmetic_t unsigned_ops;
 } patomic_ops_explicit_t;
 
-/* transaction */
-PATOMIC_DEFINE_OPS_STRUCTS(opsig_transaction, ops_transaction);
 typedef struct {
     patomic_opsig_transaction_store_t fp_store;
     patomic_opsig_transaction_load_t fp_load;
@@ -370,12 +443,6 @@ typedef struct {
     patomic_ops_transaction_raw_t raw_ops;
 } patomic_ops_transaction_t;
 
-
-#undef PATOMIC_DEFINE_OPS_STRUCTS
-#undef PATOMIC_DEFINE_XCHG_OPS_STRUCT
-#undef PATOMIC_DEFINE_BITWISE_OPS_STRUCT
-#undef PATOMIC_DEFINE_BINARY_OPS_STRUCT
-#undef PATOMIC_DEFINE_ARITHMETIC_OPS_STRUCT
 
 #ifdef __cplusplus
 }  /* extern "C" */
