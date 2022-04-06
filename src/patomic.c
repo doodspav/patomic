@@ -303,7 +303,7 @@ patomic_is_pow2(
         );                                                             \
         /* set flags to all transaction opcats except RAW */           \
         /* since we just checked RAW ops above */                      \
-        flags = patomic_opcat_TRANSACTION;                             \
+        flags = patomic_opcats_TRANSACTION;                            \
         flags &= ~((unsigned int) patomic_opcat_RAW);                  \
         /* remove tabort since we only care the other RAW ops */       \
         result &= ~((unsigned int) patomic_opkind_TABORT);             \

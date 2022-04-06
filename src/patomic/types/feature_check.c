@@ -367,16 +367,17 @@ patomic_feature_check_leaf(
         PATOMIC_CASE_UNSET_OPKINDS(UARI_V, ops, opkinds);
         PATOMIC_CASE_UNSET_OPKINDS(UARI_F, ops, opkinds);
 
-        case patomic_opcat_BIN:
-        case patomic_opcat_SARI:
-        case patomic_opcat_UARI:
-        case patomic_opcat_ARI:
-        case patomic_opcat_IMPLICIT:
+        case patomic_opcats_BIN:
+        case patomic_opcats_SARI:
+        case patomic_opcats_UARI:
+        case patomic_opcats_ARI:
+        case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
-        case patomic_opcat_TRANSACTION:
+        case patomic_opcats_TRANSACTION:
             patomic_assert_always("combined opcats" && 0);
             break;
 
+        /* not supported in patomic_ops_t */
         case patomic_opcat_SPEC:
         case patomic_opcat_FLAG:
         case patomic_opcat_RAW:
@@ -411,16 +412,17 @@ patomic_feature_check_leaf_explicit(
         PATOMIC_CASE_UNSET_OPKINDS(UARI_V, ops, opkinds);
         PATOMIC_CASE_UNSET_OPKINDS(UARI_F, ops, opkinds);
 
-        case patomic_opcat_BIN:
-        case patomic_opcat_SARI:
-        case patomic_opcat_UARI:
-        case patomic_opcat_ARI:
-        case patomic_opcat_IMPLICIT:
+        case patomic_opcats_BIN:
+        case patomic_opcats_SARI:
+        case patomic_opcats_UARI:
+        case patomic_opcats_ARI:
+        case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
-        case patomic_opcat_TRANSACTION:
+        case patomic_opcats_TRANSACTION:
             patomic_assert_always("combined opcats" && 0);
             break;
 
+        /* not supported in patomic_ops_explicit_t */
         case patomic_opcat_SPEC:
         case patomic_opcat_FLAG:
         case patomic_opcat_RAW:
@@ -459,13 +461,13 @@ patomic_feature_check_leaf_transaction(
         PATOMIC_CASE_UNSET_OPKINDS(FLAG, ops, opkinds);
         PATOMIC_CASE_UNSET_OPKINDS(RAW, ops, opkinds);
 
-        case patomic_opcat_BIN:
-        case patomic_opcat_SARI:
-        case patomic_opcat_UARI:
-        case patomic_opcat_ARI:
-        case patomic_opcat_IMPLICIT:
+        case patomic_opcats_BIN:
+        case patomic_opcats_SARI:
+        case patomic_opcats_UARI:
+        case patomic_opcats_ARI:
+        case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
-        case patomic_opcat_TRANSACTION:
+        case patomic_opcats_TRANSACTION:
             patomic_assert_always("combined opcats" && 0);
             break;
 

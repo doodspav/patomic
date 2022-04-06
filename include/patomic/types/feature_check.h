@@ -13,6 +13,8 @@ extern "C" {
  * OPCAT
  *
  * - operation category
+ * - opcat: single bit set (or zero bits for NONE)
+ * - opcats: multiple bits set
  *
  * - S/U(ARI): signed/unsigned version of (arithmetic) operations
  * - _F: fetch version of operations
@@ -24,10 +26,11 @@ extern "C" {
  */
 
 typedef enum {
+    /* opcat */
     patomic_opcat_NONE = 0x0
     ,patomic_opcat_LDST = 0x1
     ,patomic_opcat_XCHG = 0x2
-    ,patomic_opcat_BIT = 0x4
+    ,patomic_opcat_BIT  = 0x4
     ,patomic_opcat_BIN_V = 0x8
     ,patomic_opcat_BIN_F = 0x10
     ,patomic_opcat_SARI_V = 0x20
@@ -36,21 +39,22 @@ typedef enum {
     ,patomic_opcat_UARI_F = 0x100
     ,patomic_opcat_SPEC = 0x200
     ,patomic_opcat_FLAG = 0x400
-    ,patomic_opcat_RAW = 0x800
-    ,patomic_opcat_BIN  = patomic_opcat_BIN_V  | patomic_opcat_BIN_F
-    ,patomic_opcat_SARI = patomic_opcat_SARI_V | patomic_opcat_SARI_F
-    ,patomic_opcat_UARI = patomic_opcat_UARI_V | patomic_opcat_UARI_F
-    ,patomic_opcat_ARI  = patomic_opcat_SARI   | patomic_opcat_UARI
-    ,patomic_opcat_IMPLICIT = patomic_opcat_LDST |
-                              patomic_opcat_XCHG |
-                              patomic_opcat_BIT  |
-                              patomic_opcat_BIN  |
-                              patomic_opcat_ARI
-    ,patomic_opcat_EXPLICIT = patomic_opcat_IMPLICIT
-    ,patomic_opcat_TRANSACTION = patomic_opcat_EXPLICIT |
-                                 patomic_opcat_SPEC     |
-                                 patomic_opcat_FLAG     |
-                                 patomic_opcat_RAW
+    ,patomic_opcat_RAW  = 0x800
+    /* opcats */
+    ,patomic_opcats_BIN  = patomic_opcat_BIN_V  | patomic_opcat_BIN_F
+    ,patomic_opcats_SARI = patomic_opcat_SARI_V | patomic_opcat_SARI_F
+    ,patomic_opcats_UARI = patomic_opcat_UARI_V | patomic_opcat_UARI_F
+    ,patomic_opcats_ARI  = patomic_opcats_SARI  | patomic_opcats_UARI
+    ,patomic_opcats_IMPLICIT    = patomic_opcat_LDST |
+                                  patomic_opcat_XCHG |
+                                  patomic_opcat_BIT  |
+                                  patomic_opcats_BIN |
+                                  patomic_opcats_ARI
+    ,patomic_opcats_EXPLICIT    = patomic_opcats_IMPLICIT
+    ,patomic_opcats_TRANSACTION = patomic_opcats_EXPLICIT |
+                                  patomic_opcat_SPEC      |
+                                  patomic_opcat_FLAG      |
+                                  patomic_opcat_RAW
 } patomic_opcat_t;
 
 
@@ -71,27 +75,48 @@ typedef enum {
     /* base (opcat_LDST) */
     ,patomic_opkind_LOAD  = 0x1
     ,patomic_opkind_STORE = 0x2
+    ,patomic_opkinds_LDST = patomic_opkind_LOAD |
+                            patomic_opkind_STORE
     /* xchg */
     ,patomic_opkind_EXCHANGE = 0x1
     ,patomic_opkind_CMPXCHG_WEAK   = 0x2
     ,patomic_opkind_CMPXCHG_STRONG = 0x4
+    ,patomic_opkinds_XCHG = patomic_opkind_EXCHANGE     |
+                            patomic_opkind_CMPXCHG_WEAK |
+                            patomic_opkind_CMPXCHG_STRONG
     /* bitwise and flag */
     ,patomic_opkind_TEST = 0x1
     ,patomic_opkind_TEST_SET   = 0x2
     ,patomic_opkind_TEST_RESET = 0x4
-    ,patomic_opkind_TEST_COMPL = 0x8  /* bitwise only */
-    ,patomic_opkind_CLEAR = patomic_opkind_TEST_RESET
+    ,patomic_opkind_TEST_COMPL = 0x8
+    ,patomic_opkind_CLEAR = 0x10
+    ,patomic_opkinds_BIT  = patomic_opkind_TEST       |
+                            patomic_opkind_TEST_SET   |
+                            patomic_opkind_TEST_RESET |
+                            patomic_opkind_TEST_COMPL
+    ,patomic_opkinds_FLAG = patomic_opkind_TEST     |
+                            patomic_opkind_TEST_SET |
+                            patomic_opkind_CLEAR
     /* binary */
     ,patomic_opkind_OR  = 0x1
     ,patomic_opkind_XOR = 0x2
     ,patomic_opkind_AND = 0x4
     ,patomic_opkind_NOT = 0x8
+    ,patomic_opkinds_BIN = patomic_opkind_OR  |
+                           patomic_opkind_XOR |
+                           patomic_opkind_AND |
+                           patomic_opkind_NOT
     /* arithmetic */
     ,patomic_opkind_ADD = 0x1
     ,patomic_opkind_SUB = 0x2
     ,patomic_opkind_INC = 0x4
     ,patomic_opkind_DEC = 0x8
     ,patomic_opkind_NEG = 0x10
+    ,patomic_opkinds_ARI = patomic_opkind_ADD |
+                           patomic_opkind_SUB |
+                           patomic_opkind_INC |
+                           patomic_opkind_DEC |
+                           patomic_opkind_NEG
     /* special */
     ,patomic_opkind_DCMPXCHG_WEAK   = 0x1
     ,patomic_opkind_DCMPXCHG_STRONG = 0x2
@@ -99,11 +124,21 @@ typedef enum {
     ,patomic_opkind_NCMPXCHG_STRONG = 0x8
     ,patomic_opkind_GENERIC     = 0x10
     ,patomic_opkind_GENERIC_WFB = 0x20
+    ,patomic_opkinds_SPEC = patomic_opkind_DCMPXCHG_WEAK   |
+                            patomic_opkind_DCMPXCHG_STRONG |
+                            patomic_opkind_NCMPXCHG_WEAK   |
+                            patomic_opkind_NCMPXCHG_STRONG |
+                            patomic_opkind_GENERIC         |
+                            patomic_opkind_GENERIC_WFB
     /* raw */
     ,patomic_opkind_TBEGIN  = 0x1
     ,patomic_opkind_TABORT  = 0x2
     ,patomic_opkind_TCOMMIT = 0x4
     ,patomic_opkind_TTEST   = 0x8
+    ,patomic_opkinds_RAW = patomic_opkind_TBEGIN  |
+                           patomic_opkind_TABORT  |
+                           patomic_opkind_TCOMMIT |
+                           patomic_opkind_TTEST
 } patomic_opkind_t;
 
 
