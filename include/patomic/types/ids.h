@@ -79,13 +79,13 @@ typedef enum {
 
 /* returns all combined ids for implementations whose kind is in kinds */
 PATOMIC_EXPORT unsigned int
-patomic_impl_get_ids(
+patomic_get_ids(
     unsigned int kinds
 );
 
 /* returns kind for given id, or kind_UNKN for invalid id or id_NULL */
 PATOMIC_EXPORT patomic_kind_t
-patomic_impl_get_kind(
+patomic_get_kind(
     patomic_id_t id
 );
 

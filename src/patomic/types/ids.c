@@ -4,7 +4,7 @@
 
 
 unsigned int
-patomic_impl_get_ids(
+patomic_get_ids(
     unsigned int kinds
 )
 {
@@ -23,7 +23,7 @@ patomic_impl_get_ids(
 }
 
 patomic_kind_t
-patomic_impl_get_kind(
+patomic_get_kind(
     patomic_id_t id
 )
 {
