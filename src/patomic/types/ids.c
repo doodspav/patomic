@@ -12,8 +12,11 @@ patomic_impl_get_ids(
     patomic_impl_t const *const end = begin + PATOMIC_IMPL_REGISTER_SIZE;
     unsigned int ids = 0;
 
-    for (; begin != end; ++begin) {
-        if (begin->kind & kinds) { ids |= begin->id; }
+    for (; begin != end; ++begin)
+    {
+        unsigned int kind = (unsigned int) begin->kind;
+        unsigned int id = (unsigned int) begin->id;
+        if (kind & kinds) { ids |= id; }
     }
 
     return ids;

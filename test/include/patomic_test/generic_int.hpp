@@ -2,6 +2,7 @@
 #define PATOMIC_TEST_GENERIC_INT_HPP
 
 #include <cassert>
+#include <climits>
 #include <cstring>
 #include <limits>
 #include <vector>

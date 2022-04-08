@@ -108,6 +108,7 @@ patomic_create(
     unsigned int ids
 )
 {
+    patomic_t ret;
     patomic_t objs[PATOMIC_IMPL_REGISTER_SIZE];
     patomic_t *begin = objs;
     patomic_t *end   = objs;
@@ -115,8 +116,8 @@ patomic_create(
 
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
-        if ( (patomic_impl_register[i].id & ids) &&
-             (patomic_impl_register[i].kind & kinds))
+        if ( ((unsigned int)patomic_impl_register[i].id & ids) &&
+             ((unsigned int)patomic_impl_register[i].kind & kinds))
         {
             *end++ = patomic_impl_register[i].fp_create(
                 byte_width,
@@ -128,7 +129,7 @@ patomic_create(
 
     /* TODO: sort objs by alignment */
 
-    patomic_t ret = patomic_impl_create_null(byte_width, order, opts);
+    ret = patomic_impl_create_null(byte_width, order, opts);
     for (; begin != end; ++begin) { patomic_combine(&ret, begin); }
 
     return ret;
@@ -142,6 +143,7 @@ patomic_create_explicit(
     unsigned int ids
 )
 {
+    patomic_explicit_t ret;
     patomic_explicit_t objs[PATOMIC_IMPL_REGISTER_SIZE];
     patomic_explicit_t *begin = objs;
     patomic_explicit_t *end   = objs;
@@ -149,8 +151,8 @@ patomic_create_explicit(
 
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
-        if ( (patomic_impl_register[i].id & ids) &&
-             (patomic_impl_register[i].kind & kinds))
+        if ( ((unsigned int)patomic_impl_register[i].id & ids) &&
+             ((unsigned int)patomic_impl_register[i].kind & kinds))
         {
             *end++ = patomic_impl_register[i].fp_create_explicit(
                 byte_width,
@@ -161,7 +163,7 @@ patomic_create_explicit(
 
     /* TODO: sort objs by alignment */
 
-    patomic_explicit_t ret = patomic_impl_create_explicit_null(byte_width, opts);
+    ret = patomic_impl_create_explicit_null(byte_width, opts);
     for (; begin != end; ++begin) { patomic_combine_explicit(&ret, begin); }
 
     return ret;
@@ -182,8 +184,8 @@ patomic_create_transaction(
 
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
-        if ( (patomic_impl_register[i].id & ids) &&
-             (patomic_impl_register[i].kind & kinds))
+        if ( ((unsigned int)patomic_impl_register[i].id & ids) &&
+             ((unsigned int)patomic_impl_register[i].kind & kinds))
         {
             *end++ = patomic_impl_register[i];
         }
