@@ -5,7 +5,7 @@ include(cmake/InSourceGuard.cmake)
 
 project(
     patomic
-    VERSION 0.4.1
+    VERSION 0.5.0
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
@@ -64,6 +64,7 @@ add_library(
     # src/patomic/types
     src/patomic/types/align.c
     src/patomic/types/feature_check.c
+    src/patomic/types/ids.c
     src/patomic/types/memory_order.c
     src/patomic/types/transaction.c
     # src/impl

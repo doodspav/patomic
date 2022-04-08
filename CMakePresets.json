@@ -78,13 +78,13 @@
     {
       "name": "ci-win32-msvc",
       "inherits": ["dev-mode", "ci-build", "ci-flags-msvc"],
-      "generator": "Visual Studio 16 2019",
+      "generator": "Visual Studio 17 2022",
       "architecture": "Win32"
     },
     {
       "name": "ci-win64-msvc",
       "inherits": ["dev-mode", "ci-build", "ci-flags-msvc"],
-      "generator": "Visual Studio 16 2019",
+      "generator": "Visual Studio 17 2022",
       "architecture": "x64"
     },
     {

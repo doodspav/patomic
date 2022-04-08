@@ -11,7 +11,7 @@ patomic_t
 patomic_impl_create_tsx(
     size_t byte_width,
     patomic_memory_order_t order,
-    int options
+    unsigned int options
 )
 {
     patomic_t ret;
@@ -27,7 +27,7 @@ patomic_impl_create_tsx(
 patomic_explicit_t
 patomic_impl_create_explicit_tsx(
     size_t byte_width,
-    int options
+    unsigned int options
 )
 {
     patomic_explicit_t ret;
@@ -41,7 +41,7 @@ patomic_impl_create_explicit_tsx(
 
 patomic_transaction_t
 patomic_impl_create_transaction_tsx(
-    int options
+    unsigned int options
 )
 {
     patomic_transaction_t ret;

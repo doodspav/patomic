@@ -85,8 +85,10 @@ protected:
     {
         // get patomic
         auto &p = GetParam();
-        auto opt = patomic_options_IGNORE_NON_ARG_IDS;
-        auto pit = patomic_create(p.width, p.order, opt, 1, p.id);
+        auto pit = patomic_create(
+            p.width, p.order, patomic_option_NONE,
+            patomic_kinds_ALL, p.id
+        );
         // setup members
         m_iops = p.is_signed ? pit.ops.signed_ops : pit.ops.unsigned_ops;
         m_order = p.order;
@@ -98,8 +100,10 @@ protected:
     {
         // get patomic
         auto &p = GetParam();
-        auto opt = patomic_options_IGNORE_NON_ARG_IDS;
-        auto pet = patomic_create_explicit(p.width, opt, 1, p.id);
+        auto pet = patomic_create_explicit(
+            p.width, patomic_option_NONE,
+            patomic_kinds_ALL, p.id
+        );
         // setup members
         m_eops = p.is_signed ? pet.ops.signed_ops : pet.ops.unsigned_ops;
         m_order = p.order;
@@ -370,7 +374,7 @@ static auto get_test_params() -> const std::vector<patomic::test::sized_param>&
         // generate implicit unsigned params
         for (auto id : patomic::test::get_ids()) {
             // don't include NULL
-            if (id == patomic_impl_id_NULL) { continue; }
+            if (id == patomic_id_NULL) { continue; }
             for (auto width : patomic::test::get_widths()) {
                 for (auto order : patomic::test::get_orders()) {
                     // .is_explicit= false, .is_signed=false

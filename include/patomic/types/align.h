@@ -30,7 +30,7 @@ extern "C" {
  * - the "minimum" alignment is only valid if the object resides
  *   entirely within the buffer specified with "size_within" (unless
  *   "size_within" is 0 in which case "minimum" is always valid)
- * - the purpose of this is to communicate on x86 that operations
+ * - the intention of this is to communicate on x86 that operations
  *   on a type are atomic if the object doesn't cross a cache line
  *
  * EXAMPLES:
@@ -74,6 +74,7 @@ patomic_cache_line_size(void);
  * - if you need to be certain, implement these functions yourself, and don't
  *   use them if no atomic implementation is available
  */
+
 PATOMIC_EXPORT int
 patomic_align_meets_recommended(
     const volatile void *ptr,

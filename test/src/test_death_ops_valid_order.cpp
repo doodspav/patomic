@@ -28,8 +28,10 @@ protected:
     {
         // setup ops
         auto &p = GetParam();
-        auto opt = patomic_options_IGNORE_NON_ARG_IDS;
-        auto pet = patomic_create_explicit(p.width, opt, 1, p.id);
+        auto pet = patomic_create_explicit(
+            p.width, patomic_option_NONE,
+            patomic_kinds_ALL, p.id
+        );
         m_ops = pet.ops;
         m_order = p.order;
         // setup order inputs
@@ -638,7 +640,7 @@ get_buffer_test_params()
         // generate params (we only care about id, width, and seed)
         for (auto id : patomic::test::get_ids()) {
             // don't include NULL
-            if (id == patomic_impl_id_NULL) { continue; }
+            if (id == patomic_id_NULL) { continue; }
             for (auto width : patomic::test::get_widths()) {
                 params.push_back({width, order, id, dist(gen), false, false});
             }

@@ -16,28 +16,28 @@ namespace patomic {
     namespace test {
 
         template <size_t N> using order_array = std::array<patomic_memory_order_t, N>;
-        template <size_t N> using id_array = std::array<patomic_impl_id_t, N>;
+        template <size_t N> using id_array = std::array<patomic_id_t, N>;
 
         static constexpr auto get_ids() -> id_array<5>
         {
             return {
-                patomic_impl_id_NULL
-                ,patomic_impl_id_MSVC
-                ,patomic_impl_id_STD
-                ,patomic_impl_id_TSX
-                ,patomic_impl_id_GNU
+                patomic_id_NULL
+                ,patomic_id_MSVC
+                ,patomic_id_STD
+                ,patomic_id_TSX
+                ,patomic_id_GNU
             };
         }
 
-        static constexpr auto get_id_name(patomic_impl_id_t id) -> const char*
+        static constexpr auto get_id_name(patomic_id_t id) -> const char*
         {
             switch (id)
             {
-                case patomic_impl_id_NULL: return "NULL";
-                case patomic_impl_id_MSVC: return "MSVC";
-                case patomic_impl_id_STD: return "STD";
-                case patomic_impl_id_TSX: return "TSX";
-                case patomic_impl_id_GNU: return "GNU";
+                case patomic_id_NULL: return "NULL";
+                case patomic_id_MSVC: return "MSVC";
+                case patomic_id_STD: return "STD";
+                case patomic_id_TSX: return "TSX";
+                case patomic_id_GNU: return "GNU";
                 default: return "UNKNOWN";
             }
         }
@@ -81,7 +81,7 @@ namespace patomic {
         {
             size_t width;
             patomic_memory_order_t order;
-            patomic_impl_id_t id;
+            patomic_id_t id;
             unsigned int seed;
             bool is_explicit;
             bool is_signed;

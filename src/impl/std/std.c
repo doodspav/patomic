@@ -629,7 +629,7 @@ patomic_t
 patomic_impl_create_std(
     size_t byte_width,
     patomic_memory_order_t order,
-    int options
+    unsigned int options
 )
 {
     patomic_t ret;
@@ -642,7 +642,7 @@ patomic_impl_create_std(
 patomic_explicit_t
 patomic_impl_create_explicit_std(
     size_t byte_width,
-    int options
+    unsigned int options
 )
 {
     patomic_explicit_t ret;
@@ -660,7 +660,7 @@ patomic_t
 patomic_impl_create_std(
     size_t byte_width,
     patomic_memory_order_t order,
-    int options
+    unsigned int options
 )
 {
     patomic_t ret = {0};
@@ -675,7 +675,7 @@ patomic_impl_create_std(
 patomic_explicit_t
 patomic_impl_create_explicit_std(
     size_t byte_width,
-    int options
+    unsigned int options
 )
 {
     patomic_explicit_t ret = {0};
@@ -692,7 +692,7 @@ patomic_impl_create_explicit_std(
 
 patomic_transaction_t
 patomic_impl_create_transaction_std(
-    int options
+    unsigned int options
 )
 {
     patomic_transaction_t ret = {0};

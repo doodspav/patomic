@@ -20,10 +20,11 @@
  * - fp_create_transaction: (options)
  */
 typedef struct {
-    patomic_impl_id_t id;
-    patomic_t (* fp_create) (size_t, patomic_memory_order_t, int);
-    patomic_explicit_t (* fp_create_explicit) (size_t, int);
-    patomic_transaction_t (* fp_create_transaction) (int);
+    patomic_id_t id;
+    patomic_kind_t kind;
+    patomic_t (* fp_create) (size_t, patomic_memory_order_t, unsigned int);
+    patomic_explicit_t (* fp_create_explicit) (size_t, unsigned int);
+    patomic_transaction_t (* fp_create_transaction) (unsigned int);
 } patomic_impl_t;
 
 /*
@@ -36,31 +37,36 @@ typedef struct {
 static const patomic_impl_t
 patomic_impl_register[] = {
     {
-        patomic_impl_id_NULL,
+        patomic_id_NULL,
+        patomic_kind_UNKN,
         patomic_impl_create_null,
         patomic_impl_create_explicit_null,
         patomic_impl_create_transaction_null
     }
     ,{
-        patomic_impl_id_STD,
+        patomic_id_STD,
+        patomic_kind_BLTN,
         patomic_impl_create_std,
         patomic_impl_create_explicit_std,
         patomic_impl_create_transaction_std
     }
     ,{
-        patomic_impl_id_MSVC,
+        patomic_id_MSVC,
+        patomic_kind_ASM,
         patomic_impl_create_msvc,
         patomic_impl_create_explicit_msvc,
         patomic_impl_create_transaction_msvc
     }
     ,{
-        patomic_impl_id_TSX,
+        patomic_id_TSX,
+        patomic_kind_ASM,
         patomic_impl_create_tsx,
         patomic_impl_create_explicit_tsx,
         patomic_impl_create_transaction_tsx
     }
     ,{
-        patomic_impl_id_GNU,
+        patomic_id_GNU,
+        patomic_kind_BLTN,
         patomic_impl_create_gnu,
         patomic_impl_create_explicit_gnu,
         patomic_impl_create_transaction_gnu

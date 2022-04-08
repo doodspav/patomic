@@ -929,7 +929,7 @@ patomic_t
 patomic_impl_create_msvc(
     size_t byte_width,
     patomic_memory_order_t order,
-    int options
+    unsigned int options
 )
 {
     patomic_t ret;
@@ -948,7 +948,7 @@ patomic_impl_create_msvc(
 patomic_explicit_t
 patomic_impl_create_explicit_msvc(
     size_t byte_width,
-    int options
+    unsigned int options
 )
 {
     patomic_explicit_t ret;
@@ -969,7 +969,7 @@ patomic_impl_create_explicit_msvc(
 patomic_t patomic_impl_create_msvc(
     size_t byte_width,
     patomic_memory_order_t order,
-    int options
+    unsigned int options
 )
 {
     patomic_t ret;
@@ -985,7 +985,7 @@ patomic_t patomic_impl_create_msvc(
 patomic_explicit_t
 patomic_impl_create_explicit_msvc(
     size_t byte_width,
-    int options
+    unsigned int options
 )
 {
     patomic_explicit_t ret;
@@ -1001,7 +1001,7 @@ patomic_impl_create_explicit_msvc(
 
 patomic_transaction_t
 patomic_impl_create_transaction_msvc(
-    int options
+    unsigned int options
 )
 {
     patomic_transaction_t ret;

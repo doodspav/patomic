@@ -15,9 +15,9 @@
 
 patomic_t
 patomic_impl_create_gnu(
-        size_t byte_width,
-        patomic_memory_order_t order,
-        int options
+    size_t byte_width,
+    patomic_memory_order_t order,
+    unsigned int options
 )
 {
     patomic_t ret = {0};
@@ -36,8 +36,8 @@ patomic_impl_create_gnu(
 
 patomic_explicit_t
 patomic_impl_create_explicit_gnu(
-        size_t byte_width,
-        int options
+    size_t byte_width,
+    unsigned int options
 )
 {
     patomic_explicit_t ret = {0};
@@ -55,7 +55,7 @@ patomic_impl_create_explicit_gnu(
 
 patomic_transaction_t
 patomic_impl_create_transaction_gnu(
-    int options
+    unsigned int options
 )
 {
     patomic_transaction_t ret = {0};
