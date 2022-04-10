@@ -227,21 +227,21 @@ patomic_feature_check_any_transaction(
 PATOMIC_EXPORT unsigned int
 patomic_feature_check_leaf(
     const patomic_ops_t *ops,
-    patomic_opcat_t opcat, 
+    unsigned int opcat,
     unsigned int opkinds
 );
 
 PATOMIC_EXPORT unsigned int
 patomic_feature_check_leaf_explicit(
     const patomic_ops_explicit_t *ops,
-    patomic_opcat_t opcat,
+    unsigned int opcat,
     unsigned int opkinds
 );
 
 PATOMIC_EXPORT unsigned int
 patomic_feature_check_leaf_transaction(
     const patomic_ops_transaction_t *ops,
-    patomic_opcat_t opcat,
+    unsigned int opcat,
     unsigned int opkinds
 );
 

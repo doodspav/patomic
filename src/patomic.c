@@ -105,7 +105,7 @@ patomic_create(
     patomic_memory_order_t order,
     unsigned int opts,
     unsigned int kinds,
-    unsigned int ids
+    unsigned long ids
 )
 {
     patomic_t ret;
@@ -116,8 +116,8 @@ patomic_create(
 
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
-        if ( ((unsigned int)patomic_impl_register[i].id & ids) &&
-             ((unsigned int)patomic_impl_register[i].kind & kinds))
+        if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
+             ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
             *end++ = patomic_impl_register[i].fp_create(
                 byte_width,
@@ -140,7 +140,7 @@ patomic_create_explicit(
     size_t byte_width,
     unsigned int opts,
     unsigned int kinds,
-    unsigned int ids
+    unsigned long ids
 )
 {
     patomic_explicit_t ret;
@@ -151,8 +151,8 @@ patomic_create_explicit(
 
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
-        if ( ((unsigned int)patomic_impl_register[i].id & ids) &&
-             ((unsigned int)patomic_impl_register[i].kind & kinds))
+        if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
+             ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
             *end++ = patomic_impl_register[i].fp_create_explicit(
                 byte_width,
@@ -173,7 +173,7 @@ PATOMIC_EXPORT patomic_transaction_t
 patomic_create_transaction(
     unsigned int opts,
     unsigned int kinds,
-    unsigned int ids
+    unsigned long ids
 )
 {
     patomic_transaction_t ret;
@@ -184,8 +184,8 @@ patomic_create_transaction(
 
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
-        if ( ((unsigned int)patomic_impl_register[i].id & ids) &&
-             ((unsigned int)patomic_impl_register[i].kind & kinds))
+        if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
+             ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
             *end++ = patomic_impl_register[i];
         }

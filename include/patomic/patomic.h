@@ -112,7 +112,7 @@ patomic_create(
     patomic_memory_order_t order,
     unsigned int opts,
     unsigned int kinds,
-    unsigned int ids
+    unsigned long ids
 );
 
 PATOMIC_EXPORT patomic_explicit_t
@@ -120,14 +120,14 @@ patomic_create_explicit(
     size_t byte_width,
     unsigned int opts,
     unsigned int kinds,
-    unsigned int ids
+    unsigned long ids
 );
 
 PATOMIC_EXPORT patomic_transaction_t
 patomic_create_transaction(
     unsigned int opts,
     unsigned int kinds,
-    unsigned int ids
+    unsigned long ids
 );
 
 

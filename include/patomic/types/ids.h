@@ -17,18 +17,24 @@ extern "C" {
  * - the value of each implementation's id does not correspond to its kind
  * - the order and value of ids does not confer any ranking or priority
  *
- * - ALL is all bits set rather than other values combined to avoid an ABI break
- *   if a new id is added
+ * - ids are guaranteed to be consecutive powers of 2, starting at 1, with
+ *   id_NULL having the value of 0
+ *
+ * - unsigned long macros are used here rather than an enum to extend the number
+ *   of implementations we can support (up to 32)
+ * - ids_ALL is all bits set rather than other values combined to avoid an ABI
+ *   break if a new id is added
  */
 
-typedef enum {
-    patomic_ids_ALL  = ~0
-    ,patomic_id_NULL = 0x0
-    ,patomic_id_STD  = 0x1
-    ,patomic_id_MSVC = 0x2
-    ,patomic_id_GNU  = 0x4
-    ,patomic_id_TSX  = 0x8
-} patomic_id_t;
+typedef unsigned long patomic_id_t;
+
+#define patomic_id_NULL (0ul)
+#define patomic_id_STD  (1ul << 0ul)
+#define patomic_id_MSVC (1ul << 1ul)
+#define patomic_id_GNU  (1ul << 2ul)
+#define patomic_id_TSX  (1ul << 3ul)
+
+#define patomic_ids_ALL (~0ul)
 
 
 /*
@@ -42,9 +48,6 @@ typedef enum {
  *         most compiler builtins and stdatomic.h fall in this category
  * - UNKN: unknown kind
  *
- * - ALL is all bits set rather than other values combined to avoid an ABI break
- *   if a new id is added
- *
  * - values are ordered in ascending order based on efficiency (under the
  *   assumption that an inline ASM implementation will be the most efficient)
  *
@@ -56,12 +59,15 @@ typedef enum {
  */
 
 typedef enum {
-    patomic_kinds_ALL  = ~0
-    ,patomic_kind_UNKN = 0x0
+    patomic_kind_UNKN  = 0x0
     ,patomic_kind_DYN  = 0x1
     ,patomic_kind_LIB  = 0x2
     ,patomic_kind_BLTN = 0x4
     ,patomic_kind_ASM  = 0x8
+    ,patomic_kinds_ALL = patomic_kind_DYN  |
+                         patomic_kind_LIB  |
+                         patomic_kind_BLTN |
+                         patomic_kind_ASM
 } patomic_kind_t;
 
 
@@ -78,15 +84,15 @@ typedef enum {
  */
 
 /* returns all combined ids for implementations whose kind is in kinds */
-PATOMIC_EXPORT unsigned int
+PATOMIC_EXPORT unsigned long
 patomic_get_ids(
     unsigned int kinds
 );
 
 /* returns kind for given id, or kind_UNKN for invalid id or id_NULL */
-PATOMIC_EXPORT patomic_kind_t
+PATOMIC_EXPORT unsigned int
 patomic_get_kind(
-    patomic_id_t id
+    unsigned long id
 );
 
 

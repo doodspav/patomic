@@ -73,15 +73,15 @@ typedef struct {
 typedef struct {
     size_t width;
     size_t attempts;
-    const patomic_transaction_flag_t *flag;
+    const patomic_transaction_flag_t *flag_nullable;
 } patomic_transaction_config_t;
 
 typedef struct {
     size_t width;
     size_t attempts;
     size_t fallback_attempts;
-    const patomic_transaction_flag_t *flag;
-    const patomic_transaction_flag_t *fallback_flag;
+    const patomic_transaction_flag_t *flag_nullable;
+    const patomic_transaction_flag_t *fallback_flag_nullable;
 } patomic_transaction_config_wfb_t;
 
 

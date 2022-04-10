@@ -115,7 +115,7 @@ patomic_feature_check_all(
     unsigned int opcats
 )
 {
-    if (opcats == 0) { return opcats; }
+    if (opcats == 0u) { return opcats; }
 
     PATOMIC_UNSET_OPCAT_LDST(ops, opcats, &&);
     PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, &&);
@@ -138,7 +138,7 @@ patomic_feature_check_all_explicit(
     unsigned int opcats
 )
 {
-    if (opcats == 0) { return opcats; }
+    if (opcats == 0u) { return opcats; }
 
     PATOMIC_UNSET_OPCAT_LDST(ops, opcats, &&);
     PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, &&);
@@ -161,7 +161,7 @@ patomic_feature_check_all_transaction(
     unsigned int opcats
 )
 {
-    if (opcats == 0) { return opcats; }
+    if (opcats == 0u) { return opcats; }
 
     PATOMIC_UNSET_OPCAT_LDST(ops, opcats, &&);
     PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, &&);
@@ -189,7 +189,7 @@ patomic_feature_check_any(
     unsigned int opcats
 )
 {
-    if (opcats == 0) { return opcats; }
+    if (opcats == 0u) { return opcats; }
 
     PATOMIC_UNSET_OPCAT_LDST(ops, opcats, ||);
     PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, ||);
@@ -212,7 +212,7 @@ patomic_feature_check_any_explicit(
     unsigned int opcats
 )
 {
-    if (opcats == 0) { return opcats; }
+    if (opcats == 0u) { return opcats; }
 
     PATOMIC_UNSET_OPCAT_LDST(ops, opcats, ||);
     PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, ||);
@@ -235,7 +235,7 @@ patomic_feature_check_any_transaction(
     unsigned int opcats
 )
 {
-    if (opcats == 0) { return opcats; }
+    if (opcats == 0u) { return opcats; }
 
     PATOMIC_UNSET_OPCAT_LDST(ops, opcats, ||);
     PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, ||);
@@ -346,11 +346,11 @@ patomic_is_pow2_or_zero(
 unsigned int
 patomic_feature_check_leaf(
     patomic_ops_t const *const ops,
-    patomic_opcat_t opcat,
+    unsigned int opcat,
     unsigned int opkinds
 )
 {
-    if ((opcat == 0) || (opkinds == 0)) { return opkinds; }
+    if ((opcat == 0u) || (opkinds == 0u)) { return opkinds; }
     patomic_assert_always(patomic_is_pow2_or_zero(opcat));
 
     switch (opcat)
@@ -374,7 +374,7 @@ patomic_feature_check_leaf(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            patomic_assert_always("combined opcats" && 0);
+            patomic_assert_unreachable("combined opcats" && 0);
             break;
 
         /* not supported in patomic_ops_t */
@@ -391,11 +391,11 @@ patomic_feature_check_leaf(
 unsigned int
 patomic_feature_check_leaf_explicit(
     patomic_ops_explicit_t const *const ops,
-    patomic_opcat_t opcat,
+    unsigned int opcat,
     unsigned int opkinds
 )
 {
-    if ((opcat == 0) || (opkinds == 0)) { return opkinds; }
+    if ((opcat == 0u) || (opkinds == 0u)) { return opkinds; }
     patomic_assert_always(patomic_is_pow2_or_zero(opcat));
 
     switch (opcat)
@@ -419,7 +419,7 @@ patomic_feature_check_leaf_explicit(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            patomic_assert_always("combined opcats" && 0);
+            patomic_assert_unreachable("combined opcats" && 0);
             break;
 
         /* not supported in patomic_ops_explicit_t */
@@ -436,11 +436,11 @@ patomic_feature_check_leaf_explicit(
 unsigned int
 patomic_feature_check_leaf_transaction(
     patomic_ops_transaction_t const *const ops,
-    patomic_opcat_t opcat,
+    unsigned int opcat,
     unsigned int opkinds
 )
 {
-    if ((opcat == 0) || (opkinds == 0)) { return opkinds; }
+    if ((opcat == 0u) || (opkinds == 0u)) { return opkinds; }
     patomic_assert_always(patomic_is_pow2_or_zero(opcat));
 
     switch (opcat)
@@ -468,7 +468,7 @@ patomic_feature_check_leaf_transaction(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            patomic_assert_always("combined opcats" && 0);
+            patomic_assert_unreachable("combined opcats" && 0);
             break;
 
         case patomic_opcat_NONE:
