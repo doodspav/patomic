@@ -71,8 +71,18 @@ patomic_cache_line_size(void);
  * - realistically a uintptr type or macro will be available on any compiler
  *   which can provide some access to an atomic implementation
  *
- * - if you need to be certain, implement these functions yourself, and don't
+ * - if you need to be certain, implement these functions yourself, or don't
  *   use them if no atomic implementation is available
+ *
+ * - in meets_minimum, if width == 0, then align.size_within value is ignored
+ *
+ * NOTE:
+ * - the fact that a call to one of these functions succeeds, does not mean that
+ *   align.recommended or align.minimum is a valid alignment for an object in C
+ * - it only means that ops functions can accept objects with such an alignment
+ * - e.g. align.recommended == 0x3 means that ops functions could accept a
+ *   pointer to an object at address 0x3, not that 0x3 is a valid alignment in C
+ *   (it isn't)
  */
 
 PATOMIC_EXPORT int

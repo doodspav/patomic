@@ -28,7 +28,7 @@ patomic_align_meets_recommended(
 )
 {
     patomic_uintptr_t addr = (patomic_uintptr_t) ptr;
-    return (PATOMIC_MOD_POW2(addr, align.recommended) == 0);
+    return (PATOMIC_MOD_CPOW2(addr, align.recommended) == 0);
 }
 
 int
@@ -39,7 +39,7 @@ patomic_align_meets_minimum(
 )
 {
     patomic_uintptr_t addr = (patomic_uintptr_t) ptr;
-    if (PATOMIC_MOD_POW2(addr, align.minimum) == 0)
+    if (PATOMIC_MOD_CPOW2(addr, align.minimum) == 0)
     {
         if (align.size_within == 0) { return 1; }
         addr = (patomic_uintptr_t) PATOMIC_MOD_CPOW2(addr, align.size_within);
