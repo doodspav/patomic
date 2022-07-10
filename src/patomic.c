@@ -195,9 +195,14 @@ patomic_create_transaction(
 
     for (; begin != end; ++begin)
     {
+        ret = begin->fp_create_transaction(opts);
+
+        /* cmpxchg_strong MUST NOT be implemented */
+        /* transactions can always spuriously fail, so it would be impossible */
+        patomic_assert_always(ret.ops.xchg_ops.fp_cmpxchg_strong == NULL);
+
         /* any impl supporting any ops should support tbegin */
         /* TODO: do a more thorough check */
-        ret = begin->fp_create_transaction(opts);
         if (ret.ops.raw_ops.fp_tbegin != NULL) { return ret; }
     }
 

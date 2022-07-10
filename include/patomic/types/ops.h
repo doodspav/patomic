@@ -192,24 +192,6 @@ typedef patomic_transaction_result_t           \
     (volatile void *obj,                       \
      patomic_transaction_config_t config);
 
-/* NOTE: expected and desired may be NULL - check transaction cmpxchg docs */
-/* NOTE: config.width applies to both sets of params */
-typedef patomic_transaction_result_wfb_t           \
-    (* patomic_opsig_transaction_double_cmpxchg_t) \
-    (volatile void *obj_a,                         \
-     volatile void *obj_b,                         \
-     void *expected_nullable_a,                    \
-     void *expected_nullable_b,                    \
-     const void *desired_nullable_a,               \
-     const void *desired_nullable_b,               \
-     patomic_transaction_config_wfb_t);
-
-/* NOTE: size of cxs array is obtained from config.width */
-typedef patomic_transaction_result_wfb_t      \
-    (* patomic_opsig_transaction_n_cmpxchg_t) \
-    (const patomic_transaction_cmpxchg_t *cxs,
-     patomic_transaction_config_wfb_t config);
-
 /* NOTE: config.width is ignored */
 typedef patomic_transaction_result_t        \
     (* patomic_opsig_transaction_generic_t) \
@@ -377,6 +359,9 @@ typedef struct {
     patomic_opsig_explicit_cmpxchg_t fp_cmpxchg_strong;
 } patomic_ops_explicit_xchg_t;
 
+/* cmpxchg_strong will always be NULL */
+/* it is impossible to implement as transactions can always spuriously fail */
+/* it is kept around for consistency with non-transaction op structs */
 typedef struct {
     patomic_opsig_transaction_exchange_t fp_exchange;
     patomic_opsig_transaction_cmpxchg_t fp_cmpxchg_weak;
@@ -392,10 +377,6 @@ typedef struct {
 } patomic_ops_transaction_flag_t;
 
 typedef struct {
-    patomic_opsig_transaction_double_cmpxchg_t fp_double_cmpxchg_weak;
-    patomic_opsig_transaction_double_cmpxchg_t fp_double_cmpxchg_strong;
-    patomic_opsig_transaction_n_cmpxchg_t fp_n_cmpxchg_weak;
-    patomic_opsig_transaction_n_cmpxchg_t fp_n_cmpxchg_strong;
     patomic_opsig_transaction_generic_t fp_generic;
     patomic_opsig_transaction_generic_wfb_t fp_generic_wfb;
 } patomic_ops_transaction_special_t;

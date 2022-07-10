@@ -36,25 +36,6 @@ typedef struct {
 
 
 /*
- * TRANSACTION CMPXCHG
- *
- * - used in n_cmpxchg to pass multiple memory locations
- * - expected and desired may be NULL
- *
- * - if expected is NULL, no comparison (and write-back) is performed
- * - if desired is NULL, no value is stored to obj
- * - setting both to NULL would be a little pointless
- */
-
-typedef struct {
-    size_t width;
-    volatile void *obj;
-    void *expected_nullable;
-    const void *desired_nullable;
-} patomic_transaction_cmpxchg_t;
-
-
-/*
  * TRANSACTION CONFIG
  *
  * - width: size in bytes of objects to operate on
@@ -63,6 +44,10 @@ typedef struct {
  *   transaction
  * - flag: read from at the start of atomic transaction
  * - fallback_flag: read from at the start of fallback atomic transaction
+ *
+ * - width is expected to be non-zero, but zero is still a valid value (it just
+ *   isn't explicitly checked for to skip steps in an op)
+ * - width is ignored in generic transaction functions
  *
  * - flag and fallback_flag may point to the same object, or be NULL (in which
  *   case a locally allocated flag is used)
