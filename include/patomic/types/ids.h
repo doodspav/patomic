@@ -51,6 +51,16 @@ typedef unsigned long patomic_id_t;
  * - values are ordered in ascending order based on efficiency (under the
  *   assumption that an inline ASM implementation will be the most efficient)
  *
+ * Usage:
+ * - on architectures such as x86, many atomic operations can be done in a
+ *   single instruction which is guaranteed to succeed
+ * - these same operations can also be done using a cmpxchg loop
+ * - the single instruction option is likely faster, and has better guarantees
+ *   of forward progress, so is an ideal choice
+ * - higher ranked kinds are more likely to use a single instruction
+ *   implementation (i.e. ASM is all but guaranteed to use single instruction
+ *   whereas LIB could use anything, including the cmpxchg loop)
+ *
  * Note:
  * - BLTN is only used where the implementation makes a best-faith effort to
  *   provide an ASM implementation; otherwise, LIB or DYN should be used
