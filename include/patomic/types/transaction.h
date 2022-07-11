@@ -15,6 +15,8 @@ extern "C" {
  * - used to trigger an abort in a live transaction if modified, by reading from
  *   it at the start of each transaction
  * - any modification to any memory in the same cache line should cause an abort
+ * - traditionally this may point to a global lock so that transactions can be
+ *   used safely alongside regular locks
  *
  * - padded_flag_holder is intended for C90/99 since no alignment utilities
  *   are provided in these standard revisions
@@ -51,6 +53,10 @@ typedef struct {
  *
  * - flag and fallback_flag may point to the same object, or be NULL (in which
  *   case a locally allocated flag is used)
+ * - flag tends to guard a read--write code path, and fallback_flag tends to
+ *   guard a read-only code path
+ * - it may be useful to use flag as a unique read-write lock, and fallback_flag
+ *   as a shared read-only lock
  *
  * - wfb: with fallback
  */
@@ -114,6 +120,8 @@ patomic_transaction_abort_reason(
  * - fallback_attempts_made: how many attempts were made to commit the fallback
  *   atomic operation
  *
+ * - status will default to TSUCCESS if attempts_made is 0 because attempts was
+ *   set to 0 in config
  * - fallback_status will default to TSUCCESS if fallback_attempts_made is 0
  *
  * - wfb: with fallback
