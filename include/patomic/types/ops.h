@@ -125,6 +125,8 @@ typedef void (* patomic_opsig_explicit_void_noarg_t) \
  * - result-out-param
  *
  * - (except for flag and raw)
+ *
+ * TODO: properly define what happens when attempts and sizes are 0
  */
 
 typedef void (* patomic_opsig_transaction_store_t) \
@@ -192,6 +194,20 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) \
     (volatile void *obj,                                \
      patomic_transaction_config_t config,               \
      patomic_transaction_result_t *result);
+
+/* TODO: comments */
+typedef int (* patomic_opsig_transaction_double_cmpxchg_t) \
+    (patomic_transaction_cmpxchg_t cxa,                    \
+     patomic_transaction_cmpxchg_t cxb,                    \
+     patomic_transaction_config_wfb_t config,              \
+     patomic_transaction_result_wfb_t *result);
+
+/* TODO: comments */
+typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) \
+    (const patomic_transaction_cmpxchg_t *cxs_buf,        \
+     size_t cxs_len,                                      \
+     patomic_transaction_config_wfb_t config,             \
+     patomic_transaction_result_wfb_t *result);
 
 /* NOTE: config.width is ignored */
 typedef void (* patomic_opsig_transaction_generic_t) \
@@ -380,6 +396,8 @@ typedef struct {
 } patomic_ops_transaction_flag_t;
 
 typedef struct {
+    patomic_opsig_transaction_double_cmpxchg_t fp_double_cmpxchg;
+    patomic_opsig_transaction_multi_cmpxchg_t fp_multi_cmpxchg;
     patomic_opsig_transaction_generic_t fp_generic;
     patomic_opsig_transaction_generic_wfb_t fp_generic_wfb;
 } patomic_ops_transaction_special_t;

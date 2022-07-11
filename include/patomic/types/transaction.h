@@ -38,6 +38,20 @@ typedef struct {
 
 
 /*
+ * TRANSACTION CMPXCHG
+ *
+ * - used in double_cmpxchg and multi_cmpxchg to pass multiple memory locations
+ * - the width of all objects is obtained from config.width (shown below)
+ */
+
+typedef struct {
+    volatile void *obj;
+    void *expected;
+    const void *desired;
+} patomic_transaction_cmpxchg_t;
+
+
+/*
  * TRANSACTION CONFIG
  *
  * - width: size in bytes of objects to operate on
@@ -88,6 +102,13 @@ typedef struct {
  * - nested: abort occurred in inner nested transaction
  * - debug: abort caused by debug trap
  * - int: abort caused by interrupt
+ *
+ * Note:
+ * - in operations with a fallback path, an explicit abort will immediately
+ *   shift execution to the fallback path, regardless of whether all attempts on
+ *   the primary path have been exhausted
+ * - this feature is intended for use in double_cmpxchg, multi_cmpxchg, and
+ *   generic_wfb operations
  */
 
 /* Note: status can take up to 8 bits (of minimum 16bit uint) */
