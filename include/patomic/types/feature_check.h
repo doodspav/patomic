@@ -118,17 +118,13 @@ typedef enum {
                            patomic_opkind_DEC |
                            patomic_opkind_NEG
     /* special */
-    ,patomic_opkind_DCMPXCHG_WEAK   = 0x1
-    ,patomic_opkind_DCMPXCHG_STRONG = 0x2
-    ,patomic_opkind_NCMPXCHG_WEAK   = 0x4
-    ,patomic_opkind_NCMPXCHG_STRONG = 0x8
-    ,patomic_opkind_GENERIC     = 0x10
-    ,patomic_opkind_GENERIC_WFB = 0x20
-    ,patomic_opkinds_SPEC = patomic_opkind_DCMPXCHG_WEAK   |
-                            patomic_opkind_DCMPXCHG_STRONG |
-                            patomic_opkind_NCMPXCHG_WEAK   |
-                            patomic_opkind_NCMPXCHG_STRONG |
-                            patomic_opkind_GENERIC         |
+    ,patomic_opkind_DOUBLE_CMPXCHG = 0x1
+    ,patomic_opkind_MULTI_CMPXCHG  = 0x2
+    ,patomic_opkind_GENERIC        = 0x4
+    ,patomic_opkind_GENERIC_WFB    = 0x8
+    ,patomic_opkinds_SPEC = patomic_opkind_DOUBLE_CMPXCHG |
+                            patomic_opkind_MULTI_CMPXCHG  |
+                            patomic_opkind_GENERIC        |
                             patomic_opkind_GENERIC_WFB
     /* raw */
     ,patomic_opkind_TBEGIN  = 0x1
