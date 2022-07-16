@@ -40,41 +40,35 @@ typedef unsigned long patomic_id_t;
 /*
  * IMPLEMENTATION KINDS
  *
- * - DYN: dynamic function call that cannot be inlined, e.g. OS apis
- * - LIB: unknown library implementation which may be inlined
+ * - UNKN: unknown kind (no implementation will have this kind)
+ * - DYN:  dynamic function call that cannot be inlined
+ * - OS:   implementation provided by host OS, e.g. Interlocked, atomic_ops(3C)
+ * - LIB:  statically linked library implementation which may be inlined
+ * - BLTN: usually ASM but may fall back to LIB/OS/DYN implementation under
+ *         certain circumstances, e.g. __atomic -> libatomic for 16B operations
+ *         most compiler builtins and stdatomic.h macros fall in this category
  * - ASM: precise instructions with no call overhead, e.g. _Interlocked
- * - BLTN: usually ASM but may fall back to LIB/DYN implementation under certain
- *         circumstances, e.g. __atomic -> libatomic for 16B operations
- *         most compiler builtins and stdatomic.h fall in this category
- * - UNKN: unknown kind
  *
- * - values are ordered in ascending order based on efficiency (under the
- *   assumption that an inline ASM implementation will be the most efficient)
- *
- * Usage:
- * - on architectures such as x86, many atomic operations can be done in a
- *   single instruction which is guaranteed to succeed
- * - these same operations can also be done using a cmpxchg loop
- * - the single instruction option is likely faster, and has better guarantees
- *   of forward progress, so is an ideal choice
- * - higher ranked kinds are more likely to use a single instruction
- *   implementation (i.e. ASM is all but guaranteed to use single instruction
- *   whereas LIB could use anything, including the cmpxchg loop)
+ * - values are ordered in ascending order based on call overhead (under the
+ *   assumption that an inline ASM implementation will have the least overhead)
+ * - values are NOT ordered on quality of implementation (i.e. on x86 an ASM
+ *   implementation of add is free to use a LOCK CMPXCHG loop over LOCK XADD)
  *
  * Note:
+ * - implementations may have different kinds on different platforms
  * - BLTN is only used where the implementation makes a best-faith effort to
- *   provide an ASM implementation; otherwise, LIB or DYN should be used
- * - LIB is still guaranteed to be lock-free and address-free (along with the
- *   other three groups)
+ *   provide an ASM implementation, otherwise, LIB, OS, or DYN should be used
  */
 
 typedef enum {
     patomic_kind_UNKN  = 0x0
     ,patomic_kind_DYN  = 0x1
-    ,patomic_kind_LIB  = 0x2
-    ,patomic_kind_BLTN = 0x4
-    ,patomic_kind_ASM  = 0x8
+    ,patomic_kind_OS   = 0x2
+    ,patomic_kind_LIB  = 0x4
+    ,patomic_kind_BLTN = 0x8
+    ,patomic_kind_ASM  = 0x10
     ,patomic_kinds_ALL = patomic_kind_DYN  |
+                         patomic_kind_OS   |
                          patomic_kind_LIB  |
                          patomic_kind_BLTN |
                          patomic_kind_ASM
