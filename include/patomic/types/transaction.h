@@ -67,7 +67,7 @@ typedef struct {
  *
  * - flag and fallback_flag may point to the same object, or be NULL (in which
  *   case a locally allocated flag is used)
- * - flag tends to guard a read--write code path, and fallback_flag tends to
+ * - flag tends to guard a read-write code path, and fallback_flag tends to
  *   guard a read-only code path
  * - it may be useful to use flag as a unique read-write lock, and fallback_flag
  *   as a shared read-only lock
@@ -166,15 +166,12 @@ typedef struct {
  *
  * - recommended limits for transactions
  *
- * - max_rmw_memory (3N): test transaction reads N bytes from contiguous block A,
- *   compares them N bytes from contiguous block B, and writes them to
- *   contiguous block C. N is the maximum value tested where the transaction
- *   did not fail. max_rmw_memory is the TOTAL memory capacity in all three
- *   contiguous blocks (i.e. 3N).
- * - max_load_memory (2N): test transaction reads N bytes from a contiguous
- *   block A into a contiguous block B. N is the maximum value tested where the
- *   transaction did not fail. max_load_memory is the TOTAL memory capacity in
- *   both contiguous blocks (i.e. 2N).
+ * - max_rmw_memory (N): test transaction performs equivalent to a successful
+ *   fp_cmpxchg_weak with a width of N, with N being the maximum value tested
+ *   where the transaction eventually succeeded
+ * - max_load_memory (N): test transaction performs equivalent to fp_load with a
+ *   width of N, with N being the maximum value tested where the transaction
+ *   eventually succeeded
  *
  * - min_rmw_attempts: the number of attempts taken for the max_rmw_memory test
  *   transaction to succeed
@@ -186,7 +183,7 @@ typedef struct {
  * - the tests are run at least once per program execution
  * - implementations may cache the result of each test
  *
- * WARNING:
+ * Note:
  * - the tests are run under sterile conditions with no memory contention
  * - they represent the best possible outcome, which may not be achievable in
  *   real world scenarios

@@ -9,6 +9,7 @@ extern "C" {
 
 /*
  * IMPLICIT MEMORY ORDER OPSIGS
+ *
  * - in-params
  * - out-params
  */
@@ -58,6 +59,7 @@ typedef void (* patomic_opsig_void_noarg_t) \
 
 /*
  * EXPLICIT MEMORY ORDER OPSIGS
+ *
  * - in-params
  * - memory order
  * - out-params
@@ -119,6 +121,7 @@ typedef void (* patomic_opsig_explicit_void_noarg_t) \
 
 /*
  * TRANSACTION OPSIGS
+ *
  * - in-params
  * - config
  * - out-params
@@ -126,7 +129,35 @@ typedef void (* patomic_opsig_explicit_void_noarg_t) \
  *
  * - (except for flag and raw)
  *
- * TODO: properly define what happens when attempts and sizes are 0
+ * config.width == 0:
+ * - transactions proceed as normal, no short-circuiting
+ * - very high likely-hood of successful transactions since nothing will be read
+ *   or written
+ * - pointers in in-params and out-params will not be de-referenced
+ *
+ * config.attempts == 0:
+ * - primary transaction path will not be attempted
+ * - status will be set to TABORT_EXPLICIT with reason 0 and attempts_made to 0
+ * - if a fallback transaction path is available, it will be executed as normal
+ * - pointers in in-params and out-params will not be de-referenced in primary
+ *   path (but may be de-referenced in fallback path)
+ *
+ * config.fallback_attempts == 0:
+ * - fallback transaction path will not be attempted
+ * - fallback_status will be set to TABORT_EXPLICIT with reason 0 and
+ *   fallback_attempts_made to 0
+ * - pointers in in-params and out-params will not be de-referenced (but may
+ *   have already been de-referenced in primary path)
+ *
+ * cxs_len == 0:
+ * - transactions proceed as normal, no short-circuiting
+ * - very high likely-hood of successful transactions since nothing will be read
+ *   or written
+ * - pointers in in-params and out-params will not be de-referenced
+ *
+ * NOTE:
+ * - if an in-params or out-params pointer is not de-referenced because of the
+ *   above conditions, it will not be otherwise accessed, and may be NULL
  */
 
 typedef void (* patomic_opsig_transaction_store_t) \
@@ -148,7 +179,7 @@ typedef void (* patomic_opsig_transaction_exchange_t) \
      void *ret,                                       \
      patomic_transaction_result_t *result);
 
-/* returns 1 if cas succeeds, 0 if cas fails or aborts */
+/* returns 1 if cas succeeds, 0 if cas fails or primary transaction aborts */
 /* status of fallback load transaction does not affect return value */
 typedef int (* patomic_opsig_transaction_cmpxchg_t) \
     (volatile void *obj,                            \
@@ -195,14 +226,16 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) \
      patomic_transaction_config_t config,               \
      patomic_transaction_result_t *result);
 
-/* TODO: comments */
+/* returns 1 if cas succeeds, 0 if cas fails or primary transaction aborts */
+/* status of fallback load transaction does not affect return value */
 typedef int (* patomic_opsig_transaction_double_cmpxchg_t) \
     (patomic_transaction_cmpxchg_t cxa,                    \
      patomic_transaction_cmpxchg_t cxb,                    \
      patomic_transaction_config_wfb_t config,              \
      patomic_transaction_result_wfb_t *result);
 
-/* TODO: comments */
+/* returns 1 if cas succeeds, 0 if cas fails or primary transaction aborts */
+/* status of fallback load transaction does not affect return value */
 typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) \
     (const patomic_transaction_cmpxchg_t *cxs_buf,        \
      size_t cxs_len,                                      \
@@ -248,6 +281,7 @@ typedef int (* patomic_opsig_transaction_ttest_t) (void);
 
 /*
  * OP STRUCTS
+ *
  * - implicit: no extra parameters or special return type
  * - explicit: memory order parameter
  * - transaction: tconfig parameter, tresult return type (except flag and raw)
