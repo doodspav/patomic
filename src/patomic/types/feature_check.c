@@ -74,17 +74,15 @@
 #define PATOMIC_UNSET_OPCAT_UARI_F(ops, cats, and_or) \
     PATOMIC_UNSET_OPCAT_ARI(ops, cats, and_or, F, _fetch_, U, uns)
 
-#define PATOMIC_UNSET_OPCAT_SPEC(ops, cats, and_or)                        \
-    do {                                                                   \
-        if ((cats & patomic_opcat_SPEC)                                    \
-            && ((ops->special_ops.fp_double_cmpxchg_weak != NULL)   and_or \
-                (ops->special_ops.fp_double_cmpxchg_strong != NULL) and_or \
-                (ops->special_ops.fp_n_cmpxchg_weak != NULL)        and_or \
-                (ops->special_ops.fp_n_cmpxchg_strong != NULL)      and_or \
-                (ops->special_ops.fp_generic != NULL)               and_or \
-                (ops->special_ops.fp_generic_wfb != NULL)))                \
-        { cats ^= patomic_opcat_SPEC; }                                    \
-    }                                                                      \
+#define PATOMIC_UNSET_OPCAT_SPEC(ops, cats, and_or)                 \
+    do {                                                            \
+        if ((cats & patomic_opcat_SPEC)                             \
+            && ((ops->special_ops.fp_double_cmpxchg != NULL) and_or \
+                (ops->special_ops.fp_multi_cmpxchg != NULL)  and_or \
+                (ops->special_ops.fp_generic != NULL)        and_or \
+                (ops->special_ops.fp_generic_wfb != NULL)))         \
+        { cats ^= patomic_opcat_SPEC; }                             \
+    }                                                               \
     while (0)
 
 #define PATOMIC_UNSET_OPCAT_FLAG(ops, cats, and_or)        \
@@ -306,16 +304,10 @@ patomic_feature_check_any_transaction(
 #define PATOMIC_UNSET_OPKINDS_UARI_F(ops, kinds) \
     PATOMIC_UNSET_OPKINDS_ARI(ops, kinds, _fetch_, uns)
 
-#define PATOMIC_UNSET_OPKINDS_SPEC(ops, kinds)                                 \
-    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_double_cmpxchg_weak, kinds,   \
-                             DCMPXCHG_WEAK);                                   \
-    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_double_cmpxchg_strong, kinds, \
-                             DCMPXCHG_STRONG);                                 \
-    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_n_cmpxchg_weak, kinds,        \
-                             NCMPXCHG_WEAK);                                   \
-    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_n_cmpxchg_strong, kinds,      \
-                             NCMPXCHG_STRONG);                                 \
-    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_generic, kinds, GENERIC);     \
+#define PATOMIC_UNSET_OPKINDS_SPEC(ops, kinds)                                           \
+    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_double_cmpxchg, kinds, DOUBLE_CMPXCHG); \
+    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_multi_cmpxchg, kinds, MULTI_CMPXCHG);   \
+    PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_generic, kinds, GENERIC);               \
     PATOMIC_CHK_UNSET_OPKIND(ops->special_ops.fp_generic_wfb, kinds, GENERIC_WFB)
 
 #define PATOMIC_UNSET_OPKINDS_FLAG(ops, kinds)                            \
@@ -374,7 +366,7 @@ patomic_feature_check_leaf(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            patomic_assert_unreachable("combined opcats" && 0);
+            patomic_assert_unreachable("combined opcats (unreachable)" && 0);
             break;
 
         /* not supported in patomic_ops_t */
@@ -419,7 +411,7 @@ patomic_feature_check_leaf_explicit(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            patomic_assert_unreachable("combined opcats" && 0);
+            patomic_assert_unreachable("combined opcats (unreachable)" && 0);
             break;
 
         /* not supported in patomic_ops_explicit_t */
@@ -468,7 +460,7 @@ patomic_feature_check_leaf_transaction(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcat_EXPLICIT (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            patomic_assert_unreachable("combined opcats" && 0);
+            patomic_assert_unreachable("combined opcats (unreachable)" && 0);
             break;
 
         case patomic_opcat_NONE:
