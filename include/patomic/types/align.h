@@ -52,10 +52,24 @@ typedef struct {
 } patomic_align_t;
 
 
-/* represents the maximum cache line size in all known hardware */
-/* WARNING: changing this constitutes an ABI break */
+/* represents the maximum cache line size for the host platform */
+/* the value is always a power of 2 */
+/* note: changing this is an ABI break, requiring a major version number change */
 #undef PATOMIC_MAX_CACHE_LINE_SIZE
 #define PATOMIC_MAX_CACHE_LINE_SIZE 128
+
+/*
+ * - represents the maximum cache line size for the host platform
+ * - value is always a power of 2
+ *
+ * WARNING:
+ * - changing this value is NOT considered an ABI break
+ * - this means that changing it does NOT require a major version number change
+ * - the benefit is that the value can be updated frequently to more closely
+ *   match the true value on a wider range of platforms as they come up
+ */
+#undef PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE
+#define PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE 128
 
 /* Note: this may return a value <= to the macro value (always a power of 2) */
 /* the value will always be at least as large as a cache line */

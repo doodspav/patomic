@@ -15,26 +15,40 @@ extern "C" {
  * - used to trigger an abort in a live transaction if modified, by reading from
  *   it at the start of each transaction
  * - any modification to any memory in the same cache line should cause an abort
+ * - a patomic_transaction_flag_t pointer can point to any memory location since
+ *   it's just a volatile unsigned char *
  * - traditionally this may point to a global lock so that transactions can be
  *   used safely alongside regular locks
- *
- * - padded_flag_holder is intended for C90/99 since no alignment utilities
- *   are provided in these standard revisions
- * - it ensures the flag variable has its own cache line to avoid false
- *   sharing (which may cause a live transaction to unexpectedly abort)
- *
- * - you are not required to align/pad your flag
- * - if you do align/pad your flag, you are not required to use the flag holder
- * - e.g. in C11 you may use _Alignas
  */
 
 typedef volatile unsigned char patomic_transaction_flag_t;
+
+
+/*
+ * TRANSACTION PADDED FLAG HOLDER
+ *
+ * - padded_flag_holder is intended for C90/99 since no alignment utilities
+ *   are provided in these standard revisions
+ * - it ensures that the flag variable has its own cache line to avoid false
+ *   sharing (which may cause a live transaction to unexpectedly abort)
+ *
+ * - you are not required to align/pad your flag
+ * - if you do align/pad your flag, you are not required to use this flag holder
+ * - e.g. in C11 you may use _Alignas (or create your own flag holder)
+ */
 
 typedef struct {
     unsigned char _padding_pre[PATOMIC_MAX_CACHE_LINE_SIZE - 1];
     patomic_transaction_flag_t flag;
     unsigned char _padding_post[PATOMIC_MAX_CACHE_LINE_SIZE];
 } patomic_transaction_padded_flag_holder_t;
+
+/* WARNING: see warning for PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE in align.h */
+typedef struct {
+    unsigned char _padding_pre[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE - 1];
+    patomic_transaction_flag_t flag;
+    unsigned char _padding_post[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE];
+} patomic_transaction_padded_flag_holder_abi_unsafe_t;
 
 
 /*
