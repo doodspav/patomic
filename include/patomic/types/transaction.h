@@ -43,12 +43,12 @@ typedef struct {
     unsigned char _padding_post[PATOMIC_MAX_CACHE_LINE_SIZE];
 } patomic_transaction_padded_flag_holder_t;
 
-/* WARNING: see warning for PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE in align.h */
+/* WARNING: see warning for PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE in align.h */
 typedef struct {
-    unsigned char _padding_pre[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE - 1];
+    unsigned char _padding_pre[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE - 1];
     patomic_transaction_flag_t flag;
-    unsigned char _padding_post[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE];
-} patomic_transaction_padded_flag_holder_abi_unsafe_t;
+    unsigned char _padding_post[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE];
+} patomic_transaction_padded_flag_holder_abi_unstable_t;
 
 
 /*

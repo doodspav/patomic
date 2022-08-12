@@ -68,8 +68,8 @@ typedef struct {
  * - the benefit is that the value can be updated frequently to more closely
  *   match the true value on a wider range of platforms as they come up
  */
-#undef PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE
-#define PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSAFE 128
+#undef PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE
+#define PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE 128
 
 /* Note: this may return a value <= to the macro value (always a power of 2) */
 /* the value will always be at least as large as a cache line */
