@@ -89,6 +89,8 @@ patomic_cache_line_size(void);
  *   use them if no atomic implementation is available
  *
  * - in meets_minimum, if width == 0, then align.size_within value is ignored
+ * - this is the same as checking that ptr is aligned to both align.minimum
+ *   and align.size_within
  *
  * NOTE:
  * - the fact that a call to one of these functions succeeds, does not mean that
