@@ -1,0 +1,21 @@
+name: Feature Template
+description: Create a new Feature issue, representing a collection of User Stories to create a software component
+title: ""
+labels: ["feature"]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      placeholder: Type to add Description
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance Criteria
+      placeholder: Type to add Acceptance Criteria
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: User Stories
+      placeholder: "- [ ] User Story issue(s) to be part of this Feature"
