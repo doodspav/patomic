@@ -1,6 +1,5 @@
 name: Epic Template
 description: Create a new Epic issue, representing a collection of Features to reach a product goal
-title: ""
 labels: ["epic"]
 body:
   - type: textarea

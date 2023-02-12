@@ -1,6 +1,5 @@
 name: User Story Template
 description: Create a new User Story issue, representing a small objective
-title: ""
 labels: ["user story"]
 body:
   - type: textarea
