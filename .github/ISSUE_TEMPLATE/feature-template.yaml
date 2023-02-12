@@ -1,6 +1,5 @@
 name: Feature Template
 description: Create a new Feature issue, representing a collection of User Stories to create a software component
-title: ""
 labels: ["feature"]
 body:
   - type: textarea
