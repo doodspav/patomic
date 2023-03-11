@@ -71,3 +71,10 @@ target_include_directories(
 )
 
 target_compile_features(patomic_patomic PUBLIC c_std_90)
+
+
+# ---- Install Rules ----
+
+if(NOT CMAKE_SKIP_INSTALL_RULES)
+    include(cmake/util/InstallRules.cmake)
+endif()
