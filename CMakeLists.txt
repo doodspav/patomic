@@ -19,6 +19,7 @@ include(cmake/util/OptionVariables.cmake)
 
 add_library(
     patomic_patomic
+    ${patomic_BUILD_TYPE}
     # include
     include/patomic/patomic.h
     # src
@@ -32,7 +33,7 @@ add_library(patomic::patomic ALIAS patomic_patomic)
 # ---- Generate Build Info Headers ----
 
 # used in export header generated below
-if(NOT BUILD_SHARED_LIBS)
+if(NOT patomic_BUILD_SHARED)
     target_compile_definitions(patomic_patomic PUBLIC PATOMIC_STATIC_DEFINE)
 endif()
 
@@ -65,7 +66,7 @@ target_include_directories(
 
 # header files from /include
 target_include_directories(
-    patomic_patomic ${warning_guard}
+    patomic_patomic ${patomic_WARNING_GUARD}
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
