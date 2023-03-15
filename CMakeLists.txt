@@ -79,3 +79,11 @@ target_compile_features(patomic_patomic PUBLIC c_std_90)
 if(NOT CMAKE_SKIP_INSTALL_RULES)
     include(cmake/util/InstallRules.cmake)
 endif()
+
+
+# ---- Setup Tests ----
+
+include(CTest)
+if(patomic_BUILD_TESTING)
+    add_subdirectory(test)
+endif()

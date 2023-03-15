@@ -35,3 +35,20 @@ if(NOT PROJECT_IS_TOP_LEVEL)
         set(patomic_WARNING_GUARD SYSTEM)
     endif()
 endif()
+
+
+# ---- Enable Testing ----
+
+# By default tests aren't enabled even with BUILD_TESTING unless the library is
+# built as a top level project.
+# This is in order to cut down on unnecessary compile times, since it's unlikely
+# for users to want to run the tests of their dependencies.
+if(PROJECT_IS_TOP_LEVEL)
+    option(BUILD_TESTING "Build tests" OFF)
+endif()
+option(
+    patomic_BUILD_TESTING
+    "Override BUILD_TESTING for patomic library"
+    ${BUILD_TESTING}
+)
+mark_as_advanced(patomic_BUILD_TESTING)
