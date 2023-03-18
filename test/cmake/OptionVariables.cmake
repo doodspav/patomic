@@ -7,7 +7,7 @@
 # This gives users the option to disable this behaviour.
 option(
     patomic_test_SET_CTEST_PATH_ENV_WINDOWS
-    "Set PATH environment variable for tests when run using CTest on Windows"
+    "Set PATH environment variable for tests when run CTest on Windows"
     ON
 )
 mark_as_advanced(patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
