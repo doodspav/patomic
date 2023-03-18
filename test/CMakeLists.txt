@@ -63,7 +63,7 @@ windows_deps_path(
 # check we're on Windows, and we have SHARED_LIBRARY dependencies
 if(NOT deps_path STREQUAL "" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
-    # set environment variable for each test ctest works automatically
+    # set environment variable for each test so that ctest works automatically
     if(patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
         foreach(test IN LISTS patomic_test_TESTS)
             set_property(
@@ -78,4 +78,11 @@ if(NOT deps_path STREQUAL "" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         OUTPUT "${PROJECT_BINARY_DIR}/windows_dependencies_path.txt"
         CONTENT "${deps_path}"
     )
+endif()
+
+
+# ---- Install Rules ----
+
+if(NOT CMAKE_SKIP_INSTALL_RULES)
+    include(cmake/InstallRules.cmake)
 endif()
