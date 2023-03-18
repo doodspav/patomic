@@ -7,6 +7,8 @@ project(
     LANGUAGES CXX
 )
 
+include(cmake/OptionVariables.cmake)
+
 
 # ---- Dependencies ----
 
@@ -17,6 +19,8 @@ if(PROJECT_IS_TOP_LEVEL)
     enable_testing()
 endif()
 
+# for Windows: prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 find_package(GTest REQUIRED)
 include(GoogleTest)
 
@@ -45,3 +49,33 @@ gtest_add_tests(
     TARGET patomic_test
     TEST_LIST patomic_test_TESTS
 )
+
+
+# ---- Windows Path Issues ----
+
+include(cmake/WindowsDependenciesPath.cmake)
+windows_deps_path(
+    deps_path
+    patomic::patomic
+    GTest::gtest_main
+)
+
+# check we're on Windows, and we have SHARED_LIBRARY dependencies
+if(NOT deps_path STREQUAL "" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+
+    # set environment variable for each test ctest works automatically
+    if(patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
+        foreach(test IN LISTS patomic_test_TESTS)
+            set_property(
+                TEST "${test}"
+                PROPERTY ENVIRONMENT "PATH=${deps_path}"
+            )
+        endforeach()
+    endif()
+
+    # create file with PATH contents for when not running tests through CMake
+    file(GENERATE
+        OUTPUT "${PROJECT_BINARY_DIR}/windows_dependencies_path.txt"
+        CONTENT "${deps_path}"
+    )
+endif()
