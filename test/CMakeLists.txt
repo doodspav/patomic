@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
+include(cmake/PreventInSourceBuilds.cmake)
+
 project(
     patomic_test
     DESCRIPTION "Standalone tests for patomic library"
