@@ -27,32 +27,6 @@ find_package(GTest REQUIRED)
 include(GoogleTest)
 
 
-# ---- Declare Tests ----
-
-add_executable(
-    patomic_test
-    example_add.cpp
-)
-add_executable(patomic::test ALIAS patomic_test)
-
-target_link_libraries(
-    patomic_test
-    PRIVATE
-    patomic::patomic
-    GTest::gtest_main
-)
-
-target_compile_features(patomic_test PRIVATE cxx_std_14)
-
-
-# ---- Discover Tests ----
-
-gtest_add_tests(
-    TARGET patomic_test
-    TEST_LIST patomic_test_TESTS
-)
-
-
 # ---- Windows Path Issues ----
 
 include(cmake/WindowsDependenciesPath.cmake)
@@ -63,19 +37,11 @@ windows_deps_path(
 )
 
 # check we're on Windows, and we have SHARED_LIBRARY dependencies
-if(NOT deps_path STREQUAL "" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+set(windows_and_shared FALSE)
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT deps_path STREQUAL "")
+    set(windows_and_shared TRUE)
 
-    # set environment variable for each test so that ctest works automatically
-    if(patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
-        foreach(test IN LISTS patomic_test_TESTS)
-            set_property(
-                TEST "${test}"
-                PROPERTY ENVIRONMENT "PATH=${deps_path}"
-            )
-        endforeach()
-    endif()
-
-    # create file with PATH contents for when not running tests through CMake
+    # create file with PATH contents for when running tests independent of CTest
     file(GENERATE
         OUTPUT "${PROJECT_BINARY_DIR}/windows_dependencies_path.txt"
         CONTENT "${deps_path}"
@@ -83,7 +49,22 @@ if(NOT deps_path STREQUAL "" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 
-# ---- Install Rules ----
+# ---- Declare Tests ----
+
+add_custom_target(patomic_test)
+set_target_properties(
+    patomic_test
+    PROPERTIES
+    WIN_DEPS_PATH  ${deps_path}
+    WIN_AND_SHARED ${windows_and_shared}
+)
+
+# add all test subdirectories
+add_subdirectory(bt)
+add_subdirectory(ut)
+
+
+# ---- Further Installation and Packaging ----
 
 if(NOT CMAKE_SKIP_INSTALL_RULES)
     include(cmake/InstallRules.cmake)

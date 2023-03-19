@@ -1,3 +1,18 @@
+# ---- Test Install Directory ----
+
+# Normally tests would be install in CMAKE_INSTALL_BINDIR by default since
+# they're executables.
+# This is undesirable, so this variable exists to override the install location
+# of test binaries separately.
+# It's not prefixed with patomic_test because it's ok for it to be shared and
+# overridden by parent projects.
+# Note: this is not an official CMake variable
+set(
+    CMAKE_INSTALL_TESTDIR "share/test"
+    CACHE PATH "(unofficial) Default test install location"
+)
+
+
 # ---- Windows Tests Path ----
 
 # By default we set PATH for tests run with CTest on Windows in order to prevent
