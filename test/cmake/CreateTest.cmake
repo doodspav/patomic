@@ -33,6 +33,8 @@ function(create_test)
 
     set(kind "")  # -> "bt"
     set(name "")  # -> "${ARG_BT}"
+    # we turn kind into a list so that we can check its length (should be 1)
+    # and name is just the last name we process
     foreach(ak IN LISTS all_kinds)
         # if(ARG_BT)
         if (ARG_${ak})
@@ -82,6 +84,7 @@ function(create_test)
     set(output_name ${name})
 
     if (NOT "${target}" MATCHES ${patomic_test_CREATE_TEST_TARGETS_MATCHING})
+        message(DEBUG "Skipping creation of test target ${target} (matches ${patomic_test_CREATE_TEST_TARGETS_MATCHING})")
         return()
     endif()
 
@@ -202,6 +205,7 @@ function(create_test_win_deps_path_file ARG_KIND)
         # get dependencies set by create_test from target
         get_target_property(dep_targets patomic_${kind} WIN_DEP_TARGETS)
         if("${dep_targets}" STREQUAL "dep_targets-NOTFOUND")
+            message(DEBUG "Skipping creation of Windows dependencies PATH file for ${ARG_KIND}; no relevant test targets created")
             return()
         endif()
         list(REMOVE_DUPLICATES dep_targets)
