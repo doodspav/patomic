@@ -8,8 +8,8 @@ include(../cmake/WindowsDependenciesPath.cmake)
 add_custom_target(patomic_ut)
 add_dependencies(patomic_test patomic_ut)
 
-create_test(UT ut_example_add SOURCE example_add.cpp)
-create_test(UT ut_example_sub SOURCE example_sub.cpp)
+create_test(UT example_add SOURCE example_add.cpp)
+create_test(UT example_sub SOURCE example_sub.cpp)
 
 
 # ---- Windows Path Issues ----

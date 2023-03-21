@@ -3,6 +3,9 @@
 # Creates a target to build a test executable and registers it with CTest.
 # Expects a target named patomic_${kind} to exist.
 # E.g. if you call it as create_test(BT ...) then patomic_bt must exist.
+# The target is named patomic_${kind}_${name} but the name of the executable
+# produced is just ${name}.
+# When the executable is installed, it's installed as patomic/${kind}/${name}.
 #
 # create_test(
 #     BT|UT <name>
@@ -74,8 +77,9 @@ function(create_test)
     # setup target
 
     set(parent_target patomic_${kind})
-    set(target ${name})
+    set(target ${parent_target}_${name})
     set(target_deps patomic::patomic GTest::gtest_main ${ARG_LINK})
+    set(output_name ${name})
 
     add_executable(
         ${target}
@@ -91,8 +95,10 @@ function(create_test)
 
     target_compile_features(${target} PRIVATE cxx_std_14)
 
+    set_target_properties(${target} PROPERTIES OUTPUT_NAME ${output_name})
 
-    # setup tests with CTest
+
+    # register tests with CTest
 
     # must be run in same directory scope as target
     gtest_add_tests(
