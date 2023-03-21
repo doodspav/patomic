@@ -142,10 +142,20 @@ function(create_test)
     # setup install of target
 
     if(NOT CMAKE_SKIP_INSTALL_RULES)
+        # install as part of patomic_${kind} component
         install(
             TARGETS ${target}
             RUNTIME #
             COMPONENT "${parent_target}"
+            DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
+            EXCLUDE_FROM_ALL
+        )
+
+        # install as part of patomic_test component
+        install(
+            TARGETS ${target}
+            RUNTIME #
+            COMPONENT patomic_test
             DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
             EXCLUDE_FROM_ALL
         )
@@ -203,16 +213,26 @@ function(create_test_win_deps_path_file ARG_KIND)
         )
 
         # create file
+        set(file_path "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt")
         file(GENERATE
-            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt"
+            OUTPUT ${file_path}
             CONTENT "${deps_path}"
         )
 
         # copy file to install location
         if(NOT CMAKE_SKIP_INSTALL_RULES)
+            # install as part of patomic_${kind} component
             install(
-                FILES "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt"
+                FILES ${file_path}
                 COMPONENT patomic_${kind}
+                DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
+                EXCLUDE_FROM_ALL
+            )
+
+            # install as part of patomic_test component
+            install(
+                FILES ${file_path}
+                COMPONENT patomic_test
                 DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
                 EXCLUDE_FROM_ALL
             )
