@@ -1,33 +1,64 @@
 # ---- Create Test ----
 
-# Creates a test executable and registers it with CTest.
+# Creates a target to build a test executable and registers it with CTest.
+# Expects a target named patomic_${kind} to exist.
+# E.g. if you call it as create_test(BT ...) then patomic_bt must exist.
 #
 # create_test(
 #     BT|UT <name>
 #     [INCLUDE <item>...]
 #     [SOURCE <item>...]
+#     [LINK <item>...]
 # )
 function(create_test)
+
+    # setup what arguments we expect
+
+    set(all_kinds "BT;UT")  # list we can iterate over
+    set(all_kinds_option "BT|UT")  # string to use in debug message
+
     cmake_parse_arguments(
         "ARG"
         ""
-        "BT;UT"
-        "INCLUDE;SOURCE"
+        "${all_kinds}"
+        "INCLUDE;SOURCE;LINK"
         ${ARGN}
     )
+
+
+    # check what test kinds are passed
+
+    set(kind "")  # -> "bt"
+    set(name "")  # -> "${ARG_BT}"
+    foreach(ak IN LISTS all_kinds)
+        # if(ARG_BT)
+        if (ARG_${ak})
+            string(TOLOWER ${ak} ak_lower)
+            # kind.append(bt)
+            # name = ${ARG_BT}
+            list(APPEND kind "${ak_lower}")
+            set(name "${ARG_${ak}}")
+        endif()
+    endforeach()
 
 
     # validate arguments
 
     set(args_valid TRUE)
     set(func_name "create_test")
+    set(LENGTH kind kinds_count)
 
-    if(NOT ARG_BT AND NOT ARG_UT)
-        message(WARNING "<BT|UT> option needs to be specified when invoking '${func_name}'")
+    if(kinds_count EQUAL 0)
+        message(WARNING "${all_kinds_option} option needs to be specified when invoking '${func_name}'")
         set(args_valid FALSE)
-    elseif(ARG_BT AND ARG_UT)
-        message(WARNING "Only one of <BT|UT> options may be specified when invoking '${func_name}'")
+    elseif(kinds_count GREATER 1)
+        message(WARNING "Only a single ${all_kinds_option} option may be specified when invoking '${func_name}'")
         set(args_valid FALSE)
+    elseif(TARGET ${name})
+        message(WARNING "Test name must not be an existing target when invoking '${func_name}', was passed: ${name}")
+        set(args_valid FALSE)
+    elseif("${name}" STREQUAL "")
+        message(WARNING "Test name must not be empty when invoking '${func_name}'")
     endif()
 
     if(DEFINED ARG_UNPARSED_ARGUMENTS)
@@ -35,24 +66,16 @@ function(create_test)
         set(args_valid FALSE)
     endif()
 
-    if(NOT ${args_valid})
+    if (NOT args_valid)
         message(FATAL_ERROR "Aborting '${func_name}' due to invalid arguments")
-    endif()
-
-
-    # coalesce arguments
-
-    set(name "${ARG_BT}")
-    set(kind "bt")
-    if(ARG_UT)
-        set(name "${ARG_UT}")
-        set(kind "ut")
     endif()
 
 
     # setup target
 
-    set(target patomic_${kind}_${name})
+    set(parent_target patomic_${kind})
+    set(target ${name})
+    set(target_deps patomic::patomic GTest::gtest_main ${ARG_LINK})
 
     add_executable(
         ${target}
@@ -63,8 +86,7 @@ function(create_test)
     target_link_libraries(
         ${target}
         PRIVATE
-        patomic::patomic
-        GTest::gtest_main
+        ${target_deps}
     )
 
     target_compile_features(${target} PRIVATE cxx_std_14)
@@ -78,38 +100,50 @@ function(create_test)
         TEST_LIST added_tests
     )
 
-    # get these values from root target so we don't recompute every time
-    get_target_property(deps_path patomic_test WIN_DEPS_PATH)
-    get_target_property(win_and_shared patomic_test WIN_AND_SHARED)
 
-    # set environment variable for each test so that CTest works automatically
-    if(win_and_shared AND patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
-        foreach(test IN LISTS added_tests)
-            set_property(
-                TEST "${test}"
-                PROPERTY ENVIRONMENT "PATH=${deps_path}"
-            )
-        endforeach()
+    # deal with Windows runtime linker issues for tests (with and without CTest)
+
+    if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+
+        # get paths to all shared library dependencies (DLLs)
+        windows_deps_path(
+            deps_path
+            ${target_deps}
+        )
+
+        # set environment variable for the each test so that CTest works automatically
+        if (deps_path AND patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
+            foreach(test IN LISTS added_tests)
+                set_property(
+                    TEST "${test}"
+                    PROPERTY ENVIRONMENT "PATH=${deps_path}"
+                )
+            endforeach()
+        endif()
+
+        # make dependencies accessible from parent target
+        set_property(
+            TARGET ${parent_target}
+            APPEND PROPERTY WIN_DEP_TARGETS ${target_deps}
+        )
     endif()
 
 
     # setup install of target
 
-    set(component patomic_${kind})
-
     if(NOT CMAKE_SKIP_INSTALL_RULES)
         install(
             TARGETS ${target}
             RUNTIME #
-            COMPONENT ${component}
+            COMPONENT "${parent_target}"
             DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
             EXCLUDE_FROM_ALL
         )
     endif()
 
 
-    # attach to root target
+    # attach to parent target
 
-    add_dependencies(patomic_test ${target})
+    add_dependencies(${parent_target} ${target})
 
 endfunction()

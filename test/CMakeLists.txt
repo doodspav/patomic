@@ -27,45 +27,17 @@ find_package(GTest REQUIRED)
 include(GoogleTest)
 
 
-# ---- Windows Path Issues ----
-
-include(cmake/WindowsDependenciesPath.cmake)
-windows_deps_path(
-    deps_path
-    patomic::patomic
-    GTest::gtest_main
-)
-
-# check we're on Windows, and we have SHARED_LIBRARY dependencies
-set(windows_and_shared FALSE)
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT deps_path STREQUAL "")
-    set(windows_and_shared TRUE)
-
-    # create file with PATH contents for when running tests independent of CTest
-    file(GENERATE
-        OUTPUT "${PROJECT_BINARY_DIR}/windows_dependencies_path.txt"
-        CONTENT "${deps_path}"
-    )
-endif()
-
-
 # ---- Declare Tests ----
 
 add_custom_target(patomic_test)
-set_target_properties(
-    patomic_test
-    PROPERTIES
-    WIN_DEPS_PATH  ${deps_path}
-    WIN_AND_SHARED ${windows_and_shared}
-)
 
 # add all test subdirectories
 add_subdirectory(bt)
 add_subdirectory(ut)
 
 
-# ---- Further Installation and Packaging ----
+# ---- Support Packaging Library ----
 
-if(NOT CMAKE_SKIP_INSTALL_RULES)
-    include(cmake/InstallRules.cmake)
+if(PROJECT_IS_TOP_LEVEL AND NOT CMAKE_SKIP_INSTALL_RULES)
+    include(CPack)
 endif()
