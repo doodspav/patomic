@@ -35,5 +35,5 @@ function(windows_deps_path VAR)
         set(glue "\;")  # backslash is important
     endforeach()
 
-    set(${VAR} "${path}")
+    set(${VAR} "${path}" PARENT_SCOPE)
 endfunction()

@@ -2,7 +2,7 @@
 #include <patomic/patomic.h>
 
 
-TEST(suite, name)
+TEST(BtSuite, Add)
 {
     ASSERT_EQ(5, patomic_example_add(2, 3));
 }
