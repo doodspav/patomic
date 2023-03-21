@@ -13,6 +13,18 @@ set(
 )
 
 
+# ---- Test Build Selection ----
+
+# This option provides a way to selectively disable/enable tests based on target
+# name (not suite/case name, or name passed to create_test).
+# Regex must be written according to CMake Regex Specification.
+# By default all test targets are enabled.
+set(
+    patomic_test_CREATE_TEST_TARGETS_MATCHING "^(.*)$"
+    CACHE STRING "Only test targets matching regex are created and registered with CTest"
+)
+
+
 # ---- Windows Tests Path ----
 
 # By default we set PATH for tests run with CTest on Windows in order to prevent

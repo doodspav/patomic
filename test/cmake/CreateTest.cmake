@@ -81,6 +81,10 @@ function(create_test)
     set(target_deps patomic::patomic GTest::gtest_main ${ARG_LINK})
     set(output_name ${name})
 
+    if (NOT "${target}" MATCHES ${patomic_test_CREATE_TEST_TARGETS_MATCHING})
+        return()
+    endif()
+
     add_executable(
         ${target}
         ${ARG_INCLUDE}
@@ -187,6 +191,9 @@ function(create_test_win_deps_path_file ARG_KIND)
 
         # get dependencies set by create_test from target
         get_target_property(dep_targets patomic_${kind} WIN_DEP_TARGETS)
+        if("${dep_targets}" STREQUAL "dep_targets-NOTFOUND")
+            return()
+        endif()
         list(REMOVE_DUPLICATES dep_targets)
 
         # get paths to all shared library dependencies (DLLs)
