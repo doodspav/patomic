@@ -147,3 +147,63 @@ function(create_test)
     add_dependencies(${parent_target} ${target})
 
 endfunction()
+
+
+# ---- Create Test Dependency File ----
+
+# Creates a file containing the output of windows_deps_path for all tests of
+# the given kind registered so far.
+# Expects a target named patomic_${kind} to exist
+# E.g. if you call it as create_test_win_deps_path_file(BT) then patomic_bt must
+# exist.
+#
+# create_test_win_deps_path_file(
+#     BT|UT
+# )
+function(create_test_win_deps_path_file ARG_KIND)
+
+    # check KIND is valid
+
+    set(all_kinds_option "BT|UT")
+    set(func_name "create_test_win_deps_path_file")
+
+    if (NOT ARG_KIND MATCHES "^(${all_kinds_option})$")
+        message(WARNING "${all_kinds_option} option needs to be specified when invoking '${func_name}'")
+        message(FATAL_ERROR "Aborting '${func_name}' due to invalid arguments")
+    endif()
+
+    string(TOLOWER ${ARG_KIND} kind)
+
+
+    # create and install file with dependencies path
+
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+
+        # get dependencies set by create_test from target
+        get_target_property(dep_targets patomic_${kind} WIN_DEP_TARGETS)
+        list(REMOVE_DUPLICATES dep_targets)
+
+        # get paths to all shared library dependencies (DLLs)
+        windows_deps_path(
+            deps_path
+            ${dep_targets}
+        )
+
+        # create file
+        file(GENERATE
+            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt"
+            CONTENT "${deps_path}"
+        )
+
+        # copy file to install location
+        if(NOT CMAKE_SKIP_INSTALL_RULES)
+            install(
+                FILES "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt"
+                COMPONENT patomic_${kind}
+                DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
+                EXCLUDE_FROM_ALL
+            )
+        endif()
+    endif()
+
+endfunction()
