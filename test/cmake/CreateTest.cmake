@@ -118,6 +118,11 @@ function(create_test)
 
     if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
+        # check we actually care about Windows PATH stuff
+        if (NOT patomic_test_SET_CTEST_PATH_ENV_WINDOWS AND NOT patomic_test_CREATE_WINDOWS_PATH_FILE)
+            return()
+        endif()
+
         # get paths to all shared library dependencies (DLLs)
         windows_deps_path(
             deps_path
@@ -135,10 +140,12 @@ function(create_test)
         endif()
 
         # make dependencies accessible from parent target
-        set_property(
-            TARGET ${parent_target}
-            APPEND PROPERTY WIN_DEP_TARGETS ${target_deps}
-        )
+        if (patomic_test_CREATE_WINDOWS_PATH_FILE)
+            set_property(
+                TARGET ${parent_target}
+                APPEND PROPERTY WIN_DEP_TARGETS ${target_deps}
+            )
+        endif()
     endif()
 
 
@@ -184,6 +191,13 @@ endfunction()
 #     BT|UT
 # )
 function(create_test_win_deps_path_file ARG_KIND)
+
+    # check we actually want to generate file
+
+    if(NOT patomic_test_CREATE_WINDOWS_PATH_FILE)
+        return()
+    endif()
+
 
     # check KIND is valid
 
