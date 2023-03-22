@@ -83,7 +83,8 @@ endif()
 
 # ---- Setup Tests ----
 
-include(CTest)
 if(patomic_BUILD_TESTING)
+    # need to enable testing in case BUILD_TESTING is disabled
+    enable_testing()
     add_subdirectory(test)
 endif()
