@@ -6,9 +6,9 @@
 # path in order to find linked dependencies
 # See: https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order
 # Usage: windows_deps_path(<variable> <link-target>...)
-function(windows_deps_path VAR)
+function(windows_deps_path ARG_VAR)
     if(NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-        set(${VAR} "" PARENT_SCOPE)
+        set(${ARG_VAR} "" PARENT_SCOPE)
         return()
     endif()
 
@@ -35,5 +35,5 @@ function(windows_deps_path VAR)
         set(glue "\;")  # backslash is important
     endforeach()
 
-    set(${VAR} "${path}" PARENT_SCOPE)
+    set(${ARG_VAR} "${path}" PARENT_SCOPE)
 endfunction()

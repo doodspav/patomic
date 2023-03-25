@@ -6,14 +6,14 @@ if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_SHARED_LIBS "Build shared libs" OFF)
 endif()
 option(
-    patomic_BUILD_SHARED
+    PATOMIC_BUILD_SHARED
     "Override BUILD_SHARED_LIBS for patomic library"
     ${BUILD_SHARED_LIBS}
 )
-mark_as_advanced(patomic_BUILD_SHARED)
-set(patomic_BUILD_TYPE STATIC)
-if(patomic_BUILD_SHARED)
-    set(patomic_BUILD_TYPE SHARED)
+mark_as_advanced(PATOMIC_BUILD_SHARED)
+set(build_type STATIC)
+if(PATOMIC_BUILD_SHARED)
+    set(build_type SHARED)
 endif()
 
 
@@ -23,16 +23,16 @@ endif()
 # omit warnings from the provided paths, if the compiler supports that.
 # This is to provide a user experience similar to find_package when
 # add_subdirectory or FetchContent is used to consume this project.
-set(patomic_WARNING_GUARD "")
+set(warning_guard "")
 if(NOT PROJECT_IS_TOP_LEVEL)
     option(
-        patomic_INCLUDES_WITH_SYSTEM
+        PATOMIC_INCLUDES_WITH_SYSTEM
         "Use SYSTEM modifier for patomic's includes, disabling warnings"
         ON
     )
-    mark_as_advanced(patomic_INCLUDES_WITH_SYSTEM)
-    if(patomic_INCLUDES_WITH_SYSTEM)
-        set(patomic_WARNING_GUARD SYSTEM)
+    mark_as_advanced(PATOMIC_INCLUDES_WITH_SYSTEM)
+    if(PATOMIC_INCLUDES_WITH_SYSTEM)
+        set(warning_guard SYSTEM)
     endif()
 endif()
 
@@ -47,8 +47,32 @@ if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_TESTING "Build tests" OFF)
 endif()
 option(
-    patomic_BUILD_TESTING
+    PATOMIC_BUILD_TESTING
     "Override BUILD_TESTING for patomic library"
     ${BUILD_TESTING}
 )
-mark_as_advanced(patomic_BUILD_TESTING)
+mark_as_advanced(PATOMIC_BUILD_TESTING)
+
+
+# ---- Install Include Directory ----
+
+# Adds an extra directory to the include path by default, so that when you link
+# against the target, you get `<prefix>/include/patomic-X.Y.Z` added to your
+# include paths rather than `<prefix/include`.
+if(PROJECT_IS_TOP_LEVEL)
+    set(
+        CMAKE_INSTALL_INCLUDEDIR "include/patomic-${PROJECT_VERSION}"
+        CACHE PATH ""
+    )
+endif()
+
+
+# ---- Install CMake Directory ----
+
+# This allows package maintainers to freely override the installation path for
+# the CMake configs.
+set(
+    PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package}"
+    CACHE PATH "CMake package config location relative to the install prefix"
+)
+mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)

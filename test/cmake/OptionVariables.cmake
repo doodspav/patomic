@@ -20,7 +20,7 @@ set(
 # Regex must be written according to CMake Regex Specification.
 # By default all test targets are enabled.
 set(
-    patomic_test_CREATE_TEST_TARGETS_MATCHING "^(.*)$"
+    PATOMIC_CREATE_TEST_TARGETS_MATCHING "^(.*)$"
     CACHE STRING "Only test targets matching regex are created and registered with CTest"
 )
 
@@ -33,11 +33,11 @@ set(
 # than prepend to it.
 # This gives users the option to disable this behaviour.
 option(
-    patomic_test_SET_CTEST_PATH_ENV_WINDOWS
+    PATOMIC_WINDOWS_SET_CTEST_PATH_ENV
     "Set PATH environment variable for tests when run CTest on Windows"
     ON
 )
-mark_as_advanced(patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
+mark_as_advanced(PATOMIC_WINDOWS_SET_CTEST_PATH_ENV)
 
 
 # ---- Windows Path File ----
@@ -50,8 +50,8 @@ mark_as_advanced(patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
 # Additionally disabled by default because it contains potentially private
 # information about the target platform.
 option(
-    patomic_test_CREATE_WINDOWS_PATH_FILE
+    PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE
     "Create file with PATH environment variables for tests on Windows"
     OFF
 )
-mark_as_advanced(patomic_test_CREATE_WINDOWS_PATH_FILE)
+mark_as_advanced(PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
