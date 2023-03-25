@@ -11,9 +11,9 @@ option(
     ${BUILD_SHARED_LIBS}
 )
 mark_as_advanced(PATOMIC_BUILD_SHARED)
-set(patomic_BUILD_TYPE STATIC)
+set(build_type STATIC)
 if(PATOMIC_BUILD_SHARED)
-    set(patomic_BUILD_TYPE SHARED)
+    set(build_type SHARED)
 endif()
 
 
@@ -23,7 +23,7 @@ endif()
 # omit warnings from the provided paths, if the compiler supports that.
 # This is to provide a user experience similar to find_package when
 # add_subdirectory or FetchContent is used to consume this project.
-set(patomic_WARNING_GUARD "")
+set(warning_guard "")
 if(NOT PROJECT_IS_TOP_LEVEL)
     option(
         PATOMIC_INCLUDES_WITH_SYSTEM
@@ -32,7 +32,7 @@ if(NOT PROJECT_IS_TOP_LEVEL)
     )
     mark_as_advanced(PATOMIC_INCLUDES_WITH_SYSTEM)
     if(PATOMIC_INCLUDES_WITH_SYSTEM)
-        set(patomic_WARNING_GUARD SYSTEM)
+        set(warning_guard SYSTEM)
     endif()
 endif()
 

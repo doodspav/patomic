@@ -19,7 +19,7 @@ include(cmake/util/OptionVariables.cmake)
 
 add_library(
     patomic_patomic
-    ${patomic_BUILD_TYPE}
+    ${build_type}
     # include
     include/patomic/patomic.h
     # src
@@ -66,7 +66,7 @@ target_include_directories(
 
 # header files from /include
 target_include_directories(
-    patomic_patomic ${patomic_WARNING_GUARD}
+    patomic_patomic ${warning_guard}
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
