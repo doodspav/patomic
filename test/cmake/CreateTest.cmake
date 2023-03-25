@@ -83,8 +83,8 @@ function(create_test)
     set(target_deps patomic::patomic GTest::gtest_main ${ARG_LINK})
     set(output_name ${name})
 
-    if (NOT "${target}" MATCHES ${patomic_test_CREATE_TEST_TARGETS_MATCHING})
-        message(DEBUG "Skipping creation of test target ${target} (matches ${patomic_test_CREATE_TEST_TARGETS_MATCHING})")
+    if (NOT "${target}" MATCHES ${PATOMIC_CREATE_TEST_TARGETS_MATCHING})
+        message(DEBUG "Skipping creation of test target ${target} (matches ${PATOMIC_CREATE_TEST_TARGETS_MATCHING})")
         return()
     endif()
 
@@ -119,7 +119,7 @@ function(create_test)
     if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
         # check we actually care about Windows PATH stuff
-        if (NOT patomic_test_SET_CTEST_PATH_ENV_WINDOWS AND NOT patomic_test_CREATE_WINDOWS_PATH_FILE)
+        if (NOT PATOMIC_WINDOWS_SET_CTEST_PATH_ENV AND NOT PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
             return()
         endif()
 
@@ -130,7 +130,7 @@ function(create_test)
         )
 
         # set environment variable for the each test so that CTest works automatically
-        if (deps_path AND patomic_test_SET_CTEST_PATH_ENV_WINDOWS)
+        if (deps_path AND PATOMIC_WINDOWS_SET_CTEST_PATH_ENV)
             foreach(test IN LISTS added_tests)
                 set_property(
                     TEST "${test}"
@@ -140,7 +140,7 @@ function(create_test)
         endif()
 
         # make dependencies accessible from parent target
-        if (patomic_test_CREATE_WINDOWS_PATH_FILE)
+        if (PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
             set_property(
                 TARGET ${parent_target}
                 APPEND PROPERTY WIN_DEP_TARGETS ${target_deps}
@@ -194,7 +194,7 @@ function(create_test_win_deps_path_file ARG_KIND)
 
     # check we actually want to generate file
 
-    if(NOT patomic_test_CREATE_WINDOWS_PATH_FILE)
+    if(NOT PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
         return()
     endif()
 
