@@ -52,3 +52,27 @@ option(
     ${BUILD_TESTING}
 )
 mark_as_advanced(PATOMIC_BUILD_TESTING)
+
+
+# ---- Install Include Directory ----
+
+# Adds an extra directory to the include path by default, so that when you link
+# against the target, you get `<prefix>/include/patomic-X.Y.Z` added to your
+# include paths rather than `<prefix/include`.
+if(PROJECT_IS_TOP_LEVEL)
+    set(
+        CMAKE_INSTALL_INCLUDEDIR "include/patomic-${PROJECT_VERSION}"
+        CACHE PATH ""
+    )
+endif()
+
+
+# ---- Install CMake Directory ----
+
+# This allows package maintainers to freely override the installation path for
+# the CMake configs.
+set(
+    PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package}"
+    CACHE PATH "CMake package config location relative to the install prefix"
+)
+mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)
