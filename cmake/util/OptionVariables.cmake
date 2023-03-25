@@ -6,13 +6,13 @@ if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_SHARED_LIBS "Build shared libs" OFF)
 endif()
 option(
-    patomic_BUILD_SHARED
+    PATOMIC_BUILD_SHARED
     "Override BUILD_SHARED_LIBS for patomic library"
     ${BUILD_SHARED_LIBS}
 )
-mark_as_advanced(patomic_BUILD_SHARED)
+mark_as_advanced(PATOMIC_BUILD_SHARED)
 set(patomic_BUILD_TYPE STATIC)
-if(patomic_BUILD_SHARED)
+if(PATOMIC_BUILD_SHARED)
     set(patomic_BUILD_TYPE SHARED)
 endif()
 
@@ -26,12 +26,12 @@ endif()
 set(patomic_WARNING_GUARD "")
 if(NOT PROJECT_IS_TOP_LEVEL)
     option(
-        patomic_INCLUDES_WITH_SYSTEM
+        PATOMIC_INCLUDES_WITH_SYSTEM
         "Use SYSTEM modifier for patomic's includes, disabling warnings"
         ON
     )
-    mark_as_advanced(patomic_INCLUDES_WITH_SYSTEM)
-    if(patomic_INCLUDES_WITH_SYSTEM)
+    mark_as_advanced(PATOMIC_INCLUDES_WITH_SYSTEM)
+    if(PATOMIC_INCLUDES_WITH_SYSTEM)
         set(patomic_WARNING_GUARD SYSTEM)
     endif()
 endif()
@@ -47,8 +47,8 @@ if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_TESTING "Build tests" OFF)
 endif()
 option(
-    patomic_BUILD_TESTING
+    PATOMIC_BUILD_TESTING
     "Override BUILD_TESTING for patomic library"
     ${BUILD_TESTING}
 )
-mark_as_advanced(patomic_BUILD_TESTING)
+mark_as_advanced(PATOMIC_BUILD_TESTING)

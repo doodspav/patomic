@@ -33,7 +33,7 @@ add_library(patomic::patomic ALIAS patomic_patomic)
 # ---- Generate Build Info Headers ----
 
 # used in export header generated below
-if(NOT patomic_BUILD_SHARED)
+if(NOT PATOMIC_BUILD_SHARED)
     target_compile_definitions(patomic_patomic PUBLIC PATOMIC_STATIC_DEFINE)
 endif()
 
@@ -83,7 +83,7 @@ endif()
 
 # ---- Setup Tests ----
 
-if(patomic_BUILD_TESTING)
+if(PATOMIC_BUILD_TESTING)
     # need to enable testing in case BUILD_TESTING is disabled
     enable_testing()
     add_subdirectory(test)
