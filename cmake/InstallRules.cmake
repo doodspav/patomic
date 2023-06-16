@@ -7,7 +7,7 @@ set(package patomic)
 # copy header files to CMAKE_INSTALL_INCLUDEDIR
 install(
     DIRECTORY
-    "${PROJECT_SOURCE_DIR}/include/"
+    "../include"
     "${PROJECT_BINARY_DIR}/include/"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT patomic_Development
@@ -30,7 +30,7 @@ install(
 
 # copy config file for find_package to find
 install(
-    FILES "${PROJECT_SOURCE_DIR}/cmake/util/InstallConfig.cmake"
+    FILES "InstallConfig.cmake"
     DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
     RENAME "${package}Config.cmake"
     COMPONENT patomic_Development

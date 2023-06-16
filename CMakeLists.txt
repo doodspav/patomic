@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-include(cmake/util/PreventInSourceBuilds.cmake)
+include(cmake/PreventInSourceBuilds.cmake)
 
 project(
     patomic
@@ -11,8 +11,8 @@ project(
 )
 
 # don't change include order, OptionVariables checks if project is top level
-include(cmake/util/ProjectIsTopLevel.cmake)
-include(cmake/util/OptionVariables.cmake)
+include(cmake/ProjectIsTopLevel.cmake)
+include(cmake/OptionVariables.cmake)
 
 
 # ---- Declare Library ----
@@ -77,7 +77,7 @@ target_compile_features(patomic_patomic PUBLIC c_std_90)
 # ---- Install Rules ----
 
 if(NOT CMAKE_SKIP_INSTALL_RULES)
-    include(cmake/util/InstallRules.cmake)
+    include(cmake/InstallRules.cmake)
 endif()
 
 
