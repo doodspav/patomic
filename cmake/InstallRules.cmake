@@ -1,60 +1,63 @@
 include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
-
-# find_package(<package>) call for consumers to find this project
-set(package patomic)
 
 # copy header files to CMAKE_INSTALL_INCLUDEDIR
 install(
     DIRECTORY
-    "../include"
-    "${PROJECT_BINARY_DIR}/include/"
+    "${PROJECT_SOURCE_DIR}/include"  # our header files
+    "${PROJECT_BINARY_DIR}/include"  # generated header files
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    COMPONENT patomic_Development
+    COMPONENT ${package_name}-development
 )
 
 # copy target build output artifacts to OS dependent locations
+# (except includes)
 install(
-    TARGETS patomic_patomic
-    EXPORT patomicTargets
+    TARGETS ${target_name}
+    EXPORT ${package_name}-targets
     RUNTIME #
-    COMPONENT patomic_Runtime
+    COMPONENT ${package_name}-runtime
     LIBRARY #
-    COMPONENT patomic_Runtime
-    NAMELINK_COMPONENT patomic_Development
+    COMPONENT ${package_name}-runtime
+    NAMELINK_COMPONENT ${package_name}-development
     ARCHIVE #
-    COMPONENT patomic_Development
+    COMPONENT ${package_name}-development
     INCLUDES #
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
+# create config file that points to targets file
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/in/patomic-config.cmake.in"
+    "${PROJECT_BINARY_DIR}/cmake/${package_name}-config.cmake"
+    @ONLY
+)
+
 # copy config file for find_package to find
 install(
-    FILES "InstallConfig.cmake"
+    FILES "${PROJECT_BINARY_DIR}/cmake/${package_name}-config.cmake"
     DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
-    RENAME "${package}Config.cmake"
-    COMPONENT patomic_Development
+    COMPONENT ${package_name}-development
 )
 
 # create version file for consumer to check version in CMake
 write_basic_package_version_file(
-    "${package}ConfigVersion.cmake"
-    COMPATIBILITY SameMajorVersion
+    "${package_name}-config-version.cmake"
+    COMPATIBILITY SameMajorVersion  # a.k.a. SemVer
 )
 
-# copy version file for find_package to find
+# copy version file for find_package to find for version check
 install(
-    FILES "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
+    FILES "${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
     DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
-    COMPONENT patomic_Development
+    COMPONENT ${package_name}-development
 )
 
-# create core configuration file detailing targets for consumer
+# create targets file included by config file with targets for consumers
 install(
-    EXPORT patomicTargets
+    EXPORT ${package_name}-targets
     NAMESPACE patomic::
     DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
-    COMPONENT patomic_Development
+    COMPONENT ${package_name}-development
 )
 
 # support packaging library
