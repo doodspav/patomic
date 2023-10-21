@@ -26,7 +26,7 @@ include(cmake/OptionVariables.cmake)
 
 # target that we can modify (can't modify ALIAS targets)
 # target name should not be the same as ${PROJECT_NAME}, causes add_subdirectory issues
-set(target_name "patomic_patomic")
+set(target_name "patomic-patomic")
 add_library(${target_name} ${build_type})
 
 # alias to cause error at configuration time instead of link time if target is missing
