@@ -98,7 +98,12 @@ endif()
 # ---- Setup Tests ----
 
 if(PATOMIC_BUILD_TESTING)
+
+    # tell unit tests where our source files are
+    set(PATOMIC_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
+
     # need to enable testing in case BUILD_TESTING is disabled
     enable_testing()
     add_subdirectory(test)
+
 endif()

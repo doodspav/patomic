@@ -31,9 +31,15 @@ include(GoogleTest)
 
 add_custom_target(patomic_test)
 
-# add all test subdirectories
+# add BTs unconditionally
 add_subdirectory(bt)
-add_subdirectory(ut)
+
+# only add UTs if patomic source files are available
+if(PATOMIC_SOURCE_DIR)
+   add_subdirectory(ut)
+else()
+    message(STATUS "Variable 'PATOMIC_SOURCE_DIR' empty or not set; skipping unit tests")
+endif()
 
 
 # ---- Support Packaging Library ----
