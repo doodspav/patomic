@@ -1,6 +1,3 @@
-include(WindowsDependenciesPath.cmake)
-
-
 # ---- Create Test ----
 
 # Creates a target to build a test executable and registers it with CTest.
@@ -45,7 +42,7 @@ function(_create_test)
     set(name "")  # -> value of "${ARG_BT}"
     # we turn 'kind' into a list so that we can check its length (which should be 1)
     # 'name' is just the last name we process (there should only be 1 name)
-    foreach(ak in LISTS all_kinds)
+    foreach(ak IN LISTS all_kinds)
         # if(ARG_BT)
         if (ARG_${ak})
             string(TOLOWER ${ak} ak_lower)
@@ -117,7 +114,7 @@ function(_create_test)
 
     # link dependencies (all tests use GTest framework)
     # update list directly because we use it in Windows PATH stuff later
-    list(APPEND ARG_LINK GTest::gtest GTest::gmock)
+    list(APPEND ARG_LINK GTest::gtest_main GTest::gmock_main)
     target_link_libraries(
         ${target} PRIVATE
         ${ARG_LINK}
@@ -272,6 +269,8 @@ function(create_ut)
         UT      ${ARG_NAME}
         SOURCE  ${ARG_SOURCE}
         INCLUDE
+            "$<BUILD_INTERFACE:${PATOMIC_BINARY_DIR}/include>"
+            "$<BUILD_INTERFACE:${PATOMIC_SOURCE_DIR}/include>"
             "$<BUILD_INTERFACE:${PATOMIC_SOURCE_DIR}/src/include>"
             ${ARG_INCLUDE}
     )

@@ -5,15 +5,10 @@
 # |======================================|==============|============|
 # | CMAKE_INSTALL_TESTDIR (unofficial)   | Always       | share/test |
 # |--------------------------------------|--------------|------------|
-# | PATOMIC_SOURCE_DIR                   | Always       | ""         |
 # | PATOMIC_CREATE_TEST_TARGETS_MATCHING | Always       | ^(.*)$     |
 # | PATOMIC_WINDOWS_SET_CTEST_PATH_ENV   | Always       | ON         |
 # | PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE | Always       | OFF        |
 # --------------------------------------------------------------------
-
-# Note:
-# PATOMIC_SOURCE_DIR is set by patomic and available through there if
-# patomic-test is built as a subproject.
 
 
 # ---- Test Install Directory ----
@@ -33,25 +28,6 @@ set(
     CMAKE_INSTALL_TESTDIR "share/test"
     CACHE STRING "(unofficial) Default test install location"
 )
-
-
-# ---- Library Source Directory
-
-# Unit tests need access to the private header files not available from linking
-# against the patomic::patomic target.
-# This variable can be set to let unit tests know where to find these files.
-# When building this as a subproject of patomic (as you would by just building
-# patomic normally with tests enabled), this variable is set automatically.
-# If this variable is empty or not set, no unit tests will be built.
-# The variable type is STRING rather than PATH, because otherwise passing
-# -PATOMIC_SOURCE_DIR=relative/patomic on the command line would expand to an
-# absolute path with the base being the current CMake directory, leading to
-# unexpected errors.
-set(
-    PATOMIC_SOURCE_DIR ""
-    CACHE STRING "Path to source files of patomic::patomic target for unit tests"
-)
-mark_as_advanced(PATOMIC_SOURCE_DIR)
 
 
 # ---- Test Build Selection ----

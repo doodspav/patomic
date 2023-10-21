@@ -16,9 +16,14 @@ include(cmake/OptionVariables.cmake)
 
 include(cmake/ProjectIsTopLevel.cmake)
 
-if(NOT TARGET patomic::patomic)
-    find_package(patomic REQUIRED)
+# need to enable testing ourselves if we're the root project
+if(PROJECT_IS_TOP_LEVEL)
     enable_testing()
+endif()
+
+# patomic is not a required dependency
+if(NOT TARGET patomic::patomic)
+    find_package(patomic QUIET)
 endif()
 
 # for Windows: prevent overriding the parent project's compiler/linker settings
@@ -31,14 +36,18 @@ include(GoogleTest)
 
 add_custom_target(patomic-test)
 
-# add BTs unconditionally
-add_subdirectory(bt)
+# only add BTs if patomic target is available
+if(TARGET patomic::patomic)
+    add_subdirectory(bt)
+else()
+    message(STATUS "Skipping binary tests; patomic target not available")
+endif()
 
-# only add UTs if patomic source files are available
-if(PATOMIC_SOURCE_DIR)
+# only add UTs if patomic files are available
+if(PATOMIC_BINARY_DIR AND PATOMIC_SOURCE_DIR)
    add_subdirectory(ut)
 else()
-    message(STATUS "Variable 'PATOMIC_SOURCE_DIR' empty or not set; skipping unit tests")
+    message(STATUS "Skipping unit tests; not building as direct sub-project of patomic")
 endif()
 
 

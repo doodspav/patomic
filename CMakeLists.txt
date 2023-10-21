@@ -10,7 +10,7 @@ set(package_name "patomic")
 
 # create base project
 project(
-    ${package_name}
+    patomic
     VERSION 0.5.1
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
@@ -99,11 +99,16 @@ endif()
 
 if(PATOMIC_BUILD_TESTING)
 
-    # tell unit tests where our source files are
+    # need to enable testing in case BUILD_TESTING is disabled
+    if(PROJECT_IS_TOP_LEVEL)
+        enable_testing()
+    endif()
+
+    # tell unit tests where our files are
+    set(PATOMIC_BINARY_DIR "${PROJECT_BINARY_DIR}")
     set(PATOMIC_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
 
-    # need to enable testing in case BUILD_TESTING is disabled
-    enable_testing()
+    # include test project
     add_subdirectory(test)
 
 endif()
