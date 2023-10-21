@@ -16,7 +16,7 @@ include(cmake/OptionVariables.cmake)
 
 include(cmake/ProjectIsTopLevel.cmake)
 
-if(PROJECT_IS_TOP_LEVEL)
+if(NOT TARGET patomic::patomic)
     find_package(patomic REQUIRED)
     enable_testing()
 endif()
@@ -29,7 +29,7 @@ include(GoogleTest)
 
 # ---- Declare Tests ----
 
-add_custom_target(patomic_test)
+add_custom_target(patomic-test)
 
 # add BTs unconditionally
 add_subdirectory(bt)
