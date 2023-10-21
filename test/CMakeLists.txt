@@ -47,7 +47,7 @@ endif()
 if(PATOMIC_BINARY_DIR AND PATOMIC_SOURCE_DIR)
    add_subdirectory(ut)
 else()
-    message(STATUS "Skipping unit tests; not building as direct sub-project of patomic")
+    message(STATUS "Skipping unit tests; not building as sub-project of patomic")
 endif()
 
 
