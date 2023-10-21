@@ -7,8 +7,8 @@ include(../cmake/WindowsDependenciesPath.cmake)
 add_custom_target(patomic-test-bt)
 add_dependencies(patomic-test patomic-test-bt)
 
-create_test(BT example_add SOURCE example_add.cpp)
-create_test(BT example_sub SOURCE example_sub.cpp)
+create_bt(NAME example_add SOURCE example_add.cpp)
+create_bt(NAME example_sub SOURCE example_sub.cpp)
 
 
 # ---- Windows Path Issues ----

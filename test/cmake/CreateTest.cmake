@@ -17,13 +17,13 @@ include(WindowsDependenciesPath.cmake)
 # - patomic-test-${kind} -> custom target & component (build install) for all tests of a specific kind
 # - patomic-test-${kind}-${name} -> executable target for a single test
 #
-# create_test(
+# _create_test(
 #     BT|UT <name>
 #     [INCLUDE <item>...]
 #     [SOURCE <item>...]
 #     [LINK <item>...]
 # )
-function(create_test)
+function(_create_test)
 
     # setup what arguments we expect
 
@@ -116,11 +116,11 @@ function(create_test)
     )
 
     # link dependencies (all tests use GTest framework)
-    # save list for Windows PATH issues later
-    set(target_deps patomic::patomic GTest::gtest GTest::gmock ${ARG_LINK})
+    # update list directly because we use it in Windows PATH stuff later
+    list(APPEND ARG_LINK GTest::gtest GTest::gmock)
     target_link_libraries(
         ${target} PRIVATE
-        ${target_deps}
+        ${ARG_LINK}
     )
 
     # require C++14 as minimum
@@ -167,7 +167,7 @@ function(create_test)
         # get paths to all shared library dependencies (DLLs)
         windows_deps_paths(
             deps_paths
-            ${target_deps}
+            ${ARG_LINK}
         )
 
         # set environment variable for each test so that CTest works
@@ -185,7 +185,7 @@ function(create_test)
         if(PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
             set_property(
                 TARGET ${parent_target}
-                APPEND PROPERTY WIN_DEPS_TARGETS "${target_deps}"
+                APPEND PROPERTY WIN_DEPS_TARGETS "${ARG_LINK}"
             )
         endif()
 
@@ -215,6 +215,66 @@ function(create_test)
         )
 
     endif()
+
+endfunction()
+
+
+# Creates target patomic-test-bt-${name} corresponding to BT test executable.
+#
+# create_bt(
+#     NAME <name>
+#     [INCLUDE <item>...]
+#     [SOURCE <item>...]
+#     [LINK <item>...]
+# )
+function(create_bt)
+
+    cmake_parse_arguments(
+        "ARG"
+        ""
+        "NAME"
+        "INCLUDE;SOURCE;LINK"
+        ${ARGN}
+    )
+
+    _create_test(
+        ${ARG_UNPARSED_ARGUMENTS}
+        BT      ${ARG_NAME}
+        INCLUDE ${ARG_INCLUDE}
+        SOURCE  ${ARG_SOURCE}
+        LINK
+            patomic::patomic
+            ${ARG_LINK}
+    )
+
+endfunction()
+
+
+# Creates target patomic-test-ut-${name} corresponding to UT test executable.
+#
+# create_ut(
+#     NAME <name>
+#     [INCLUDE <item>...]
+#     [SOURCE <item>...]
+# )
+function(create_ut)
+
+    cmake_parse_arguments(
+        "ARG"
+        ""
+        "NAME"
+        "INCLUDE;SOURCE"
+        ${ARGN}
+    )
+
+    _create_test(
+        ${ARG_UNPARSED_ARGUMENTS}
+        UT      ${ARG_NAME}
+        SOURCE  ${ARG_SOURCE}
+        INCLUDE
+            "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>"
+            ${ARG_INCLUDE}
+    )
 
 endfunction()
 
