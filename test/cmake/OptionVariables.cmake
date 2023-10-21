@@ -17,7 +17,7 @@
 # they're executables.
 # This is undesirable, so this variable exists to override the install location
 # of test binaries separately.
-# It's not prefixed with patomic_test because it's ok for it to be shared and
+# It's not prefixed with PATOMIC_ because it's ok for it to be shared and
 # overridden by parent projects.
 # Note: this is not an official CMake variable
 set(
