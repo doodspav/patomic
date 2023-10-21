@@ -44,6 +44,7 @@ else()
 endif()
 
 # only add UTs if patomic files are available
+# these are currently set by patomic before including this project
 if(PATOMIC_BINARY_DIR AND PATOMIC_SOURCE_DIR)
    add_subdirectory(ut)
 else()
