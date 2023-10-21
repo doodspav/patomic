@@ -32,14 +32,16 @@ add_library(${target_name} ${build_type})
 # alias to cause error at configuration time instead of link time if target is missing
 add_library(patomic::patomic ALIAS ${target_name})
 
-# add sources to target
+# add /include files to target
+# unfortunately can't have CML file in /include
 target_sources(
     ${target_name} PRIVATE
     # include
     include/patomic/patomic.h
-    # src
-    src/patomic.c
 )
+
+# add /src files to target
+add_subdirectory(src)
 
 
 # ---- Generate Build Info Headers ----

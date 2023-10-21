@@ -116,6 +116,7 @@ function(_create_test)
     if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.20.0")
         list(APPEND ARG_LINK GTest::gtest_main)
         # TODO: this prevents test lookup on Windows; fix once pipeline exists
+        # TODO: see https://github.com/google/googletest/issues/2157
         # if ("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.23.0")
         #     list(APPEND ARG_LINK GTest::gmock)
         # endif()
