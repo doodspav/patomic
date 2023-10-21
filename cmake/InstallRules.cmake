@@ -3,14 +3,14 @@ include(CMakePackageConfigHelpers)
 # copy header files to CMAKE_INSTALL_INCLUDEDIR
 install(
     DIRECTORY
-    "${PROJECT_SOURCE_DIR}/include"  # our header files
-    "${PROJECT_BINARY_DIR}/include"  # generated header files
+    "${PROJECT_SOURCE_DIR}/include/"  # our header files
+    "${PROJECT_BINARY_DIR}/include/"  # generated header files
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT ${package_name}-development
 )
 
 # copy target build output artifacts to OS dependent locations
-# (except includes)
+# (except includes, that just sets a compiler flag with the path)
 install(
     TARGETS ${target_name}
     EXPORT ${package_name}-targets

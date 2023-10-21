@@ -1,4 +1,5 @@
-include(GNUInstallDirs)
+# included further down to avoid interfering with our cache variables
+# include(GNUInstallDirs)
 
 
 # ---- Options Summary ----
@@ -91,6 +92,11 @@ if(PROJECT_IS_TOP_LEVEL)
     # marked as advanced in GNUInstallDirs version, so we follow their lead
     mark_as_advanced(CMAKE_INSTALL_INCLUDEDIR)
 endif()
+
+
+# do not include earlier or we can't set CMAKE_INSTALL_INCLUDEDIR above
+# required for CMAKE_INSTALL_LIBDIR below
+include(GNUInstallDirs)
 
 
 # ---- Install CMake Directory ----
