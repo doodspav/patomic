@@ -5,6 +5,7 @@
       "name": "patomic-ci-base",
       "hidden": true,
       "binaryDir": "${sourceDir}/build",
+      "generator": "Ninja",
       "cacheVariables": {
         "BUILD_TESTING": true,
         "CMAKE_C_STANDARD": "11",
@@ -13,6 +14,13 @@
         "CMAKE_CXX_STANDARD": "14",
         "CMAKE_CXX_STANDARD_REQUIRED": true,
         "CMAKE_CXX_EXTENSIONS": false
+      }
+    },
+    {
+      "name": "patomic-ci-skip-install",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_SKIP_INSTALL_RULES": true
       }
     },
     {
@@ -60,7 +68,7 @@
       "name": "patomic-ci-flags-clang",
       "hidden": true,
       "environment": {
-        "CFLAGS": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment",
+        "CFLAGS": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories",
         "CXXFLAGS": "-Wall -Wextra -Werror -Wpedantic"
       }
     },
@@ -83,6 +91,7 @@
       "name": "patomic-ci-macos-clang-sanitize",
       "inherits": [
         "patomic-ci-base",
+        "patomic-ci-skip-install",
         "patomic-ci-flags-clang",
         "patomic-ci-flags-gnu-sanitize"
       ]
@@ -98,6 +107,7 @@
       "name": "patomic-ci-windows-msvc-sanitize",
       "inherits": [
         "patomic-ci-base",
+        "patomic-ci-skip-install",
         "patomic-ci-flags-msvc",
         "patomic-ci-flags-msvc-sanitize"
       ]
@@ -110,9 +120,10 @@
       ]
     },
     {
-      "name:": "patomic-ci-ubuntu-clang-sanitize",
+      "name": "patomic-ci-ubuntu-clang-sanitize",
       "inherits": [
         "patomic-ci-base",
+        "patomic-ci-skip-install",
         "patomic-ci-flags-clang",
         "patomic-ci-flags-gnu-sanitize"
       ]
@@ -128,6 +139,7 @@
       "name": "patomic-ci-ubuntu-gcc-coverage",
       "inherits": [
         "patomic-ci-base",
+        "patomic-ci-skip-install",
         "patomic-ci-flags-gcc",
         "patomic-ci-flags-gnu-coverage"
       ]
@@ -136,13 +148,17 @@
       "name": "patomic-ci-ubuntu-gcc-sanitize",
       "inherits": [
         "patomic-ci-base",
+        "patomic-ci-skip-install",
         "patomic-ci-flags-gcc",
         "patomic-ci-flags-gnu-sanitize"
       ]
     },
     {
       "name": "patomic-ci-unix-gnu-ansi",
-      "inherits": ["patomic-ci-base"],
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-skip-install"
+      ],
       "cacheVariables": {
         "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
         "CMAKE_C_STANDARD": "90"
