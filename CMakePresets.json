@@ -81,22 +81,6 @@
       }
     },
     {
-      "name": "patomic-ci-macos-clang",
-      "inherits": [
-        "patomic-ci-base",
-        "patomic-ci-flags-clang"
-      ]
-    },
-    {
-      "name": "patomic-ci-macos-clang-sanitize",
-      "inherits": [
-        "patomic-ci-base",
-        "patomic-ci-skip-install",
-        "patomic-ci-flags-clang",
-        "patomic-ci-flags-gnu-sanitize"
-      ]
-    },
-    {
       "name": "patomic-ci-windows-msvc",
       "inherits": [
         "patomic-ci-base",
@@ -113,14 +97,14 @@
       ]
     },
     {
-      "name": "patomic-ci-ubuntu-clang",
+      "name": "patomic-ci-unix-clang",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-flags-clang"
       ]
     },
     {
-      "name": "patomic-ci-ubuntu-clang-sanitize",
+      "name": "patomic-ci-unix-clang-sanitize",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-skip-install",
@@ -129,14 +113,14 @@
       ]
     },
     {
-      "name": "patomic-ci-ubuntu-gcc",
+      "name": "patomic-ci-unix-gcc",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-flags-gcc"
       ]
     },
     {
-      "name": "patomic-ci-ubuntu-gcc-coverage",
+      "name": "patomic-ci-unix-gcc-coverage",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-skip-install",
@@ -145,7 +129,7 @@
       ]
     },
     {
-      "name": "patomic-ci-ubuntu-gcc-sanitize",
+      "name": "patomic-ci-unix-gcc-sanitize",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-skip-install",
