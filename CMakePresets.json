@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "configurePresets": [
+    {
+      "name": "patomic-ci-base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "BUILD_TESTING": true,
+        "CMAKE_C_STANDARD": "11",
+        "CMAKE_C_STANDARD_REQUIRED": true,
+        "CMAKE_C_EXTENSIONS": false,
+        "CMAKE_CXX_STANDARD": "14",
+        "CMAKE_CXX_STANDARD_REQUIRED": true,
+        "CMAKE_CXX_EXTENSIONS": false
+      }
+    },
+    {
+      "name": "patomic-ci-flags-gnu-coverage",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-ggdb3 --coverage",
+        "CMAKE_CXX_FLAGS_INIT": "-ggdb3 --coverage",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "--coverage",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "--coverage",
+        "CMAKE_STATIC_LINKER_FLAGS_INIT": "--coverage"
+      }
+    },
+    {
+      "name": "patomic-ci-flags-gnu-sanitize",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-fno-omit-frame-pointer -fsanitize=address,undefined",
+        "CMAKE_CXX_FLAGS_INIT": "-fno-omit-frame-pointer -fsanitize=address,undefined",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fsanitize=address,undefined",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fsanitize=address,undefined",
+        "CMAKE_STATIC_LINKER_FLAGS_INIT": "-fsanitize=address,undefined"
+      }
+    },
+    {
+      "name": "patomic-ci-flags-msvc-sanitize",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-fsanitize=address",
+        "CMAKE_CXX_FLAGS_INIT": "-fsanitize=address",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fsanitize=address",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fsanitize=address",
+        "CMAKE_STATIC_LINKER_FLAGS_INIT": "-fsanitize=address"
+      }
+    },
+    {
+      "name": "patomic-ci-flags-gcc",
+      "hidden": true,
+      "environment": {
+        "CFLAGS": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function",
+        "CXXFLAGS": "-Wall -Wextra -Werror -Wpedantic"
+      }
+    },
+    {
+      "name": "patomic-ci-flags-clang",
+      "hidden": true,
+      "environment": {
+        "CFLAGS": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment",
+        "CXXFLAGS": "-Wall -Wextra -Werror -Wpedantic"
+      }
+    },
+    {
+      "name": "patomic-ci-flags-msvc",
+      "hidden": true,
+      "environment": {
+        "CFLAGS": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668",
+        "CXXFLAGS": "/permissive- /volatile:iso /W4 /WX"
+      }
+    },
+    {
+      "name": "patomic-ci-macos-clang",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-clang"
+      ]
+    },
+    {
+      "name": "patomic-ci-macos-clang-sanitize",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-clang",
+        "patomic-ci-flags-gnu-sanitize"
+      ]
+    },
+    {
+      "name": "patomic-ci-windows-msvc",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-msvc"
+      ]
+    },
+    {
+      "name": "patomic-ci-windows-msvc-sanitize",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-msvc",
+        "patomic-ci-flags-msvc-sanitize"
+      ]
+    },
+    {
+      "name": "patomic-ci-ubuntu-clang",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-clang"
+      ]
+    },
+    {
+      "name:": "patomic-ci-ubuntu-clang-sanitize",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-clang",
+        "patomic-ci-flags-gnu-sanitize"
+      ]
+    },
+    {
+      "name": "patomic-ci-ubuntu-gcc",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-gcc"
+      ]
+    },
+    {
+      "name": "patomic-ci-ubuntu-gcc-coverage",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-gcc",
+        "patomic-ci-flags-gnu-coverage"
+      ]
+    },
+    {
+      "name": "patomic-ci-ubuntu-gcc-sanitize",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-flags-gcc",
+        "patomic-ci-flags-gnu-sanitize"
+      ]
+    },
+    {
+      "name": "patomic-ci-unix-gnu-ansi",
+      "inherits": ["patomic-ci-base"],
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
+        "CMAKE_C_STANDARD": "90"
+      }
+    }
+  ]
+}
