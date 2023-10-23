@@ -5,7 +5,6 @@
       "name": "patomic-ci-base",
       "hidden": true,
       "binaryDir": "${sourceDir}/build",
-      "generator": "Ninja",
       "cacheVariables": {
         "BUILD_TESTING": true,
         "CMAKE_C_STANDARD": "11",
@@ -26,6 +25,7 @@
     {
       "name": "patomic-ci-compiler-windows-clang",
       "hidden": true,
+      "generator": "Visual Studio 17 2022",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl"
@@ -34,6 +34,7 @@
     {
       "name": "patomic-ci-compiler-windows-msvc",
       "hidden": true,
+      "generator": "Visual Studio 17 2022",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl"
@@ -42,6 +43,7 @@
     {
       "name": "patomic-ci-compiler-unix-clang",
       "hidden": true,
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++"
@@ -50,6 +52,7 @@
     {
       "name": "patomic-ci-compiler-unix-gcc",
       "hidden": true,
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++"
