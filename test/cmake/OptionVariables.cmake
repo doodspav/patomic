@@ -1,12 +1,13 @@
 # ---- Options Summary ----
 
-# --------------------------------------------------------------------
-# | Option                               | Availability | Default    |
-# |======================================|==============|============|
-# | CMAKE_INSTALL_TESTDIR (unofficial)   | Always       | share/test |
-# |--------------------------------------|--------------|------------|
-# | PATOMIC_CREATE_TEST_TARGETS_MATCHING | Always       | ^(.*)$     |
-# --------------------------------------------------------------------
+# -----------------------------------------------------------------------
+# | Option                                | Availability   | Default    |
+# |=======================================|================|============|
+# | CMAKE_INSTALL_TESTDIR (unofficial)    | Always         | share/test |
+# |---------------------------------------|----------------|------------|
+# | PATOMIC_CREATE_TEST_TARGETS_MATCHING  | Always         | ^(.*)$     |
+# | PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV | Always (3.22+) | ON         |
+# -----------------------------------------------------------------------
 
 
 # ---- Test Install Directory ----
@@ -39,3 +40,20 @@ set(
     CACHE STRING "Only test targets matching regex are created and registered with CTest"
 )
 mark_as_advanced(PATOMIC_CREATE_TEST_TARGETS_MATCHING)
+
+
+# ---- Windows Tests Paths ----
+
+# By default we prepend the PATH environment variable for tests run with CTest
+# on Windows with the directory paths of all its shared library dependencies.
+# This is done to prevent linker errors (because Windows doesn't support rpath).
+# This option has no effect when not running on Windows.
+# This option requires CMake 3.22 or later.
+if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.22.0")
+    option(
+        PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV
+        "Modify PATH environment variable for tests when run with CTest on Windows"
+        ON
+    )
+    mark_as_advanced(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
+endif()

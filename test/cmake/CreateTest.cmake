@@ -187,6 +187,42 @@ function(_create_test)
     add_dependencies(${parent_target} ${target})
 
 
+    # deal with Windows runtime linker lookup issues
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND
+        PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
+
+        # get paths to all shared library dependencies (DLLs)
+        # this should just be patomic and gtest
+        set(deps_paths )
+        foreach(dep_target IN LISTS ARG_LINK)
+            # This will fail if passed a link option that isn't a target
+            # This is intentional; don't do that.
+            # Instead, create an IMPORTED library, and set its target properties
+            # such as IMPORTED_LOCATION for the library path and set
+            # INTERFACE_INCLUDE_DIRECTORIES to the directories containing any
+            # necessary header files.
+            get_target_property(type "${dep_target}" TYPE)
+            if(type STREQUAL "SHARED_LIBRARY")
+                list(APPEND deps_paths "$<TARGET_FILE_DIR:${dep_target}>")
+            endif()
+        endforeach()
+
+        # tidy up the paths
+        list(REMOVE_DUPLICATES deps_paths)
+        string(REPLACE ";" "\;" deps_paths "${deps_paths}")
+
+        # modify environment variable for each test so that CTest can find DLLs
+        foreach(test IN LISTS added_tests)
+            set_tests_properties(
+                "${test}" PROPERTIES
+                ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${deps_paths}"
+            )
+        endforeach()
+
+    endif()
+
+
     # setup install of target
 
     if(NOT CMAKE_SKIP_INSTALL_RULES)
