@@ -56,4 +56,10 @@ if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.22.0")
         ON
     )
     mark_as_advanced(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
+elseif(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
+    message(
+        WARNING
+        "Option 'PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV' for 'patomic_test' requires CMake 3.22+, currently running ${CMAKE_VERSION}, option is disabled"
+    )
+    set(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV )
 endif()
