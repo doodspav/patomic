@@ -9,7 +9,7 @@
 # - executable name -> ${name} (e.g. SomeExample on Unix or SomeExample.exe on Windows)
 # - install directory -> ${CMAKE_INSTALL_TESTDIR}/${kind} (e.g. share/test/bt)
 #
-# Working Directory:
+# Working Directory (CTest):
 # - each test target has its working directory set to ${PROJECT_BINARY_DIR}/working/${kind}/${name}
 # - if a multi-config generator is used, 'working' is replaced with 'working/$<CONFIG>'
 # - reasoning:
@@ -187,44 +187,6 @@ function(_create_test)
     add_dependencies(${parent_target} ${target})
 
 
-    # deal with Windows runtime linker issues
-
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-
-        # check we actually care about Windows PATH stuff
-        if(NOT PATOMIC_WINDOWS_SET_CTEST_PATH_ENV AND
-           NOT PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
-            return()
-        endif()
-
-        # get paths to all shared library dependencies (DLLs)
-        windows_deps_paths(
-            deps_paths
-            ${ARG_LINK}
-        )
-
-        # set environment variable for each test so that CTest works
-        if(deps_paths AND PATOMIC_WINDOWS_SET_CTEST_PATH_ENV)
-            foreach(test IN LISTS added_tests)
-                set_property(
-                    TEST "${test}"
-                    PROPERTY ENVIRONMENT "PATH=${deps_paths}"
-                )
-            endforeach()
-        endif()
-
-        # make dependencies accessible from parent target
-        # so that we can create single file for all tests in kind
-        if(PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
-            set_property(
-                TARGET ${parent_target}
-                APPEND PROPERTY WIN_DEPS_TARGETS "${ARG_LINK}"
-            )
-        endif()
-
-    endif()
-
-
     # setup install of target
 
     if(NOT CMAKE_SKIP_INSTALL_RULES)
@@ -314,91 +276,5 @@ function(create_ut)
     # visibility macros will break UTs on Windows
     set(target_name patomic-test-ut-${ARG_NAME})
     target_compile_definitions(${target_name} PRIVATE PATOMIC_STATIC_DEFINE)
-
-endfunction()
-
-
-# ---- Create Test Dependency File ----
-
-# Creates a file containing the output of windows_deps_paths for all tests of
-# the given kind registered so far.
-# The file path will be "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt".
-# Expects a target named patomic-test-${kind} to exist
-# E.g. if you call it as create_test_win_deps_paths_file(BT) then patomic-bt must
-# exist.
-# This function has no effect when not running on Windows.
-#
-# create_test_win_deps_paths_file(
-#     BT|UT
-# )
-function(create_test_win_deps_paths_file ARG_KIND)
-
-    # check we actually want to generate file
-
-    if(NOT PATOMIC_WINDOWS_CREATE_PATH_ENV_FILE)
-        return()
-    endif()
-
-
-    # check KIND is valid
-
-    set(all_kinds_opt_msg "BT|UT")
-    set(func_name "create_test_win_deps_paths_file")
-
-    if(NOT ARG_KIND MATCHES "^(${all_kinds_option})$")
-        message(WARNING "${all_kinds_option} option needs to be specified when invoking '${func_name}'")
-        message(FATAL_ERROR "Aborting '${func_name}' due to invalid arguments")
-    endif()
-
-    string(TOLOWER ${ARG_KIND} kind)
-
-
-    # create and install file with dependencies path
-
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-
-        # get dependencies set by create_test from target
-        get_target_property(dep_targets patomic-test-${kind} WIN_DEP_TARGETS)
-        if("${dep_targets}" STREQUAL "dep_targets-NOTFOUND")
-            message(VERBOSE "Skipping creation of Windows dependencies PATH file for ${ARG_KIND}; no relevant test targets created")
-            return()
-        endif()
-        list(REMOVE_DUPLICATES dep_targets)
-
-        # get paths to all shared library dependencies (DLLs)
-        windows_deps_paths(
-            deps_paths
-            ${dep_targets}
-        )
-
-        # create file
-        set(file_path "${CMAKE_CURRENT_BINARY_DIR}/windows_dependencies_path.txt")
-        file(GENERATE
-            OUTPUT ${file_path}
-            CONTENT "${deps_paths}"
-        )
-
-        # copy file to install location
-        if(NOT CMAKE_SKIP_INSTALL_RULES)
-
-            # install as part of patomic-test-${kind} component
-            install(
-                FILES ${file_path}
-                COMPONENT patomic-test-${kind}
-                DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
-                EXCLUDE_FROM_ALL
-            )
-
-            # install as part of patomic-test component
-            install(
-                FILES ${file_path}
-                COMPONENT patomic-test
-                DESTINATION "${CMAKE_INSTALL_TESTDIR}/patomic/${kind}"
-                EXCLUDE_FROM_ALL
-            )
-
-        endif()
-
-    endif()
 
 endfunction()
