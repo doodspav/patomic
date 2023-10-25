@@ -79,14 +79,6 @@
       }
     },
     {
-      "name": "patomic-ci-flags-msvc-sanitize",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "/fsanitize=address",
-        "CMAKE_CXX_FLAGS_INIT": "/fsanitize=address"
-      }
-    },
-    {
       "name": "patomic-ci-flags-gcc",
       "hidden": true,
       "environment": {
@@ -140,16 +132,6 @@
         "patomic-ci-base",
         "patomic-ci-compiler-windows-msvc",
         "patomic-ci-flags-msvc"
-      ]
-    },
-    {
-      "name": "patomic-ci-windows-msvc-sanitize",
-      "inherits": [
-        "patomic-ci-base",
-        "patomic-ci-compiler-windows-msvc",
-        "patomic-ci-flags-msvc",
-        "patomic-ci-flags-msvc-sanitize",
-        "patomic-ci-skip-install"
       ]
     },
     {
