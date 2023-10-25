@@ -23,15 +23,6 @@
       }
     },
     {
-      "name": "patomic-ci-compiler-windows-clang",
-      "hidden": true,
-      "generator": "Visual Studio 17 2022",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl"
-      }
-    },
-    {
       "name": "patomic-ci-compiler-windows-msvc",
       "hidden": true,
       "generator": "Visual Studio 17 2022",
@@ -82,11 +73,8 @@
       "name": "patomic-ci-flags-msvc-sanitize",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-fsanitize=address",
-        "CMAKE_CXX_FLAGS_INIT": "-fsanitize=address",
-        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fsanitize=address",
-        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fsanitize=address",
-        "CMAKE_STATIC_LINKER_FLAGS_INIT": "-fsanitize=address"
+        "CMAKE_C_FLAGS_INIT": "/fsanitize=address",
+        "CMAKE_CXX_FLAGS_INIT": "/fsanitize=address"
       }
     },
     {
@@ -179,6 +167,7 @@
     },
     {
       "name": "patomic-ci-unix-gnu-ansi",
+      "generator": "Ninja",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-skip-install"
