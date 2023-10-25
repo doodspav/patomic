@@ -138,10 +138,7 @@
         "patomic-ci-base",
         "patomic-ci-compiler-unix-clang",
         "patomic-ci-flags-clang"
-      ],
-      "environment": {
-        "LDFLAGS": "-fuse-ld=lld"
-      }
+      ]
     },
     {
       "name": "patomic-ci-unix-clang-coverage",
@@ -153,7 +150,7 @@
       "environment": {
         "CFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
         "CXXFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
-        "LDFLAGS": "-fprofile-instr-generate -fcoverage-mapping -fuse-ld=lld"
+        "LDFLAGS": "-fprofile-instr-generate -fcoverage-mapping"
       }
     },
     {
@@ -166,7 +163,7 @@
       "environment": {
         "CFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
         "CXXFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
-        "LDFLAGS": "-fsanitize=address,undefined -fuse-ld=lld"
+        "LDFLAGS": "-fsanitize=address,undefined"
       }
     },
     {
@@ -175,10 +172,7 @@
         "patomic-ci-base",
         "patomic-ci-compiler-unix-gcc",
         "patomic-ci-flags-gcc"
-      ],
-      "environment": {
-        "LDFLAGS": "-fuse-ld=ld"
-      }
+      ]
     },
 
     {
