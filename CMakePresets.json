@@ -16,12 +16,14 @@
       }
     },
     {
-      "name": "patomic-ci-skip-install",
+      "name": "patomic-ci-base-skip-install",
       "hidden": true,
+      "inherits": ["patomic-ci-base"],
       "cacheVariables": {
         "CMAKE_SKIP_INSTALL_RULES": true
       }
     },
+
     {
       "name": "patomic-ci-compiler-windows-clang",
       "hidden": true,
@@ -58,73 +60,68 @@
         "CMAKE_CXX_COMPILER": "g++"
       }
     },
+
     {
-      "name": "patomic-ci-flags-clang-coverage",
+      "name": "patomic-ci-flags-clang",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
-        "CMAKE_CXX_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
-        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
-        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping"
-      }
-    },
-    {
-      "name": "patomic-ci-flags-gnu-sanitize",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
-        "CMAKE_CXX_FLAGS_INIT": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
-        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fsanitize=address,undefined",
-        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fsanitize=address,undefined"
+        "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories",
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic"
       }
     },
     {
       "name": "patomic-ci-flags-gcc",
       "hidden": true,
-      "environment": {
-        "CFLAGS": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function",
-        "CXXFLAGS": "-Wall -Wextra -Werror -Wpedantic"
-      }
-    },
-    {
-      "name": "patomic-ci-flags-clang",
-      "hidden": true,
-      "environment": {
-        "CFLAGS": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories",
-        "CXXFLAGS": "-Wall -Wextra -Werror -Wpedantic"
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function",
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic"
       }
     },
     {
       "name": "patomic-ci-flags-msvc",
       "hidden": true,
-      "environment": {
-        "CFLAGS": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668",
-        "CXXFLAGS": "/permissive- /volatile:iso /W4 /WX"
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668",
+        "CMAKE_CXX_FLAGS_INIT": "/permissive- /volatile:iso /W4 /WX"
       }
     },
+
     {
       "name": "patomic-ci-windows-clang",
       "inherits": [
-        "patomic-ci-base",
+        "patomic-ci-base-skip-install",
         "patomic-ci-compiler-windows-clang",
         "patomic-ci-flags-msvc"
-      ]
+      ],
+      "environment": {
+        "LDFLAGS": "-fuse-ld=lld-link"
+      }
     },
     {
       "name": "patomic-ci-windows-clang-coverage",
       "inherits": [
-        "patomic-ci-base",
+        "patomic-ci-base-skip-install",
         "patomic-ci-compiler-windows-clang",
-        "patomic-ci-flags-clang-coverage"
-      ]
+        "patomic-ci-flags-msvc"
+      ],
+      "environment": {
+        "CFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
+        "CXXFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
+        "LDFLAGS": "-fprofile-instr-generate -fcoverage-mapping -fuse-ld=lld-link"
+      }
     },
     {
       "name": "patomic-ci-windows-clang-sanitize",
       "inherits": [
-        "patomic-ci-base",
+        "patomic-ci-base-skip-install",
         "patomic-ci-compiler-windows-clang",
-        "patomic-ci-flags-gnu-sanitize"
-      ]
+        "patomic-ci-flags-msvc"
+      ],
+      "environment": {
+        "CFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
+        "CXXFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
+        "LDFLAGS": "-fsanitize=address,undefined -fuse-ld=lld-link"
+      }
     },
     {
       "name": "patomic-ci-windows-msvc",
@@ -134,33 +131,43 @@
         "patomic-ci-flags-msvc"
       ]
     },
+
     {
       "name": "patomic-ci-unix-clang",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-compiler-unix-clang",
         "patomic-ci-flags-clang"
-      ]
+      ],
+      "environment": {
+        "LDFLAGS": "-fuse-ld=lld"
+      }
     },
     {
       "name": "patomic-ci-unix-clang-coverage",
       "inherits": [
-        "patomic-ci-base",
+        "patomic-ci-base-skip-install",
         "patomic-ci-compiler-unix-clang",
-        "patomic-ci-flags-clang",
-        "patomic-ci-flags-clang-coverage",
-        "patomic-ci-skip-install"
-      ]
+        "patomic-ci-flags-clang"
+      ],
+      "environment": {
+        "CFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
+        "CXXFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
+        "LDFLAGS": "-fprofile-instr-generate -fcoverage-mapping -fuse-ld=lld"
+      }
     },
     {
       "name": "patomic-ci-unix-clang-sanitize",
       "inherits": [
-        "patomic-ci-base",
+        "patomic-ci-base-skip-install",
         "patomic-ci-compiler-unix-clang",
-        "patomic-ci-flags-clang",
-        "patomic-ci-flags-gnu-sanitize",
-        "patomic-ci-skip-install"
-      ]
+        "patomic-ci-flags-clang"
+      ],
+      "environment": {
+        "CFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
+        "CXXFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
+        "LDFLAGS": "-fsanitize=address,undefined -fuse-ld=lld"
+      }
     },
     {
       "name": "patomic-ci-unix-gcc",
@@ -168,24 +175,17 @@
         "patomic-ci-base",
         "patomic-ci-compiler-unix-gcc",
         "patomic-ci-flags-gcc"
-      ]
+      ],
+      "environment": {
+        "LDFLAGS": "-fuse-ld=ld"
+      }
     },
-    {
-      "name": "patomic-ci-unix-gcc-sanitize",
-      "inherits": [
-        "patomic-ci-base",
-        "patomic-ci-compiler-unix-gcc",
-        "patomic-ci-flags-gcc",
-        "patomic-ci-flags-gnu-sanitize",
-        "patomic-ci-skip-install"
-      ]
-    },
+
     {
       "name": "patomic-ci-unix-gnu-ansi",
       "generator": "Ninja",
       "inherits": [
-        "patomic-ci-base",
-        "patomic-ci-skip-install"
+        "patomic-ci-base-skip-install"
       ],
       "cacheVariables": {
         "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
