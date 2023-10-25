@@ -23,6 +23,15 @@
       }
     },
     {
+      "name": "patomic-ci-compiler-windows-clang",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
+      }
+    },
+    {
       "name": "patomic-ci-compiler-windows-msvc",
       "hidden": true,
       "generator": "Visual Studio 17 2022",
@@ -100,6 +109,30 @@
         "CFLAGS": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668",
         "CXXFLAGS": "/permissive- /volatile:iso /W4 /WX"
       }
+    },
+    {
+      "name": "patomic-ci-windows-clang",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-compiler-windows-clang",
+        "patomic-ci-flags-msvc"
+      ]
+    },
+    {
+      "name": "patomic-ci-windows-clang-coverage",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-compiler-windows-clang",
+        "patomic-ci-flags-clang-coverage"
+      ]
+    },
+    {
+      "name": "patomic-ci-windows-clang-sanitize",
+      "inherits": [
+        "patomic-ci-base",
+        "patomic-ci-compiler-windows-clang",
+        "patomic-ci-flags-gnu-sanitize"
+      ]
     },
     {
       "name": "patomic-ci-windows-msvc",
