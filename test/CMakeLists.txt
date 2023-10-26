@@ -26,8 +26,11 @@ if(NOT TARGET patomic::patomic)
     find_package(patomic QUIET)
 endif()
 
-# for Windows: prevent overriding the parent project's compiler/linker settings
+# set GTest options
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(gtest_hide_internal_symbols ON CACHE BOOL "" FORCE)
+
+# get GTest
 find_package(GTest REQUIRED)
 include(GoogleTest)
 

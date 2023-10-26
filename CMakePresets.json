@@ -78,30 +78,6 @@
     },
 
     {
-      "name": "patomic-ci-windows-clang",
-      "inherits": [
-        "patomic-ci-base-skip-install",
-        "patomic-ci-compiler-clang",
-        "patomic-ci-flags-clang"
-      ],
-      "environment": {
-        "CXXFLAGS": "-Wno-language-extension-token"
-      }
-    },
-    {
-      "name": "patomic-ci-windows-clang-coverage",
-      "inherits": [
-        "patomic-ci-base-skip-install",
-        "patomic-ci-compiler-clang",
-        "patomic-ci-flags-msvc"
-      ],
-      "environment": {
-        "CFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
-        "CXXFLAGS": "-fprofile-instr-generate -fcoverage-mapping",
-        "LDFLAGS": "-fprofile-instr-generate -fcoverage-mapping -fuse-ld=lld-link"
-      }
-    },
-    {
       "name": "patomic-ci-windows-msvc",
       "inherits": [
         "patomic-ci-base",
@@ -160,6 +136,7 @@
         "patomic-ci-base-skip-install"
       ],
       "cacheVariables": {
+        "BUILD_TESTING": false,
         "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
         "CMAKE_C_STANDARD": "90"
       }
