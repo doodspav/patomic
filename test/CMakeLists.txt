@@ -54,6 +54,11 @@ else()
     message(STATUS "Skipping unit tests; not building as sub-project of patomic")
 endif()
 
+# only add CIs if running in CI
+if($ENV{CI})
+    add_subdirectory(ci)
+endif()
+
 
 # ---- Support Packaging Library ----
 
