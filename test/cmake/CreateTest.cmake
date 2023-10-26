@@ -23,7 +23,7 @@
 # - patomic-test-${kind}-${name} -> executable target for a single test
 #
 # _create_test(
-#     BT|UT <name>
+#     BT|UT|CI <name>
 #     [INCLUDE <item>...]
 #     [SOURCE <item>...]
 #     [LINK <item>...]
@@ -32,8 +32,8 @@ function(_create_test)
 
     # setup what arguments we expect
 
-    set(all_kinds "BT;UT")  # list of all kinds we can iterate over
-    set(all_kinds_opt_msg "BT|UT")  # string to use in debug message
+    set(all_kinds "BT;UT;CI")  # list of all kinds we can iterate over
+    set(all_kinds_opt_msg "BT|UT|CI")  # string to use in debug message
 
     cmake_parse_arguments(
         "ARG"
@@ -312,5 +312,35 @@ function(create_ut)
     # visibility macros will break UTs on Windows
     set(target_name patomic-test-ut-${ARG_NAME})
     target_compile_definitions(${target_name} PRIVATE PATOMIC_STATIC_DEFINE)
+
+endfunction()
+
+
+# Creates target patomic-test-ci-${name} corresponding to CI test executable.
+# Note: intended to test CI environment, e.g. ensure sanitizer works.
+#
+# create_ci(
+#     NAME <name>
+#     [INCLUDE <item>...]
+#     [SOURCE <item>...]
+#     [LINK <item>...]
+# )
+function(create_ci)
+
+    cmake_parse_arguments(
+        "ARG"
+        ""
+        "NAME"
+        "INCLUDE;SOURCE;LINK"
+        ${ARGN}
+    )
+
+    _create_test(
+        ${ARG_UNPARSED_ARGUMENTS}
+        CI      ${ARG_NAME}
+        INCLUDE ${ARG_INCLUDE}
+        SOURCE  ${ARG_SOURCE}
+        LINK    ${ARG_LINK}
+    )
 
 endfunction()
