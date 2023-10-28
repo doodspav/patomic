@@ -34,6 +34,21 @@ set(gtest_hide_internal_symbols ON CACHE BOOL "" FORCE)
 find_package(GTest REQUIRED)
 include(GoogleTest)
 
+# sometimes this variable is not correctly set by GTest's find_package
+if(NOT GTEST_INCLUDE_DIRS)
+    if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.20.0")
+        get_target_property(
+            GTEST_INCLUDE_DIRS
+            GTest::gtest INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+        )
+    else()
+        get_target_property(
+            GTEST_INCLUDE_DIRS
+            GTest::GTest INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+        )
+    endif()
+endif()
+
 
 # ---- Declare Tests ----
 
