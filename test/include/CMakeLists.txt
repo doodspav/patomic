@@ -3,7 +3,7 @@
 # set variable so we can add the sources to all our test targets later
 set(
     patomic_test_include_sources
-    # test
+    # test/...
 )
 
 # transform to absolute path otherwise wrong current directory will be used
