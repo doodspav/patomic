@@ -1,13 +1,8 @@
 # fine with CML file here because include isn't installed for tests
 
-# set variable so that we can add the sources to all our test targets later
-set(
-    patomic_test_include_sources
-    # test/...
-)
-
-# transform to absolute path otherwise wrong current directory will be used
-list(
-    TRANSFORM patomic_test_include_sources
-    PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/"
+# create interface target that is automatically linked to all tests
+add_library(
+    patomic-test-include INTERFACE
+    # .
+    "example.hpp"
 )

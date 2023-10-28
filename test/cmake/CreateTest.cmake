@@ -114,8 +114,6 @@ function(_create_test)
     # add sources to target
     target_sources(
         ${target} PRIVATE
-        ${patomic_test_include_sources}
-        ${patomic_test_src_sources}
         ${ARG_SOURCE}
     )
 
@@ -124,6 +122,13 @@ function(_create_test)
         ${target} PRIVATE
         "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
         ${ARG_INCLUDE}
+    )
+
+    # add /src and /include sources that apply to all test targets
+    target_link_libraries(
+        ${target} PRIVATE
+        patomic-test-include
+        $<TARGET_OBJECTS:patomic-test-src>
     )
 
     # update dependencies list directly because we use it in Windows PATH stuff later

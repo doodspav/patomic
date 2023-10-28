@@ -40,7 +40,7 @@ include(GoogleTest)
 add_custom_target(patomic-test)
 
 # always add include and src; used by and linked to all test targets
-# must be added first to set sources variable that we use when creating targets
+# must be added first to create targets that we use when creating test targets
 add_subdirectory(include)
 add_subdirectory(src)
 

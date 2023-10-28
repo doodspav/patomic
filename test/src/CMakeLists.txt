@@ -1,14 +1,13 @@
-# these sources are automatically linked to all tests
-
-# set variable so that we can add the sources to all our test targets later
-set(
-    patomic_test_src_sources
-    # src
+# create object target that is automatically linked to all tests
+add_library(
+    patomic-test-src OBJECT
+    # .
     "gtest_sanitizer_support.cpp"
 )
 
-# transform to absolute path otherwise wrong current directory will be used
-list(
-    TRANSFORM patomic_test_src_sources
-    PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/"
+# add include directories
+target_include_directories(
+    patomic-test-src PRIVATE
+    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${GTEST_INCLUDE_DIRS}>"
 )
