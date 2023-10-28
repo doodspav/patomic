@@ -5,7 +5,6 @@
 add_library(
     patomic-test-include INTERFACE
     # .
-    "example.hpp"
 )
 
 # require C++14 as minimum

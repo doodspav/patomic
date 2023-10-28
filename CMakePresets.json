@@ -71,8 +71,8 @@
       "name": "patomic-ci-flags-gnu-sanitize",
       "hidden": true,
       "environment": {
-        "CFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
-        "CXXFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer -DPATOMIC_CI_UBSAN=1 -DPATOMIC_CI_ASAN=1",
+        "CFLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CXXFLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -DPATOMIC_CI_UBSAN=1 -DPATOMIC_CI_ASAN=1",
         "LDFLAGS": "-fsanitize=address,undefined"
       }
     },
