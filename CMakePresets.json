@@ -68,7 +68,7 @@
       }
     },
     {
-      "name": "patomic-ci-flags-clang-sanitize",
+      "name": "patomic-ci-flags-gnu-sanitize",
       "hidden": true,
       "environment": {
         "CFLAGS": "-fsanitize=address,undefined -fno-sanitize-recover -fno-omit-frame-pointer",
@@ -105,7 +105,7 @@
       "inherits": [
         "patomic-ci-base-skip-install",
         "patomic-ci-compiler-clang",
-        "patomic-ci-flags-clang-sanitize"
+        "patomic-ci-flags-gnu-sanitize"
       ]
     },
     {
@@ -113,6 +113,14 @@
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-compiler-gcc"
+      ]
+    },
+    {
+      "name": "patomic-ci-unix-gcc-sanitize",
+      "inherits": [
+        "patomic-ci-base-skip-install",
+        "patomic-ci-compiler-gcc",
+        "patomic-ci-flags-gnu-sanitize"
       ]
     },
 
