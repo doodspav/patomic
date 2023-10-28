@@ -109,9 +109,13 @@ function(_create_test)
     endif()
 
     # create target with sources
-    add_executable(
-        ${target}
+    add_executable(${target})
+
+    # add sources to target
+    target_sources(
+        ${target} PRIVATE
         ${patomic_test_include_sources}
+        ${patomic_test_src_sources}
         ${ARG_SOURCE}
     )
 

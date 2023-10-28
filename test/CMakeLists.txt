@@ -39,9 +39,10 @@ include(GoogleTest)
 
 add_custom_target(patomic-test)
 
-# always add includes
+# always add include and src; used by and linked to all test targets
 # must be added first to set sources variable that we use when creating targets
 add_subdirectory(include)
+add_subdirectory(src)
 
 # only add BTs if patomic target is available
 if(TARGET patomic::patomic)
