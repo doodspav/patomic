@@ -111,12 +111,14 @@ function(_create_test)
     # create target with sources
     add_executable(
         ${target}
+        ${patomic_test_include_sources}
         ${ARG_SOURCE}
     )
 
     # add include directories
     target_include_directories(
         ${target} PRIVATE
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
         ${ARG_INCLUDE}
     )
 
