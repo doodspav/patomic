@@ -11,3 +11,9 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${GTEST_INCLUDE_DIRS}>"
 )
+
+# require C++14 as minimum
+target_compile_features(
+    patomic-test-src PRIVATE
+    cxx_std_14
+)

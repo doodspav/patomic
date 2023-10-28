@@ -7,3 +7,9 @@ add_library(
     # .
     "example.hpp"
 )
+
+# require C++14 as minimum
+target_compile_features(
+    patomic-test-include INTERFACE
+    cxx_std_14
+)
