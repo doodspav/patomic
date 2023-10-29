@@ -2,6 +2,7 @@
 add_library(
     patomic-test-src OBJECT
     # .
+    "dummy.cpp"
 )
 
 # add include directories
