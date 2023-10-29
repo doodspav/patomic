@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
 
-class CiAsan : public testing::Test
+class CiAsanDeathTest : public testing::Test
 {};
 
 
-TEST_F(CiAsan, UseAfterFree)
+TEST_F(CiAsanDeathTest, UseAfterFree)
 {
     auto fn = []() noexcept -> void {
         int *p = new int(5);
@@ -17,7 +17,7 @@ TEST_F(CiAsan, UseAfterFree)
     EXPECT_DEATH(fn(), ".*AddressSanitizer: heap-use-after-free.*");
 }
 
-TEST_F(CiAsan, HeapBufferOverflow)
+TEST_F(CiAsanDeathTest, HeapBufferOverflow)
 {
     auto fn = []() noexcept -> void {
         int *arr = new int[100]{};
@@ -30,7 +30,7 @@ TEST_F(CiAsan, HeapBufferOverflow)
     EXPECT_DEATH(fn(), ".*AddressSanitizer: heap-buffer-overflow.*");
 }
 
-TEST_F(CiAsan, StackBufferOverflow)
+TEST_F(CiAsanDeathTest, StackBufferOverflow)
 {
     auto fn = []() noexcept -> void {
         int arr[100]{};
@@ -41,7 +41,7 @@ TEST_F(CiAsan, StackBufferOverflow)
     EXPECT_DEATH(fn(), ".*AddressSanitizer: stack-buffer-overflow.*");
 }
 
-TEST_F(CiAsan, GlobalBufferOverflow)
+TEST_F(CiAsanDeathTest, GlobalBufferOverflow)
 {
     auto fn = []() noexcept -> void {
         static int arr[100]{};

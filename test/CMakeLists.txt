@@ -62,6 +62,7 @@ add_subdirectory(src)
 # only add BTs if patomic target is available
 if(TARGET patomic::patomic)
     add_subdirectory(bt)
+    message(STATUS "Enabled binary tests")
 else()
     message(STATUS "Skipping binary tests; patomic target not available")
 endif()
@@ -70,6 +71,7 @@ endif()
 # these are currently set by patomic before including this project
 if(PATOMIC_BINARY_DIR AND PATOMIC_SOURCE_DIR)
    add_subdirectory(ut)
+    message(STATUS "Enabled unit tests")
 else()
     message(STATUS "Skipping unit tests; not building as sub-project of patomic")
 endif()
@@ -77,6 +79,9 @@ endif()
 # only add CIs if running in CI
 if($ENV{CI})
     add_subdirectory(ci)
+    message(STATUS "Enabled continuous integration tests")
+else()
+    message(STATUS "Skipping continuous integration tests; not building as part of pipeline run")
 endif()
 
 
