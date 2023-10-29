@@ -5,6 +5,8 @@ class CiAsanDeathTest : public testing::Test
 {};
 
 
+#if PATOMIC_CI_ASAN
+
 TEST_F(CiAsanDeathTest, UseAfterFree)
 {
     auto fn = []() noexcept -> void {
@@ -51,3 +53,5 @@ TEST_F(CiAsanDeathTest, GlobalBufferOverflow)
     };
     EXPECT_DEATH(fn(), ".*AddressSanitizer: global-buffer-overflow.*");
 }
+
+#endif  // PATOMIC_CI_ASAN

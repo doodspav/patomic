@@ -8,6 +8,8 @@ class CiUbsanDeathTest : public testing::Test
 {};
 
 
+#if PATOMIC_CI_UBSAN
+
 TEST_F(CiUbsanDeathTest, IndexOutOfBounds)
 {
     auto fn = []() noexcept -> void {
@@ -69,3 +71,5 @@ TEST_F(CiUbsanDeathTest, FloatCastOverflow)
         ".*UndefinedBehaviorSanitizer: undefined-behavior.*"
     );
 }
+
+#endif  // PATOMIC_CI_UBSAN
