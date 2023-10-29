@@ -1,0 +1,93 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test-native-windows-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        build-type: [Debug, Release]
+        build-shared: [OFF, ON]
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Checkout GoogleTest
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          path: googletest
+
+      - name: Build and Install GoogleTest
+        run: |
+          cd googletest
+          mkdir googletest
+          mkdir build
+          cd build
+          cmake -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
+          cmake --build . --config ${{ matrix.build-type }}
+          cmake --install . --config ${{ matrix.build-type }} --prefix install
+
+      - name: Build patomic
+        run: |
+          cd patomic
+          mkdir build
+          cd build
+          cmake --preset patomic-ci-${{ matrix.os }} -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DGTest_DIR=../../googletest/build/install/lib/cmake/GTest ..
+          cmake --build . --config ${{ matrix.build-type }}
+
+      - name: Test patomic
+        run: |
+          cd patomic/build
+          ctest -C ${{ matrix.build-type }} .
+  
+  test-native-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: 
+        build-type: [Debug, Release]
+        build-shared: [OFF, ON]
+        compiler: [clang, gcc, gnu-ansi]
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Checkout GoogleTest
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          path: googletest
+
+      - name: Build and Install GoogleTest
+        run: |
+          cd googletest
+          mkdir googletest
+          mkdir build
+          cd build
+          cmake -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
+          cmake --build . --config ${{ matrix.build-type }}
+          cmake --install . --config ${{ matrix.build-type }} --prefix install
+
+      - name: Build patomic
+        run: |
+          cd patomic
+          mkdir build
+          cd build
+          cmake --preset patomic-ci-unix-${{ matrix.compiler }} -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DGTest_DIR=../../googletest/build/install/lib/cmake/GTest ..
+          cmake --build . --config ${{ matrix.build-type }}
+
+      - name: Test patomic
+        run: |
+          cd patomic/build
+          ctest -C ${{ matrix.build-type }} .
