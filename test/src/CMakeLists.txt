@@ -2,7 +2,7 @@
 add_library(
     patomic-test-src OBJECT
     # .
-    "dummy.cpp"
+    "gtest_sanitizer.cpp"
 )
 
 # add include directories
