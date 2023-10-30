@@ -15,14 +15,6 @@
         "CMAKE_CXX_EXTENSIONS": false
       }
     },
-    {
-      "name": "patomic-ci-base-skip-install",
-      "hidden": true,
-      "inherits": ["patomic-ci-base"],
-      "cacheVariables": {
-        "CMAKE_SKIP_INSTALL_RULES": false
-      }
-    },
 
     {
       "name": "patomic-ci-compiler-clang",
@@ -126,7 +118,7 @@
     {
       "name": "patomic-ci-unix-clang-ansi",
       "inherits": [
-        "patomic-ci-base-skip-install",
+        "patomic-ci-base",
         "patomic-ci-compiler-clang",
         "patomic-ci-flags-gnu-ansi"
       ]
@@ -134,7 +126,7 @@
     {
       "name": "patomic-ci-unix-clang-coverage",
       "inherits": [
-        "patomic-ci-base-skip-install",
+        "patomic-ci-base",
         "patomic-ci-compiler-clang",
         "patomic-ci-flags-clang-coverage"
       ]
@@ -142,7 +134,7 @@
     {
       "name": "patomic-ci-unix-clang-sanitize",
       "inherits": [
-        "patomic-ci-base-skip-install",
+        "patomic-ci-base",
         "patomic-ci-compiler-clang",
         "patomic-ci-flags-gnu-sanitize"
       ]
@@ -158,7 +150,7 @@
     {
       "name": "patomic-ci-unix-gcc-ansi",
       "inherits": [
-        "patomic-ci-base-skip-install",
+        "patomic-ci-base",
         "patomic-ci-compiler-gcc",
         "patomic-ci-flags-gnu-ansi"
       ]
@@ -166,7 +158,7 @@
     {
       "name": "patomic-ci-unix-gcc-sanitize",
       "inherits": [
-        "patomic-ci-base-skip-install",
+        "patomic-ci-base",
         "patomic-ci-compiler-gcc",
         "patomic-ci-flags-gnu-sanitize"
       ]
