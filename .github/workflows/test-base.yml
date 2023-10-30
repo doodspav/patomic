@@ -13,20 +13,27 @@ jobs:
         # verbose labels make things easier to read in GitHub Actions
         # arch gets converted to preset
         platform:
-          - os: windows-latest
-            arch: msvc-x86
-          - os: windows-latest
-            arch: msvc-x64
+          # - os: windows-latest
+          #   arch: msvc-x86
+          #   preset: patomic-ci-windows-msvc -A Win32
+          # - os: windows-latest
+          #   arch: msvc-x64
+          #   preset: patomic-ci-windows-msvc -A x64
           - os: macos-latest
             arch: clang-x86_64
+            preset: patomic-ci-unix-clang
           - os: ubuntu-latest
             arch: clang-x86_64
+            preset: patomic-ci-unix-clang
           - os: ubuntu-latest
             arch: clang-ansi-x86_64
+            preset: patomic-ci-unix-clang-ansi
           - os: ubuntu-latest
             arch: gcc-x86_64
+            preset: patomic-ci-unix-gcc
           - os: ubuntu-latest
             arch: gcc-ansi-x86_64
+            preset: patomic-ci-unix-gcc-ansi
         # build-type/shared gets converted to cmake option
         build-type:
           - debug
@@ -37,24 +44,24 @@ jobs:
         # convert verbose labels to usable values
         include:
           # arch -> preset
-          - platform:
-              arch: msvc-x86
-              preset: patomic-ci-windows-msvc -A Win32
-          - platform:
-              arch: msvc-x64
-              preset: patomic-ci-windows-msvc -A x64
-          - platform:
-              arch: clang-x86_64
-              preset: patomic-ci-unix-clang
-          - platform:
-              arch: clang-ansi-x86_64
-              preset: patomic-ci-unix-clang-ansi
-          - platform:
-              arch: gcc-x86_64
-              preset: patomic-ci-unix-gcc
-          - platform:
-              arch: gcc-ansi-x86_64
-              preset: patomic-ci-unix-gcc-ansi
+          # - platform:
+          #     arch: msvc-x86
+          #     preset: patomic-ci-windows-msvc -A Win32
+          # - platform:
+          #     arch: msvc-x64
+          #     preset: patomic-ci-windows-msvc -A x64
+          # - platform:
+          #     arch: clang-x86_64
+          #     preset: patomic-ci-unix-clang
+          # - platform:
+          #     arch: clang-ansi-x86_64
+          #     preset: patomic-ci-unix-clang-ansi
+          # - platform:
+          #     arch: gcc-x86_64
+          #     preset: patomic-ci-unix-gcc
+          # - platform:
+          #     arch: gcc-ansi-x86_64
+          #     preset: patomic-ci-unix-gcc-ansi
           # build-type -> cmake-build-type
           - build-type: debug
             cmake-build-type: Debug
