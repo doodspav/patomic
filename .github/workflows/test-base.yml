@@ -10,6 +10,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
         build-type:
           - debug
           - release
@@ -19,19 +23,18 @@ jobs:
         include:
           # set os and preset for each platform
           - os: windows-latest
-            preset: patomic-ci-windows-msvc -A Win32
-          - os: windows-latest
-            preset: patomic-ci-windows-msvc -A x64
+            presets:
+              - patomic-ci-windows-msvc -A Win32
+              - patomic-ci-windows-msvc -A x64
           - os: macos-latest
-            preset: patomic-ci-unix-clang
+            presets:
+              - patomic-ci-unix-clang
           - os: ubuntu-latest
-            preset: patomic-ci-unix-clang
-          - os: ubuntu-latest
-            preset: patomic-ci-unix-clang-ansi
-          - os: ubuntu-latest
-            preset: patomic-ci-unix-gcc
-          - os: ubuntu-latest
-            preset: patomic-ci-unix-gcc-ansi
+            presets:
+              - patomic-ci-unix-clang
+              - patomic-ci-unix-clang-ansi
+              - patomic-ci-unix-gcc
+              - patomic-ci-unix-gcc-ansi
           # convert matrix options to cmake options
           - build-type: debug
             cmake-build-type: Debug
