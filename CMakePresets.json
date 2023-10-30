@@ -157,15 +157,6 @@
         "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
         "CMAKE_C_STANDARD": "90"
       }
-    },
-
-    {
-      "name": "patomic-ci-windows-latest",
-      "inherits": "patomic-ci-windows-msvc"
-    },
-    {
-      "name": "patomic-ci-macos-latest",
-      "inherits": "patomic-ci-unix-clang"
     }
   ]
 }
