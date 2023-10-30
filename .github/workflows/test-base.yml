@@ -12,27 +12,27 @@ jobs:
       matrix:
         # verbose labels make things easier to read in GitHub Actions
         platform:
-          - windows-msvc-x86:
-              os: windows-latest
-              preset: patomic-ci-windows-msvc -A Win32
-          - windows-msvc-x64:
-              os: windows-latest
-              preset: patomic-ci-windows-msvc -A x64
-          - macos-clang-x86_64:
-              os: macos-latest
-              preset: patomic-ci-macos-clang
-          - ubuntu-clang-x86_64:
-              os: ubuntu-latest
-              preset: patomic-ci-clang
-          - ubuntu-clang-ansi-x86_64:
-              os: ubuntu-latest
-              preset: patomic-ci-clang-ansi
-          - ubuntu-gcc-x86_64:
-              os: ubuntu-latest
-              preset: patomic-ci-gcc
-          - ubuntu-gcc-ansi-x86_64:
-              os: ubuntu-latest
-              preset: patomic-ci-gcc-ansi
+          - arch: windows-msvc-x86
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A Win32
+          - arch: windows-msvc-x64
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A x64
+          - arch: macos-clang-x86_64
+            os: macos-latest
+            preset: patomic-ci-macos-clang
+          - arch: ubuntu-clang-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-clang
+          - arch: ubuntu-clang-ansi-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-clang-ansi
+          - arch: ubuntu-gcc-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-gcc
+          - arch: ubuntu-gcc-ansi-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-gcc-ansi
         # build-type:
         #   - debug
         #   - release
