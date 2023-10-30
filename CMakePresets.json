@@ -27,7 +27,7 @@
     {
       "name": "patomic-ci-compiler-clang",
       "hidden": true,
-      "generator": "Unix Makfiles",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++"
@@ -36,7 +36,7 @@
     {
       "name": "patomic-ci-compiler-gcc",
       "hidden": true,
-      "generator": "Unix Makfiles",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++"
@@ -148,7 +148,7 @@
 
     {
       "name": "patomic-ci-unix-gnu-ansi",
-      "generator": "Unix Makfiles",
+      "generator": "Unix Makefiles",
       "inherits": [
         "patomic-ci-base-skip-install"
       ],
