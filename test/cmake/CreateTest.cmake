@@ -109,12 +109,11 @@ function(_create_test)
     endif()
 
     # create target with sources
-    add_executable(${target})
+    add_executable(${target} "$<TARGET_OBJECTS:patomic-test-src>")
 
     # add sources to target
     target_sources(
         ${target} PRIVATE
-        $<TARGET_OBJECTS:patomic-test-src>
         ${ARG_SOURCE}
     )
 
