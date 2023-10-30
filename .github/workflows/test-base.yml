@@ -40,7 +40,6 @@ jobs:
       - name: Build and Install GoogleTest
         run: |
           cd googletest
-          mkdir googletest
           mkdir build
           cd build
           cmake -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
