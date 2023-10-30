@@ -7,7 +7,10 @@ on:
 
 jobs:
   test-native:
-    runs-on: ${{ matrix.os }}
+    runs-on:
+      - windows-latest
+      - macos-latest
+      - ubuntu-latest
     strategy:
       matrix:
         # verbose matrix so that elements are easier to read on GitHub when run
