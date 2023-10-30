@@ -53,7 +53,7 @@
     },
 
     {
-      "name": "patomic-ci-flags-clang",
+      "name": "patomic-ci-warning-flags-clang",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories",
@@ -61,7 +61,7 @@
       }
     },
     {
-      "name": "patomic-ci-flags-gcc",
+      "name": "patomic-ci-warning-flags-gcc",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function",
@@ -69,7 +69,7 @@
       }
     },
     {
-      "name": "patomic-ci-flags-msvc",
+      "name": "patomic-ci-warning-flags-msvc",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_FLAGS_INIT": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668",
@@ -95,13 +95,23 @@
         "LDFLAGS": "-fsanitize=address,undefined"
       }
     },
+    {
+      "name": "patomic-ci-flags-gnu-ansi",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
+        "CMAKE_C_STANDARD": "90",
+        "CMAKE_C_STANDARD_REQUIRED": true,
+        "CMAKE_C_EXTENSIONS": false
+      }
+    },
 
     {
       "name": "patomic-ci-windows-msvc",
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-compiler-msvc",
-        "patomic-ci-flags-msvc"
+        "patomic-ci-warning-flags-msvc"
       ]
     },
 
@@ -110,7 +120,15 @@
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-compiler-clang",
-        "patomic-ci-flags-clang"
+        "patomic-ci-warning-flags-clang"
+      ]
+    },
+    {
+      "name": "patomic-ci-unix-clang-ansi",
+      "inherits": [
+        "patomic-ci-base-skip-install",
+        "patomic-ci-compiler-clang",
+        "patomic-ci-flags-gnu-ansi"
       ]
     },
     {
@@ -134,7 +152,15 @@
       "inherits": [
         "patomic-ci-base",
         "patomic-ci-compiler-gcc",
-        "patomic-ci-flags-gcc"
+        "patomic-ci-warning-flags-gcc"
+      ]
+    },
+    {
+      "name": "patomic-ci-unix-gcc-ansi",
+      "inherits": [
+        "patomic-ci-base-skip-install",
+        "patomic-ci-compiler-gcc",
+        "patomic-ci-flags-gnu-ansi"
       ]
     },
     {
@@ -144,19 +170,6 @@
         "patomic-ci-compiler-gcc",
         "patomic-ci-flags-gnu-sanitize"
       ]
-    },
-
-    {
-      "name": "patomic-ci-unix-gnu-ansi",
-      "generator": "Unix Makefiles",
-      "inherits": [
-        "patomic-ci-base-skip-install"
-      ],
-      "cacheVariables": {
-        "BUILD_TESTING": false,
-        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
-        "CMAKE_C_STANDARD": "90"
-      }
     }
   ]
 }

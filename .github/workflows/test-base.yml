@@ -21,7 +21,11 @@ jobs:
           - os: ubuntu-latest
             preset: patomic-ci-unix-clang
           - os: ubuntu-latest
+            preset: patomic-ci-unix-clang-ansi
+          - os: ubuntu-latest
             preset: patomic-ci-unix-gcc
+          - os: ubuntu-latest
+            preset: patomic-ci-unix-gcc-ansi
 
     steps:
       - name: Checkout patomic
