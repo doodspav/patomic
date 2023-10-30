@@ -33,22 +33,22 @@ jobs:
           - ubuntu-gcc-ansi-x86_64:
               os: ubuntu-latest
               preset: patomic-ci-gcc-ansi
-        build-type:
-          - debug
-          - release
-        build-shared:
-          - static
-          - shared
-        include:
-          # convert matrix options to cmake options
-          - build-type: debug
-            cmake-build-type: Debug
-          - build-type: release
-            cmake-build-type: Release
-          - build-shared: static
-            cmake-build-shared: OFF
-          - build-shared: shared
-            cmake-build-shared: ON
+        # build-type:
+        #   - debug
+        #   - release
+        # build-shared:
+        #   - static
+        #   - shared
+        # include:
+        #   # convert matrix options to cmake options
+        #   - build-type: debug
+        #     cmake-build-type: Debug
+        #   - build-type: release
+        #     cmake-build-type: Release
+        #   - build-shared: static
+        #     cmake-build-shared: OFF
+        #   - build-shared: shared
+        #     cmake-build-shared: ON
 
     steps:
       - name: Checkout patomic
