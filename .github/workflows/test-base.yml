@@ -20,15 +20,14 @@ jobs:
           - linux-clang-ansi-x86_64
           - linux-gcc-x86_64
           - linux-gcc-ansi-x864-64
-        # build-type/shared gets converted to cmake option
-        build-type:
-          - debug
-          - release
+        # build-shared gets converted to cmake option
         build-shared:
           - static
           - shared
         # convert verbose labels to usable values
         include:
+          # use Release for everything
+          - cmake-build-type: Release
           # platform -> os, preset
           # - platform: windows-msvc-x86
           #   os: windows-latest
@@ -51,11 +50,6 @@ jobs:
           - platform: linux-gcc-ansi-x864-64
             os: ubuntu-latest
             preset: patomic-ci-unix-gcc-ansi
-          # build-type -> cmake-build-type
-          - build-type: debug
-            cmake-build-type: Debug
-          - build-type: release
-            cmake-build-type: Release
           # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
