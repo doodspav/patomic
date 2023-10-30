@@ -13,8 +13,8 @@ jobs:
         # verbose labels make things easier to read in GitHub Actions
         # platform gets converted to os, preset
         platform:
-          # - windows-msvc-x86
-          # - windows-msvc-x64
+          - windows-msvc-x86
+          - windows-msvc-x64
           - macos-clang-x86_64
           - linux-clang-x86_64
           - linux-clang-ansi-x86_64
@@ -24,17 +24,17 @@ jobs:
         build-shared:
           - static
           - shared
-        # convert verbose labels to usable values
+        # convert verbose labels to usable values (which don't appear in name)
         include:
           # use Release for everything
           - cmake-build-type: Release
           # platform -> os, preset
-          # - platform: windows-msvc-x86
-          #   os: windows-latest
-          #   preset: patomic-ci-windows-msvc -A Win32
-          # - platform: windows-msvc-x64
-          #   os: windows-latest
-          #   preset: patomic-ci-windows-msvc -A x64
+          - platform: windows-msvc-x86
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A Win32
+          - platform: windows-msvc-x64
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A x64
           - platform: macos-clang-x86_64
             os: macos-latest
             preset: patomic-ci-unix-clang
