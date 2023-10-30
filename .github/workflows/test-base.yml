@@ -10,35 +10,53 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     strategy:
       matrix:
-        # platforms needed to combine presets and os
+        # verbose labels make things easier to read in GitHub Actions
+        # arch gets converted to preset
         platform:
           - os: windows-latest
-            preset: patomic-ci-windows-msvc -A Win32
+            arch: msvc-x86
           - os: windows-latest
-            preset: patomic-ci-windows-msvc -A x64
+            arch: msvc-x64
           - os: macos-latest
-            preset: patomic-ci-unix-clang
+            arch: clang-x86_64
           - os: ubuntu-latest
-            preset: patomic-ci-unix-clang
+            arch: clang-x86_64
           - os: ubuntu-latest
-            preset: patomic-ci-unix-clang-ansi
+            arch: clang-ansi-x86_64
           - os: ubuntu-latest
-            preset: patomic-ci-unix-gcc
+            arch: gcc-x86_64
           - os: ubuntu-latest
-            preset: patomic-ci-unix-gcc-ansi
-        # verbose labels make things easier to read in GitHub Actions
+            arch: gcc-ansi-x86_64
+        # build-type/shared gets converted to cmake option
         build-type:
           - debug
           - release
         build-shared:
           - static
           - shared
-        # convert matrix options to cmake options
+        # convert verbose labels to usable values
         include:
+          # arch -> preset
+          - arch: msvc-x86
+            preset: patomic-ci-windows-msvc -A Win32
+          - arch: msvc-x64
+            preset: patomic-ci-windows-msvc -A x64
+          - arch: clang-x86_64
+            preset: patomic-ci-unix-clang
+          - arch: clang-x86_64
+            preset: patomic-ci-unix-clang
+          - arch: clang-ansi-x86_64
+            preset: patomic-ci-unix-clang-ansi
+          - arch: gcc-x86_64
+            preset: patomic-ci-unix-gcc
+          - arch: gcc-ansi-x86_64
+            preset: patomic-ci-unix-gcc-ansi
+          # build-type -> cmake-build-type
           - build-type: debug
             cmake-build-type: Debug
           - build-type: release
             cmake-build-type: Release
+          # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
           - build-shared: shared
