@@ -13,14 +13,6 @@ jobs:
       - ubuntu-latest
     strategy:
       matrix:
-        # verbose matrix so that elements are easier to read on GitHub when run
-        platform:
-          - windows-msvc-x86,
-          - windows-msvc-x64,
-          - macos-clang-x86_64,
-          - ubuntu-clang-x86_64,
-          - ubuntu-gcc-x86_64,
-          - ubuntu-ansi-x86_64
         build-type:
           - debug
           - release
@@ -29,26 +21,19 @@ jobs:
           - shared
         include:
           # set os and preset for each platform
-          - platform: windows-msvc-x86
-            os: windows-latest
+          - os: windows-latest
             preset: patomic-ci-windows-msvc -A Win32
-          - platform: windows-msvc-x64
-            os: windows-latest
+          - os: windows-latest
             preset: patomic-ci-windows-msvc -A x64
-          - platform: macos-clang-x86_64
-            os: macos-latest
+          - os: macos-latest
             preset: patomic-ci-unix-clang
-          - platform: ubuntu-clang-x86_64
-            os: ubuntu-latest
+          - os: ubuntu-latest
             preset: patomic-ci-unix-clang
-          - platform: ubuntu-clang-ansi-x86_64
-            os: ubuntu-latest
+          - os: ubuntu-latest
             preset: patomic-ci-unix-clang-ansi
-          - platform: ubuntu-gcc-x86_64
-            os: ubuntu-latest
+          - os: ubuntu-latest
             preset: patomic-ci-unix-gcc
-          - platform: ubuntu-gcc-ansi-x86_64
-            os: ubuntu-latest
+          - os: ubuntu-latest
             preset: patomic-ci-unix-gcc-ansi
           # convert matrix options to cmake options
           - build-type: debug
