@@ -17,15 +17,15 @@ jobs:
           - os: windows-latest
             preset: patomic-ci-windows-msvc -A x64
           - os: macos-latest
-            preset: patomic-ci-macos-clang
+            preset: patomic-ci-unix-clang
           - os: ubuntu-latest
-            preset: patomic-ci-clang
+            preset: patomic-ci-unix-clang
           - os: ubuntu-latest
-            preset: patomic-ci-clang-ansi
+            preset: patomic-ci-unix-clang-ansi
           - os: ubuntu-latest
-            preset: patomic-ci-gcc
+            preset: patomic-ci-unix-gcc
           - os: ubuntu-latest
-            preset: patomic-ci-gcc-ansi
+            preset: patomic-ci-unix-gcc-ansi
         # verbose labels make things easier to read in GitHub Actions
         build-type:
           - debug
@@ -35,7 +35,6 @@ jobs:
           - shared
         # convert matrix options to cmake options
         include:
-          # convert matrix options to cmake options
           - build-type: debug
             cmake-build-type: Debug
           - build-type: release
