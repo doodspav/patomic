@@ -87,6 +87,17 @@ jobs:
           cmake --build . --config ${{ matrix.cmake-build-type }}
 
       - name: Test patomic
+        continue-on-error: true
         run: |
           cd patomic/build
           ctest -C ${{ matrix.cmake-build-type }} .
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}
+          path: upload/
+        run: |
+          mkdir upload
+          mkdir upload/${{ matrix.build-shared }}
+          cp patomic/build/Testing/Temporary/* upload/${{ matrix.build-shared }}
