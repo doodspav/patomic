@@ -20,7 +20,7 @@
       "hidden": true,
       "inherits": ["patomic-ci-base"],
       "cacheVariables": {
-        "CMAKE_SKIP_INSTALL_RULES": true
+        "CMAKE_SKIP_INSTALL_RULES": false
       }
     },
 
