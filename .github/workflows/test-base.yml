@@ -40,9 +40,10 @@ jobs:
       - name: Build and Install GoogleTest
         run: |
           cd googletest
+          cp ../patomic/CMakePresets.json .
           mkdir build
           cd build
-          cmake -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
+          cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
           cmake --build . --config ${{ matrix.build-type }}
           cmake --install . --config ${{ matrix.build-type }} --prefix install
 
