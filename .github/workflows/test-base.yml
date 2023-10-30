@@ -37,20 +37,24 @@ jobs:
         # convert verbose labels to usable values
         include:
           # arch -> preset
-          - arch: msvc-x86
-            preset: patomic-ci-windows-msvc -A Win32
-          - arch: msvc-x64
-            preset: patomic-ci-windows-msvc -A x64
-          - arch: clang-x86_64
-            preset: patomic-ci-unix-clang
-          - arch: clang-x86_64
-            preset: patomic-ci-unix-clang
-          - arch: clang-ansi-x86_64
-            preset: patomic-ci-unix-clang-ansi
-          - arch: gcc-x86_64
-            preset: patomic-ci-unix-gcc
-          - arch: gcc-ansi-x86_64
-            preset: patomic-ci-unix-gcc-ansi
+          - platform:
+              arch: msvc-x86
+              preset: patomic-ci-windows-msvc -A Win32
+          - platform:
+              arch: msvc-x64
+              preset: patomic-ci-windows-msvc -A x64
+          - platform:
+              arch: clang-x86_64
+              preset: patomic-ci-unix-clang
+          - platform:
+              arch: clang-ansi-x86_64
+              preset: patomic-ci-unix-clang-ansi
+          - platform:
+              arch: gcc-x86_64
+              preset: patomic-ci-unix-gcc
+          - platform:
+              arch: gcc-ansi-x86_64
+              preset: patomic-ci-unix-gcc-ansi
           # build-type -> cmake-build-type
           - build-type: debug
             cmake-build-type: Debug
