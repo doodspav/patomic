@@ -11,22 +11,19 @@ jobs:
     strategy:
       matrix:
         # verbose matrix so that elements are easier to read on GitHub when run
-        platform: [
-          windows-msvc-x86,
-          windows-msvc-x64,
-          macos-clang-x86_64,
-          ubuntu-clang-x86_64,
-          ubuntu-gcc-x86_64,
-          ubuntu-ansi-x86_64
-        ]
-        build-type: [
-          debug,
-          release
-        ]
-        build-shared: [
-          static,
-          shared
-        ]
+        platform:
+          - windows-msvc-x86,
+          - windows-msvc-x64,
+          - macos-clang-x86_64,
+          - ubuntu-clang-x86_64,
+          - ubuntu-gcc-x86_64,
+          - ubuntu-ansi-x86_64
+        build-type:
+          - debug
+          - release
+        build-shared:
+          - static
+          - shared
         include:
           # set os and preset for each platform
           - platform: windows-msvc-x86
