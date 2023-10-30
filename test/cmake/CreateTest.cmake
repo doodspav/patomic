@@ -109,7 +109,7 @@ function(_create_test)
     endif()
 
     # create target with sources
-    add_executable(${target} "$<TARGET_OBJECTS:patomic-test-src>")
+    add_executable(${target})
 
     # add sources to target
     target_sources(
@@ -128,6 +128,7 @@ function(_create_test)
     target_link_libraries(
         ${target} PRIVATE
         patomic-test-include
+        "$<TARGET_OBJECTS:patomic-test-src>"
     )
 
     # update dependencies list directly because we use it in Windows PATH stuff later
