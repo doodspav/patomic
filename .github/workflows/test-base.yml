@@ -18,8 +18,6 @@ jobs:
             preset: patomic-ci-windows-msvc
           - os: macos-latest
             preset: patomic-ci-unix-clang
-          - os: macos-latest
-            preset: patomic-ci-unix-gnu-ansi
           - os: ubuntu-latest
             preset: patomic-ci-unix-clang
           - os: ubuntu-latest
