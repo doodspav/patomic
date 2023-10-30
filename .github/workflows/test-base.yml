@@ -92,12 +92,15 @@ jobs:
           cd patomic/build
           ctest -C ${{ matrix.cmake-build-type }} .
 
+      - name: Prepare Test Results
+        run: |
+          mkdir upload
+          mkdir upload/${{ matrix.platform }}
+          mkdir upload/${{ matrix.platform }}/${{ matrix.build-shared }}
+          cp patomic/build/Testing/Temporary/* upload/${{ matrix.platform }}/${{ matrix.build-shared }}
+
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.platform }}
+          name: test-native-results
           path: upload/
-        run: |
-          mkdir upload
-          mkdir upload/${{ matrix.build-shared }}
-          cp patomic/build/Testing/Temporary/* upload/${{ matrix.build-shared }}
