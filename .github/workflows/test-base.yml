@@ -83,14 +83,14 @@ jobs:
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_DIR:PATH="../../googletest/build/install/lib/cmake/GTest" ..
-          cmake --build . --config ${{ matrix.cmake-build-type }}
+          cmake --verbose --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_DIR:PATH="../../googletest/build/install/lib/cmake/GTest" ..
+          cmake --verbose --build . --config ${{ matrix.cmake-build-type }}
 
       - name: Test patomic
         continue-on-error: true
         run: |
           cd patomic/build
-          ctest -C ${{ matrix.cmake-build-type }} .
+          ctest --verbose --build-config ${{ matrix.cmake-build-type }} .
 
       - name: Prepare Test Results
         run: |
