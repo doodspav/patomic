@@ -9,7 +9,7 @@ class CiUbsanDeathTest : public testing::Test
 {};
 
 
-#if !PATOMIC_CI_UBSAN
+#if PATOMIC_CI_UBSAN
 
 TEST_F(CiUbsanDeathTest, NotEnabled)
 {

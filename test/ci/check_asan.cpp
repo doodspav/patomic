@@ -5,7 +5,7 @@ class CiAsanDeathTest : public testing::Test
 {};
 
 
-#if !PATOMIC_CI_ASAN
+#if PATOMIC_CI_ASAN
 
 TEST_F(CiAsanDeathTest, NotEnabled)
 {
