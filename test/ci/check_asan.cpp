@@ -5,7 +5,14 @@ class CiAsanDeathTest : public testing::Test
 {};
 
 
-#if PATOMIC_CI_ASAN
+#if !PATOMIC_CI_ASAN
+
+TEST_F(CiAsanDeathTest, NotEnabled)
+{
+    GTEST_SKIP() << "Running in CI but Address Sanitizer is not enabled";
+}
+
+#else
 
 TEST_F(CiAsanDeathTest, UseAfterFree)
 {

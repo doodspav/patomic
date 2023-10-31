@@ -9,7 +9,14 @@ class CiUbsanDeathTest : public testing::Test
 {};
 
 
-#if PATOMIC_CI_UBSAN
+#if !PATOMIC_CI_UBSAN
+
+TEST_F(CiUbsanDeathTest, NotEnabled)
+{
+    GTEST_SKIP() << "Running in CI but Undefined Behaviour Sanitizer is not enabled";
+}
+
+#else
 
 TEST_F(CiUbsanDeathTest, ShiftExponentTooLarge)
 {
