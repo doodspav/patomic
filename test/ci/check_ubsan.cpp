@@ -9,17 +9,11 @@ class CiUbsanDeathTest : public testing::Test
 {};
 
 
-#if !PATOMIC_CI_UBSAN
-
-TEST_F(CiUbsanDeathTest, NotEnabled)
-{
-    GTEST_SKIP() << "Running in CI but Undefined Behaviour Sanitizer is not enabled";
-}
-
-#else
-
 TEST_F(CiUbsanDeathTest, ShiftExponentTooLarge)
 {
+#if !PATOMIC_CI_UBSAN
+    GTEST_SKIP() << "Undefined Behaviour Sanitizer is not enabled";
+#else
     EXPECT_FATAL_FAILURE({
         volatile int _ = sizeof(int) * CHAR_BIT;
         int x = 10;
@@ -27,10 +21,14 @@ TEST_F(CiUbsanDeathTest, ShiftExponentTooLarge)
 
         _ = x << e;  // <-- shift exponent too large (intentional)
     }, "ubsan");
+#endif
 }
 
 TEST_F(CiUbsanDeathTest, SignedIntegerOverflow)
 {
+#if !PATOMIC_CI_UBSAN
+    GTEST_SKIP() << "Undefined Behaviour Sanitizer is not enabled";
+#else
     EXPECT_FATAL_FAILURE({
         volatile int _ = 5;
         int x = _;
@@ -39,10 +37,14 @@ TEST_F(CiUbsanDeathTest, SignedIntegerOverflow)
 
         _ = x;
     }, "ubsan");
+#endif
 }
 
 TEST_F(CiUbsanDeathTest, FloatCastOverflow)
 {
+#if !PATOMIC_CI_UBSAN
+    GTEST_SKIP() << "Undefined Behaviour Sanitizer is not enabled";
+#else
     EXPECT_FATAL_FAILURE({
         volatile auto _ = std::numeric_limits<double>::max();
         int x;
@@ -51,6 +53,5 @@ TEST_F(CiUbsanDeathTest, FloatCastOverflow)
 
         _ = x;
     }, "ubsan");
+#endif
 }
-
-#endif  // PATOMIC_CI_UBSAN
