@@ -83,7 +83,7 @@ jobs:
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ matrix.preset }} --verbose -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_DIR:PATH="../../googletest/build/install/lib/cmake/GTest" ..
+          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_DIR:PATH="../../googletest/build/install/lib/cmake/GTest" ..
           cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
 
       - name: Test patomic
