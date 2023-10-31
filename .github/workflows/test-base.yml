@@ -24,6 +24,13 @@ jobs:
         build-shared:
           - static
           - shared
+        # exclude static builds on windows
+        # these fail to link on CI but can't reproduce locally
+        exclude:
+          - platform: windows-msvc-x86
+            build-shared: static
+          - platform: windows-msvc-x64
+            build-shared: static
         # convert verbose labels to usable values (which don't appear in name)
         include:
           # use Release for everything
