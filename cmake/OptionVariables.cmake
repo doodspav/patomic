@@ -66,11 +66,15 @@ endif()
 if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_TESTING "Build tests" OFF)
 endif()
+if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
+    set(build_testing ON)
+endif()
 option(
     PATOMIC_BUILD_TESTING
     "Override BUILD_TESTING for ${package_name} library"
-    ${BUILD_TESTING}
+    ${build_testing}
 )
+set(build_testing )
 mark_as_advanced(PATOMIC_BUILD_TESTING)
 
 
