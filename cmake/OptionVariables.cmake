@@ -83,7 +83,8 @@ mark_as_advanced(PATOMIC_BUILD_TESTING)
 # Adds an extra directory to the include path by default, so that when you link
 # against the target, you get `<prefix>/include/<package>-X.Y.Z` added to your
 # include paths rather than `<prefix/include`.
-# This doesn't affect include paths used by consumers of this project.
+# This doesn't affect include paths used by consumers of this project, but helps
+# prevent headers from multiple versions affecting each other.
 # The variable type is STRING rather than PATH, because otherwise passing
 # -DCMAKE_INSTALL_INCLUDEDIR=include on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to
@@ -99,7 +100,7 @@ endif()
 
 
 # do not include earlier or we can't set CMAKE_INSTALL_INCLUDEDIR above
-# required for CMAKE_INSTALL_LIBDIR below
+# include required for CMAKE_INSTALL_LIBDIR below
 include(GNUInstallDirs)
 
 
@@ -116,5 +117,4 @@ set(
     PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}"
     CACHE STRING "CMake package config location relative to the install prefix"
 )
-# depends on CMAKE_INSTALL_LIBDIR which is marked as advanced in GNUInstallDirs
 mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)
