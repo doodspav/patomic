@@ -117,4 +117,5 @@ set(
     PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}"
     CACHE STRING "CMake package config location relative to the install prefix"
 )
+# depends on CMAKE_INSTALL_LIBDIR which is marked as advanced in GNUInstallDirs
 mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)
