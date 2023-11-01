@@ -102,6 +102,7 @@ endif()
 if(PATOMIC_BUILD_TESTING)
 
     # need to enable testing in case BUILD_TESTING is disabled
+    # CTest expects that the top level project enables testing
     if(PROJECT_IS_TOP_LEVEL)
         enable_testing()
     endif()
