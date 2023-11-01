@@ -213,6 +213,9 @@ function(_create_test)
             # such as IMPORTED_LOCATION for the library path and set
             # INTERFACE_INCLUDE_DIRECTORIES to the directories containing any
             # necessary header files.
+            if(NOT TARGET "${dep_target}")
+                message(FATAL_ERROR "Encountered non-target dependency '${dep_target}' for target ${target} (check source comment)")
+            endif()
             get_target_property(type "${dep_target}" TYPE)
             if(type STREQUAL "SHARED_LIBRARY")
                 list(APPEND deps_paths "$<TARGET_FILE_DIR:${dep_target}>")
