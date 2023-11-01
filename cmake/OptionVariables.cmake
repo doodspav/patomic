@@ -12,7 +12,7 @@
 # | CMAKE_INSTALL_INCLUDEDIR     | Top-Level     | include/${package_name}-${PROJECT_VERSION}    |
 # |------------------------------|---------------|-----------------------------------------------|
 # | PATOMIC_BUILD_SHARED         | Always        | ${BUILD_SHARED_LIBS}                          |
-# | PATOMIC_BUILD_TESTING        | Always        | ${BUILD_TESTING}                              |
+# | PATOMIC_BUILD_TESTING        | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}  |
 # | PATOMIC_INCLUDES_WITH_SYSTEM | Not Top-Level | ON                                            |
 # | PATOMIC_INSTALL_CMAKEDIR     | Always        | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name} |
 # ------------------------------------------------------------------------------------------------
