@@ -116,6 +116,10 @@ include(GNUInstallDirs)
 # -DPATOMIC_INSTALL_CMAKEDIR=lib/cmake on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to
 # unexpected errors.
+#
+# Note: this will yield the lowest compatible version on platforms that sort
+# their directories' contents unless you set CMAKE_FIND_PACKAGE_SORT_DIRECTION
+# to DEC before calling find_package.
 set(
     PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION}"
     CACHE STRING "CMake package config location relative to the install prefix"
