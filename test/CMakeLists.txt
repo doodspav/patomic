@@ -26,10 +26,6 @@ if(NOT TARGET patomic::patomic)
     find_package(patomic QUIET)
 endif()
 
-# set GTest options
-set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
-set(gtest_hide_internal_symbols ON CACHE BOOL "" FORCE)
-
 # get GTest
 find_package(GTest REQUIRED)
 include(GoogleTest)
