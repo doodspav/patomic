@@ -113,8 +113,8 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: s390x
+          platforms: arm64
 
       - name: Check uname
         run: |
-          docker run --rm s390x/alpine uname -a
+          docker run --rm arm64v8/alpine uname -a
