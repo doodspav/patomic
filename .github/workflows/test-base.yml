@@ -81,7 +81,7 @@ jobs:
           cp ../patomic/CMakePresets.json .
           mkdir build
           cd build
-          cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} ..
+          cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} ..
           cmake --build . --config ${{ matrix.cmake-build-type }}
           cmake --install . --config ${{ matrix.cmake-build-type }} --prefix install
 
