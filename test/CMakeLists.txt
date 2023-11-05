@@ -27,7 +27,7 @@ if(NOT TARGET patomic::patomic)
 endif()
 
 # set GTest options
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 set(gtest_hide_internal_symbols ON CACHE BOOL "" FORCE)
 
 # get GTest
