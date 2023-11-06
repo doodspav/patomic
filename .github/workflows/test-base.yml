@@ -6,105 +6,113 @@ on:
       - "**"
 
 jobs:
-  #test-native:
-  #  runs-on: ${{ matrix.os }}
-  #  strategy:
-  #    fail-fast: false
-  #    matrix:
-  #      # verbose labels make things easier to read in GitHub Actions
-  #      # platform gets converted to os, preset
-  #      platform:
-  #        - windows-msvc-x86
-  #        - windows-msvc-x64
-  #        - macos-clang-x86_64
-  #        - linux-clang-x86_64
-  #        - linux-clang-ansi-x86_64
-  #        - linux-gcc-x86_64
-  #        - linux-gcc-ansi-x864-64
-  #      # build-shared gets converted to cmake option
-  #      build-shared:
-  #        - static
-  #        - shared
-  #      # convert verbose labels to usable values (which don't appear in name)
-  #      include:
-  #        # use Release for everything
-  #        - cmake-build-type: Release
-  #        # platform -> os, preset
-  #        - platform: windows-msvc-x86
-  #          os: windows-latest
-  #          preset: patomic-ci-windows-msvc -A Win32
-  #        - platform: windows-msvc-x64
-  #          os: windows-latest
-  #          preset: patomic-ci-windows-msvc -A x64
-  #        - platform: macos-clang-x86_64
-  #          os: macos-latest
-  #          preset: patomic-ci-unix-clang
-  #        - platform: linux-clang-x86_64
-  #          os: ubuntu-latest
-  #          preset: patomic-ci-unix-clang
-  #        - platform: linux-clang-ansi-x86_64
-  #          os: ubuntu-latest
-  #          preset: patomic-ci-unix-clang-ansi
-  #        - platform: linux-gcc-x86_64
-  #          os: ubuntu-latest
-  #          preset: patomic-ci-unix-gcc
-  #        - platform: linux-gcc-ansi-x864-64
-  #          os: ubuntu-latest
-  #          preset: patomic-ci-unix-gcc-ansi
-  #        # build-shared -> cmake-build-shared
-  #        - build-shared: static
-  #          cmake-build-shared: OFF
-  #        - build-shared: shared
-  #          cmake-build-shared: ON
-  #
-  #  steps:
-  #    - name: Checkout patomic
-  #      uses: actions/checkout@v4
-  #      with:
-  #        path: patomic
-  #
-  #    - name: Checkout GoogleTest
-  #      uses: actions/checkout@v4
-  #      with:
-  #        repository: google/googletest
-  #        path: googletest
-  #
-  #    - name: Build and Install GoogleTest
-  #      run: |
-  #        cd googletest
-  #        cp ../patomic/CMakePresets.json .
-  #        mkdir build
-  #        cd build
-  #        cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
-  #        cmake --build . --config ${{ matrix.cmake-build-type }}
-  #        cmake --install . --config ${{ matrix.cmake-build-type }} --prefix install
-  #
-  #    - name: Build patomic
-  #      run: |
-  #        cd patomic
-  #        mkdir build
-  #        cd build
-  #        cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="../../googletest/build/install/lib/cmake/GTest" ..
-  #        cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
-  #
-  #    - name: Test patomic
-  #      continue-on-error: true
-  #      run: |
-  #        cd patomic/build
-  #        ctest --verbose --build-config ${{ matrix.cmake-build-type }} .
-  #
-  #    - name: Prepare Test Results
-  #      run: |
-  #        mkdir upload
-  #        mkdir upload/${{ matrix.platform }}
-  #        mkdir upload/${{ matrix.platform }}/${{ matrix.build-shared }}
-  #        cp patomic/build/Testing/Temporary/* upload/${{ matrix.platform }}/${{ matrix.build-shared }}
-  #
-  #    - name: Upload Test Results
-  #      uses: actions/upload-artifact@v3
-  #      with:
-  #        name: test-native-results
-  #        path: upload/
+  test-native:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # verbose labels make things easier to read in GitHub Actions
+        # platform gets converted to os, preset
+        platform:
+          - windows-gcc-x86_64
+          - windows-gcc-ansi-x86_64
+          - windows-msvc-x86
+          - windows-msvc-x64
+          - macos-clang-x86_64
+          - linux-clang-x86_64
+          - linux-clang-ansi-x86_64
+          - linux-gcc-x86_64
+          - linux-gcc-ansi-x86_64
+        # build-shared gets converted to cmake option
+        build-shared:
+          - static
+          - shared
+        # convert verbose labels to usable values (which don't appear in name)
+        include:
+          # use Release for everything
+          - cmake-build-type: Release
+          # platform -> os, preset
+          - platform: windows-gcc-x86_64
+            os: windows-latest
+            preset: patomic-ci-unix-gcc
+          - platform: windows-gcc-ansi-x86_64
+            os: windows-latest
+            preset: patomic-ci-unix-gcc-ansi
+          - platform: windows-msvc-x86
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A Win32
+          - platform: windows-msvc-x64
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A x64
+          - platform: macos-clang-x86_64
+            os: macos-latest
+            preset: patomic-ci-unix-clang
+          - platform: linux-clang-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-unix-clang
+          - platform: linux-clang-ansi-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-unix-clang-ansi
+          - platform: linux-gcc-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-unix-gcc
+          - platform: linux-gcc-ansi-x86_64
+            os: ubuntu-latest
+            preset: patomic-ci-unix-gcc-ansi
+          # build-shared -> cmake-build-shared
+          - build-shared: static
+            cmake-build-shared: OFF
+          - build-shared: shared
+            cmake-build-shared: ON
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Checkout GoogleTest
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          path: googletest
+
+      - name: Build and Install GoogleTest
+        run: |
+          cd googletest
+          cp ../patomic/CMakePresets.json .
+          mkdir build
+          cd build
+          cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --build . --config ${{ matrix.cmake-build-type }}
+          cmake --install . --config ${{ matrix.cmake-build-type }} --prefix install
+
+      - name: Build patomic
+        run: |
+          cd patomic
+          mkdir build
+          cd build
+          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="../../googletest/build/install/lib/cmake/GTest" ..
+          cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
+
+      - name: Test patomic
+        continue-on-error: true
+        run: |
+          cd patomic/build
+          ctest --verbose --build-config ${{ matrix.cmake-build-type }} .
+
+      - name: Prepare Test Results
+        run: |
+          mkdir upload
+          mkdir upload/${{ matrix.platform }}
+          mkdir upload/${{ matrix.platform }}/${{ matrix.build-shared }}
+          cp patomic/build/Testing/Temporary/* upload/${{ matrix.platform }}/${{ matrix.build-shared }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-native-results
+          path: upload/
 
   test-qemu:
     runs-on: ubuntu-latest
