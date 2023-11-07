@@ -13,18 +13,46 @@ endif()
 
 # clang
 if(platform MATCHES "clang")
+
+    # compiler
     set(CMAKE_C_COMPILER "clang")
     set(CMAKE_CXX_COMPILER "clang++")
 
+    # platform
+    set(CMAKE_GENERATOR "Unix Makefiles")
+    if(platform MATCHES "-x86$")
+        string(APPEND CMAKE_C_FLAGS_INIT " -m32")
+        string(APPEND CMAKE_CXX_FLAGS_INIT " -m32")
+    endif()
+
 # gcc
 elseif(platform MATCHES "gcc")
+
+    # compiler
     set(CMAKE_C_COMPILER "gcc")
     set(CMAKE_CXX_COMPILER "g++")
 
+    # platform
+    set(CMAKE_GENERATOR "Unix Makefiles")
+    if(platform MATCHES "-x86$")
+        string(APPEND CMAKE_C_FLAGS_INIT " -m32")
+        string(APPEND CMAKE_CXX_FLAGS_INIT " -m32")
+    endif()
+
 # msvc
 elseif(platform MATCHES "msvc")
+
+    # compiler
     set(CMAKE_C_COMPILER "cl")
     set(CMAKE_CXX_COMPILER "cl")
+
+    # platform
+    set(CMAKE_GENERATOR "Visual Studio 17 2022")
+    if(platform MATCHES "-x86$")
+        set(CMAKE_GENERATOR_PLATFORM "Win32")
+    elseif(platform MATCHES "-(x64|x86_64)$")
+        set(CMAKE_GENERATOR_PLATFORM "x64")
+    endif()
 
 # no need to error on unknown compilers, done at start
 endif()
