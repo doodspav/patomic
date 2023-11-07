@@ -128,8 +128,8 @@ jobs:
 
       - name: Set up xGcc
         run: |
-          apt install g++-11-aarch64-linux-gnu
-          apt install g++-11-multilib
+          sudo apt install g++-11-aarch64-linux-gnu
+          sudo apt install g++-11-multilib
 
       - name: Compile Hello World
         run: |
