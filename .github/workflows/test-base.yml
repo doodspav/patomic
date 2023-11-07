@@ -9,7 +9,6 @@ jobs:
   #test-native:
   #  runs-on: ${{ matrix.os }}
   #  strategy:
-  #    fail-fast: false
   #    matrix:
   #      # verbose labels make things easier to read in GitHub Actions
   #      # platform gets converted to os, preset
