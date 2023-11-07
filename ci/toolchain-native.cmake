@@ -9,17 +9,10 @@ if(NOT platform MATCHES "${platform_regex}")
 endif()
 
 
-# ---- Compiler and Platform ----
+# ---- Platform ----
 
 # clang
 if(platform MATCHES "clang")
-
-    # compiler
-    set(CMAKE_C_COMPILER "clang")
-    set(CMAKE_CXX_COMPILER "clang++")
-
-    # platform
-    set(CMAKE_GENERATOR "Unix Makefiles")
     if(platform MATCHES "-x86$")
         string(APPEND CMAKE_C_FLAGS_INIT " -m32")
         string(APPEND CMAKE_CXX_FLAGS_INIT " -m32")
@@ -27,13 +20,6 @@ if(platform MATCHES "clang")
 
 # gcc
 elseif(platform MATCHES "gcc")
-
-    # compiler
-    set(CMAKE_C_COMPILER "gcc")
-    set(CMAKE_CXX_COMPILER "g++")
-
-    # platform
-    set(CMAKE_GENERATOR "Unix Makefiles")
     if(platform MATCHES "-x86$")
         string(APPEND CMAKE_C_FLAGS_INIT " -m32")
         string(APPEND CMAKE_CXX_FLAGS_INIT " -m32")
@@ -41,13 +27,6 @@ elseif(platform MATCHES "gcc")
 
 # msvc
 elseif(platform MATCHES "msvc")
-
-    # compiler
-    set(CMAKE_C_COMPILER "cl")
-    set(CMAKE_CXX_COMPILER "cl")
-
-    # platform
-    set(CMAKE_GENERATOR "Visual Studio 17 2022")
     if(platform MATCHES "-x86$")
         set(CMAKE_GENERATOR_PLATFORM "Win32")
     elseif(platform MATCHES "-(x64|x86_64)$")
@@ -83,7 +62,7 @@ if(platform MATCHES "warning")
 
     # ansi
     if(platform MATCHES "ansi")
-        if(NOT platform MATCHES "(clang|gcc")
+        if(NOT platform MATCHES "(clang|gcc)")
             message(FATAL_ERROR "Only clang/gcc are supported for ansi, unsupported platform: ${platform}")
         endif()
         string(APPEND CMAKE_C_FLAGS_INIT " -Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment")
