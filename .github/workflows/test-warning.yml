@@ -13,12 +13,12 @@ jobs:
         # verbose labels make things easier to read in GitHub Actions
         # platform gets converted to os, preset
         platform:
-        #   - windows-gcc-x86_64
-        #   - windows-gcc-ansi-x86_64
-        #   - windows-msvc-x86
-        #   - windows-msvc-x64
-        #   - macos-clang-x86_64
-        #   - macos-clang-ansi-x86_64
+          - windows-gcc-x86_64
+          - windows-gcc-ansi-x86_64
+          - windows-msvc-x86
+          - windows-msvc-x64
+          - macos-clang-x86_64
+          - macos-clang-ansi-x86_64
           - linux-clang-x86_64
           - linux-clang-ansi-x86_64
           - linux-gcc-x86_64
@@ -32,36 +32,32 @@ jobs:
           # use Release for everything
           - cmake-build-type: Release
           # platform -> os, preset
-        #  - platform: windows-gcc-x86_64
-        #    os: windows-latest
-        #    preset: patomic-ci-unix-gcc
-        #  - platform: windows-gcc-ansi-x86_64
-        #    os: windows-latest
-        #    preset: patomic-ci-unix-gcc-ansi
-        #  - platform: windows-msvc-x86
-        #    os: windows-latest
-        #    preset: patomic-ci-windows-msvc -A Win32
-        #  - platform: windows-msvc-x64
-        #    os: windows-latest
-        #    preset: patomic-ci-windows-msvc -A x64
-        #  - platform: macos-clang-x86_64
-        #    os: macos-latest
-        #    preset: patomic-ci-unix-clang
-        #  - platform: macos-clang-ansi-x86_64
-        #    os: macos-latest
-        #    preset: patomic-ci-unix-clang-ansi
+          - platform: windows-gcc-x86_64
+            os: windows-latest
+            preset: patomic-ci-unix-gcc
+          - platform: windows-gcc-ansi-x86_64
+            os: windows-latest
+            preset: patomic-ci-unix-gcc-ansi
+          - platform: windows-msvc-x86
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A Win32
+          - platform: windows-msvc-x64
+            os: windows-latest
+            preset: patomic-ci-windows-msvc -A x64
+          - platform: macos-clang-x86_64
+            os: macos-latest
+            preset: patomic-ci-unix-clang
+          - platform: macos-clang-ansi-x86_64
+            os: macos-latest
+            preset: patomic-ci-unix-clang-ansi
           - platform: linux-clang-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-clang
           - platform: linux-clang-ansi-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-clang-ansi
           - platform: linux-gcc-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-gcc
           - platform: linux-gcc-ansi-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-gcc-ansi
           # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
