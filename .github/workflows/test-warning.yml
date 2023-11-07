@@ -52,12 +52,16 @@ jobs:
             preset: patomic-ci-unix-clang-ansi
           - platform: linux-clang-x86_64
             os: ubuntu-latest
+            preset: patomic-ci-unix-clang
           - platform: linux-clang-ansi-x86_64
             os: ubuntu-latest
+            preset: patomic-ci-unix-clang-ansi
           - platform: linux-gcc-x86_64
             os: ubuntu-latest
+            preset: patomic-ci-unix-gcc
           - platform: linux-gcc-ansi-x86_64
             os: ubuntu-latest
+            preset: patomic-ci-unix-gcc-ansi
           # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
@@ -122,6 +126,16 @@ jobs:
         with:
           platforms: arm64
 
-      - name: Check uname
+      - name: Set up xGcc
         run: |
-          docker run --rm arm64v8/alpine uname -a
+          apt install g++-11-aarch64-linux-gnu
+          apt install g++-11-multilib
+
+      - name: Compile Hello World
+        run: |
+          echo "#include <stdio.h>\nint main() { printf("Hello, world!\n"); }\n" >> test.c
+          gcc-11-aarch64-linux-gnu test.c -o test
+
+      - name: Run Hello World
+        run: |
+          docker run --rm arm64v8/alpine ./test
