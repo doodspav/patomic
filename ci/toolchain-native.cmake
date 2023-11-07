@@ -3,7 +3,7 @@
 set(PATOMIC_CI_PLATFORM "" CACHE STRING "Check toolchain file for more information")
 set(platform ${PATOMIC_CI_PLATFORM})
 
-set(platform_regex "^(windows|macos|linux)-(clang|gcc|msvc)-(ansi-)?(x86_64|x86|x64)$")
+set(platform_regex "^(warning|coverage|sanitizer)-(windows|macos|linux)-(clang|gcc|msvc)-(ansi-)?(x86_64|x86|x64)$")
 if(NOT platform MATCHES "${platform_regex}")
     message(FATAL_ERROR "Unsupported platform: ${platform} (does not match ${platform_regex})")
 endif()
@@ -139,5 +139,5 @@ elseif(platform MATCHES "sanitizer")
         message(FATAL_ERROR "Only clang/gcc are supported for sanitizer, unsupported platform: ${platform}")
     endif()
 
-# no need to error on missing mode, not a necessary component
+# no need to error on missing mode, done at start
 endif()
