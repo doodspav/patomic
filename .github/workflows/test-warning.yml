@@ -128,8 +128,9 @@ jobs:
 
       - name: Set up xGcc
         run: |
-          sudo apt install g++-11-aarch64-linux-gnu
-          sudo apt install g++-11-multilib
+          sudo apt install gcc-11-aarch64-linux-gnu
+          sudo apt install gcc-11-multilib
+          ls /usr/bin/*aarch64*
 
       - name: Compile Hello World
         run: |
