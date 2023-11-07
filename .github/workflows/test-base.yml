@@ -18,6 +18,7 @@ jobs:
         #   - windows-msvc-x86
         #   - windows-msvc-x64
         #   - macos-clang-x86_64
+        #   - macos-clang-ansi-x86_64
           - linux-clang-x86_64
           - linux-clang-ansi-x86_64
           - linux-gcc-x86_64
@@ -46,6 +47,9 @@ jobs:
         #  - platform: macos-clang-x86_64
         #    os: macos-latest
         #    preset: patomic-ci-unix-clang
+        #  - platform: macos-clang-ansi-x86_64
+        #    os: macos-latest
+        #    preset: patomic-ci-unix-clang-ansi
           - platform: linux-clang-x86_64
             os: ubuntu-latest
             preset: patomic-ci-unix-clang
