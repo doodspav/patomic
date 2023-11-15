@@ -136,7 +136,6 @@ jobs:
           sudo apt-file list gcc-10-aarch64-linux-gnu
           sudo apt-file list gcc-10-multilib
           ls /usr/bin/*aarch64*
-          find /usr -name '*aarch64*'
 
       - name: Compile Hello World
         run: |
