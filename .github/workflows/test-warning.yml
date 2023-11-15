@@ -131,8 +131,10 @@ jobs:
           sudo apt install gcc-10-aarch64-linux-gnu
           sudo apt install gcc-10-multilib
           sudo apt-cache dumpavail | sudo dpkg --merge-avail - 
-          sudo dpkg -L gcc-10-aarch64-linux-gnu
-          sudo dpkg -L gcc-10-multilib
+          sudo apt install apt-file
+          sudo apt-file update
+          sudo apt-file list gcc-10-aarch64-linux-gnu
+          sudo apt-file list gcc-10-multilib
           ls /usr/bin/*aarch64*
           find /usr -name '*aarch64*'
 
