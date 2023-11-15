@@ -140,7 +140,7 @@ jobs:
       - name: Compile Hello World
         run: |
           echo "#include <stdio.h>\nint main() { printf("Hello, world!\n"); }\n" >> test.c
-          aarch64-linux-gnu-gcc-11 test.c -o test
+          aarch64-linux-gnu-cpp-12 test.c -o test
 
       - name: Run Hello World
         run: |
