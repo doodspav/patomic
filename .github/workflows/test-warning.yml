@@ -130,8 +130,8 @@ jobs:
         run: |
           sudo apt install gcc-10-aarch64-linux-gnu
           sudo apt install gcc-10-multilib
-          sudo dpkg -L gcc-10-aarch64-linux-gnu
-          sudo dpkg -L gcc-10-multilib
+          sudo apt content gcc-10-aarch64-linux-gnu
+          sudo apt content gcc-10-multilib
           ls /usr/bin/*aarch64*
           find /usr -name '*aarch64*'
 
