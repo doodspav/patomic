@@ -130,26 +130,22 @@ jobs:
 
       - name: Install stuff
         run: |
-          sudo apt install gcc-12-aarch64-linux-gnu
-          sudo apt install gcc-12-multilib
+          sudo apt install gcc-11-aarch64-linux-gnu
+          sudo apt install gcc-11-multilib
 
       - name: Show what was installed
         run: |
-          sudo apt-file list gcc-12-aarch64-linux-gnu
-          sudo apt-file list gcc-12-multilib
+          sudo apt-file list gcc-11-aarch64-linux-gnu
+          sudo apt-file list gcc-11-multilib
 
       - name: Show contents of /usr/bin
         run: |
           ls /usr/bin/*aarch64*
 
-      - name: Search for compiler et. al.
-        run: |
-          find /usr -name "aarch64-linux-gnu-*"
-
       - name: Compile Hello World
         run: |
           echo "int main() { printf("Hello, world!\n"); }" >> test.c
-          aarch64-linux-gnu-gcc-12 test.c -o test
+          /usr/bin/aarch64-linux-gnu-gcc-11 test.c -o test
 
       - name: Run Hello World on QEMU
         run: |
