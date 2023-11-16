@@ -143,7 +143,7 @@ jobs:
 
       - name: Compile Hello World
         run: |
-          echo "int main() { printf("Hello, world!\n"); }" >> test.c
+          echo "int main() { printf(\"Hello, world!\n\"); }" >> test.c
           /usr/bin/aarch64-linux-gnu-gcc-11 test.c -o test
 
       - name: Run Hello World on QEMU
