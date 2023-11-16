@@ -144,4 +144,4 @@ jobs:
 
       - name: Run Hello World
         run: |
-          docker run --rm arm64v8/alpine ./test
+          docker run --rm arm64v8/ubuntu ./test
