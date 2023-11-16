@@ -134,4 +134,4 @@ jobs:
       - name: Run Hello World on QEMU
         run: |
           sudo apt install qemu-user
-          qemu-aarch64 /usr/aarch64-linux-gnu ./test
+          qemu-aarch64 -L /usr/aarch64-linux-gnu ./test
