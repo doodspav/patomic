@@ -142,9 +142,9 @@ jobs:
         run: |
           ls /usr/bin/*aarch64*
 
-      - name: Search for compiler
+      - name: Search for compiler et. al.
         run: |
-          find /usr -name aarch64-linux-gnu-gcc-12
+          find /usr -name "aarch64-linux-gnu-*"
 
       - name: Compile Hello World
         run: |
