@@ -121,7 +121,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up xGcc
+      - name: Install helpers
+        run: |
+          sudo apt update
+          sudo apt-cache dumpavail | sudo dpkg --merge-avail - 
+          sudo apt install apt-file
+          sudo apt-file update
+
+      - name: Install stuff
         run: |
           sudo apt install gcc-12-aarch64-linux-gnu
           sudo apt install gcc-12-multilib
