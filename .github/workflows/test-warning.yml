@@ -135,10 +135,8 @@ jobs:
 
       - name: Show what was installed
         run: |
-          sudo apt-cache dumpavail | sudo dpkg --merge-avail - 
-          sudo apt install apt-file
-          sudo apt-file update
           sudo apt-file list gcc-12-aarch64-linux-gnu
+          sudo apt-file list gcc-12-multilib
 
       - name: Show contents of /usr/bin
         run: |
