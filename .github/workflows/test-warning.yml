@@ -128,8 +128,8 @@ jobs:
 
       - name: Compile Hello World
         run: |
-          echo "#include <stdio.h>\nint main() { printf("Hello, world!\n"); }\n" >> test.c
-          aarch64-linux-gnu-cpp-12 test.c -o test
+          echo "int main() { printf("Hello, world!\n"); }" >> test.c
+          /usr/bin/aarch64-linux-gnu-gcc-12 test.c -o test
 
       - name: Run Hello World on QEMU
         run: |
