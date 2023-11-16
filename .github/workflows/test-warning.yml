@@ -127,6 +127,7 @@ jobs:
           sudo apt-cache dumpavail | sudo dpkg --merge-avail - 
           sudo apt install apt-file
           sudo apt-file update
+          sudo apt install tree
 
       - name: Install stuff
         run: |
@@ -137,9 +138,10 @@ jobs:
           sudo apt-file list gcc-11-aarch64-linux-gnu
           sudo apt-file list gcc-11-multilib
 
-      - name: Show contents of /usr/bin
+      - name: Show contents of expected installed dirs
         run: |
-          ls /usr/bin/*aarch64*
+          tree /usr/aarch64-linux-gnu
+          tree /usr/lib/gcc-cross/aarch64-linux-gnu/11
 
       - name: Compile Hello World
         run: |
