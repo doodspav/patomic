@@ -131,7 +131,6 @@ jobs:
       - name: Install stuff
         run: |
           sudo apt install gcc-11-aarch64-linux-gnu
-          sudo apt install gcc-11-multilib
 
       - name: Show what was installed
         run: |
