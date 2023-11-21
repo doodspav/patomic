@@ -121,34 +121,69 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install helpers
+      - name: Install Cross Compiler and Qemu
         run: |
-          sudo apt update
-          sudo apt-cache dumpavail | sudo dpkg --merge-avail - 
-          sudo apt install apt-file
-          sudo apt-file update
-          sudo apt install tree
-
-      - name: Install stuff
-        run: |
+          sudo apt install gcc-11-multilib
           sudo apt install gcc-11-aarch64-linux-gnu
-
-      - name: Show what was installed
-        run: |
-          sudo apt-file list gcc-11-aarch64-linux-gnu
-          sudo apt-file list gcc-11-multilib
-
-      - name: Show contents of expected installed dirs
-        run: |
-          tree /usr/aarch64-linux-gnu
-          tree /usr/lib/gcc-cross/aarch64-linux-gnu/11
-
-      - name: Compile Hello World
-        run: |
-          echo "int main() { printf(\"Hello, world!\n\"); }" >> test.c
-          /usr/bin/aarch64-linux-gnu-gcc-11 test.c -o test
-
-      - name: Run Hello World on QEMU
-        run: |
           sudo apt install qemu-user
-          qemu-aarch64 -L /usr/aarch64-linux-gnu ./test
+
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Checkout GoogleTest
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          path: googletest
+
+      - name: Build and Install GoogleTest
+        run: |
+          cd googletest
+          mkdir build
+          cd build
+          cmake -DCMAKE_TOOLCHAIN_FILE:PATH="../../patomic/ci/toolchain-ubuntu-gcc-cross.cmake" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug ..
+          cmake --build .
+          cmake --install . --prefix install
+
+      - name: Build patomic
+        run: |
+          cd patomic
+          mkdir build
+          cd build
+          cmake -DCMAKE_TOOLCHAIN_FILE:PATH="../../patomic/ci/toolchain-ubuntu-gcc-cross.cmake" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug ..
+          cmake --build .
+
+#    steps:
+#      - name: Install helpers
+#        run: |
+#          sudo apt update
+#          sudo apt-cache dumpavail | sudo dpkg --merge-avail -
+#          sudo apt install apt-file
+#          sudo apt-file update
+#          sudo apt install tree
+#
+#      - name: Install stuff
+#        run: |
+#          sudo apt install gcc-11-aarch64-linux-gnu
+#
+#      - name: Show what was installed
+#        run: |
+#          sudo apt-file list gcc-11-aarch64-linux-gnu
+#          sudo apt-file list gcc-11-multilib
+#
+#      - name: Show contents of expected installed dirs
+#        run: |
+#          tree /usr/aarch64-linux-gnu
+#          tree /usr/lib/gcc-cross/aarch64-linux-gnu/11
+#
+#      - name: Compile Hello World
+#        run: |
+#          echo "int main() { printf(\"Hello, world!\n\"); }" >> test.c
+#          /usr/bin/aarch64-linux-gnu-gcc-11 test.c -o test
+#
+#      - name: Run Hello World on QEMU
+#        run: |
+#          sudo apt install qemu-user
+#          qemu-aarch64 -L /usr/aarch64-linux-gnu ./test
