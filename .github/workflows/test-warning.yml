@@ -123,8 +123,8 @@ jobs:
     steps:
       - name: Install Cross Compiler and Qemu
         run: |
-          sudo apt install gcc-11-multilib
-          sudo apt install gcc-11-aarch64-linux-gnu
+          sudo apt install g++-11-multilib
+          sudo apt install g++-11-aarch64-linux-gnu
           sudo apt install qemu-user
 
       - name: Checkout patomic
