@@ -7,10 +7,10 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "BUILD_TESTING": true,
-        "CMAKE_C_STANDARD": 11,
+        "CMAKE_C_STANDARD": "11",
         "CMAKE_C_STANDARD_REQUIRED": true,
         "CMAKE_C_EXTENSIONS": false,
-        "CMAKE_CXX_STANDARD": 14,
+        "CMAKE_CXX_STANDARD": "14",
         "CMAKE_CXX_STANDARD_REQUIRED": true,
         "CMAKE_CXX_EXTENSIONS": false
       }
@@ -49,7 +49,7 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
-        "CMAKE_C_STANDARD": 90
+        "CMAKE_C_STANDARD": "90"
       }
     },
     {
