@@ -153,7 +153,7 @@ jobs:
           #   compiler-version: ${{ matrix.llvm-version }}
           - compiler: gcc
             preset: patomic-ci-qemu-ubuntu-gcc-warning
-            compiler-version: ${{ matrix.gcc-version }}
+            compiler-version: ${{ gcc-version }}
 
     steps:
       - name: Install Toolchains and Qemu
