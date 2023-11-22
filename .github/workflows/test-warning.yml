@@ -182,6 +182,7 @@ jobs:
         run: |
           cd googletest
           cp -r ../patomic/ci/ ./
+          cp ../patomic/CMakePresets.json .
           mkdir build
           cd build
           cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
