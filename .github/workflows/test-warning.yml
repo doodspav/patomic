@@ -163,19 +163,20 @@ jobs:
           sudo apt install llvm-${{ matrix.llvm-version }}
           sudo apt install qemu-user
 
-      - name: Display what was Installed
-        run: |
-          sudo apt update
-          sudo apt-cache dumpavail | sudo dpkg --merge-avail -
-          sudo apt install apt-file
-          sudo apt install tree
-          sudo apt-file update
-          sudo apt-file list g++-${{ matrix.gcc-version }}-multilib
-          sudo apt-file list g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
-          tree /usr/aarch64-linux-gnu
-          tree /usr/lib/gcc-cross/aarch64-linux-gnu/11
+      # - name: Display what was Installed
+      #   run: |
+      #     sudo apt update
+      #     sudo apt-cache dumpavail | sudo dpkg --merge-avail -
+      #     sudo apt install apt-file
+      #     sudo apt install tree
+      #     sudo apt-file update
+      #     sudo apt-file list g++-${{ matrix.gcc-version }}-multilib
+      #     sudo apt-file list g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
+      #     tree /usr/${{ matrix.architecture }}-linux-gnu
+      #     tree /usr/lib/gcc-cross/${{ matrix.architecture }}-linux-gnu/${{ matrix.gcc-version}}
 
       - name: Set Up Sysroot
+        # cannot use symlink or reference directory directly, will not work
         run: |
           cp -r /usr/${{ matrix.architecture }}-linux-gnu/ ${HOME}/sysroot
 
