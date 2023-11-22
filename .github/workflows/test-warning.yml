@@ -168,9 +168,12 @@ jobs:
           sudo apt update
           sudo apt-cache dumpavail | sudo dpkg --merge-avail -
           sudo apt install apt-file
+          sudo apt install tree
           sudo apt-file update
           sudo apt-file list g++-${{ matrix.gcc-version }}-multilib
           sudo apt-file list g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
+          tree /usr/aarch64-linux-gnu
+          tree /usr/lib/gcc-cross/aarch64-linux-gnu/11
 
       - name: Set Up Sysroot
         run: |
