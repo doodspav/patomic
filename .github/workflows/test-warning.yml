@@ -34,34 +34,34 @@ jobs:
           # platform -> os, preset
           - platform: windows-gcc-x86_64
             os: windows-latest
-            preset: patomic-ci-unix-gcc
+            preset: patomic-ci-native-unix-gcc-warning
           - platform: windows-gcc-ansi-x86_64
             os: windows-latest
-            preset: patomic-ci-unix-gcc-ansi
+            preset: patomic-ci-native-unix-gcc-ansi
           - platform: windows-msvc-x86
             os: windows-latest
-            preset: patomic-ci-windows-msvc -A Win32
+            preset: patomic-ci-native-windows-msvc-warning -A Win32
           - platform: windows-msvc-x64
             os: windows-latest
-            preset: patomic-ci-windows-msvc -A x64
+            preset: patomic-ci-native-windows-msvc-warning -A x64
           - platform: macos-clang-x86_64
             os: macos-latest
-            preset: patomic-ci-unix-clang
+            preset: patomic-ci-native-unix-clang-warning
           - platform: macos-clang-ansi-x86_64
             os: macos-latest
-            preset: patomic-ci-unix-clang-ansi
+            preset: patomic-ci-native-unix-clang-ansi
           - platform: linux-clang-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-clang
+            preset: patomic-ci-native-unix-clang-warning
           - platform: linux-clang-ansi-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-clang-ansi
+            preset: patomic-ci-native-unix-clang-ansi
           - platform: linux-gcc-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-gcc
+            preset: patomic-ci-native-unix-gcc-warning
           - platform: linux-gcc-ansi-x86_64
             os: ubuntu-latest
-            preset: patomic-ci-unix-gcc-ansi
+            preset: patomic-ci-native-unix-gcc-ansi
           # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
