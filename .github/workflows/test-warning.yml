@@ -177,7 +177,7 @@ jobs:
 
       - name: Set Up Sysroot
         run: |
-          ln -s /usr/${{ matrix.architecture }}-linux-gnu/ ${HOME}/sysroot
+          ln /usr/${{ matrix.architecture }}-linux-gnu/ ${HOME}/sysroot
 
       - name: Checkout patomic
         uses: actions/checkout@v4
