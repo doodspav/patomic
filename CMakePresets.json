@@ -198,14 +198,6 @@
     },
 
     {
-      "name": "patomic-ci-qemu-ubuntu-gcc-warning",
-      "toolchainFile": "ci/toolchain-ubuntu-gcc-cross.cmake",
-      "inherits": [
-        "_patomic-ci-base",
-        "_patomic-ci-flags-warning-gcc"
-      ]
-    },
-    {
       "name": "patomic-ci-qemu-ubuntu-gcc-ansi",
       "toolchainFile": "ci/toolchain-ubuntu-gcc-cross.cmake",
       "inherits": [
