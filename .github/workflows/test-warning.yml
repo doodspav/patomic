@@ -150,7 +150,7 @@ jobs:
           # compiler -> preset
           # - compiler: clang
           #   preset: patomic-ci-qemu-ubuntu-clang-warning
-          #   compiler-version: ${{ matrix.llvm-version }}
+          #   compiler-version: 14
           - compiler: gcc
             preset: patomic-ci-qemu-ubuntu-gcc-warning
             compiler-version: 11
@@ -162,6 +162,15 @@ jobs:
           sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
           sudo apt install llvm-${{ matrix.llvm-version }}
           sudo apt install qemu-user
+
+      - name: Display what was Installed
+        run: |
+          sudo apt update
+          sudo apt-cache dumpavail | sudo dpkg --merge-avail -
+          sudo apt install apt-file
+          sudo apt-file update
+          sudo apt-file list g++-${{ matrix.gcc-version }}-multilib
+          sudo apt-file list g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
 
       - name: Set Up Sysroot
         run: |
