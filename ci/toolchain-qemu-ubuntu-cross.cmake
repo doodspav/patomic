@@ -1,23 +1,31 @@
 # get environment variables set by CI
-set(architecture "$ENV{PATOMIC_CI_XARCH}")
 set(triple "$ENV{PATOMIC_CI_XTRIPLE}")
+set(architecture "$ENV{PATOMIC_CI_XARCH}")
 set(compiler "$ENV{PATOMIC_CI_XCOMPILER}")
 set(version "$ENV{PATOMIC_CI_XCOMPILER_VERSION}")
 
-# check environment variables are set and have reasonable values
-# if(NOT triple)
-#     message(FATAL_ERROR "PATOMIC_CI_XTRIPLE environment variable is not set")
-# elseif(NOT triple MATCHES "^([a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+(-[a-zA-Z0-9]+)?)$")
-#     message(FATAL_ERROR "PATOMIC_CI_XTRIPLE '${triple}' does not match expected regex pattern")
-# elseif(NOT compiler)
-#     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER environment variable is not set")
-# elseif(NOT compiler MATCHES "^(clang|gcc)$")
-#     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER environment variable '${compiler}' is not 'clang' or 'gcc'")
-# elseif(NOT version)
-#     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION environment variable is not set")
-# elseif(NOT version MATCHES "^(\\d+)$")
-#     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION environment variable '${version}' is not a number")
-# endif()
+# check environment variables are set
+if(NOT triple)
+    message(FATAL_ERROR "PATOMIC_CI_XTRIPLE environment variable is not set")
+elseif(NOT architecture)
+    message(FATAL_ERROR "PATOMIC_CI_XARCH environment variable is not set")
+elseif(NOT compiler)
+    message(FATAL_ERROR "PATOMIC_CI_XCOMPILER environment variable is not set")
+elseif(NOT version)
+    message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION environment variable is not set")
+endif()
+
+# check environment variables have reasonable values
+# do this separately to checking if the value is empty for nicer error messages
+if(NOT triple MATCHES "^([a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+(-[a-zA-Z0-9]+)?)$")
+    message(FATAL_ERROR "PATOMIC_CI_XTRIPLE value '${triple}' does not match expected pattern '<arch>-<vendor?>-<os>-<abi>'")
+elseif(NOT architecture MATCHES "^(${triple})")
+    message(FATAL_ERROR "PATOMIC_CI_XARCH value '${architecture}' does not match first component of triple '${triple}'")
+elseif(NOT compiler MATCHES "^(clang|gcc)$")
+    message(FATAL_ERROR "PATOMIC_CI_XCOMPILER '${compiler}' is not 'clang' or 'gcc'")
+elseif(NOT version MATCHES "^(\\d+)$")
+    message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION '${version}' is not a number")
+endif()
 
 # set basic target information
 set(CMAKE_SYSTEM_NAME Linux)
