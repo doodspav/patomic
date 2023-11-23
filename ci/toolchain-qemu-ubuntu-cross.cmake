@@ -19,7 +19,7 @@ endif()
 # do this separately to checking if the value is empty for nicer error messages
 if(NOT triple MATCHES "^([a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+(-[a-zA-Z0-9]+)?)$")
     message(FATAL_ERROR "PATOMIC_CI_XTRIPLE value '${triple}' does not match expected pattern '<arch>-<vendor?>-<os>-<abi>'")
-elseif(NOT architecture MATCHES "^${triple}")
+elseif(NOT architecture MATCHES "^(${triple}.*)$")
     message(FATAL_ERROR "PATOMIC_CI_XARCH value '${architecture}' does not match first component of triple '${triple}'")
 elseif(NOT compiler MATCHES "^(clang|gcc)$")
     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER '${compiler}' is not 'clang' or 'gcc'")
