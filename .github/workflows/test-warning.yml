@@ -209,7 +209,13 @@ jobs:
           cd build
           cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="${HOME}/sysroot/lib/cmake/GTest" ..
           cmake --build . --verbose
-      
+
+      - name: Test patomic
+        continue-on-error: true
+        run: |
+          cd patomic/build
+          ctest --verbose .
+  
 
   #test-qemu:
   #  runs-on: ubuntu-latest

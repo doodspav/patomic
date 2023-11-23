@@ -11,6 +11,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_architecture ${architecture})
 
 set(CMAKE_SYSROOT "$ENV{HOME}/sysroot")
+set(CMAKE_CROSSCOMPILING_EMULATOR "qemu-${architecture};-L;${CMAKE_SYSROOT}")
+
 set(CMAKE_C_COMPILER ${architecture}-linux-gnu-gcc-${version})
 set(CMAKE_CXX_COMPILER ${architecture}-linux-gnu-g++-${version})
 set(CMAKE_AR ${architecture}-linux-gnu-ar)
