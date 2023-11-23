@@ -14,7 +14,9 @@ set(CMAKE_SYSROOT "$ENV{HOME}/sysroot")
 set(CMAKE_CROSSCOMPILING_EMULATOR "qemu-${architecture};-L;${CMAKE_SYSROOT}")
 
 set(CMAKE_C_COMPILER "clang-${version}")
+set(CMAKE_C_COMPILER_TARGET "${architecture}-linux-gnu")
 set(CMAKE_CXX_COMPILER "clang++-${version}")
+set(CMAKE_CXX_COMPILER_TARGET "${architecture}-linux-gnu")
 set(CMAKE_AR "llvm-ar-${version}")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
