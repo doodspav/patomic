@@ -131,6 +131,7 @@ jobs:
         # short form here so that it doesn't take up the whole GitHub Action name
         architecture:
           - aarch64
+          - s390x
         compiler:
           - clang
           - gcc
@@ -161,6 +162,8 @@ jobs:
           # architecture -> triple
           - architecture: aarch64
             triple: aarch64-linux-gnu
+          - architecture: s390x
+            triple: s390x-linux-gnu
 
     steps:
       - name: Install Toolchains and Qemu
