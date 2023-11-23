@@ -115,7 +115,7 @@ jobs:
   #    - name: Upload Test Results
   #      uses: actions/upload-artifact@v3
   #      with:
-  #        name: test-native-results
+  #        name: test-warning-native-results
   #        path: upload/
 
   test-qemu:
@@ -222,3 +222,16 @@ jobs:
         run: |
           cd patomic/build
           ctest --verbose .
+
+      - name: Prepare Test Results
+        run: |
+          mkdir upload
+          mkdir upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}
+          mkdir upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
+          cp patomic/build/Testing/Temporary/* upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-warning-qemu-results
+          path: upload/
