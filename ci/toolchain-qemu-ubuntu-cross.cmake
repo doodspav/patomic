@@ -23,8 +23,8 @@ if(NOT triple MATCHES "^([a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+(-[a-zA-Z0-9]+)?)
 #    message(FATAL_ERROR "PATOMIC_CI_XARCH value '${architecture}' does not match first component of triple '${triple}'")
 elseif(NOT compiler MATCHES "^(clang|gcc)$")
     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER '${compiler}' is not 'clang' or 'gcc'")
-elseif(NOT version MATCHES "^(\\d+)$")
-    message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION '${version}' is not a number")
+#elseif(NOT version MATCHES "^(\\d+)$")
+#    message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION '${version}' is not a number")
 endif()
 
 # set basic target information
