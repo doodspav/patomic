@@ -19,7 +19,8 @@ set(version "$ENV{PATOMIC_CI_XCOMPILER_VERSION}")
 # endif()
 
 # get target architecture from triple
-string(REGEX_MATCH "[a-zA-Z0-9]+" architecture "${triple}")
+# string(REGEX_MATCH "[a-zA-Z0-9]+" architecture "${triple}")
+set(architecture "aarch64")
 
 # set basic target information
 set(CMAKE_SYSTEM_NAME Linux)
