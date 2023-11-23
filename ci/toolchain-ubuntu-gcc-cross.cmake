@@ -8,7 +8,7 @@ elseif(NOT version)
 endif()
 
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_architecture ${architecture})
+set(CMAKE_SYSTEM_PROCESSOR "${architecture}")
 
 set(CMAKE_SYSROOT "$ENV{HOME}/sysroot")
 set(CMAKE_CROSSCOMPILING_EMULATOR "qemu-${architecture};-L;${CMAKE_SYSROOT}")

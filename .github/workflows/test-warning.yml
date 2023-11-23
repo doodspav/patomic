@@ -128,7 +128,7 @@ jobs:
         architecture:
           - aarch64
         compiler:
-          # - clang
+          - clang
           - gcc
         # build-shared gets converted to cmake option
         build-shared:
@@ -148,9 +148,9 @@ jobs:
           - build-shared: shared
             cmake-build-shared: ON
           # compiler -> preset
-          # - compiler: clang
-          #   preset: patomic-ci-qemu-ubuntu-clang-warning
-          #   compiler-version: 14
+          - compiler: clang
+            preset: patomic-ci-qemu-ubuntu-clang-warning
+            compiler-version: 14
           - compiler: gcc
             preset: patomic-ci-qemu-ubuntu-gcc-warning
             compiler-version: 11
