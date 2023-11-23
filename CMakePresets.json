@@ -15,6 +15,14 @@
         "CMAKE_CXX_EXTENSIONS": false
       }
     },
+    {
+      "name": "_patomic-ci-qemu-base",
+      "hidden": true,
+      "toolchainFile": "ci/toolchain-qemu-ubuntu-cross.cmake",
+      "inherits": [
+        "_patomic-ci-base"
+      ]
+    },
 
     {
       "name": "_patomic-ci-native-compiler-clang",
@@ -166,58 +174,51 @@
 
     {
       "name": "patomic-ci-qemu-ubuntu-clang-ansi",
-      "toolchainFile": "ci/toolchain-ubuntu-clang-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-ansi-gnu"
       ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-clang-coverage",
-      "toolchainFile": "ci/toolchain-ubuntu-clang-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-coverage-clang"
       ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-clang-sanitize",
-      "toolchainFile": "ci/toolchain-ubuntu-clang-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-sanitize-gnu"
       ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-clang-warning",
-      "toolchainFile": "ci/toolchain-ubuntu-clang-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-warning-clang"
       ]
     },
 
     {
       "name": "patomic-ci-qemu-ubuntu-gcc-ansi",
-      "toolchainFile": "ci/toolchain-ubuntu-gcc-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-ansi-gnu"
       ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-gcc-sanitize",
-      "toolchainFile": "ci/toolchain-ubuntu-gcc-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-sanitize-gnu"
       ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-gcc-warning",
-      "toolchainFile": "ci/toolchain-ubuntu-gcc-cross.cmake",
       "inherits": [
-        "_patomic-ci-base",
+        "_patomic-ci-qemu-base",
         "_patomic-ci-flags-warning-gcc"
       ]
     }

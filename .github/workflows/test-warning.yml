@@ -121,12 +121,13 @@ jobs:
   test-qemu:
     runs-on: ubuntu-latest
     env:
-      PATOMIC_CI_XARCH: ${{ matrix.architecture }}
+      PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
+      PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler-version }}
     strategy:
       matrix:
-        architecture:
-          - aarch64
+        triple:
+          - aarch64-linux-gnu
         compiler:
           - clang
           - gcc
@@ -137,9 +138,6 @@ jobs:
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
-          # toolchain versions to use
-          - gcc-version: 11
-          - llvm-version: 14
           # use Release for everything
           - cmake-build-type: Release
           # build-shared -> cmake-build-shared
@@ -147,7 +145,10 @@ jobs:
             cmake-build-shared: OFF
           - build-shared: shared
             cmake-build-shared: ON
-          # compiler -> preset
+          # toolchain versions to use
+          - gcc-version: 11
+          - llvm-version: 14
+          # compiler -> preset, compiler-version
           - compiler: clang
             preset: patomic-ci-qemu-ubuntu-clang-warning
             compiler-version: 14
@@ -159,7 +160,7 @@ jobs:
       - name: Install Toolchains and Qemu
         run: |
           sudo apt install g++-${{ matrix.gcc-version }}-multilib
-          sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
+          sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
           sudo apt install llvm-${{ matrix.llvm-version }}
           sudo apt install qemu-user
 
@@ -171,14 +172,14 @@ jobs:
       #     sudo apt install tree
       #     sudo apt-file update
       #     sudo apt-file list g++-${{ matrix.gcc-version }}-multilib
-      #     sudo apt-file list g++-${{ matrix.gcc-version }}-${{ matrix.architecture }}-linux-gnu
-      #     tree /usr/${{ matrix.architecture }}-linux-gnu
-      #     tree /usr/lib/gcc-cross/${{ matrix.architecture }}-linux-gnu/${{ matrix.gcc-version}}
+      #     sudo apt-file list g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
+      #     tree /usr/${{ matrix.triple }}
+      #     tree /usr/lib/gcc-cross/${{ matrix.triple }}/${{ matrix.gcc-version}}
 
       - name: Set Up Sysroot
         # cannot use symlink or reference directory directly, will not work
         run: |
-          cp -r /usr/${{ matrix.architecture }}-linux-gnu/ ${HOME}/sysroot
+          cp -r /usr/${{ matrix.triple }}/ ${HOME}/sysroot
 
       - name: Checkout patomic
         uses: actions/checkout@v4
