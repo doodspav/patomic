@@ -164,7 +164,7 @@ jobs:
           # - architecture: aarch64
           #   triple: aarch64-linux-gnu
           - architecture: arm
-            triple: arm-linux-gnu
+            triple: arm-linux-gnueabi
           # - architecture: s390x
           #   triple: s390x-linux-gnu
 
