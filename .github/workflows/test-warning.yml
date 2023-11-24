@@ -180,6 +180,10 @@ jobs:
           sudo apt install clang-${{ matrix.llvm-version }}
           sudo apt install qemu-user
 
+      - name: Show what architectures clang-${{ matrix.llvm-version }} supports
+        run: |
+          clang-${{ matrix.llvm-version }} --print-targets
+
       # - name: Display what was Installed
       #   run: |
       #     sudo apt update
