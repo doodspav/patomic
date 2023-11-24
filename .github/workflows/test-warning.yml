@@ -131,7 +131,8 @@ jobs:
         # short form here so that it doesn't take up the whole GitHub Action name
         architecture:
           # - aarch64
-          - arm
+          # - arm
+          - hppa
           # - s390x
         compiler:
           - clang
@@ -163,8 +164,10 @@ jobs:
           # architecture -> triple
           # - architecture: aarch64
           #   triple: aarch64-linux-gnu
-          - architecture: arm
-            triple: arm-linux-gnueabi
+          # - architecture: arm
+          #   triple: arm-linux-gnueabi
+          - architecture: hppa
+            triple: hppa-linux-gnu
           # - architecture: s390x
           #   triple: s390x-linux-gnu
 
