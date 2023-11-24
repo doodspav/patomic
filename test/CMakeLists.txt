@@ -45,6 +45,19 @@ if(NOT GTEST_INCLUDE_DIRS)
     endif()
 endif()
 
+# get libatomic (.so.1 in case of no namelink, e.g. FC19 and Ubuntu)
+find_library(libatomic NAMES atomic atomic.so.1 libatomic.so.1)
+
+# link GTest to libatomic if it exists
+# necessary for using GTest on platforms without atomic operations where
+# libatomic is not automatically linked (e.g. clang-15 for arm-linux-gnueabi)
+if(libatomic)
+    set_property(
+        TARGET GTest::gtest
+        APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${libatomic}"
+    )
+endif()
+
 
 # ---- Declare Tests ----
 
