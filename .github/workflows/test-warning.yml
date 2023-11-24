@@ -130,9 +130,8 @@ jobs:
         # architecture gets converted to triple
         # short form here so that it doesn't take up the whole GitHub Action name
         architecture:
-          # - aarch64
+          - aarch64
           # - arm
-          - hppa
           # - s390x
         compiler:
           - clang
@@ -162,12 +161,10 @@ jobs:
             preset: patomic-ci-qemu-ubuntu-gcc-warning
             compiler-version: 11
           # architecture -> triple
-          # - architecture: aarch64
-          #   triple: aarch64-linux-gnu
+          - architecture: aarch64
+            triple: aarch64-linux-gnu
           # - architecture: arm
           #   triple: arm-linux-gnueabi
-          - architecture: hppa
-            triple: hppa-linux-gnu
           # - architecture: s390x
           #   triple: s390x-linux-gnu
 
