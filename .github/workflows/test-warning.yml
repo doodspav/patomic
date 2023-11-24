@@ -151,7 +151,7 @@ jobs:
           - build-shared: shared
             cmake-build-shared: ON
           # toolchain versions to use
-          - gcc-version: 11
+          - gcc-version: 10
           - llvm-version: 15
           # compiler -> preset, compiler-version
           - compiler: clang
@@ -159,7 +159,7 @@ jobs:
             compiler-version: 15
           - compiler: gcc
             preset: patomic-ci-qemu-ubuntu-gcc-warning
-            compiler-version: 11
+            compiler-version: 10
           # architecture -> triple
           - architecture: aarch64
             triple: aarch64-linux-gnu
@@ -177,9 +177,9 @@ jobs:
           sudo apt install clang-${{ matrix.llvm-version }}
           sudo apt install qemu-user
 
-      - name: Show what architectures clang-${{ matrix.llvm-version }} supports
-        run: |
-          clang-${{ matrix.llvm-version }} --print-targets
+      # - name: Show what architectures clang-${{ matrix.llvm-version }} supports
+      #   run: |
+      #    clang-${{ matrix.llvm-version }} --print-targets
 
       # - name: Display what was Installed
       #   run: |
