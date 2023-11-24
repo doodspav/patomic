@@ -45,7 +45,8 @@ if(NOT GTEST_INCLUDE_DIRS)
     endif()
 endif()
 
-# get libatomic (.so.1 in case of no namelink, e.g. FC19 and Ubuntu)
+# get libatomic if it exists (.so.1 in case of no namelink, e.g. FC19 and Ubuntu)
+# courtesy of HP's foedus_code's FindGccAtomic.cmake (the .so.1 part)
 find_library(libatomic NAMES atomic atomic.so.1 libatomic.so.1)
 
 # link GTest to libatomic if it exists
