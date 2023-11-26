@@ -328,33 +328,3 @@ function(create_ut)
     target_compile_definitions(${target_name} PRIVATE PATOMIC_STATIC_DEFINE)
 
 endfunction()
-
-
-# Creates target patomic-test-ci-${name} corresponding to CI test executable.
-# Note: intended to test CI environment, e.g. ensure sanitizer works.
-#
-# create_ci(
-#     NAME <name>
-#     [INCLUDE <item>...]
-#     [SOURCE <item>...]
-#     [LINK <item>...]
-# )
-function(create_ci)
-
-    cmake_parse_arguments(
-        "ARG"
-        ""
-        "NAME"
-        "INCLUDE;SOURCE;LINK"
-        ${ARGN}
-    )
-
-    _create_test(
-        ${ARG_UNPARSED_ARGUMENTS}
-        CI      ${ARG_NAME}
-        INCLUDE ${ARG_INCLUDE}
-        SOURCE  ${ARG_SOURCE}
-        LINK    ${ARG_LINK}
-    )
-
-endfunction()

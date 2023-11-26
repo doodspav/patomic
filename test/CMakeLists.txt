@@ -86,14 +86,6 @@ else()
     message(STATUS "Skipping unit tests; not building as sub-project of patomic")
 endif()
 
-# only add CIs if running in CI
-if($ENV{CI})
-    add_subdirectory(ci)
-    message(STATUS "Enabled continuous integration tests")
-else()
-    message(STATUS "Skipping continuous integration tests; not building as part of pipeline run")
-endif()
-
 
 # ---- Support Packaging Library ----
 
