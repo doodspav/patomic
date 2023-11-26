@@ -14,15 +14,11 @@ jobs:
   #      # platform gets converted to os, preset
   #      platform:
   #        - windows-gcc-x86_64
-  #        - windows-gcc-ansi-x86_64
   #        - windows-msvc-x86
   #        - windows-msvc-x64
   #        - macos-clang-x86_64
-  #        - macos-clang-ansi-x86_64
   #        - linux-clang-x86_64
-  #        - linux-clang-ansi-x86_64
   #        - linux-gcc-x86_64
-  #        - linux-gcc-ansi-x86_64
   #      # build-shared gets converted to cmake option
   #      build-shared:
   #        - static
@@ -36,9 +32,6 @@ jobs:
   #        - platform: windows-gcc-x86_64
   #          os: windows-latest
   #          preset: patomic-ci-native-unix-gcc-warning
-  #        - platform: windows-gcc-ansi-x86_64
-  #          os: windows-latest
-  #          preset: patomic-ci-native-unix-gcc-ansi
   #        - platform: windows-msvc-x86
   #          os: windows-latest
   #          preset: patomic-ci-native-windows-msvc-warning -A Win32
@@ -48,21 +41,12 @@ jobs:
   #        - platform: macos-clang-x86_64
   #          os: macos-latest
   #          preset: patomic-ci-native-unix-clang-warning
-  #        - platform: macos-clang-ansi-x86_64
-  #          os: macos-latest
-  #          preset: patomic-ci-native-unix-clang-ansi
   #        - platform: linux-clang-x86_64
   #          os: ubuntu-latest
   #          preset: patomic-ci-native-unix-clang-warning
-  #        - platform: linux-clang-ansi-x86_64
-  #          os: ubuntu-latest
-  #          preset: patomic-ci-native-unix-clang-ansi
   #        - platform: linux-gcc-x86_64
   #          os: ubuntu-latest
   #          preset: patomic-ci-native-unix-gcc-warning
-  #        - platform: linux-gcc-ansi-x86_64
-  #          os: ubuntu-latest
-  #          preset: patomic-ci-native-unix-gcc-ansi
   #        # build-shared -> cmake-build-shared
   #        - build-shared: static
   #          cmake-build-shared: OFF
