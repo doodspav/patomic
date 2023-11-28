@@ -125,6 +125,10 @@ jobs:
         build-shared:
           - static
           - shared
+        # exclude architectures unsupported by certain compilers
+        exclude:
+          - architecture: alpha
+            compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
