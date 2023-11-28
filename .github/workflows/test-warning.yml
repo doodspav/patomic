@@ -245,3 +245,10 @@ jobs:
         with:
           name: test-warning-qemu-results
           path: upload/
+
+      - name: Upload Diagnostic Errors
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-warning-qemu-diagnostics
+          path: /tmp/
