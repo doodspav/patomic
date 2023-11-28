@@ -117,6 +117,7 @@ jobs:
           - aarch64
           - alpha
           - arm
+          - hppa
           - s390x
         compiler:
           - clang
@@ -128,6 +129,8 @@ jobs:
         # exclude architectures unsupported by certain compilers
         exclude:
           - architecture: alpha
+            compiler: clang
+          - architecture: hppa
             compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
@@ -156,6 +159,8 @@ jobs:
             triple: alpha-linux-gnu
           - architecture: arm
             triple: arm-linux-gnueabi
+          - architecture: hppa
+            triple: hppa-linux-gnu
           - architecture: s390x
             triple: s390x-linux-gnu
 
