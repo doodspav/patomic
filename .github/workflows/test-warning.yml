@@ -251,6 +251,7 @@ jobs:
           mkdir diagnostics
           mkdir diagnostics/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}
           mkdir diagnostics/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
+          touch /tmp/force-tmp-to-exist-in-ci.txt
           cp /tmp/*.cpp upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
           cp /tmp/*.sh upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
 
