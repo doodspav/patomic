@@ -146,8 +146,8 @@ jobs:
           # fixme: riscv64 is supported, but gcc errors on a system header (GHI #25)
           - architecture: riscv64
             compiler: gcc
-          # - architecture: sh4
-          #   compiler: clang
+          - architecture: sh4
+            compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
