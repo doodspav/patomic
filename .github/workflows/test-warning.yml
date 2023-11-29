@@ -134,9 +134,12 @@ jobs:
             compiler: clang
           - architecture: hppa
             compiler: clang
-          # m68k is supported by clang but causes an ICE
+          # fixme: m68k is supported by clang, but causes an ICE (GHI #25)
           - architecture: m68k
             compiler: clang
+          # fixme: m68k is supported by gcc, but segfaults at runtime (GHI #25)
+          - architecture: m68k
+            compiler: gcc
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
