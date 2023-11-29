@@ -119,6 +119,7 @@ jobs:
           - arm
           - hppa
           - m68k
+          - mips
           - s390x
         compiler:
           - clang
@@ -167,6 +168,8 @@ jobs:
             triple: hppa-linux-gnu
           - architecture: m68k
             triple: m68k-linux-gnu
+          - architecture: mips
+            triple: mips-linux-gnu
           - architecture: s390x
             triple: s390x-linux-gnu
 
