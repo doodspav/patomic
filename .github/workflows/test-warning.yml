@@ -87,7 +87,7 @@ jobs:
         continue-on-error: true
         run: |
           cd patomic/build
-          ctest --verbose --build-config ${{ matrix.cmake-build-type }} .
+          ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake-build-type }} .
 
       - name: Prepare Test Results
         run: |
@@ -271,7 +271,7 @@ jobs:
         continue-on-error: true
         run: |
           cd patomic/build
-          ctest --verbose .
+          ctest --verbose --output-junit Testing/Temporary/results.xml .
 
       - name: Prepare Test Results
         run: |
