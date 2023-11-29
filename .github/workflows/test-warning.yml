@@ -140,7 +140,7 @@ jobs:
           - static
           - shared
         # exclude architectures unsupported by certain compilers
-        # exclude:
+        exclude:
           # - architecture: alpha
           #   compiler: clang
           # - architecture: hppa
@@ -150,6 +150,9 @@ jobs:
           #   compiler: gcc
           # - architecture: sh4
           #   compiler: clang
+          # fixme: sparc64 is supported, but segfaults qemu when built with gcc (GHI #25)
+          - architecture: sparc64
+            compiler: gcc
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
