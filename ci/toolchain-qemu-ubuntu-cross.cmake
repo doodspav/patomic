@@ -33,7 +33,7 @@ set(CMAKE_SYSTEM_PROCESSOR "${architecture}")
 
 # use sysroot at compile time and pass to QEMU when executing target binaries
 set(qemu_command "qemu-${architecture}")
-if(architecture MATCHES "^(i386|i486|i686|x86)$")
+if(architecture STREQUAL "i686")
     set(qemu_command "qemu-x86_64")
 endif()
 set(CMAKE_SYSROOT "$ENV{HOME}/sysroot")
@@ -41,11 +41,11 @@ set(CMAKE_CROSSCOMPILING_EMULATOR "${qemu_command};-L;${CMAKE_SYSROOT}")
 
 # set the appropriate cross compilers and archiver
 # value of ${compiler} is checked at start when obtained from environment variable
-if(compiler MATCHES "clang")
+if(compiler STREQUAL "clang")
     set(CMAKE_C_COMPILER "clang-${version}")
     set(CMAKE_CXX_COMPILER "clang++-${version}")
     set(CMAKE_AR "llvm-ar-${version}")
-elseif(compiler MATCHES "gcc")
+elseif(compiler STREQUAL "gcc")
     set(CMAKE_C_COMPILER "${triple}-gcc-${version}")
     set(CMAKE_CXX_COMPILER "${triple}-g++-${version}")
     set(CMAKE_AR "${triple}-ar")
@@ -54,6 +54,10 @@ endif()
 # set the target triple matching the cross compilers above
 set(CMAKE_C_COMPILER_TARGET "${triple}")
 set(CMAKE_CXX_COMPILER_TARGET "${triple}")
+if(compiler STREQUAL "clang" AND architecture STREQUAL "i686")
+    set(CMAKE_C_COMPILER_TARGET "x86")
+    set(CMAKE_CXX_COMPILER_TARGET "x86")
+endif()
 
 # search for programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
