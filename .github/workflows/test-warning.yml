@@ -124,6 +124,9 @@ jobs:
           - mips64
           - mips64el
           - mipsel
+          - ppc
+          - ppc64
+          - ppc64le
           - s390x
         compiler:
           - clang
@@ -177,6 +180,12 @@ jobs:
             triple: mips64el-linux-gnuabi64
           - architecture: mipsel
             triple: mipsel-linux-gnu
+          - architecture: ppc
+            triple: powerpc-linux-gnu
+          - architecture: ppc64
+            triple: powerpc64-linux-gnu
+          - architecture: ppc64le
+            triple: powerpc64le-linux-gnu
           - architecture: s390x
             triple: s390x-linux-gnu
 
