@@ -129,6 +129,7 @@ jobs:
           # - ppc64le
           - riscv64
           # - s390x
+          - sh4
         compiler:
           - clang
           - gcc
@@ -145,6 +146,8 @@ jobs:
           # fixme: riscv64 is supported, but gcc errors on a system header (GHI #25)
           - architecture: riscv64
             compiler: gcc
+          # - architecture: sh4
+          #   compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
@@ -194,6 +197,8 @@ jobs:
             triple: riscv64-linux-gnu
           # - architecture: s390x
           #   triple: s390x-linux-gnu
+          - architecture: sh4
+            triple: sh4-linux-gnu
 
     steps:
       - name: Install Toolchains and Qemu
