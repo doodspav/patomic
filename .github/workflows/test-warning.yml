@@ -124,8 +124,6 @@ jobs:
           - mips64
           - mips64el
           - mipsel
-          - mipsn32
-          - mipsn32el
           - s390x
         compiler:
           - clang
@@ -139,10 +137,6 @@ jobs:
           - architecture: alpha
             compiler: clang
           - architecture: hppa
-            compiler: clang
-          - architecture: mipsn32
-            compiler: clang
-          - architecture: mipsn32el
             compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
@@ -183,10 +177,6 @@ jobs:
             triple: mips64el-linux-gnuabi64
           - architecture: mipsel
             triple: mipsel-linux-gnu
-          - architecture: mipsn32
-            triple: mipsisa32r6-linux-gnu
-          - architecture: mipsn32el
-            triple: mipsisa32r6el-linux-gnu
           - architecture: s390x
             triple: s390x-linux-gnu
 
