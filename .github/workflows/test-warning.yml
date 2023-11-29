@@ -118,7 +118,8 @@ jobs:
           - alpha
           - arm
           - hppa
-          - m68k
+          # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
+          # - m68k
           - mips
           - s390x
         compiler:
@@ -134,12 +135,6 @@ jobs:
             compiler: clang
           - architecture: hppa
             compiler: clang
-          # fixme: m68k is supported by clang, but causes an ICE (GHI #25)
-          - architecture: m68k
-            compiler: clang
-          # fixme: m68k is supported by gcc, but segfaults at runtime (GHI #25)
-          - architecture: m68k
-            compiler: gcc
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
@@ -169,8 +164,8 @@ jobs:
             triple: arm-linux-gnueabi
           - architecture: hppa
             triple: hppa-linux-gnu
-          - architecture: m68k
-            triple: m68k-linux-gnu
+          # - architecture: m68k
+          #   triple: m68k-linux-gnu
           - architecture: mips
             triple: mips-linux-gnu
           - architecture: s390x
