@@ -119,6 +119,7 @@ jobs:
           # - arm
           - armhf
           # - hppa
+          - ia32
           # # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
           # # - m68k
           # - mips
@@ -185,6 +186,8 @@ jobs:
             triple: arm-linux-gnueabihf
           # - architecture: hppa
           #   triple: hppa-linux-gnu
+          - architecture: ia32
+            triple: i686-linux-gnu
           # # - architecture: m68k
           # #   triple: m68k-linux-gnu
           # - architecture: mips

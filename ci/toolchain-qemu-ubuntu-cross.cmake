@@ -33,8 +33,8 @@ set(CMAKE_SYSTEM_PROCESSOR "${architecture}")
 
 # use sysroot at compile time and pass to QEMU when executing target binaries
 set(qemu_command "qemu-${architecture}")
-if(architecture STREQUAL "i686")
-    set(qemu_command "qemu-x86_64")
+if(architecture MATCHES "^(i386|i486|i686|x86)$")
+    set(qemu_command "qemu-i386")
 elseif(architecture STREQUAL "armhf")
     set(qemu_command "qemu-arm")
 endif()
