@@ -114,7 +114,7 @@ jobs:
         # architecture gets converted to triple
         # short form here so that it doesn't take up the whole GitHub Action name
         architecture:
-          # - aarch64
+          - aarch64
           # - alpha
           # - arm
           # - hppa
@@ -129,7 +129,8 @@ jobs:
           # - ppc64le
           - riscv64
           # - s390x
-          - sh4
+          # # fixme: sh4 is supported (only for gcc), but segfaults qemu when built with gcc (GHI #25)
+          # # - sh4
         compiler:
           - clang
           - gcc
@@ -169,8 +170,8 @@ jobs:
             preset: patomic-ci-qemu-ubuntu-gcc-warning
             compiler-version: 10
           # architecture -> triple
-          # - architecture: aarch64
-          #   triple: aarch64-linux-gnu
+          - architecture: aarch64
+            triple: aarch64-linux-gnu
           # - architecture: alpha
           #   triple: alpha-linux-gnu
           # - architecture: arm
