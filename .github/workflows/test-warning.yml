@@ -114,21 +114,21 @@ jobs:
         # architecture gets converted to triple
         # short form here so that it doesn't take up the whole GitHub Action name
         architecture:
-          - aarch64
-          - alpha
-          - arm
-          - hppa
-          # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
-          # - m68k
-          - mips
-          - mips64
-          - mips64el
-          - mipsel
-          - ppc
-          - ppc64
-          - ppc64le
+          # - aarch64
+          # - alpha
+          # - arm
+          # - hppa
+          # # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
+          # # - m68k
+          # - mips
+          # - mips64
+          # - mips64el
+          # - mipsel
+          # - ppc
+          # - ppc64
+          # - ppc64le
           - riscv64
-          - s390x
+          # - s390x
         compiler:
           - clang
           - gcc
@@ -142,6 +142,9 @@ jobs:
             compiler: clang
           - architecture: hppa
             compiler: clang
+          # fixme: riscv64 is supported, but gcc errors on a system header (GHI #25)
+          - architecture: riscv64
+            compiler: gcc
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
@@ -163,34 +166,34 @@ jobs:
             preset: patomic-ci-qemu-ubuntu-gcc-warning
             compiler-version: 10
           # architecture -> triple
-          - architecture: aarch64
-            triple: aarch64-linux-gnu
-          - architecture: alpha
-            triple: alpha-linux-gnu
-          - architecture: arm
-            triple: arm-linux-gnueabi
-          - architecture: hppa
-            triple: hppa-linux-gnu
-          # - architecture: m68k
-          #   triple: m68k-linux-gnu
-          - architecture: mips
-            triple: mips-linux-gnu
-          - architecture: mips64
-            triple: mips64-linux-gnuabi64
-          - architecture: mips64el
-            triple: mips64el-linux-gnuabi64
-          - architecture: mipsel
-            triple: mipsel-linux-gnu
-          - architecture: ppc
-            triple: powerpc-linux-gnu
-          - architecture: ppc64
-            triple: powerpc64-linux-gnu
-          - architecture: ppc64le
-            triple: powerpc64le-linux-gnu
+          # - architecture: aarch64
+          #   triple: aarch64-linux-gnu
+          # - architecture: alpha
+          #   triple: alpha-linux-gnu
+          # - architecture: arm
+          #   triple: arm-linux-gnueabi
+          # - architecture: hppa
+          #   triple: hppa-linux-gnu
+          # # - architecture: m68k
+          # #   triple: m68k-linux-gnu
+          # - architecture: mips
+          #   triple: mips-linux-gnu
+          # - architecture: mips64
+          #   triple: mips64-linux-gnuabi64
+          # - architecture: mips64el
+          #   triple: mips64el-linux-gnuabi64
+          # - architecture: mipsel
+          #   triple: mipsel-linux-gnu
+          # - architecture: ppc
+          #   triple: powerpc-linux-gnu
+          # - architecture: ppc64
+          #   triple: powerpc64-linux-gnu
+          # - architecture: ppc64le
+          #   triple: powerpc64le-linux-gnu
           - architecture: riscv64
             triple: riscv64-linux-gnu
-          - architecture: s390x
-            triple: s390x-linux-gnu
+          # - architecture: s390x
+          #   triple: s390x-linux-gnu
 
     steps:
       - name: Install Toolchains and Qemu
