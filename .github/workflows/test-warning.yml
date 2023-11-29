@@ -121,6 +121,9 @@ jobs:
           # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
           # - m68k
           - mips
+          - mips64
+          - mips64el
+          - mipsel
           - s390x
         compiler:
           - clang
@@ -168,6 +171,12 @@ jobs:
           #   triple: m68k-linux-gnu
           - architecture: mips
             triple: mips-linux-gnu
+          - architecture: mips64
+            triple: mips64-linux-gnuabi64
+          - architecture: mips64el
+            triple: mips64el-linux-gnuabi64
+          - architecture: mipsel
+            triple: mipsel-linux-gnu
           - architecture: s390x
             triple: s390x-linux-gnu
 
