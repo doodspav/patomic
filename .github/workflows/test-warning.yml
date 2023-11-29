@@ -133,6 +133,9 @@ jobs:
             compiler: clang
           - architecture: hppa
             compiler: clang
+          # m68k is supported by clang but causes an ICE
+          - architecture: m68k
+            compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
