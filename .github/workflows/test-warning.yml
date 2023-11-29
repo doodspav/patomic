@@ -141,7 +141,7 @@ jobs:
           - static
           - shared
         # exclude architectures unsupported by certain compilers
-        # exclude:
+        exclude:
           # - architecture: alpha
           #   compiler: clang
           # - architecture: hppa
@@ -151,6 +151,9 @@ jobs:
           #   compiler: gcc
           # - architecture: sh4
           #   compiler: clang
+          # fixme: i686 should be supported, but not sure what triple to give clang (GHI #25)
+          - architecture: i686
+            compiler: clang
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:

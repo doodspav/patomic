@@ -54,10 +54,6 @@ endif()
 # set the target triple matching the cross compilers above
 set(CMAKE_C_COMPILER_TARGET "${triple}")
 set(CMAKE_CXX_COMPILER_TARGET "${triple}")
-if(compiler STREQUAL "clang" AND architecture STREQUAL "i686")
-    set(CMAKE_C_COMPILER_TARGET "x86")
-    set(CMAKE_CXX_COMPILER_TARGET "x86")
-endif()
 
 # search for programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
