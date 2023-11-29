@@ -32,8 +32,12 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR "${architecture}")
 
 # use sysroot at compile time and pass to QEMU when executing target binaries
+set(qemu_command "qemu-${architecture}")
+if(architecture MATCHES "^(i386|i486|i686|x86)$")
+    set(qemu_command "qemu-x86_64")
+endif()
 set(CMAKE_SYSROOT "$ENV{HOME}/sysroot")
-set(CMAKE_CROSSCOMPILING_EMULATOR "qemu-${architecture};-L;${CMAKE_SYSROOT}")
+set(CMAKE_CROSSCOMPILING_EMULATOR "${qemu_command};-L;${CMAKE_SYSROOT}")
 
 # set the appropriate cross compilers and archiver
 # value of ${compiler} is checked at start when obtained from environment variable
