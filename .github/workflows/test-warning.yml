@@ -245,19 +245,3 @@ jobs:
         with:
           name: test-warning-qemu-results
           path: upload/
-
-      - name: Prepare Diagnostic Errors
-        run: |
-          mkdir diagnostics
-          mkdir diagnostics/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}
-          mkdir diagnostics/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
-          touch /tmp/force-tmp-to-exist-in-ci.txt
-          cp /tmp/*.cpp upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
-          cp /tmp/*.sh upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
-
-      - name: Upload Diagnostic Errors
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: test-warning-qemu-diagnostics
-          path: diagnostics/
