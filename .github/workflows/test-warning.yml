@@ -7,11 +7,13 @@ on:
 
 jobs:
   test-native:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    env:
+      PATOMIC_CI_ID: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
     strategy:
       matrix:
         # verbose labels make things easier to read in GitHub Actions
-        # platform gets converted to os, preset
+        # platform gets converted to os, preset, compiler, architecture
         platform:
           - windows-gcc-x86_64
           - windows-msvc-x86
@@ -28,25 +30,37 @@ jobs:
         include:
           # use Release for everything
           - cmake-build-type: Release
-          # platform -> os, preset
+          # platform -> os, preset, compiler, architecture
           - platform: windows-gcc-x86_64
-            os: windows-latest
+            os: windows
             preset: patomic-ci-native-unix-gcc-warning
+            compiler: gcc
+            architecture: x86_64
           - platform: windows-msvc-x86
-            os: windows-latest
+            os: windows
             preset: patomic-ci-native-windows-msvc-warning -A Win32
+            compiler: msvc
+            architecture: x86
           - platform: windows-msvc-x64
-            os: windows-latest
+            os: windows
             preset: patomic-ci-native-windows-msvc-warning -A x64
+            compiler: msvc
+            architecture: x64
           # - platform: macos-clang-x86_64
-          #   os: macos-latest
+          #   os: macos
           #   preset: patomic-ci-native-unix-clang-warning
+          #   compiler: clang
+          #   architecture: x86_64
           # - platform: linux-clang-x86_64
-          #   os: ubuntu-latest
+          #   os: ubuntu
           #   preset: patomic-ci-native-unix-clang-warning
+          #   compiler: clang
+          #   architecture: x86_64
           # - platform: linux-gcc-x86_64
-          #   os: ubuntu-latest
+          #   os: ubuntu
           #   preset: patomic-ci-native-unix-gcc-warning
+          #   compiler: gcc
+          #   architecture: x86_64
           # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
@@ -90,21 +104,21 @@ jobs:
           ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake-build-type }} .
 
       - name: Prepare Test Results
+        shell: bash
         run: |
           mkdir upload
-          mkdir upload/${{ matrix.platform }}
-          mkdir upload/${{ matrix.platform }}/${{ matrix.build-shared }}
-          cp patomic/build/Testing/Temporary/* upload/${{ matrix.platform }}/${{ matrix.build-shared }}
+          cp patomic/build/Testing/Temporary/* upload/${PATOMIC_CI_ID}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
-          name: test-warning-native-results
+          name: test-warning-results
           path: upload/
 
   test-qemu:
     runs-on: ubuntu-latest
     env:
+      PATOMIC_CI_ID: ${{ matrix.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build-shared }}
       PATOMIC_CI_XARCH: ${{ matrix.architecture }}
       PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
@@ -283,14 +297,13 @@ jobs:
           ctest --verbose --output-junit Testing/Temporary/results.xml .
 
       - name: Prepare Test Results
+        shell: bash
         run: |
           mkdir upload
-          mkdir upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}
-          mkdir upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
-          cp patomic/build/Testing/Temporary/* upload/qemu-linux-${{ matrix.compiler }}-${{ matrix.architecture }}/${{ matrix.build-shared }}
+          cp patomic/build/Testing/Temporary/* upload/${PATOMIC_CI_ID}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
-          name: test-warning-qemu-results
+          name: test-warning-results
           path: upload/
