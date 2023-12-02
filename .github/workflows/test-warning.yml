@@ -16,8 +16,8 @@ jobs:
         # platform gets converted to os, preset, compiler, architecture
         platform:
           - windows-gcc-x86_64
-          - windows-msvc-x86
-          - windows-msvc-x64
+          - windows-msvc-x86_32
+          - windows-msvc-x86_64
           # - macos-clang-x86_64
           # - linux-clang-x86_64
           # - linux-gcc-x86_64
@@ -36,16 +36,16 @@ jobs:
             preset: patomic-ci-native-unix-gcc-warning
             compiler: gcc
             architecture: x86_64
-          - platform: windows-msvc-x86
+          - platform: windows-msvc-x86_32
             os: windows
             preset: patomic-ci-native-windows-msvc-warning -A Win32
             compiler: msvc
-            architecture: x86
-          - platform: windows-msvc-x64
+            architecture: x86_32
+          - platform: windows-msvc-x86_64
             os: windows
             preset: patomic-ci-native-windows-msvc-warning -A x64
             compiler: msvc
-            architecture: x64
+            architecture: x86_64
           # - platform: macos-clang-x86_64
           #   os: macos
           #   preset: patomic-ci-native-unix-clang-warning
@@ -133,7 +133,6 @@ jobs:
           # - arm
           - armhf
           # - hppa
-          - i686
           # # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
           # # - m68k
           # - mips
@@ -148,6 +147,7 @@ jobs:
           # # fixme: sh4 is supported (only for gcc), but segfaults qemu when built with gcc (GHI #25)
           # # - sh4
           # - sparc64
+          - x86_32
         compiler:
           - clang
           - gcc
@@ -161,8 +161,8 @@ jobs:
         #     compiler: clang
         #   - architecture: hppa
         #     compiler: clang
-          # fixme: i686 is supported, but not sure how to make it work with clang (GHI #25)
-          - architecture: i686
+          # fixme: x86_32 is supported, but not sure how to make it work with clang (GHI #25)
+          - architecture: x86_32
             compiler: clang
         #   # fixme: riscv64 is supported, but gcc errors on a system header (GHI #25)
         #   - architecture: riscv64
@@ -203,7 +203,7 @@ jobs:
             triple: arm-linux-gnueabihf
           # - architecture: hppa
           #   triple: hppa-linux-gnu
-          - architecture: i686
+          - architecture: x86_32
             triple: i686-linux-gnu
           # # - architecture: m68k
           # #   triple: m68k-linux-gnu
