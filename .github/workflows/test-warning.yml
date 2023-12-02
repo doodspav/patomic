@@ -73,13 +73,22 @@ jobs:
         with:
           path: patomic
 
+      - name: Restore Cached GoogleTest
+        id: cache-googletest
+        uses: actions/cache@v3
+        with:
+          path: googletest/build/install
+          key: googletest-${{ env.PATOMIC_CI_ID }}
+
       - name: Checkout GoogleTest
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: google/googletest
           path: googletest
 
       - name: Build and Install GoogleTest
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
         run: |
           cd googletest
           cp ../patomic/CMakePresets.json .
@@ -265,13 +274,22 @@ jobs:
         with:
           path: patomic
 
+      - name: Restore Cached GoogleTest
+        id: cache-googletest
+        uses: actions/cache@v3
+        with:
+          path: googletest/build/install
+          key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.compiler-version }}
+
       - name: Checkout GoogleTest
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: google/googletest
           path: googletest
 
       - name: Build and Install GoogleTest
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
         run: |
           cd googletest
           cp -r ../patomic/ci/ ./
