@@ -118,7 +118,7 @@ jobs:
   test-qemu:
     runs-on: ubuntu-latest
     env:
-      PATOMIC_CI_ID: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
+      PATOMIC_CI_ID: ${{ matrix.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build-shared }}
       PATOMIC_CI_XARCH: ${{ matrix.architecture }}
       PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
