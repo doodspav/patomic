@@ -274,7 +274,7 @@ jobs:
         uses: actions/cache@v3
         with:
           # don't prefix with ${HOME} because can't find path when trying to cache
-          path: sysroot
+          path: ${{ env.HOME }}/sysroot
           # need both gcc and llvm version in case of building with clang but using gcc sysroot
           key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
 
@@ -283,9 +283,6 @@ jobs:
         # cannot use symlink or reference directory directly, will not work
         run: |
           cp -r /usr/${{ matrix.triple }}/ ${HOME}/sysroot
-          echo $PWD
-          echo $HOME
-          tree sysroot
 
       - name: Checkout GoogleTest
         if: steps.cache-googletest.outputs.cache-hit != 'true'
