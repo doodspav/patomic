@@ -212,8 +212,6 @@ jobs:
             triple: arm-linux-gnueabihf
           - architecture: hppa
             triple: hppa-linux-gnu
-          - architecture: x86_32
-            triple: i686-linux-gnu
           # - architecture: m68k
           #   triple: m68k-linux-gnu
           - architecture: mips
@@ -238,6 +236,8 @@ jobs:
           #   triple: sh4-linux-gnu
           - architecture: sparc64
             triple: sparc64-linux-gnu
+          - architecture: x86_32
+            triple: i686-linux-gnu
 
     steps:
       - name: Install or Restore Cached Toolchains and Qemu
@@ -249,7 +249,8 @@ jobs:
             llvm-${{ matrix.llvm-version }}
             clang-${{ matrix.llvm-version }}
             qemu-user
-          version: toolchain-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
+          # don't need a fancy version since everything is encoded in the packages
+          version: 1
 
       # - name: Install Toolchains and Qemu
       #   run: |
