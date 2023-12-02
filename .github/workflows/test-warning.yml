@@ -273,7 +273,8 @@ jobs:
         id: cache-googletest
         uses: actions/cache@v3
         with:
-          path: ${HOME}/sysroot
+          # don't prefix with ${HOME} because can't find path when trying to cache
+          path: sysroot
           # need both gcc and llvm version in case of building with clang but using gcc sysroot
           key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
 
