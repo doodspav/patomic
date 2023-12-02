@@ -133,7 +133,7 @@ jobs:
           # - arm
           - armhf
           # - hppa
-          - ia32
+          - i686
           # # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
           # # - m68k
           # - mips
@@ -161,8 +161,8 @@ jobs:
         #     compiler: clang
         #   - architecture: hppa
         #     compiler: clang
-          # fixme: ia32 is supported, but not sure how to make it work with clang (GHI #25)
-          - architecture: ia32
+          # fixme: i686 is supported, but not sure how to make it work with clang (GHI #25)
+          - architecture: i686
             compiler: clang
         #   # fixme: riscv64 is supported, but gcc errors on a system header (GHI #25)
         #   - architecture: riscv64
@@ -203,7 +203,7 @@ jobs:
             triple: arm-linux-gnueabihf
           # - architecture: hppa
           #   triple: hppa-linux-gnu
-          - architecture: ia32
+          - architecture: i686
             triple: i686-linux-gnu
           # # - architecture: m68k
           # #   triple: m68k-linux-gnu
