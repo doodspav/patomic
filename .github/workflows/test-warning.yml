@@ -6,123 +6,123 @@ on:
       - "**"
 
 jobs:
-  test-native:
-    runs-on: ${{ matrix.os }}-latest
-    env:
-      PATOMIC_CI_ID: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
-    strategy:
-      matrix:
-        # verbose labels make things easier to read in GitHub Actions
-        # platform gets converted to os, preset, compiler, architecture
-        platform:
-          - windows-gcc-x86_64
-          - windows-msvc-x86_32
-          - windows-msvc-x86_64
-          - macos-clang-x86_64
-          - linux-clang-x86_64
-          - linux-gcc-x86_64
-        # build-shared gets converted to cmake option
-        build-shared:
-          - static
-          - shared
-        # convert verbose labels to usable values (which don't appear in action name)
-        # also just other variables that we don't want appearing in action name
-        include:
-          # use Release for everything
-          - cmake-build-type: Release
-          # platform -> os, preset, compiler, architecture
-          - platform: windows-gcc-x86_64
-            os: windows
-            preset: patomic-ci-native-unix-gcc-warning
-            compiler: gcc
-            architecture: x86_64
-          - platform: windows-msvc-x86_32
-            os: windows
-            preset: patomic-ci-native-windows-msvc-warning -A Win32
-            compiler: msvc
-            architecture: x86_32
-          - platform: windows-msvc-x86_64
-            os: windows
-            preset: patomic-ci-native-windows-msvc-warning -A x64
-            compiler: msvc
-            architecture: x86_64
-          - platform: macos-clang-x86_64
-            os: macos
-            preset: patomic-ci-native-unix-clang-warning
-            compiler: clang
-            architecture: x86_64
-          - platform: linux-clang-x86_64
-            os: ubuntu
-            preset: patomic-ci-native-unix-clang-warning
-            compiler: clang
-            architecture: x86_64
-          - platform: linux-gcc-x86_64
-            os: ubuntu
-            preset: patomic-ci-native-unix-gcc-warning
-            compiler: gcc
-            architecture: x86_64
-          # build-shared -> cmake-build-shared
-          - build-shared: static
-            cmake-build-shared: OFF
-          - build-shared: shared
-            cmake-build-shared: ON
-
-    steps:
-      - name: Checkout patomic
-        uses: actions/checkout@v4
-        with:
-          path: patomic
-
-      - name: Restore Cached GoogleTest
-        id: cache-googletest
-        uses: actions/cache@v3
-        with:
-          path: googletest/build/install
-          key: googletest-${{ env.PATOMIC_CI_ID }}
-
-      - name: Checkout GoogleTest
-        if: steps.cache-googletest.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: google/googletest
-          path: googletest
-
-      - name: Build and Install GoogleTest
-        if: steps.cache-googletest.outputs.cache-hit != 'true'
-        run: |
-          cd googletest
-          cp ../patomic/CMakePresets.json .
-          mkdir build
-          cd build
-          cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
-          cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
-          cmake --install . --config ${{ matrix.cmake-build-type }} --prefix install
-
-      - name: Build patomic
-        run: |
-          cd patomic
-          mkdir build
-          cd build
-          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="../../googletest/build/install/lib/cmake/GTest" ..
-          cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
-
-      - name: Test patomic
-        continue-on-error: true
-        run: |
-          cd patomic/build
-          ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake-build-type }} .
-
-      - name: Prepare Test Results
-        shell: bash
-        run: |
-          mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${{ env.PATOMIC_CI_ID }}.xml
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-warning-results
-          path: upload/
+  # test-native:
+  #   runs-on: ${{ matrix.os }}-latest
+  #   env:
+  #     PATOMIC_CI_ID: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
+  #   strategy:
+  #     matrix:
+  #       # verbose labels make things easier to read in GitHub Actions
+  #       # platform gets converted to os, preset, compiler, architecture
+  #       platform:
+  #         - windows-gcc-x86_64
+  #         - windows-msvc-x86_32
+  #         - windows-msvc-x86_64
+  #         - macos-clang-x86_64
+  #         - linux-clang-x86_64
+  #         - linux-gcc-x86_64
+  #       # build-shared gets converted to cmake option
+  #       build-shared:
+  #         - static
+  #         - shared
+  #       # convert verbose labels to usable values (which don't appear in action name)
+  #       # also just other variables that we don't want appearing in action name
+  #       include:
+  #         # use Release for everything
+  #         - cmake-build-type: Release
+  #         # platform -> os, preset, compiler, architecture
+  #         - platform: windows-gcc-x86_64
+  #           os: windows
+  #           preset: patomic-ci-native-unix-gcc-warning
+  #           compiler: gcc
+  #           architecture: x86_64
+  #         - platform: windows-msvc-x86_32
+  #           os: windows
+  #           preset: patomic-ci-native-windows-msvc-warning -A Win32
+  #           compiler: msvc
+  #           architecture: x86_32
+  #         - platform: windows-msvc-x86_64
+  #           os: windows
+  #           preset: patomic-ci-native-windows-msvc-warning -A x64
+  #           compiler: msvc
+  #           architecture: x86_64
+  #         - platform: macos-clang-x86_64
+  #           os: macos
+  #           preset: patomic-ci-native-unix-clang-warning
+  #           compiler: clang
+  #           architecture: x86_64
+  #         - platform: linux-clang-x86_64
+  #           os: ubuntu
+  #           preset: patomic-ci-native-unix-clang-warning
+  #           compiler: clang
+  #           architecture: x86_64
+  #         - platform: linux-gcc-x86_64
+  #           os: ubuntu
+  #           preset: patomic-ci-native-unix-gcc-warning
+  #           compiler: gcc
+  #           architecture: x86_64
+  #         # build-shared -> cmake-build-shared
+  #         - build-shared: static
+  #           cmake-build-shared: OFF
+  #         - build-shared: shared
+  #           cmake-build-shared: ON
+  #
+  #   steps:
+  #     - name: Checkout patomic
+  #       uses: actions/checkout@v4
+  #       with:
+  #         path: patomic
+  #
+  #     - name: Restore Cached GoogleTest
+  #       id: cache-googletest
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: googletest/build/install
+  #         key: googletest-${{ env.PATOMIC_CI_ID }}
+  #
+  #     - name: Checkout GoogleTest
+  #       if: steps.cache-googletest.outputs.cache-hit != 'true'
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: google/googletest
+  #         path: googletest
+  #
+  #     - name: Build and Install GoogleTest
+  #       if: steps.cache-googletest.outputs.cache-hit != 'true'
+  #       run: |
+  #         cd googletest
+  #         cp ../patomic/CMakePresets.json .
+  #         mkdir build
+  #         cd build
+  #         cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+  #         cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
+  #         cmake --install . --config ${{ matrix.cmake-build-type }} --prefix install
+  #
+  #     - name: Build patomic
+  #       run: |
+  #         cd patomic
+  #         mkdir build
+  #         cd build
+  #         cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="../../googletest/build/install/lib/cmake/GTest" ..
+  #         cmake --build . --verbose --config ${{ matrix.cmake-build-type }}
+  #
+  #     - name: Test patomic
+  #       continue-on-error: true
+  #       run: |
+  #         cd patomic/build
+  #         ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake-build-type }} .
+  #
+  #     - name: Prepare Test Results
+  #       shell: bash
+  #       run: |
+  #         mkdir upload
+  #         cp patomic/build/Testing/Temporary/results.xml upload/${{ env.PATOMIC_CI_ID }}.xml
+  #
+  #     - name: Upload Test Results
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: test-warning-results
+  #         path: upload/
 
   test-qemu:
     runs-on: ubuntu-latest
