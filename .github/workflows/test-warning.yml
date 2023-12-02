@@ -278,7 +278,7 @@ jobs:
         id: cache-googletest
         uses: actions/cache@v3
         with:
-          path: googletest/build/install
+          path: ${HOME}/sysroot
           key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.compiler-version }}
 
       - name: Checkout GoogleTest
