@@ -18,9 +18,9 @@ jobs:
           - windows-gcc-x86_64
           - windows-msvc-x86_32
           - windows-msvc-x86_64
-          # - macos-clang-x86_64
-          # - linux-clang-x86_64
-          # - linux-gcc-x86_64
+          - macos-clang-x86_64
+          - linux-clang-x86_64
+          - linux-gcc-x86_64
         # build-shared gets converted to cmake option
         build-shared:
           - static
@@ -46,21 +46,21 @@ jobs:
             preset: patomic-ci-native-windows-msvc-warning -A x64
             compiler: msvc
             architecture: x86_64
-          # - platform: macos-clang-x86_64
-          #   os: macos
-          #   preset: patomic-ci-native-unix-clang-warning
-          #   compiler: clang
-          #   architecture: x86_64
-          # - platform: linux-clang-x86_64
-          #   os: ubuntu
-          #   preset: patomic-ci-native-unix-clang-warning
-          #   compiler: clang
-          #   architecture: x86_64
-          # - platform: linux-gcc-x86_64
-          #   os: ubuntu
-          #   preset: patomic-ci-native-unix-gcc-warning
-          #   compiler: gcc
-          #   architecture: x86_64
+          - platform: macos-clang-x86_64
+            os: macos
+            preset: patomic-ci-native-unix-clang-warning
+            compiler: clang
+            architecture: x86_64
+          - platform: linux-clang-x86_64
+            os: ubuntu
+            preset: patomic-ci-native-unix-clang-warning
+            compiler: clang
+            architecture: x86_64
+          - platform: linux-gcc-x86_64
+            os: ubuntu
+            preset: patomic-ci-native-unix-gcc-warning
+            compiler: gcc
+            architecture: x86_64
           # build-shared -> cmake-build-shared
           - build-shared: static
             cmake-build-shared: OFF
