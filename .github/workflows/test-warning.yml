@@ -107,7 +107,7 @@ jobs:
         shell: bash
         run: |
           mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${PATOMIC_CI_ID}.xml
+          cp patomic/build/Testing/Temporary/results.xml upload/${{ env.PATOMIC_CI_ID }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
@@ -297,10 +297,9 @@ jobs:
           ctest --verbose --output-junit Testing/Temporary/results.xml .
 
       - name: Prepare Test Results
-        shell: bash
         run: |
           mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${PATOMIC_CI_ID}.xml
+          cp patomic/build/Testing/Temporary/results.xml upload/${{ env.PATOMIC_CI_ID }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
