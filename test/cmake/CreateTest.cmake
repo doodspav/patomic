@@ -23,7 +23,7 @@
 # - patomic-test-${kind}-${name} -> executable target for a single test
 #
 # _create_test(
-#     BT|UT|CI <name>
+#     BT|UT <name>
 #     [INCLUDE <item>...]
 #     [SOURCE <item>...]
 #     [LINK <item>...]
@@ -32,8 +32,8 @@ function(_create_test)
 
     # setup what arguments we expect
 
-    set(all_kinds "BT;UT;CI")  # list of all kinds we can iterate over
-    set(all_kinds_opt_msg "BT|UT|CI")  # string to use in debug message
+    set(all_kinds "BT;UT")  # list of all kinds we can iterate over
+    set(all_kinds_opt_msg "BT|UT")  # string to use in debug message
 
     cmake_parse_arguments(
         "ARG"
