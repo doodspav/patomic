@@ -240,25 +240,13 @@ jobs:
             triple: i686-linux-gnu
 
     steps:
-      - name: Install or Restore Cached Toolchains and Qemu
-        uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: |
-            g++-${{ matrix.gcc-version }}-multilib
-            g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
-            llvm-${{ matrix.llvm-version }}
-            clang-${{ matrix.llvm-version }}
-            qemu-user
-          # don't need a fancy version since everything is encoded in the packages
-          version: 1
-
-      # - name: Install Toolchains and Qemu
-      #   run: |
-      #     sudo apt install g++-${{ matrix.gcc-version }}-multilib
-      #     sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
-      #     sudo apt install llvm-${{ matrix.llvm-version }}
-      #     sudo apt install clang-${{ matrix.llvm-version }}
-      #     sudo apt install qemu-user
+      - name: Install Toolchains and Qemu
+        run: |
+          sudo apt install g++-${{ matrix.gcc-version }}-multilib
+          sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
+          sudo apt install llvm-${{ matrix.llvm-version }}
+          sudo apt install clang-${{ matrix.llvm-version }}
+          sudo apt install qemu-user
 
       # - name: Show what architectures clang-${{ matrix.llvm-version }} supports
       #   run: |
