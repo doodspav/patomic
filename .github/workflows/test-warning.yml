@@ -264,22 +264,24 @@ jobs:
       #     tree /usr/${{ matrix.triple }}
       #     tree /usr/lib/gcc-cross/${{ matrix.triple }}/${{ matrix.gcc-version}}
 
-      - name: Set Up Sysroot
-        # cannot use symlink or reference directory directly, will not work
-        run: |
-          cp -r /usr/${{ matrix.triple }}/ ${HOME}/sysroot
-
       - name: Checkout patomic
         uses: actions/checkout@v4
         with:
           path: patomic
 
-      - name: Restore Cached GoogleTest
+      - name: Restore Cached GoogleTest And Sysroot
         id: cache-googletest
         uses: actions/cache@v3
         with:
           path: ${HOME}/sysroot
-          key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.compiler-version }}
+          # need both gcc and llvm version in case of building with clang but using gcc sysroot
+          key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
+
+      - name: Set Up Sysroot
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
+        # cannot use symlink or reference directory directly, will not work
+        run: |
+          cp -r /usr/${{ matrix.triple }}/ ${HOME}/sysroot
 
       - name: Checkout GoogleTest
         if: steps.cache-googletest.outputs.cache-hit != 'true'
