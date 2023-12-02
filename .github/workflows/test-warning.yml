@@ -240,13 +240,24 @@ jobs:
           #   triple: sparc64-linux-gnu
 
     steps:
-      - name: Install Toolchains and Qemu
-        run: |
-          sudo apt install g++-${{ matrix.gcc-version }}-multilib
-          sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
-          sudo apt install llvm-${{ matrix.llvm-version }}
-          sudo apt install clang-${{ matrix.llvm-version }}
-          sudo apt install qemu-user
+      - name: Install or Restore Cached Toolchains and Qemu
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: |
+            g++-${{ matrix.gcc-version }}-multilib
+            g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
+            llvm-${{ matrix.llvm-version }}
+            clang-${{ matrix.llvm-version }}
+            qemu-user
+          version: toolchain-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
+
+      # - name: Install Toolchains and Qemu
+      #   run: |
+      #     sudo apt install g++-${{ matrix.gcc-version }}-multilib
+      #     sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
+      #     sudo apt install llvm-${{ matrix.llvm-version }}
+      #     sudo apt install clang-${{ matrix.llvm-version }}
+      #     sudo apt install qemu-user
 
       # - name: Show what architectures clang-${{ matrix.llvm-version }} supports
       #   run: |
@@ -269,7 +280,7 @@ jobs:
         with:
           path: patomic
 
-      - name: Restore Cached GoogleTest And Sysroot
+      - name: Restore Cached GoogleTest and Sysroot
         id: cache-googletest
         uses: actions/cache@v3
         with:
