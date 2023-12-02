@@ -8,8 +8,6 @@ on:
 jobs:
   test-native:
     runs-on: ${{ matrix.os }}-latest
-    env:
-      PATOMIC_CI_ID: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
     strategy:
       matrix:
         # verbose labels make things easier to read in GitHub Actions
@@ -28,6 +26,8 @@ jobs:
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
+          # id used to name caches and artifacts
+          - id: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
           # use Release for everything
           - cmake-build-type: Release
           # platform -> os, preset, compiler, architecture
@@ -107,7 +107,7 @@ jobs:
         shell: bash
         run: |
           mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${PATOMIC_CI_ID}.xml
+          cp patomic/build/Testing/Temporary/results.xml upload/${{ matrix.id }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
@@ -118,7 +118,6 @@ jobs:
   test-qemu:
     runs-on: ubuntu-latest
     env:
-      PATOMIC_CI_ID: ${{ matrix.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build-shared }}
       PATOMIC_CI_XARCH: ${{ matrix.architecture }}
       PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
@@ -175,6 +174,8 @@ jobs:
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
+          # id used to name caches and artifacts
+          - id: ${{ matrix.architecture }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-shared }}
           # use Release for everything
           - cmake-build-type: Release
           # build-shared -> cmake-build-shared
@@ -300,7 +301,7 @@ jobs:
         shell: bash
         run: |
           mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${PATOMIC_CI_ID}.xml
+          cp patomic/build/Testing/Temporary/results.xml upload/${{ matrix.id }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
