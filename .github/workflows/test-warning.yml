@@ -279,7 +279,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: googletest/build/install
-          key: googletest-${{ matrix.compiler-version }}-${{ env.PATOMIC_CI_ID }}
+          key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.compiler-version }}
 
       - name: Checkout GoogleTest
         if: steps.cache-googletest.outputs.cache-hit != 'true'
