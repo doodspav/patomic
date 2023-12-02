@@ -274,7 +274,7 @@ jobs:
         uses: actions/cache@v3
         with:
           # don't prefix with ${HOME} because can't find path when trying to cache
-          path: ${{ env.HOME }}/sysroot
+          path: ~/sysroot
           # need both gcc and llvm version in case of building with clang but using gcc sysroot
           key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
 
