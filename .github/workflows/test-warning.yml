@@ -283,6 +283,8 @@ jobs:
         # cannot use symlink or reference directory directly, will not work
         run: |
           cp -r /usr/${{ matrix.triple }}/ ${HOME}/sysroot
+          echo $PWD
+          echo $HOME
           tree sysroot
 
       - name: Checkout GoogleTest
