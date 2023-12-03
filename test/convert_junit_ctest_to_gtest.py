@@ -21,11 +21,12 @@ def get_program_arguments() -> ProgArgs:
     parser.add_argument("-t", "--triple", type=str, required=True, help="Platform identifier on which input file was generated from")
 
     # obtain program arguments
-    args = parser.parse_args(args=["-i", "x86_32-ubuntu-gcc-shared.xml", "-t", "x86_32-ubuntu-gcc-shared", "-o", "results.xml"])
+    _argv = ["-i", "x86_32-ubuntu-gcc-shared.xml", "-t", "x86_32-ubuntu-gcc-shared", "-o", "results.xml"]
+    args = parser.parse_args(args=_argv)
     return ProgArgs(input_path=Path(args.input), output_path=Path(args.output), triple=args.triple)
 
 
-def _make_default_gtest_testsuite_element(suite_name: str) -> ETree.Element:
+def _make_gtest_default_testsuite(suite_name: str) -> ETree.Element:
     elem = ETree.Element("testsuite")
     elem.attrib.update({
         "name": suite_name,
@@ -39,19 +40,19 @@ def _make_default_gtest_testsuite_element(suite_name: str) -> ETree.Element:
     return elem
 
 
-def _make_gtest_result(suite_name: str, case_name: str, status: str, sysout: str) -> Optional[str]:
+def _make_gtest_testcase_result(suite_name: str, case_name: str, status: str, sysout: str) -> Optional[str]:
     # test crashed
     if status == "fail":
         return None
 
-    # test was either skipped while running, or not run at all
+    # test was either skipped while running, or not run at al
     elif status == "notrun":
         if f"[  SKIPPED ] {suite_name}.{case_name}" in sysout:
             return "skipped"
         else:
             return None
 
-    # test was run to completion, but may have failed
+    # test was run to completion but may have failed
     elif status == "run":
         if f"[  FAILED  ] {suite_name}.{case_name}" in sysout:
             return "failed"
@@ -63,15 +64,15 @@ def _make_gtest_result(suite_name: str, case_name: str, status: str, sysout: str
         raise ValueError(f"status attribute of {suite_name}.{case_name} has unknown value: {status}")
 
 
-def _add_gtest_case_to_suite(case: ETree.Element, suite: ETree.Element) -> None:
+def _add_gtest_testcase_to_testsuite(suite: ETree.Element, case: ETree.Element) -> ETree.Element:
     # helper lambda
     inc_attr = lambda elem, key: elem.set(key, str(int(elem.get(key)) + 1))
 
     # increment time and tests count
     inc_attr(suite, "tests")
     new_time = str(float(suite.get("time")) + float(case.get("time")))
-    if "." not in new_time:
-        new_time += "."
+    if '.' not in new_time:
+        new_time += '.'
     suite.set("time", new_time)
 
     # increment diagnostic counters
@@ -87,57 +88,60 @@ def _add_gtest_case_to_suite(case: ETree.Element, suite: ETree.Element) -> None:
     else:
         inc_attr(suite, "errors")
 
-    # slot case into suite
+    # attach case to suite
     suite.append(case)
+    return suite
 
 
-def _parse_gtest_testsuites_from_ctest_testsuite_element(root_elem: ETree.Element) -> List[ETree.Element]:
-    # get all test cases, mapped to gtest testsuite element
-    test_suites: Dict[str, ETree.Element] = {}
-    for elem_testcase in root_elem:
+def _parse_gtest_testsuites_from_ctest_testsuite(ctest_testsuite: ETree.Element) -> List[ETree.Element]:
+    # get all gtest testsuite names, mapped to their elements
+    gtest_suites: Dict[str, ETree.Element] = {}
+    for case in ctest_testsuite:
 
-        # all testcase element names are expected to be "Suite.Case" fromat
-        suite_name, case_name = elem_testcase.get("name").split('.', maxsplit=1)
-        elem_testcase.set("name", case_name)
-        elem_testcase.set("classname", suite_name)
+        # all testcase element names are expected to be "Suite.Case" format
+        suite_name, case_name = case.get("name").split('.', maxsplit=1)
+        case.set("name", case_name)
+        case.set("classname", suite_name)
 
         # make sure we recognise status
-        status: str = elem_testcase.get("status")
+        status: str = case.get("status")
         if status not in ["run", "notrun", "fail"]:
             raise ValueError(f"status attribute of {suite_name}.{case_name} has unknown value: {status}")
 
-        # remove <system-out> child element if test runs with no issues
+        # remove <system-out> sub-element if test runs with no issues
         sysout: str = ""
         if status == "run":
-            all_elem_sysout = elem_testcase.findall("system-out")
+            all_elem_sysout = case.findall("system-out")
             if len(all_elem_sysout) > 1:
                 raise ValueError(f"more than one <system-out> sub-element found in {suite_name}.{case_name}")
             if len(all_elem_sysout) > 0:
                 sysout = "" if all_elem_sysout[0].text is None else str(all_elem_sysout[0].text)
             sysout_lower = sysout.lower()
-            if not any(s in sysout_lower for s in ["error", "fail", "warn"]):
-                elem_testcase.remove(all_elem_sysout[0])
+            if len(all_elem_sysout) > 0 and not any(s in sysout_lower for s in ["warn", "error", "fail"]):
+                case.remove(all_elem_sysout[0])
 
         # set result to gtest values
-        result = _make_gtest_result(suite_name, case_name, status, sysout)
+        result = _make_gtest_testcase_result(suite_name, case_name, status, sysout)
         if result is not None:
-            elem_testcase.set("result", result)
+            case.set("result", result)
         if result == "skipped":
-            elem_testcase.set("status", "run")
+            case.set("status", "run")
 
         # populate dictionary
-        elem_testsuite = test_suites.get(suite_name)
-        if elem_testsuite is None:
-            elem_testsuite = _make_default_gtest_testsuite_element(suite_name)
-        _add_gtest_case_to_suite(elem_testcase, elem_testsuite)
-        test_suites[suite_name] = elem_testsuite
+        suite = gtest_suites.get(suite_name)
+        if suite is None:
+            suite = _make_gtest_default_testsuite(suite_name)
+        gtest_suites[suite_name] = _add_gtest_testcase_to_testsuite(suite, case)
 
-    # return all testsuites
-    return list(test_suites.values())
+    # return all suites
+    return list(gtest_suites.values())
 
 
-def make_gtest_root(triple: str, ctest_root: ETree.Element) -> ETree.Element:
-    # make root element
+def convert_ctest_root_to_gtest_root(triple: str, ctest_root: ETree.Element) -> ETree.Element:
+    # helper lambda
+    add_attr = lambda elem, from_, key: elem.set(key, str(int(elem.get(key)) + int(from_.get(key))))
+
+    # make gtest root element
     gtest_root = ETree.Element("testsuites")
     gtest_root.attrib.update({
         "name": triple,
@@ -150,25 +154,23 @@ def make_gtest_root(triple: str, ctest_root: ETree.Element) -> ETree.Element:
         "timestamp": ctest_root.get("timestamp")
     })
 
-    # helper lambda
-    add_attr = lambda elem, from_, key: elem.set(key, str(int(elem.get(key)) + int(from_.get(key))))
-
     # get attributes from all suites
-    gtest_suites = _parse_gtest_testsuites_from_ctest_testsuite_element(ctest_root)
+    gtest_suites = _parse_gtest_testsuites_from_ctest_testsuite(ctest_root)
     for suite in gtest_suites:
 
         # increment time
         new_time = str(float(gtest_root.get("time")) + float(suite.get("time")))
-        if "." not in new_time:
-            new_time += "."
+        if '.' not in new_time:
+            new_time += '.'
         gtest_root.set("time", new_time)
 
+        # increment diagnostic counters
         add_attr(gtest_root, suite, "failures")
         add_attr(gtest_root, suite, "disabled")
         add_attr(gtest_root, suite, "skipped")
         add_attr(gtest_root, suite, "errors")
 
-        # add as child element
+        # add as sub-element
         gtest_root.append(suite)
 
     # return complete root
@@ -177,16 +179,16 @@ def make_gtest_root(triple: str, ctest_root: ETree.Element) -> ETree.Element:
 
 if __name__ == "__main__":
 
-    prog_args = get_program_arguments()
+    args = get_program_arguments()
 
     # parse input file as xml
-    input_tree = ETree.parse(prog_args.input_path)
-    input_root = input_tree.getroot()
+    ctest_tree = ETree.parse(args.input_path)
+    ctest_root = ctest_tree.getroot()
 
-    # create output
-    output_root = make_gtest_root(prog_args.triple, input_root)
+    # convert to gtest
+    gtest_root = convert_ctest_root_to_gtest_root(args.triple, ctest_root)
+    gtest_tree = ETree.ElementTree(gtest_root)
 
-    # write output
-    output_tree = ETree.ElementTree(output_root)
-    ETree.indent(output_tree)
-    output_tree.write(prog_args.output_path, encoding="utf-8", xml_declaration=True)
+    # write gtest xml
+    ETree.indent(gtest_tree)
+    gtest_tree.write(args.output_path, encoding="utf-8", xml_declaration=True)
