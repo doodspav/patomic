@@ -4,5 +4,6 @@
 
 TEST(UtSuite, Add)
 {
+    std::abort();
     ASSERT_EQ(5, patomic_example_add(2, 3));
 }
