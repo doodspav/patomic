@@ -344,5 +344,7 @@ jobs:
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          files: |
-            test-warning-results/**/*.xml
+          action_fail: true
+          action_fail_on_inconclusive: true
+          check_name: "Tests with Warnings Results"
+          files: test-warning-results/**/*.xml
