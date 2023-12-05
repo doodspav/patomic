@@ -1,9 +1,12 @@
-name: 'Publish Test Results'
+name: Publish Test Results
 
 on:
+  push:
+    branches:
+      - '**'
   workflow_run:
     workflows:
-      - 'Run Tests With Warnings'
+      - Run Tests With Warnings
     types:
       - completed
 
