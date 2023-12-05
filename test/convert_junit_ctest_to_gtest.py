@@ -114,17 +114,17 @@ def _parse_gtest_testsuites_from_ctest_testsuite(ctest_testsuite: ETree.Element)
         if status not in ["run", "notrun", "fail"]:
             raise ValueError(f"status attribute of {suite_name}.{case_name} has unknown value: {status}")
 
-        # remove <system-out> sub-element if test runs with no issues
+        # get <system-out> sub-element for checking later
         sysout: str = ""
-        if status == "run":
-            all_elem_sysout = case.findall("system-out")
-            if len(all_elem_sysout) > 1:
-                raise ValueError(f"more than one <system-out> sub-element found in {suite_name}.{case_name}")
-            if len(all_elem_sysout) > 0:
-                sysout = "" if all_elem_sysout[0].text is None else str(all_elem_sysout[0].text)
-            sysout_lower = sysout.lower()
-            if len(all_elem_sysout) > 0 and not any(s in sysout_lower for s in ["warn", "error", "fail"]):
-                case.remove(all_elem_sysout[0])
+        all_elem_sysout = case.findall("system-out")
+        if len(all_elem_sysout) > 1:
+            raise ValueError(f"more than one <system-out> sub-element found in {suite_name}.{case_name}")
+        if len(all_elem_sysout) > 0:
+            sysout = "" if all_elem_sysout[0].text is None else str(all_elem_sysout[0].text)
+
+        # remove <system-out> sub-element if test runs with no issues
+        if status in "run" and sysout and not any(s in sysout.lower() for s in ["warn", "error", "fail"]):
+            case.remove(all_elem_sysout[0])
 
         # set result to gtest values
         result = _make_gtest_testcase_result(suite_name, case_name, status, sysout)
