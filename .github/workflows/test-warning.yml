@@ -116,7 +116,7 @@ jobs:
         shell: bash
         run: |
           mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${{ env.PATOMIC_CI_ID }}.xml
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.PATOMIC_CI_ID }} --output upload/${{ env.PATOMIC_CI_ID }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
@@ -320,7 +320,7 @@ jobs:
       - name: Prepare Test Results
         run: |
           mkdir upload
-          cp patomic/build/Testing/Temporary/results.xml upload/${{ env.PATOMIC_CI_ID }}.xml
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.PATOMIC_CI_ID }} --output upload/${{ env.PATOMIC_CI_ID }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
