@@ -1,4 +1,4 @@
-name: Run Tests With Warnings
+name: 'Run Tests With Warnings'
 
 on:
   pull_request:

@@ -1,9 +1,9 @@
-name: Publish Test Results
+name: 'Publish Test Results'
 
 on:
   workflow_run:
     workflows:
-      - "Run Tests With Warnings"
+      - 'Run Tests With Warnings'
     types:
       - completed
 
