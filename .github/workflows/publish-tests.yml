@@ -1,9 +1,6 @@
 name: Publish Test Results
 
 on:
-  push:
-    branches:
-      - '**'
   workflow_run:
     workflows:
       - Run Tests With Warnings
@@ -16,10 +13,6 @@ jobs:
     # if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Debug
-        run: |
-          echo "Working"
-
       - name: Download Test Result Artifacts
         uses: actions/download-artifact@v3
         with:
