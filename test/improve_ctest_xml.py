@@ -21,8 +21,7 @@ def get_program_arguments() -> ProgArgs:
     parser.add_argument("-t", "--triple", type=str, required=True, help="Platform identifier on which input file was generated from")
 
     # obtain program arguments
-    _argv = ["-i", "x86_32-ubuntu-gcc-shared.xml", "-t", "x86_32-ubuntu-gcc-shared", "-o", "results.xml"]
-    args = parser.parse_args(args=_argv)
+    args = parser.parse_args()
     return ProgArgs(input_path=Path(args.input), output_path=Path(args.output), triple=args.triple)
 
 
