@@ -30,6 +30,11 @@ jobs:
         include:
           # use Release for everything
           - cmake-build-type: Release
+          # build-shared -> cmake-build-shared
+          - build-shared: static
+            cmake-build-shared: OFF
+          - build-shared: shared
+            cmake-build-shared: ON
           # platform -> os, preset, compiler, architecture
           - platform: windows-gcc-x86_64
             os: windows
@@ -61,11 +66,6 @@ jobs:
             preset: patomic-ci-native-unix-gcc-warning
             compiler: gcc
             architecture: x86_64
-          # build-shared -> cmake-build-shared
-          - build-shared: static
-            cmake-build-shared: OFF
-          - build-shared: shared
-            cmake-build-shared: ON
 
     steps:
       - name: Checkout patomic
@@ -346,5 +346,5 @@ jobs:
         with:
           action_fail: true
           action_fail_on_inconclusive: true
-          check_name: "Tests Results: Warnings"
+          check_name: "Tests Results: Warning"
           files: test-warning-results/**/*.xml
