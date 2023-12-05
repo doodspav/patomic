@@ -41,23 +41,23 @@ def _make_gtest_default_testsuite(suite_name: str) -> ETree.Element:
 
 
 def _make_gtest_testcase_result(suite_name: str, case_name: str, status: str, sysout: str) -> Optional[str]:
-    # test crashed
+    # test failed, possibly crashed
     if status == "fail":
-        return None
+        if f"[  FAILED  ] {suite_name}.{case_name}" in sysout:
+            return "failed"
+        else:
+            return "crashed"
 
-    # test was either skipped while running, or not run at al
+    # test was either skipped while running, or not run at all
     elif status == "notrun":
         if f"[  SKIPPED ] {suite_name}.{case_name}" in sysout:
             return "skipped"
         else:
             return None
 
-    # test was run to completion but may have failed
+    # test was run to completion
     elif status == "run":
-        if f"[  FAILED  ] {suite_name}.{case_name}" in sysout:
-            return "failed"
-        else:
-            return "completed"
+        return "completed"
 
     # should be unreachable
     else:
@@ -78,15 +78,21 @@ def _add_gtest_testcase_to_testsuite(suite: ETree.Element, case: ETree.Element) 
     # increment diagnostic counters
     status: str = case.get("status")
     result: Optional[str] = case.get("result")
-    if status == "notrun":
-        inc_attr(suite, "disabled")
-    elif status == "run":
-        if result == "failed":
-            inc_attr(suite, "failures")
+    if status == "run":
+        if result == "completed":
+            pass
         elif result == "skipped":
             inc_attr(suite, "skipped")
+        elif result == "failed":
+            inc_attr(suite, "failures")
+        elif result == "crashed":
+            inc_attr(suite, "errors")
+        else:
+            raise ValueError(f"result attribute of {suite.get('name')}.{case.get('name')} has unknown value: {result}")
+    elif status == "notrun":
+        inc_attr(suite, "disabled")
     else:
-        inc_attr(suite, "errors")
+        raise ValueError(f"status attribute of {suite.get('name')}.{case.get('name')} has unknown value: {status}")
 
     # attach case to suite
     suite.append(case)
@@ -124,7 +130,7 @@ def _parse_gtest_testsuites_from_ctest_testsuite(ctest_testsuite: ETree.Element)
         result = _make_gtest_testcase_result(suite_name, case_name, status, sysout)
         if result is not None:
             case.set("result", result)
-        if result == "skipped":
+        if status == "fail" or result == "skipped":
             case.set("status", "run")
 
         # populate dictionary
