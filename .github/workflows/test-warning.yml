@@ -346,5 +346,5 @@ jobs:
         with:
           action_fail: true
           action_fail_on_inconclusive: true
-          check_name: "Tests with Warnings Results"
+          check_name: "Tests Results: Warnings"
           files: test-warning-results/**/*.xml
