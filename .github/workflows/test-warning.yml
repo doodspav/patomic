@@ -132,6 +132,7 @@ jobs:
       PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler-version }}
+      PATOMIC_CI_SYSROOT: '~/sysroot'
     strategy:
       matrix:
         # architecture gets converted to triple
@@ -242,6 +243,7 @@ jobs:
     steps:
       - name: Install Toolchains and Qemu
         run: |
+          sudo apt update
           sudo apt install g++-${{ matrix.gcc-version }}-multilib
           sudo apt install g++-${{ matrix.gcc-version }}-${{ matrix.triple }}
           sudo apt install llvm-${{ matrix.llvm-version }}
@@ -282,7 +284,7 @@ jobs:
         if: steps.cache-googletest.outputs.cache-hit != 'true'
         # cannot use symlink or reference directory directly, will not work
         run: |
-          cp -r /usr/${{ matrix.triple }}/ ${HOME}/sysroot
+          cp -r /usr/${{ matrix.triple }}/ ${{ env.PATOMIC_CI_SYSROOT }}
 
       - name: Checkout GoogleTest
         if: steps.cache-googletest.outputs.cache-hit != 'true'
@@ -301,14 +303,14 @@ jobs:
           cd build
           cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
           cmake --build . --verbose
-          cmake --install . --prefix ${HOME}/sysroot
+          cmake --install . --prefix ${{ env.PATOMIC_CI_SYSROOT }}
 
       - name: Build patomic
         run: |
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="${HOME}/sysroot/lib/cmake/GTest" ..
+          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="${{ env.PATOMIC_CI_SYSROOT }}/lib/cmake/GTest" ..
           cmake --build . --verbose
 
       - name: Test patomic
