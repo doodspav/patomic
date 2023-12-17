@@ -67,6 +67,22 @@ if(NOT PATOMIC_CI_SYSROOT)
 endif()
 
 
+# ---- Force Use of Cache Variables ----
+
+set(cache_variables )
+list(APPEND cache_variables
+    "PATOMIC_CI_SYSROOT"
+    "PATOMIC_CI_XARCH"
+    "PATOMIC_CI_XCOMPILER"
+    "PATOMIC_CI_XCOMPILER_VERSION"
+    "PATOMIC_CI_XTRIPLE"
+)
+
+# tells CMake to pass these variables when try_compile is invoked (runs toolchain file)
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES "${cache_variables}")
+list(REMOVE_DUPLICATES CMAKE_TRY_COMPILE_PLATFORM_VARIABLES)
+
+
 # ---- Set CMake Variables ----
 
 # set basic target information
