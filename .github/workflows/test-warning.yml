@@ -130,7 +130,7 @@ jobs:
       PATOMIC_CI_ID: ${{ matrix.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build-shared }}
       PATOMIC_CI_XARCH: ${{ matrix.architecture }}
       PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
-      PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
+      # PATOMIC_CI_XCOMPILER is specified as a cache variable in the appropriate presets (since it's a constant)
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler-version }}
       PATOMIC_CI_SYSROOT: ${{ matrix.sysroot }}
     strategy:
