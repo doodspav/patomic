@@ -132,7 +132,7 @@ jobs:
       PATOMIC_CI_XTRIPLE: ${{ matrix.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler-version }}
-      PATOMIC_CI_SYSROOT: '~/sysroot'
+      PATOMIC_CI_SYSROOT: ${{ matrix.sysroot }}
     strategy:
       matrix:
         # architecture gets converted to triple
@@ -185,6 +185,9 @@ jobs:
         # convert verbose labels to usable values (which don't appear in action name)
         # also just other variables that we don't want appearing in action name
         include:
+          # common local sysroot location for everything
+          # don't prefix with ${HOME} because not always expanded by actions
+          - sysroot: '~/sysroot'
           # use Release for everything
           - cmake-build-type: Release
           # build-shared -> cmake-build-shared
@@ -275,8 +278,7 @@ jobs:
         id: cache-googletest
         uses: actions/cache@v3
         with:
-          # don't prefix with ${HOME} because can't find path when trying to cache
-          path: ~/sysroot
+          path: ${{ matrix.sysroot }}
           # need both gcc and llvm version in case of building with clang but using gcc sysroot
           key: googletest-${{ env.PATOMIC_CI_ID }}-${{ matrix.gcc-version }}-${{ matrix.llvm-version }}
 
@@ -284,7 +286,7 @@ jobs:
         if: steps.cache-googletest.outputs.cache-hit != 'true'
         # cannot use symlink or reference directory directly, will not work
         run: |
-          cp -r /usr/${{ matrix.triple }}/ ${{ env.PATOMIC_CI_SYSROOT }}
+          cp -r /usr/${{ matrix.triple }}/ ${{ matrix.sysroot }}
 
       - name: Checkout GoogleTest
         if: steps.cache-googletest.outputs.cache-hit != 'true'
@@ -303,14 +305,14 @@ jobs:
           cd build
           cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
           cmake --build . --verbose
-          cmake --install . --prefix ${{ env.PATOMIC_CI_SYSROOT }}
+          cmake --install . --prefix ${{ matrix.sysroot }}
 
       - name: Build patomic
         run: |
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="${{ env.PATOMIC_CI_SYSROOT }}/lib/cmake/GTest" ..
+          cmake --preset ${{ matrix.preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake-build-shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DGTest_ROOT:PATH="${{ matrix.sysroot }}/lib/cmake/GTest" ..
           cmake --build . --verbose
 
       - name: Test patomic
