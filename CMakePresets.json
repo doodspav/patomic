@@ -18,7 +18,7 @@
     {
       "name": "_patomic-ci-qemu-base",
       "hidden": true,
-      "toolchainFile": "ci/toolchain-qemu-ubuntu-cross.cmake",
+      "toolchainFile": "ci/toolchain/qemu-linux-gnu.cmake",
       "inherits": [
         "_patomic-ci-base"
       ]
