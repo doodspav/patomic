@@ -53,7 +53,7 @@ set(
 )
 if(NOT PATOMIC_CI_XCOMPILER_VERSION)
     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION cache/environment variable is not set")
-elseif(NOT PATOMIC_CI_XCOMPILER_VERSION MATCHES "^(\\d+)$")
+elseif(NOT PATOMIC_CI_XCOMPILER_VERSION MATCHES "^((\\d)+)$")
     message(FATAL_ERROR "PATOMIC_CI_XCOMPILER_VERSION '${PATOMIC_CI_XCOMPILER_VERSION}' does not match regex '\\d+'")
 endif()
 
