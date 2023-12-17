@@ -15,7 +15,7 @@
 
 # ---- Get Cache/Environment Variables ----
 
-# target triple, used to set compiler (and its target), e.g. aarch64-linux-gnu
+# target triple, used to set compiler and its target, e.g. aarch64-linux-gnu
 set(
     PATOMIC_CI_XTRIPLE "$ENV{PATOMIC_CI_XTRIPLE}" CACHE STRING
     "target triple, used to set compiler and its target, e.g. aarch64-linux-gnu"
