@@ -37,6 +37,8 @@ runs:
     - name: Check No Empty Inputs
       shell: bash
       run: |
+        # Check No Empty Inputs
+        
         # checks input is not empty
         check_input() {
           input_name="${1}"
@@ -60,6 +62,8 @@ runs:
       id: generate-attributes
       shell: bash
       run: |
+        # Check Input Values and Generate Attributes
+        
         # test_type component - check
         test_types=("ansi" "coverage" "sanitize" "warning")
         if ! [[ " ${test_types[@]} " =~ " ${{ inputs.test_type }} " ]]; then
