@@ -117,6 +117,15 @@ runs:
         echo "build_shared=${build_shared}" >> GITHUB_OUTPUT
         
         # unique_cache_id component - generate, save
-        unique_id="${{ inputs.triple }}-${os}-${compiler}-${build_shared}"
+        unique_cache_id="${{ inputs.triple }}-${os}-${compiler}-${build_shared}"
         echo "unique_cache_id: ${unique_cache_id}"
         echo "unique_cache_id=${unique_cache_id}" >> GITHUB_OUTPUT
+        
+        # unique_file_name component - generate, save
+        # this is separate because:
+        # - we don't want the whole triple in file names
+        # - we may need to change this if we support multiple ABIs
+        # - separate from cache-id so we can change it without affecting caches
+        unique_file_name="${{ inputs.architecture }}-${os}-${compiler}-${build_shared}"
+        echo "unique_file_name: ${unique_file_name}"
+        echo "unique_file_name=${unique_file_name}" >>  GITHUB_OUTPUT
