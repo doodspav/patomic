@@ -78,19 +78,19 @@ runs:
         fi
         
         # os component - generate
-        if [[ "${{ env.RUNNER_OS }}" == *"macOS"* ]]; then
+        if [[ "$RUNNER_OS" == *"macOS"* ]]; then
           os="macos"
-        elif [[ "${{ env.RUNNER_OS }}" == *"windows"* ]]; then
+        elif [[ "$RUNNER_OS" == *"windows"* ]]; then
           os="windows"
-        elif [[ "${{ env.RUNNER_OS }}" == *"ubuntu"* ]]; then
+        elif [[ "$RUNNER_OS" == *"ubuntu"* ]]; then
           os="ubuntu"
         else
-          echo "Error: running on unknown OS '${{ env.RUNNER_OS }}'; does not match  one of 'macOS', 'windows', or 'ubuntu'."
+          echo "Error: running on unknown OS '$RUNNER_OS'; does not match  one of 'macOS', 'windows', or 'ubuntu'."
           exit 1
         fi
         
         # os component - save
-        echo "os: $os"
+        echo "os: ${os}"
         echo "::set-output name=os::${os}"
         
         # compiler component - generate
@@ -106,13 +106,13 @@ runs:
         fi
         
         # compiler component - save
-        echo "compiler: $compiler"
+        echo "compiler: ${compiler}"
         echo "::set-output name=compiler::${compiler}"
         
         # build_shared component - generate
         true_values=("1" "on" "yes" "true" "y")
         false_values=("0" "off" "no" "false" "n")
-        build_shared=${{ inputs.cmake_build_shared }}
+        build_shared="${{ inputs.cmake_build_shared }}"
         if [[ " ${true_values[@]} " =~ " ${build_shared,,} " ]]; then
           build_shared="shared"
         elif [[ " ${false_values[@]} " =~ " ${build_shared,,} " ]]; then
@@ -123,10 +123,10 @@ runs:
         fi
         
         # build_shared component - save
-        echo "build_shared: $build_shared"
+        echo "build_shared: ${build_shared}"
         echo "::set-output name=build_shared::${build_shared}"
         
         # unique_id component - generate, save
         unique_id="${{ inputs.architecture }}-${os}-${compiler}-${build_shared}"
-        echo "unique_id: $unique_id"
+        echo "unique_id: ${unique_id}"
         echo "::set-output name=unique_id::${unique_id}"
