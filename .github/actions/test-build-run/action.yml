@@ -66,3 +66,19 @@ runs:
           echo "Error: test_type has unknown value '${{ inputs.test_type }}'; must be one of 'ansi', 'coverage', 'sanitize', 'warning'."
           exit 1
         fi
+        
+        # os component - generate
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          os="ubuntu"
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          os="macos"
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          os="windows"
+        else
+          echo "Error: running on unknown OS '${{ runner.os }}'; does not match one of 'Linux', 'macOS', or 'Windows'."
+          exit 1
+        fi
+        
+        # os component - save
+        echo "os: ${os}"
+        echo "os=${os}" >> $GITHUB_OUTPUT
