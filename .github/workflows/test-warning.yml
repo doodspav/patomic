@@ -74,7 +74,7 @@ jobs:
           path: patomic
 
       - name: Try Using Local Action
-        uses: ./patomic/.github/actions/test-build-run.yml
+        uses: ./patomic/.github/actions/test-build-run
         with:
           test_type: ansi
           preset: ${{ matrix.preset }}
@@ -288,7 +288,7 @@ jobs:
           path: patomic
 
       - name: Try Using Local Action
-        uses: ./patomic/.github/actions/test-build-run.yml
+        uses: ./patomic/.github/actions/test-build-run
         with:
           test_type: ansi
           preset: ${{ matrix.preset }}
