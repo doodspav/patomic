@@ -91,7 +91,7 @@ runs:
         
         # os component - save
         echo "os: ${os}"
-        echo "::set-output name=os::${os}"
+        echo "os=${os}" >> $GITHUB_OUTPUT
         
         # compiler component - generate
         if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
@@ -107,7 +107,7 @@ runs:
         
         # compiler component - save
         echo "compiler: ${compiler}"
-        echo "::set-output name=compiler::${compiler}"
+        echo "compiler=${compiler}" >> $GITHUB_OUTPUT
         
         # build_shared component - generate
         true_values=("1" "on" "yes" "true" "y")
@@ -124,9 +124,9 @@ runs:
         
         # build_shared component - save
         echo "build_shared: ${build_shared}"
-        echo "::set-output name=build_shared::${build_shared}"
+        echo "build_shared=${build_shared}" >> GITHUB_OUTPUT
         
         # unique_id component - generate, save
         unique_id="${{ inputs.architecture }}-${os}-${compiler}-${build_shared}"
         echo "unique_id: ${unique_id}"
-        echo "::set-output name=unique_id::${unique_id}"
+        echo "unique_id=${unique_id}" >> GITHUB_OUTPUT
