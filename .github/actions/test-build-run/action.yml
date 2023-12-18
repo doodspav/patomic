@@ -115,3 +115,8 @@ runs:
         # build_shared component - save
         echo "build_shared: ${build_shared}"
         echo "build_shared=${build_shared}" >> GITHUB_OUTPUT
+        
+        # unique_cache_id component - generate, save
+        unique_id="${{ inputs.triple }}-${os}-${compiler}-${build_shared}"
+        echo "unique_cache_id: ${unique_cache_id}"
+        echo "unique_cache_id=${unique_cache_id}" >> GITHUB_OUTPUT
