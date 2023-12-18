@@ -77,7 +77,7 @@ runs:
           cmake_build_type="Debug"
         elif [[ "${{ inputs.test_type }}" == "sanitize" ]]; then
           cmake_build_type="Debug"
-        elif [[ "${{ inputs.test_type }}" == warning" ]]; then
+        elif [[ "${{ inputs.test_type }}" == "warning" ]]; then
           cmake_build_type="Release"
         else
           echo "Error: input 'test_type' has unknown value '${{ inputs.test_type }}'; must be one of 'ansi', 'coverage', 'sanitize', 'warning'."
