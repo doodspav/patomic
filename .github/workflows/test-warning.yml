@@ -73,6 +73,19 @@ jobs:
         with:
           path: patomic
 
+      - name: Try Using Local Action
+        uses: ./patomic/.github/actions/test-build-run.yml
+        with:
+          test_type: ansi
+          preset: ${{ matrix.preset }}
+          architecture: ${{ matrix.architecture }}
+          triple: no
+          cmake_build_shared: ${{ matrix.cmake-build-shared }}
+          patomic_path: no
+          googletest_path: no
+          working_directory: no
+          xml_file: no
+
       - name: Restore Cached GoogleTest
         id: cache-googletest
         uses: actions/cache@v3
@@ -273,6 +286,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: patomic
+
+      - name: Try Using Local Action
+        uses: ./patomic/.github/actions/test-build-run.yml
+        with:
+          test_type: ansi
+          preset: ${{ matrix.preset }}
+          architecture: ${{ matrix.architecture }}
+          triple: no
+          cmake_build_shared: ${{ matrix.cmake-build-shared }}
+          patomic_path: no
+          googletest_path: no
+          working_directory: no
+          xml_file: no
 
       - name: Restore Cached GoogleTest and Sysroot
         id: cache-googletest
