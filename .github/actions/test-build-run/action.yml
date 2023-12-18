@@ -78,12 +78,12 @@ runs:
         fi
         
         # os component - generate
-        if [[ "$RUNNER_OS" == *"macOS"* ]]; then
-          os="macos"
-        elif [[ "$RUNNER_OS" == *"windows"* ]]; then
-          os="windows"
-        elif [[ "$RUNNER_OS" == *"ubuntu"* ]]; then
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
           os="ubuntu"
+        if [[ "$RUNNER_OS" == "macOS" ]]; then
+          os="macos"
+        elif [[ "$RUNNER_OS" == "Windows" ]]; then
+          os="windows"
         else
           echo "Error: running on unknown OS '$RUNNER_OS'; does not match  one of 'macOS', 'windows', or 'ubuntu'."
           exit 1
