@@ -103,9 +103,9 @@ runs:
         true_values=("1" "on" "yes" "true" "y")
         false_values=("0" "off" "no" "false" "n")
         build_shared="${{ inputs.cmake_build_shared }}"
-        if [[ " ${true_values[@]} " =~ " ${build_shared,,} " ]];
+        if [[ " ${true_values[@]} " =~ " ${build_shared,,} " ]]; then
           build_shared="shared"
-        elif [[ "${false_values[@]} " =~ " ${build_shared,,} " ]];
+        elif [[ "${false_values[@]} " =~ " ${build_shared,,} " ]]; then
           build_shared="static"
         else
           echo "Error: input 'cmake_build_shared' value is '${build_shared}', must be one of: ${true_values[*]} ${false_values[*]} (case-insensitive)."
