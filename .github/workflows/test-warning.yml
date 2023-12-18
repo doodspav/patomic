@@ -83,8 +83,6 @@ jobs:
           cmake_build_shared: ${{ matrix.cmake-build-shared }}
           patomic_path: no
           googletest_path: no
-          working_directory: no
-          xml_file: no
 
       - name: Restore Cached GoogleTest
         id: cache-googletest
@@ -297,8 +295,6 @@ jobs:
           cmake_build_shared: ${{ matrix.cmake-build-shared }}
           patomic_path: no
           googletest_path: no
-          working_directory: no
-          xml_file: no
 
       - name: Restore Cached GoogleTest and Sysroot
         id: cache-googletest

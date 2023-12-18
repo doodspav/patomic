@@ -30,14 +30,6 @@ inputs:
     description: 'Source directory of googletest repository'
     required: true
     default: ''
-  working_directory:
-    description: 'Directory to use for ephemeral (but possibly cached) files'
-    required: true
-    default: ''
-  xml_file:
-    description: 'Test results will be written to this file as XML'
-    required: true
-    default: ''
 
 runs:
   using: composite
