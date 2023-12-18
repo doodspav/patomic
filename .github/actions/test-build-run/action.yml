@@ -68,7 +68,7 @@ runs:
         # - ACTION_BUILD_SHARED
         # - ACTION_UNIQUE_CACHE_ID
         # - ACTION_UNIQUE_FILE_NAME
-        # 
+        # - ACTION_WORKING_DIR
         
         # cmake_build_type component - generate
         if [[ "${{ inputs.test_type }}" == "ansi" ]]; then
@@ -181,5 +181,6 @@ runs:
         
         # working_dir component - generate, save
         working_dir="${{ runner.temp }}/${unique_cache_id}"
+        mkdir "${working_dir}"
         echo "ACTION_WORKING_DIR: ${working_dir}"
         echo "ACTION_WORKING_DIR=${working_dir}" >> $GITHUB_ENV
