@@ -121,8 +121,8 @@ runs:
         echo "ACTION_COMPILER=${compiler}" >> $GITHUB_ENV
         
         # compiler version component - generate
-        gcc_version="ACTION_GCC_VERSION_not_set"
-        llvm_version="ACTION_LLVM_VERSION_not_set"
+        gcc_version="ACTION_GCC_VERSION_not_set_on_native"
+        llvm_version="ACTION_LLVM_VERSION_not_set_on_native"
         if [[ "${{ inputs.preset }}" == *"qemu"* ]]; then
           gcc_version="11"
           llvm_version="15"
@@ -135,7 +135,7 @@ runs:
             exit 1
           fi
         else
-          compiler_version="ACTION_COMPILER_VERSION_not_set"
+          compiler_version="ACTION_COMPILER_VERSION_not_set_on_native"
         fi
         
         # compiler version component - save
