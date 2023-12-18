@@ -121,14 +121,21 @@ runs:
         echo "ACTION_COMPILER=${compiler}" >> $GITHUB_ENV
         
         # compiler version component - generate
-        gcc_version="11"
-        llvm_version="15"
-        if [[ "${{ inputs.preset }}" == *"qemu"* && "${compiler}" == "clang" ]]; then
-          compiler_version="${clang_version}"
-        elif [[ "${{ inputs.preset }}" == *"qemu"* && "${compiler}" == "gcc" ]]; then
-          compiler_version="${gcc_version}"
+        gcc_version="ACTION_GCC_VERSION_not_set"
+        llvm_version="ACTION_LLVM_VERSION_not_set"
+        if [[ "${{ inputs.preset }}" == *"qemu"* ]]; then
+          gcc_version="11"
+          llvm_version="15"
+          if [[ "${compiler}" == "clang" ]]; then
+            compiler_version="${clang_version}"
+          elif [[ "${compiler}" == "gcc" ]]; then
+            compiler_version="${gcc_version}"
+          else
+            echo "Error: only 'clang' and 'gcc' compilers are valid when running with qemu preset."
+            exit 1
+          fi
         else
-          compiler_version="ACTION_COMPILER_VERSION_intentionally_not_set"
+          compiler_version="ACTION_COMPILER_VERSION_not_set"
         fi
         
         # compiler version component - save
