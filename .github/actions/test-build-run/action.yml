@@ -98,3 +98,20 @@ runs:
         # compiler component - save
         echo "compiler: ${compiler}"
         echo "compiler=${compiler}" >> $GITHUB_OUTPUT
+        
+        # build_shared component - generate
+        true_values=("1" "on" "yes" "true" "y")
+        false_values=("0" "off" "no" "false" "n")
+        build_shared="${{ inputs.cmake_build_shared }}"
+        if [[ " ${true_values[@]} " =~ " ${build_shared,,} " ]];
+          build_shared="shared"
+        elif [[ "${false_values[@]} " =~ " ${build_shared,,} " ]];
+          build_shared="static"
+        else
+          echo "Error: input 'cmake_build_shared' value is '${build_shared}', must be one of: ${true_values[*]} ${false_values[*]} (case-insensitive)."
+          exit 1
+        fi
+        
+        # build_shared component - save
+        echo "build_shared: ${build_shared}"
+        echo "build_shared=${build_shared}" >> GITHUB_OUTPUT
