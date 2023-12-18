@@ -1,0 +1,132 @@
+name: Build and Run Tests
+description: Builds and runs all tests as one of { ansi, coverage, sanitize, warning }.
+
+inputs:
+  test_type:
+    description: 'One of { ansi, coverage, sanitize, warning }'
+    required: true
+    default: ''
+  preset:
+    description: 'CMake preset used to build patomic and googletest'
+    required: true
+    default: ''
+  architecture:
+    description: 'CPU architecture tests are run on, passed to QEMU'
+    required: true
+    default: ''
+  triple:
+    description: 'Platform triple to compile for, used to install correct compiler and sysroot'
+    required: true
+    default: ''
+  cmake_build_shared:
+    description: 'Determines value of BUILD_SHARED_LIBS for CMake, must be considered a boolean by CMake'
+    required: true
+    default: ''
+  patomic_path:
+    description: 'Source directory of patomic repository'
+    required: true
+    default: ''
+  googletest_path:
+    description: 'Source directory of googletest repository'
+    required: true
+    default: ''
+  working_directory:
+    description: 'Directory to use for ephemeral (but possibly cached) files'
+    required: true
+    default: ''
+  xml_file:
+    description: 'Test results will be written to this file as XML'
+    required: true
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Check No Empty Inputs
+      shell: bash
+      run: |
+        # checks input is not empty
+        check_input() {
+          input_name="${1}"
+          input_value="${2}"
+          if [[ -z "${input_value}" ]]; then
+            echo "Error: required input '${input_name}' is empty or was not specified."
+            exit 1
+          fi
+        }
+        
+        # apply function to all inputs
+        check_input "test_type" "${{ inputs.test_type }}"
+        check_input "preset" "${{ inputs.preset }}"
+        check_input "architecture" "${{ inputs.architecture }}"
+        check_input "triple" "${{ inputs.triple }}"
+        check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
+        check_input "patomic_path" "${{ inputs.patomic_path }}"
+        check_input "googletest_path" "${{ inputs.googletest_path }}"
+        check_input "working_directory" "${{ inputs.working_directory }}"
+        check_input "xml_file" "${{ inputs.xml_file }}"
+
+    - name: Check Input Values and Generate Attributes
+      id: generate-attributes
+      shell: bash
+      run: |
+        # test_type component - check
+        test_types=("ansi" "coverage" "sanitize" "warning")
+        if ! [[ " ${test_types[@]} " =~ " ${{ inputs.test_type }} " ]]; then
+          echo "Error: test_type has unknown value '${{ inputs.test_type }}'; must be one of 'ansi', 'coverage', 'sanitize', 'warning'."
+          exit 1
+        fi
+        
+        # os component - generate
+        if [[ "${{ env.RUNNER_OS }}" == *"macOS"* ]]; then
+          os="macos"
+        elif [[ "${{ env.RUNNER_OS }}" == *"windows"* ]]; then
+          os="windows"
+        elif [[ "${{ env.RUNNER_OS }}" == *"ubuntu"* ]]; then
+          os="ubuntu"
+        else
+          echo "Error: running on unknown OS '${{ env.RUNNER_OS }}'; does not match  one of 'macOS', 'windows', or 'ubuntu'."
+          exit 1
+        fi
+        
+        # os component - save
+        echo "os: $os"
+        echo "::set-output name=os::${os}"
+        
+        # compiler component - generate
+        if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
+          compiler="clang"
+        elif [[ "${{ inputs.preset }}" == *"gcc"* ]]; then
+          compiler="gcc"
+        elif [[ "${{ inputs.preset }}" == *"msvc"* ]]; then
+          compiler="msvc"
+        else
+          echo "Error: cannot determine known compiler from 'preset' value '${{ inputs.preset }}'; must contain one of 'clang', 'gcc', or 'msvc'."
+          exit 1
+        fi
+        
+        # compiler component - save
+        echo "compiler: $compiler"
+        echo "::set-output name=compiler::${compiler}"
+        
+        # build_shared component - generate
+        true_values=("1" "on" "yes" "true" "y")
+        false_values=("0" "off" "no" "false" "n")
+        build_shared=${{ inputs.cmake_build_shared }}
+        if [[ " ${true_values[@]} " =~ " ${build_shared,,} " ]]; then
+          build_shared="shared"
+        elif [[ " ${false_values[@]} " =~ " ${build_shared,,} " ]]; then
+          build_shared="static"
+        else
+          echo "Error: cmake_build_shared is '${build_shared}', must be one of: ${true_values[*]} ${false_values[*]} (case-insensitive)."
+          exit 1
+        fi
+        
+        # build_shared component - save
+        echo "build_shared: $build_shared"
+        echo "::set-output name=build_shared::${build_shared}"
+        
+        # unique_id component - generate, save
+        unique_id="${{ inputs.architecture }}-${os}-${compiler}-${build_shared}"
+        echo "unique_id: $unique_id"
+        echo "::set-output name=unique_id::${unique_id}"
