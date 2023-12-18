@@ -82,3 +82,19 @@ runs:
         # os component - save
         echo "os: ${os}"
         echo "os=${os}" >> $GITHUB_OUTPUT
+        
+        # compiler component - generate
+        if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
+          compiler="clang"
+        elif [[ "${{ inputs.preset }}" == *"gcc"* ]]; then
+          compiler="gcc"
+        elif [[ "${{ inputs.preset }}" == *"msvc"* ]]; then
+          compiler="msvc"
+        else
+          echo "Error: cannot determine known compiler from 'preset' value '${{ inputs.preset }}'; must contain one of 'clang', 'gcc', or 'msvc'."
+          exit 1
+        fi
+        
+        # compiler component - save
+        echo "compiler: ${compiler}"
+        echo "compiler=${compiler}" >> $GITHUB_OUTPUT
