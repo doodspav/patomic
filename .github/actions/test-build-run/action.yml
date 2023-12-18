@@ -55,8 +55,6 @@ runs:
         check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
         check_input "patomic_path" "${{ inputs.patomic_path }}"
         check_input "googletest_path" "${{ inputs.googletest_path }}"
-        check_input "working_directory" "${{ inputs.working_directory }}"
-        check_input "xml_file" "${{ inputs.xml_file }}"
 
     - name: Check Input Values and Generate Attributes
       id: generate-attributes
