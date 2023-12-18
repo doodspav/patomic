@@ -26,10 +26,6 @@ inputs:
     description: 'Source directory of patomic repository'
     required: true
     default: ''
-  googletest_path:
-    description: 'Source directory of googletest repository'
-    required: true
-    default: ''
 
 runs:
   using: composite
@@ -56,20 +52,41 @@ runs:
         check_input "triple" "${{ inputs.triple }}"
         check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
         check_input "patomic_path" "${{ inputs.patomic_path }}"
-        check_input "googletest_path" "${{ inputs.googletest_path }}"
 
-    - name: Check Input Values and Generate Attributes
-      id: generate-attributes
+    - name: Parse Input Values Into New Attributes
       shell: bash
       run: |
-        # Check Input Values and Generate Attributes
+        # Parse Input Values Into New Attributes
         
-        # test_type component - check
-        test_types=("ansi" "coverage" "sanitize" "warning")
-        if ! [[ " ${test_types[@]} " =~ " ${{ inputs.test_type }} " ]]; then
-          echo "Error: test_type has unknown value '${{ inputs.test_type }}'; must be one of 'ansi', 'coverage', 'sanitize', 'warning'."
+        # List of variables written to GITHUB_ENV:
+        # - ACTION_CMAKE_BUILD_TYPE
+        # - ACTION_OS
+        # - ACTION_COMPILER
+        # - ACTION_COMPILER_VERSION
+        # - ACTION_GCC_VERSION
+        # - ACTION_LLVM_VERSION
+        # - ACTION_BUILD_SHARED
+        # - ACTION_UNIQUE_CACHE_ID
+        # - ACTION_UNIQUE_FILE_NAME
+        # 
+        
+        # cmake_build_type component - generate
+        if [[ "${{ inputs.test_type }}" == "ansi" ]]; then
+          cmake_build_type="Release"
+        elif [[ "${{ inputs.test_type }}" == "coverage" ]]; then
+          cmake_build_type="Debug"
+        elif [[ "${{ inputs.test_type }}" == "sanitize" ]]; then
+          cmake_build_type="Debug"
+        elif [[ "${{ inputs.test_type }}" == warning" ]]; then
+          cmake_build_type="Release"
+        else
+          echo "Error: input 'test_type' has unknown value '${{ inputs.test_type }}'; must be one of 'ansi', 'coverage', 'sanitize', 'warning'."
           exit 1
         fi
+        
+        # cmake_build_type component - save
+        echo "ACTION_CMAKE_BUILD_TYPE: ${cmake_build_type}"
+        echo "ACTION_CMAKE_BUILD_TYPE=${cmake_build_type}" >> $GITHUB_ENV
         
         # os component - generate
         if [[ "${{ runner.os }}" == "Linux" ]]; then
@@ -84,8 +101,8 @@ runs:
         fi
         
         # os component - save
-        echo "os: ${os}"
-        echo "os=${os}" >> $GITHUB_OUTPUT
+        echo "ACTION_OS: ${os}"
+        echo "ACTION_OS=${os}" >> $GITHUB_ENV
         
         # compiler component - generate
         if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
@@ -100,8 +117,29 @@ runs:
         fi
         
         # compiler component - save
-        echo "compiler: ${compiler}"
-        echo "compiler=${compiler}" >> $GITHUB_OUTPUT
+        echo "ACTION_COMPILER: ${compiler}"
+        echo "ACTION_COMPILER=${compiler}" >> $GITHUB_ENV
+        
+        # compiler version component - generate
+        gcc_version="11"
+        llvm_version="15"
+        if [[ "${{ inputs.preset }}" == *"qemu"* && "${compiler}" == "clang" ]]; then
+          compiler_version="${clang_version}"
+        elif [[ "${{ inputs.preset }}" == *"qemu"* && "${compiler}" == "gcc" ]]; then
+          compiler_version="${gcc_version}"
+        else
+          compiler_version="ACTION_COMPILER_VERSION_intentionally_not_set"
+        fi
+        
+        # compiler version component - save
+        echo "ACTION_COMPILER_VERSION: ${compiler_version}"
+        echo "ACTION_COMPILER_VERSION=${compiler_version}" >> $GITHUB_ENV
+        
+        # individual compiler version component - generate, save
+        echo "ACTION_GCC_VERSION: ${gcc_version}"
+        echo "ACTION_GCC_VERSION=${gcc_version}" >> $GITHUB_ENV
+        echo "ACTION_LLVM_VERSION: ${llvm_version}"
+        echo "ACTION_LLVM_VERSION=${llvm_version}" >> $GITHUB_ENV
         
         # build_shared component - generate
         true_values=("1" "on" "yes" "true" "y")
@@ -117,13 +155,13 @@ runs:
         fi
         
         # build_shared component - save
-        echo "build_shared: ${build_shared}"
-        echo "build_shared=${build_shared}" >> GITHUB_OUTPUT
+        echo "ACTION_BUILD_SHARED: ${build_shared}"
+        echo "ACTION_BUILD_SHARED=${build_shared}" >> $GITHUB_ENV
         
         # unique_cache_id component - generate, save
         unique_cache_id="${{ inputs.triple }}-${os}-${compiler}-${build_shared}"
-        echo "unique_cache_id: ${unique_cache_id}"
-        echo "unique_cache_id=${unique_cache_id}" >> GITHUB_OUTPUT
+        echo "ACTION_UNIQUE_CACHE_ID: ${unique_cache_id}"
+        echo "ACTION_UNIQUE_CACHE_ID=${unique_cache_id}" >> $GITHUB_ENV
         
         # unique_file_name component - generate, save
         # this is separate because:
@@ -131,5 +169,10 @@ runs:
         # - we may need to change this if we support multiple ABIs
         # - separate from cache-id so we can change it without affecting caches
         unique_file_name="${{ inputs.architecture }}-${os}-${compiler}-${build_shared}"
-        echo "unique_file_name: ${unique_file_name}"
-        echo "unique_file_name=${unique_file_name}" >>  GITHUB_OUTPUT
+        echo "ACTION_UNIQUE_FILE_NAME: ${unique_file_name}"
+        echo "ACTION_UNIQUE_FILE_NAME=${unique_file_name}" >> $GITHUB_ENV
+        
+        # working_dir component - generate, save
+        working_dir="${{ runner.temp }}/${unique_cache_id}"
+        echo "ACTION_WORKING_DIR: ${working_dir}"
+        echo "ACTION_WORKING_DIR=${working_dir}" >> $GITHUB_ENV
