@@ -210,6 +210,8 @@ runs:
       shell: bash
       # cannot use symlink or reference directory directly, will not work
       run: |
+        # Set Up Sysroot
+        
         cp -r /usr/${{ inputs.triple }}/ ${{ env.ACTION_WORKING_DIR }}/sysroot
 
     - name: Checkout GoogleTest
@@ -217,7 +219,16 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: google/googletest
-        path: ${{ env.ACTION_WORKING_DIR }}/googletest
+        path: ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
+
+    - name: Move GoogleTest to Working Directory
+      if: steps.cache-sysroot.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        # Move GoogleTest to Working Directory
+        
+        cp -r ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}/ ${{ env.ACTION_WORKING_DIR }}/googletest
+        rm -rf ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
 
     - name: Build and Install GoogleTest
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
