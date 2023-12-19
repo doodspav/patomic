@@ -73,8 +73,8 @@ jobs:
         with:
           path: patomic
 
-      - name: Try Using Local Action
-        uses: ./patomic/.github/actions/test-build-run
+      - name: Try Using Reusable workflow
+        uses: patomic/patomic/.github/workflows/reusable/test-warning.yml@feature/ghi-20-setup-pipeline-and-presets
         with:
           test_type: ansi
           preset: ${{ matrix.preset }}
@@ -283,16 +283,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: patomic
-
-      - name: Try Using Local Action
-        uses: ./patomic/.github/actions/test-build-run
-        with:
-          test_type: ansi
-          preset: ${{ matrix.preset }}
-          architecture: ${{ matrix.architecture }}
-          triple: ${{ matrix.triple }}
-          cmake_build_shared: ${{ matrix.cmake-build-shared }}
-          patomic_path: patomic
 
       - name: Restore Cached GoogleTest and Sysroot
         id: cache-googletest

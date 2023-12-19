@@ -1,0 +1,53 @@
+name: Run Tests with Warnings
+
+on:
+  workflow_call:
+    inputs:
+      preset:
+        description: 'CMake preset used to build patomic and googletest'
+        required: true
+        type: string
+        default: ''
+      architecture:
+        description: 'CPU architecture tests are run on, passed to QEMU'
+        required: true
+        type: string
+        default: ''
+      triple:
+        description: 'Platform triple to compile for, used to install correct compiler and sysroot'
+        required: true
+        type: string
+        default: ''
+      cmake_build_shared:
+        description: 'Determines value of BUILD_SHARED_LIBS for CMake, must be considered a boolean by CMake'
+        required: true
+        type: string
+        default: ''
+      patomic_path:
+        description: 'Source directory of patomic repository'
+        required: true
+        type: string
+        default: ''
+
+jobs:
+  warning:
+    steps:
+      - name: Check No Empty Inputs
+        shell: bash
+        run: |
+          # checks input is not empty
+            check_input() {
+              input_name="${1}"
+              input_value="${2}"
+              if [[ -z "${input_value}" ]]; then
+                echo "Error: required input '${input_name}' is empty or was not specified."
+                exit 1
+              fi
+            }
+
+            # apply function to all inputs
+            check_input "preset" "${{ inputs.preset }}"
+            check_input "architecture" "${{ inputs.architecture }}"
+            check_input "triple" "${{ inputs.triple }}"
+            check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
+            check_input "patomic_path" "${{ inputs.patomic_path }}"
