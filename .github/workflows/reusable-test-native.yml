@@ -18,11 +18,6 @@ on:
         required: true
         type: string
         default: ''
-      compiler:
-        description: 'Shortname of compiler being used, used for naming (does not affect which compiler is used)'
-        required: true
-        type: string
-        default: ''
 
 jobs:
   checks:
@@ -48,7 +43,6 @@ jobs:
           check_input "os"           "${{ inputs.os }}"
           check_input "preset"       "${{ inputs.preset }}"
           check_input "architecture" "${{ inputs.architecture }}"
-          check_input "compiler"     "${{ inputs.compiler }}"
 
   warning:
     needs: checks
@@ -60,6 +54,7 @@ jobs:
           - shared
         include:
           # hidden single variables
+          - compiler: ${{ contains(inputs.preset, 'clang') && 'clang' || ( contains(inputs.preset, 'gcc') && 'gcc' || 'msvc' ) }}
           - cmake_build_type: Release
           - cmake_preset: ${{ inputs.preset }}-warning
           # alias variables
@@ -69,8 +64,8 @@ jobs:
             cmake_build_shared: ON
     env:
       # these have to be in env context because they depend on matrix context
-      UNIQUE_ID: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ matrix.build_shared }}
-      UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}
+      UNIQUE_ID: ${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
+      UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ inputs.build_shared }}
 
     steps:
       - name: Checkout patomic
