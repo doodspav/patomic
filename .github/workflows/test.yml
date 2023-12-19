@@ -58,10 +58,89 @@ jobs:
   test-qemu:
     strategy:
       matrix:
-        os:
-          - macos
-          - ubuntu
+        # architecture gets converted to triple
+        # short form here so that it doesn't take up the whole GitHub Action name
+        architecture:
+          - aarch64
+          # - alpha todo: uncomment
+          - arm
+          - armhf
+          # - hppa todo: uncomment
+          # fixme: m68k is supported, but ICEs clang and segfaults qemu when built with gcc (GHI #25)
+          # - m68k
+          - mips
+          - mips64
+          - mips64el
+          - mipsel
+          - ppc
+          - ppc64
+          - ppc64le
+          # - riscv64 todo: uncomment
+          - s390x
+          # fixme: sh4 is supported (only for gcc), but segfaults qemu when built with gcc (GHI #25)
+          # - sh4
+          # - sparc64 todo:uncomment
+          # - x86_32 todo: uncomment
+        # convert architectures to triples
+        include:
+          - architecture: aarch64
+            triple: aarch64-linux-gnu
+          # - architecture: alpha
+          #   triple: alpha-linux-gnu
+          - architecture: arm
+            triple: arm-linux-gnueabi
+          - architecture: armhf
+            triple: arm-linux-gnueabihf
+          # - architecture: hppa
+          #   triple: hppa-linux-gnu
+          # - architecture: m68k
+          #   triple: m68k-linux-gnu
+          - architecture: mips
+            triple: mips-linux-gnu
+          - architecture: mips64
+            triple: mips64-linux-gnuabi64
+          - architecture: mips64el
+            triple: mips64el-linux-gnuabi64
+          - architecture: mipsel
+            triple: mipsel-linux-gnu
+          - architecture: ppc
+            triple: powerpc-linux-gnu
+          - architecture: ppc64
+            triple: powerpc64-linux-gnu
+          - architecture: ppc64le
+            triple: powerpc64le-linux-gnu
+          # - architecture: riscv64
+          #   triple: riscv64-linux-gnu
+          - architecture: s390x
+            triple: s390x-linux-gnu
+          # - architecture: sh4
+          #   triple: sh4-linux-gnu
+          # - architecture: sparc64
+          #   triple: sparc64-linux-gnu
+          # - architecture: x86_32
+          #   triple: i686-linux-gnu
     uses: doodspav/patomic/.github/workflows/reusable-test-qemu.yml@feature/ghi-20-inner-stuff
     with:
-      triple: aarch64-linux-gnu
-      architecture: aarch64
+      triple: ${{ matrix.triple }}
+      architecture: ${{ matrix.architecture }}
+
+  publish-results:
+    runs-on: ubuntu-latest
+    needs:
+      - test-native
+      - test-qemu
+
+    steps:
+      - name: Download Test Result Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: test-warning-results
+          path: test-warning-results/
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          action_fail: true
+          action_fail_on_inconclusive: true
+          check_name: "Tests Results: Warning"
+          files: test-warning-results/**/*.xml
