@@ -62,8 +62,8 @@ jobs:
           # hidden single variables
           - cmake_build_type: Release
           - cmake_preset: ${{ inputs.preset }}-warning
-          - unique_id: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ matrix.build_shared }}
-          - unique_name: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ matrix.build_shared }}
+          - unique_id: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}
+          - unique_name: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}
           # alias variables
           - build_shared: static
             cmake_build_shared: OFF
