@@ -106,12 +106,22 @@
     },
 
     {
-      "name": "patomic-ci-native-windows-msvc-warning",
+      "name": "patomic-ci-native-win32-msvc-warning",
       "inherits": [
         "_patomic-ci-base",
         "_patomic-ci-native-compiler-msvc",
         "_patomic-ci-flags-warning-msvc"
-      ]
+      ],
+      "architecture": "Win32"
+    },
+    {
+      "name": "patomic-ci-native-win64-msvc-warning",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-msvc",
+        "_patomic-ci-flags-warning-msvc"
+      ],
+      "architecture": "x64"
     },
 
     {

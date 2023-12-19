@@ -34,12 +34,12 @@ jobs:
             architecture: x86_64
           - platform: windows-msvc-x86_32
             os: windows
-            preset: patomic-ci-native-windows-msvc-warning -A Win32
+            preset: patomic-ci-native-win32-msvc-warning
             compiler: msvc
             architecture: x86_32
           - platform: windows-msvc-x86_64
             os: windows
-            preset: patomic-ci-native-windows-msvc-warning -A x64
+            preset: patomic-ci-native-win64-msvc-warning
             compiler: msvc
             architecture: x86_64
           - platform: macos-clang-x86_64
