@@ -181,12 +181,13 @@ runs:
         
         # working_dir component - generate, save
         working_dir="${{ runner.temp }}/${unique_cache_id}"
-        mkdir "${working_dir}"
+        mkdir -p "${working_dir}"
         echo "ACTION_WORKING_DIR: ${working_dir}"
         echo "ACTION_WORKING_DIR=${working_dir}" >> $GITHUB_ENV
 
     - name: Install Cross-Compiling Toolchain
       if: runner.os == 'Linux' && contains(inputs.preset, 'qemu')
+      shell: bash
       run: |
         # Install Cross-Compiling Toolchain
         
@@ -206,6 +207,7 @@ runs:
 
     - name: Set Up Sysroot
       if: runner.os == 'Linux' && contains(inputs.preset, 'qemu') && steps.cache-sysroot.outputs.cache-hit != 'true'
+      shell: bash
       # cannot use symlink or reference directory directly, will not work
       run: |
         cp -r /usr/${{ inputs.triple }}/ ${{ env.ACTION_WORKING_DIR }}/sysroot
@@ -219,6 +221,7 @@ runs:
 
     - name: Build and Install GoogleTest
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
+      shell: bash
       run: |
         # Build and Install GoogleTest
         
