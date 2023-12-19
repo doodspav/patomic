@@ -10,9 +10,14 @@ on:
 
 jobs:
   test-native:
+    strategy:
+      matrix:
+        os:
+          - macos
+          - ubuntu
     uses: doodspav/patomic/.github/workflows/reusable-test-warning.yml@feature/ghi-20-inner-stuff
     with:
-      os: ubuntu
+      os: ${{ matrix.os }}
       preset: some-preset
       architecture: some-architecture
       triple: some-triple
