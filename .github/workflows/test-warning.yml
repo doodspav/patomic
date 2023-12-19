@@ -79,7 +79,7 @@ jobs:
           test_type: ansi
           preset: ${{ matrix.preset }}
           architecture: ${{ matrix.architecture }}
-          triple: ${{ matrix.triple }}
+          triple: ${{ matrix.platform }}
           cmake_build_shared: ${{ matrix.cmake-build-shared }}
           patomic_path: patomic
 
