@@ -51,7 +51,7 @@ jobs:
 
           # apply function to all inputs
           check_input "os"           "${{ inputs.os }}"
-          check_input "preset"       "${{ env.CMAKE_PRESET }}"
+          check_input "preset"       "${{ inputs.preset }}"
           check_input "architecture" "${{ inputs.architecture }}"
           check_input "compiler"     "${{ inputs.compiler }}"
           check_input "build_shared" "${{ inputs.build_shared }}"
