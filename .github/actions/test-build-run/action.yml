@@ -238,8 +238,8 @@ runs:
         # Build and Install GoogleTest
         
         cd ${{ env.ACTION_WORKING_DIR }}/googletest
-        cp -r ${{ inputs.patomic_path }}/ci/ ./
-        cp ${{ inputs.patomic_path }}/CMakePresets.json .
+        cp -r ${{ github.workspace }}/${{ inputs.patomic_path }}/ci/ ./
+        cp ${{github.workspace }}/${{ inputs.patomic_path }}/CMakePresets.json .
         mkdir build
         cd build
         cmake --preset ${{ inputs.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ inputs.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.ACTION_CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
