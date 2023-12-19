@@ -219,8 +219,8 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: google/googletest
-        # ~/ here is $GITHUB_WORKSPACE
-        path: ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
+        # paths passed to actions/checkout are prefixed with $GITHUB_WORKSPACE
+        path: googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
 
     - name: Move GoogleTest to Working Directory
       if: steps.cache-sysroot.outputs.cache-hit != 'true'

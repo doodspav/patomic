@@ -79,9 +79,9 @@ jobs:
           test_type: ansi
           preset: ${{ matrix.preset }}
           architecture: ${{ matrix.architecture }}
-          triple: no
+          triple: ${{ matrix.triple }}
           cmake_build_shared: ${{ matrix.cmake-build-shared }}
-          patomic_path: no
+          patomic_path: patomic
 
       - name: Restore Cached GoogleTest
         id: cache-googletest
@@ -290,9 +290,9 @@ jobs:
           test_type: ansi
           preset: ${{ matrix.preset }}
           architecture: ${{ matrix.architecture }}
-          triple: no
+          triple: ${{ matrix.triple }}
           cmake_build_shared: ${{ matrix.cmake-build-shared }}
-          patomic_path: no
+          patomic_path: patomic
 
       - name: Restore Cached GoogleTest and Sysroot
         id: cache-googletest
