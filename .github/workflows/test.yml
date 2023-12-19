@@ -1,0 +1,17 @@
+name: Run All Tests
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  run-tests:
+    uses: doodspav/patomic/.github/workflows/reusable/test-warning.yml@feature/ghi-20-inner-stuff
+    with:
+      os: ubuntu
+      preset: some-preset
+      architecture: some-architecture
+      triple: some-triple
+      cmake_build_shared: ON
+      patomic_path: some-path

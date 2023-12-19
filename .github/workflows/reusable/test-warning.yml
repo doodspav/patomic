@@ -3,6 +3,11 @@ name: Run Tests with Warnings
 on:
   workflow_call:
     inputs:
+      os:
+        description: 'Used to set the runs-on attribute, must be one of macos, ubuntu, windows'
+        required: true
+        type: string
+        default: ''
       preset:
         description: 'CMake preset used to build patomic and googletest'
         required: true
@@ -31,6 +36,7 @@ on:
 
 jobs:
   warning:
+    runs-on: ${{ inputs.os }}-latest
     steps:
       - name: Check No Empty Inputs
         shell: bash
@@ -42,6 +48,8 @@ jobs:
               if [[ -z "${input_value}" ]]; then
                 echo "Error: required input '${input_name}' is empty or was not specified."
                 exit 1
+              else
+                echo "${input_name}: ${input_value}"
               fi
             }
 
