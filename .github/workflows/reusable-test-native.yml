@@ -9,7 +9,7 @@ on:
         type: string
         default: ''
       preset:
-        description: 'CMake preset used to build patomic and googletest'
+        description: 'CMake preset used to build patomic and googletest, will be conditionally suffixed with one of ansi, coverage, sanitize, warning'
         required: true
         type: string
         default: ''
@@ -51,7 +51,7 @@ jobs:
 
           # apply function to all inputs
           check_input "os"           "${{ inputs.os }}"
-          check_input "preset"       "${{ inputs.preset }}"
+          check_input "preset"       "${{ env.CMAKE_PRESET }}"
           check_input "architecture" "${{ inputs.architecture }}"
           check_input "compiler"     "${{ inputs.compiler }}"
           check_input "build_shared" "${{ inputs.build_shared }}"
@@ -62,6 +62,7 @@ jobs:
     env:
       CMAKE_BUILD_SHARED: "${{ inputs.build_shared == 'shared' && 'ON' || 'OFF' }}"
       CMAKE_BUILD_TYPE: "Release"
+      CMAKE_PRESET: "${{ inputs.preset }}-warning"
       UNIQUE_ID: "${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}"
       UNIQUE_NAME: "${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}"
 
@@ -92,7 +93,7 @@ jobs:
           cp ../patomic/CMakePresets.json .
           mkdir build
           cd build
-          cmake --preset ${{ inputs.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ env.CMAKE_BUILD_SHARED }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --preset ${{ env.CMAKE_PRESET }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ env.CMAKE_BUILD_SHARED }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
           cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
           cmake --install . --config ${{ env.CMAKE_BUILD_TYPE }} --prefix install
       
@@ -101,7 +102,7 @@ jobs:
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ inputs.preset }} -DBUILD_SHARED_LIBS=${{ env.CMAKE_BUILD_SHARED }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="../../googletest/build/install" ..
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ env.CMAKE_BUILD_SHARED }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="../../googletest/build/install" ..
           cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
       
       - name: Test patomic

@@ -29,32 +29,32 @@ jobs:
           # platform -> os, preset, compiler, architecture
           - platform: windows-gcc-x86_64
             os: windows
-            preset: patomic-ci-native-unix-gcc-warning
+            preset: patomic-ci-native-unix-gcc
             compiler: gcc
             architecture: x86_64
           - platform: windows-msvc-x86_32
             os: windows
-            preset: patomic-ci-native-win32-msvc-warning
+            preset: patomic-ci-native-win32-msvc
             compiler: msvc
             architecture: x86_32
           - platform: windows-msvc-x86_64
             os: windows
-            preset: patomic-ci-native-win64-msvc-warning
+            preset: patomic-ci-native-win64-msvc
             compiler: msvc
             architecture: x86_64
           - platform: macos-clang-x86_64
             os: macos
-            preset: patomic-ci-native-unix-clang-warning
+            preset: patomic-ci-native-unix-clang
             compiler: clang
             architecture: x86_64
           - platform: linux-clang-x86_64
             os: ubuntu
-            preset: patomic-ci-native-unix-clang-warning
+            preset: patomic-ci-native-unix-clang
             compiler: clang
             architecture: x86_64
           - platform: linux-gcc-x86_64
             os: ubuntu
-            preset: patomic-ci-native-unix-gcc-warning
+            preset: patomic-ci-native-unix-gcc
             compiler: gcc
             architecture: x86_64
 
