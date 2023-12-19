@@ -219,6 +219,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: google/googletest
+        # ~/ here is $GITHUB_WORKSPACE
         path: ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
 
     - name: Move GoogleTest to Working Directory
@@ -227,8 +228,8 @@ runs:
       run: |
         # Move GoogleTest to Working Directory
         
-        cp -r ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}/ ${{ env.ACTION_WORKING_DIR }}/googletest
-        rm -rf ~/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
+        cp -r ${{ github.workspace }}/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}/ ${{ env.ACTION_WORKING_DIR }}/googletest
+        rm -rf ${{ github.workspace }}/googletest-action-temp-${{ env.ACTION_UNIQUE_CACHE_ID }}
 
     - name: Build and Install GoogleTest
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
