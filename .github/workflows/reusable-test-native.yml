@@ -62,13 +62,15 @@ jobs:
           # hidden single variables
           - cmake_build_type: Release
           - cmake_preset: ${{ inputs.preset }}-warning
-          - unique_id: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}
-          - unique_name: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}
           # alias variables
           - build_shared: static
             cmake_build_shared: OFF
           - build_shared: shared
             cmake_build_shared: ON
+      env:
+        # these have to be in env context because they depend on matrix context
+        UNIQUE_ID: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ matrix.build_shared }}
+        UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}
 
     steps:
       - name: Checkout patomic
@@ -81,7 +83,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: googletest/build/install
-          key: googletest-${{ matrix.unique_id }}
+          key: googletest-${{ env.UNIQUE_ID }}
 
       - name: Checkout GoogleTest
         if: steps.cache-googletest.outputs.cache-hit != 'true'
@@ -118,7 +120,7 @@ jobs:
       - name: Prepare Test Results
         run: |
           mkdir upload
-          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ matrix.unique_name }} --output upload/${{ matrix.unique_name }}.xml
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
