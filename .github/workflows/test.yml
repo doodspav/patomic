@@ -9,7 +9,7 @@ on:
       - 'feature/ghi-20-inner-stuff'
 
 jobs:
-  run-tests:
+  test-native:
     uses: doodspav/patomic/.github/workflows/reusable-test-warning.yml@feature/ghi-20-inner-stuff
     with:
       os: ubuntu
