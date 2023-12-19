@@ -21,9 +21,6 @@ jobs:
           - macos-clang-x86_64
           - linux-clang-x86_64
           - linux-gcc-x86_64
-        build_shared:
-          - static
-          - shared
         # convert verbose labels to usable values (which don't appear in GitHub Actions GUI)
         include:
           # platform -> os, preset, compiler, architecture
@@ -64,7 +61,6 @@ jobs:
       preset: ${{ matrix.preset }}
       architecture: ${{ matrix.architecture }}
       compiler: ${{ matrix.compiler }}
-      build_shared: ${{ matrix.build_shared }}
 
   test-qemu:
     strategy:
