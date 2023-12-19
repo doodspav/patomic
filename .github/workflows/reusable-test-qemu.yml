@@ -1,13 +1,8 @@
-name: Run Tests with Warnings
+name: Run Tests on Emulated Platforms
 
 on:
   workflow_call:
     inputs:
-      os:
-        description: 'Used to set the runs-on attribute, must be one of macos, ubuntu, windows'
-        required: true
-        type: string
-        default: ''
       preset:
         description: 'CMake preset used to build patomic and googletest'
         required: true
@@ -28,15 +23,10 @@ on:
         required: true
         type: string
         default: ''
-      patomic_path:
-        description: 'Source directory of patomic repository'
-        required: true
-        type: string
-        default: ''
 
 jobs:
   warning:
-    runs-on: ${{ inputs.os }}-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check No Empty Inputs
         shell: bash
@@ -58,4 +48,3 @@ jobs:
           check_input "architecture" "${{ inputs.architecture }}"
           check_input "triple" "${{ inputs.triple }}"
           check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
-          check_input "patomic_path" "${{ inputs.patomic_path }}"

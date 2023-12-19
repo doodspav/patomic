@@ -15,11 +15,23 @@ jobs:
         os:
           - macos
           - ubuntu
-    uses: doodspav/patomic/.github/workflows/reusable-test-warning.yml@feature/ghi-20-inner-stuff
+    uses: doodspav/patomic/.github/workflows/reusable-test-native.yml@feature/ghi-20-inner-stuff
     with:
       os: ${{ matrix.os }}
       preset: some-preset
       architecture: some-architecture
       triple: some-triple
       cmake_build_shared: ON
-      patomic_path: some-path
+
+  test-qemu:
+    strategy:
+      matrix:
+        os:
+          - macos
+          - ubuntu
+    uses: doodspav/patomic/.github/workflows/reusable-test-qemu.yml@feature/ghi-20-inner-stuff
+    with:
+      preset: some-preset
+      architecture: some-architecture
+      triple: some-triple
+      cmake_build_shared: ON
