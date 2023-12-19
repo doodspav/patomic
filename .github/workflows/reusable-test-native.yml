@@ -14,24 +14,25 @@ on:
         type: string
         default: ''
       architecture:
-        description: 'CPU architecture tests are run on, passed to QEMU'
+        description: 'CPU architecture tests are run on, used for naming (does not affect how tests are run)'
         required: true
         type: string
         default: ''
-      triple:
-        description: 'Platform triple to compile for, used to install correct compiler and sysroot'
+      compiler:
+        description: 'Shortname of compiler being used, used for naming (does not affect which compiler is used)'
         required: true
         type: string
         default: ''
-      cmake_build_shared:
-        description: 'Determines value of BUILD_SHARED_LIBS for CMake, must be considered a boolean by CMake'
+      build_shared:
+        description: 'Determines how to build patomic and googletest, must be one of static, shared'
         required: true
         type: string
         default: ''
 
 jobs:
-  warning:
-    runs-on: ${{ inputs.os }}-latest
+  checks:
+    runs-on: ubuntu-latest
+    
     steps:
       - name: Check No Empty Inputs
         shell: bash
@@ -49,8 +50,73 @@ jobs:
           }
 
           # apply function to all inputs
-          check_input "os" "${{ inputs.os }}"
-          check_input "preset" "${{ inputs.preset }}"
+          check_input "os"           "${{ inputs.os }}"
+          check_input "preset"       "${{ inputs.preset }}"
           check_input "architecture" "${{ inputs.architecture }}"
-          check_input "triple" "${{ inputs.triple }}"
-          check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
+          check_input "compiler"     "${{ inputs.compiler }}"
+          check_input "build_shared" "${{ inputs.build_shared }}"
+
+  warning:
+    needs: checks
+    runs-on: ${{ inputs.os }}-latest
+    env:
+      CMAKE_BUILD_SHARED: "${{ inputs.build_shared == 'shared' && 'ON' || 'OFF' }}"
+      CMAKE_BUILD_TYPE: "Release"
+      UNIQUE_ID: "${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}"
+      UNIQUE_NAME: "${{ inputs.architecture }}-${{ inputs.os }}-${{ inputs.compiler }}-${{ inputs.build_shared }}"
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Restore Cached GoogleTest
+        id: cache-googletest
+        uses: actions/cache@v3
+        with:
+          path: googletest/build/install
+          key: googletest-${{ env.UNIQUE_ID }}
+
+      - name: Checkout GoogleTest
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          path: googletest
+
+      - name: Build and Install GoogleTest
+        if: steps.cache-googletest.outputs.cache-hit != 'true'
+        run: |
+          cd googletest
+          cp ../patomic/CMakePresets.json .
+          mkdir build
+          cd build
+          cmake --preset ${{ inputs.preset }} -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ env.CMAKE_BUILD_SHARED }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
+          cmake --install . --config ${{ env.CMAKE_BUILD_TYPE }} --prefix install
+      
+      - name: Build patomic
+        run: |
+          cd patomic
+          mkdir build
+          cd build
+          cmake --preset ${{ inputs.preset }} -DBUILD_SHARED_LIBS=${{ env.CMAKE_BUILD_SHARED }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="../../googletest/build/install" ..
+          cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
+      
+      - name: Test patomic
+        continue-on-error: true
+        run: |
+          cd patomic/build
+          ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
+      
+      - name: Prepare Test Results
+        run: |
+          mkdir upload
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/${{ env.UNIQUE_NAME }}.xml
+
+      - name: Upload Test Results
+        uses: actions/upload-artifactory@v3
+        with:
+          name: test-warning-results
+          path: upload/
