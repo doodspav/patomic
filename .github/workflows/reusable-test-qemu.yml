@@ -3,8 +3,8 @@ name: Run Tests on Emulated Platforms
 on:
   workflow_call:
     inputs:
-      preset:
-        description: 'CMake preset used to build patomic and googletest'
+      triple:
+        description: 'Platform triple to compile for, used to install correct compiler and sysroot'
         required: true
         type: string
         default: ''
@@ -13,20 +13,11 @@ on:
         required: true
         type: string
         default: ''
-      triple:
-        description: 'Platform triple to compile for, used to install correct compiler and sysroot'
-        required: true
-        type: string
-        default: ''
-      cmake_build_shared:
-        description: 'Determines value of BUILD_SHARED_LIBS for CMake, must be considered a boolean by CMake'
-        required: true
-        type: string
-        default: ''
 
 jobs:
-  warning:
+  checks:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check No Empty Inputs
         shell: bash
@@ -44,7 +35,114 @@ jobs:
           }
 
           # apply function to all inputs
-          check_input "preset" "${{ inputs.preset }}"
+          check_input "triple"       "${{ inputs.triple }}"
           check_input "architecture" "${{ inputs.architecture }}"
-          check_input "triple" "${{ inputs.triple }}"
-          check_input "cmake_build_shared" "${{ inputs.cmake_build_shared }}"
+
+  warning:
+    needs:  checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_shared:
+          - static
+          - shared
+        compiler:
+          - clang
+          - gcc
+        include:
+          # hidden single variables
+          - llvm_version: 15
+          - gcc_version: 11
+          - cmake_build_type: Release
+          - compiler: clang
+            compiler_version: 15
+            cmake_preset: patomic-ci-qemu-ubuntu-clang-warning
+          - compiler: gcc
+            compiler_version: 11
+            cmake_preset: patomic-ci-qemu-ubuntu-gcc-warning
+          # alias variables
+          - build_shared: static
+            cmake_build_shared: OFF
+          - build_shared: shared
+            cmake_build_shared: ON
+    env:
+      # these have to be in env context because they depend on matrix context
+      UNIQUE_ID: ${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build-shared }}-${{ matrix.gcc_version }}-${{ matrix.llvm_version }}
+      UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build-shared }}
+      # env variables used by toolchain file
+      PATOMIC_CI_XARCH: ${{ inputs.architecture }}
+      PATOMIC_CI_XTRIPLE: ${{ inputs.triple }}
+      # PATOMIC_CI_XCOMPILER: specified in preset file
+      PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler_version }}
+      PATOMIC_CI_SYSROOT: ~/sysroot
+
+    steps:
+      - name: Install Toolchains and Qemu
+        run: |
+          sudo apt update
+          sudo apt install g++-${{ matrix.gcc_version }}-multilib
+          sudo apt install g++-${{ matrix.gcc_version }}-${{ inputs.triple }}
+          sudo apt install llvm-${{ matrix.llvm_version }}
+          sudo apt install clang-${{ matrix.llvm_version }}
+          sudo apt install qemu-user
+
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Restore Cached Sysroot (with GoogleTest)
+        id: cache-sysroot
+        uses: actions/cache@v3
+        with:
+          path: ~/sysroot
+          key: sysroot-${{ env.UNIQUE_ID }}
+
+      - name: Set Up Sysroot
+        if: steps.cache-sysroot.outputs.cache-hit != 'true'
+        run: |
+          cp -r /usr/${{ inputs.triple }}/ ~/sysroot
+
+      - name: Checkout GoogleTest
+        if: steps.cache-sysroot.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          path: googletest
+
+      - name: Build and Install GoogleTest
+        if: steps.cache-sysroot.outputs.cache-hit != 'true'
+        run: |
+          cd googletest
+          cp -r ../patomic/ci/ ./
+          cp ../patomic/CMakePresets.json .
+          mkdir build
+          cd build
+          cmake --preset ${{ matrix.cmake_preset }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --build . --verbose
+          cmake --install . --prefix ~/sysroot
+
+      - name: Build patomic
+        run: |
+          cd patomic
+          mkdir build
+          cd build
+          cmake --preset ${{ matrix.cmake_preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DGTest_ROOT:PATH="~/sysroot" ..
+          cmake --build . --verbose
+
+      - name: Test patomic
+        continue-on-error: true
+        run: |
+          cd patomic/build
+          ctest --verbose --output-junit Testing/Temporary/results.xml .
+
+      - name: Prepare Test Results
+        run: |
+          mkdir upload
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/${{ env.UNIQUE_NAME }}.xml
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-warning-results
+          path: upload/

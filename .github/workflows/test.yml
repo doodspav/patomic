@@ -63,7 +63,5 @@ jobs:
           - ubuntu
     uses: doodspav/patomic/.github/workflows/reusable-test-qemu.yml@feature/ghi-20-inner-stuff
     with:
-      preset: some-preset
-      architecture: some-architecture
-      triple: some-triple
-      cmake_build_shared: ON
+      triple: aarch64-linux-gnu
+      architecture: aarch64
