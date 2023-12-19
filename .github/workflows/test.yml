@@ -27,32 +27,26 @@ jobs:
           - platform: windows-gcc-x86_64
             os: windows
             preset: patomic-ci-native-unix-gcc
-            compiler: gcc
             architecture: x86_64
           - platform: windows-msvc-x86_32
             os: windows
             preset: patomic-ci-native-win32-msvc
-            compiler: msvc
             architecture: x86_32
           - platform: windows-msvc-x86_64
             os: windows
             preset: patomic-ci-native-win64-msvc
-            compiler: msvc
             architecture: x86_64
           - platform: macos-clang-x86_64
             os: macos
             preset: patomic-ci-native-unix-clang
-            compiler: clang
             architecture: x86_64
           - platform: linux-clang-x86_64
             os: ubuntu
             preset: patomic-ci-native-unix-clang
-            compiler: clang
             architecture: x86_64
           - platform: linux-gcc-x86_64
             os: ubuntu
             preset: patomic-ci-native-unix-gcc
-            compiler: gcc
             architecture: x86_64
 
     uses: doodspav/patomic/.github/workflows/reusable-test-native.yml@feature/ghi-20-inner-stuff
@@ -60,7 +54,6 @@ jobs:
       os: ${{ matrix.os }}
       preset: ${{ matrix.preset }}
       architecture: ${{ matrix.architecture }}
-      compiler: ${{ matrix.compiler }}
 
   test-qemu:
     strategy:
