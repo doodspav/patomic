@@ -7,7 +7,7 @@ on:
 
 jobs:
   run-tests:
-    uses: doodspav/patomic/.github/workflows/reusable/test-warning.yml@feature/ghi-20-inner-stuff
+    uses: doodspav/patomic/.github/workflows/reusable-test-warning.yml@feature/ghi-20-inner-stuff
     with:
       os: ubuntu
       preset: some-preset
