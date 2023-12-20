@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - '**'
-  push:
-    branches:
-      - 'feature/ghi-20-inner-stuff'
 
 jobs:
   test-native:
