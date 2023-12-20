@@ -69,7 +69,7 @@ jobs:
       # these have to be in env context because they depend on matrix context
       UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
       UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
-      SKIP_ALL_STEPS: >-
+      SKIP_JOB: >-
         ${{ !(
           ( matrix.kind == 'coverage' && contains(inputs.preset, 'clang') ) ||
           ( matrix.kind == 'warning' )
@@ -77,13 +77,13 @@ jobs:
 
     steps:
       - name: Checkout patomic
-        if: ${{ !env.SKIP_ALL_STEPS }}
+        if: env.SKIP_JOB != 'true'
         uses: actions/checkout@v4
         with:
           path: patomic
 
       - name: Restore Cached GoogleTest
-        if: ${{ !env.SKIP_ALL_STEPS }}
+        if: env.SKIP_JOB != 'true'
         id: cache-googletest
         uses: actions/cache@v3
         with:
@@ -91,14 +91,14 @@ jobs:
           key: googletest-${{ env.UNIQUE_ID }}
 
       - name: Checkout GoogleTest
-        if: ${{ !env.SKIP_ALL_STEPS }} && steps.cache-googletest.outputs.cache-hit != 'true'
+        if: env.SKIP_JOB != 'true' && steps.cache-googletest.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: google/googletest
           path: googletest
 
       - name: Build and Install GoogleTest
-        if: ${{ !env.SKIP_ALL_STEPS }} && steps.cache-googletest.outputs.cache-hit != 'true'
+        if: env.SKIP_JOB != 'true' && steps.cache-googletest.outputs.cache-hit != 'true'
         run: |
           cd googletest
           cp ../patomic/CMakePresets.json .
@@ -109,7 +109,7 @@ jobs:
           cmake --install . --config ${{ matrix.cmake_build_type }} --prefix install
       
       - name: Build patomic
-        if: ${{ !env.SKIP_ALL_STEPS }}
+        if: env.SKIP_JOB != 'true'
         run: |
           cd patomic
           mkdir build
@@ -118,27 +118,27 @@ jobs:
           cmake --build . --verbose --config ${{ matrix.cmake_build_type }}
       
       - name: Test patomic
-        if: ${{ !env.SKIP_ALL_STEPS }}
+        if: env.SKIP_JOB != 'true'
         continue-on-error: true
         run: |
           cd patomic/build
           ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake_build_type }} .
       
       - name: Prepare Test Results
-        if: ${{ !env.SKIP_ALL_STEPS }}
+        if: env.SKIP_JOB != 'true'
         run: |
           mkdir -p upload/test/${{ matrix.kind }}
           python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
-        if: ${{ !env.SKIP_ALL_STEPS }}
+        if: env.SKIP_JOB != 'true'
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: upload/test/
 
       - name: Prepare Coverage Results
-        if: ${{ !env.SKIP_ALL_STEPS && matrix.kind == 'coverage' }}
+        if: ${{ !env.SKIP_JOB && matrix.kind == 'coverage' }}
         shell: bash
         run: |
           mkdir -p upload/cov/${{ env.UNIQUE_ID }}
@@ -156,7 +156,7 @@ jobs:
           fi
 
       - name: Upload Coverage Results
-        if: ${{ !env.SKIP_ALL_STEPS && matrix.kind == 'coverage' }}
+        if: ${{ !env.SKIP_JOB && matrix.kind == 'coverage' }}
         uses: actions/upload-artifact@v3
         with:
           name: test-coverage
