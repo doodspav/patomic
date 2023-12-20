@@ -145,17 +145,19 @@ jobs:
           mkdir -p upload/cov/${{ env.UNIQUE_ID }}
           cd patomic/build
 
-          # make sure we can glob with '*' and '**'
-          shopt -s globstar
-          
           # merge and copy over coverage output
+          # use find because bash on GitHub Actions currently does not support '**'
           if [[ "${{ inputs.os }}" == "macos" ]]; then
-            xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profraw
+            find test/working -type f -name "*.profraw" | while read profraw_file; do
+              xcrun llvm-profdata merge -output=default.profdata "${profraw_file}"
+            done
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.dylib.*.*.*.dylib ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
-            llvm-profdata merge -output=default.profdata test/working/**/*.profraw
+            find test/working -type f -name "*.profraw" | while read profraw_file; do
+              llvm-profdata merge -output=default.profdata "${profraw_file}"
+            done
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.so.*.*.* ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           fi
