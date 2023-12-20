@@ -156,7 +156,7 @@ jobs:
           fi
 
       - name: Upload Coverage Results
-        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage' }}
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         uses: actions/upload-artifact@v3
         with:
           name: test-coverage
