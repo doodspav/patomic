@@ -145,12 +145,12 @@ jobs:
           cd patomic/build
 
           if [[ "${{ inputs.os }}" == "macos" ]]; then
-            xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profraw
+            xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profdata
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.dylib.*.*.*.dylib ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
-            llvm-profdata merge -output=default.profdata test/working/**/*.profraw
+            llvm-profdata merge -output=default.profdata test/working/**/*.profdata
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.so.*.*.* ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           fi
