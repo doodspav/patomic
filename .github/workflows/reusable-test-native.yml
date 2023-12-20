@@ -148,16 +148,22 @@ jobs:
           # merge and copy over coverage output
           # use find because bash on GitHub Actions currently does not support '**'
           if [[ "${{ inputs.os }}" == "macos" ]]; then
+            echo "START LOOP"
             find test/working -type f -name "*.profraw" | while read profraw_file; do
+              echo "FILE: ${profraw_file}"
               xcrun llvm-profdata merge -output=default.profdata "${profraw_file}"
             done
+            echo "END LOOP"
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.dylib.*.*.*.dylib ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
+            echo "START LOOP"
             find test/working -type f -name "*.profraw" | while read profraw_file; do
+              echo "FILE: ${profraw_file}"
               llvm-profdata merge -output=default.profdata "${profraw_file}"
             done
+            echo "END LOOP"
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.so.*.*.* ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           fi
