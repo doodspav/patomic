@@ -68,7 +68,7 @@ jobs:
             cmake_build_shared: ON
     env:
       # these have to be in env context because they depend on matrix context
-      UNIQUE_ID: ${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ matrix.gcc_version }}-${{ matrix.llvm_version }}
+      UNIQUE_ID: warning-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ matrix.gcc_version }}-${{ matrix.llvm_version }}
       UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
       # env variables used by toolchain file
       PATOMIC_CI_XARCH: ${{ inputs.architecture }}
