@@ -114,11 +114,11 @@ jobs:
       
       - name: Prepare Test Results
         run: |
-          mkdir upload
-          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/${{ env.UNIQUE_NAME }}.xml
+          mkdir upload/warning
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/warning/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
-          name: test-warning-results
+          name: test-results
           path: upload/
