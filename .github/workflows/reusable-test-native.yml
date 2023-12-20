@@ -152,8 +152,7 @@ jobs:
               xcrun llvm-profdata merge -output=default.profdata "${profraw_file}"
             done
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
-            files=(*patomic.*)
-            echo "FILE: ${files[0]}"
+            files=(*patomic.*)  # matches libpatomic.a and libpatomic(.x.y.z).dylib
             cp "${files[0]}" ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
@@ -161,8 +160,7 @@ jobs:
               llvm-profdata merge -output=default.profdata "${profraw_file}"
             done
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
-            files=(*patomic.*)
-            echo "FILE: ${files[0]}"
+            files=(*patomic.*)  # matches libpatomic.a and libpatomic.so(.x.y.z)
             cp "${files[0]}" ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           fi
 
