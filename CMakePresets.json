@@ -187,40 +187,28 @@
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-ansi-gnu"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "clang"
-      }
+      ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-clang-coverage",
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-coverage-clang"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "clang"
-      }
+      ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-clang-sanitize",
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-sanitize-gnu"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "clang"
-      }
+      ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-clang-warning",
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-warning-clang"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "clang"
-      }
+      ]
     },
 
     {
@@ -228,30 +216,21 @@
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-ansi-gnu"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "gcc"
-      }
+      ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-gcc-sanitize",
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-sanitize-gnu"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "gcc"
-      }
+      ]
     },
     {
       "name": "patomic-ci-qemu-ubuntu-gcc-warning",
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-warning-gcc"
-      ],
-      "cacheVariables": {
-        "PATOMIC_CI_XCOMPILER": "gcc"
-      }
+      ]
     }
   ]
 }

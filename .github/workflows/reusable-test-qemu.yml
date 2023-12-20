@@ -73,7 +73,7 @@ jobs:
       # env variables used by toolchain file
       PATOMIC_CI_XARCH: ${{ inputs.architecture }}
       PATOMIC_CI_XTRIPLE: ${{ inputs.triple }}
-      # PATOMIC_CI_XCOMPILER: specified in preset file
+      PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler_version }}
       PATOMIC_CI_SYSROOT: ~/sysroot
 
