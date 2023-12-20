@@ -15,7 +15,7 @@ on:
         default: ''
 
 jobs:
-  checks:
+  check:
     runs-on: ubuntu-latest
 
     steps:

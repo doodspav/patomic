@@ -20,7 +20,7 @@ on:
         default: ''
 
 jobs:
-  checks:
+  check:
     runs-on: ubuntu-latest
     
     steps:
@@ -44,11 +44,19 @@ jobs:
           check_input "preset"       "${{ inputs.preset }}"
           check_input "architecture" "${{ inputs.architecture }}"
 
-  warning:
+  run:
     needs: checks
     runs-on: ${{ inputs.os }}-latest
+    if: >-
+      ${{
+        ( matrix.kind == 'coverage' && contains(inputs.preset, 'clang') ) || 
+        ( matrix.kind == 'warning' ) 
+      }}
     strategy:
       matrix:
+        kind:
+          - coverage
+          - warning
         build_shared:
           - static
           - shared
@@ -64,7 +72,7 @@ jobs:
             cmake_build_shared: ON
     env:
       # these have to be in env context because they depend on matrix context
-      UNIQUE_ID: warning-${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
+      UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
       UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
 
     steps:
@@ -114,11 +122,36 @@ jobs:
       
       - name: Prepare Test Results
         run: |
-          mkdir -p upload/warning
-          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/warning/${{ env.UNIQUE_NAME }}.xml
+          mkdir -p upload/test/${{ matrix.kind }}
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: upload/
+          path: upload/test/
+
+      - name: Prepare Coverage Results
+        if: ${{ matrix.kind == 'coverage' }}
+        shell: bash
+        run: |
+          mkdir -p upload/cov/${{ env.UNIQUE_ID }}
+          cd patomic/build
+
+          if [[ "${{ inputs.os }}" == "macos" ]]; then
+            xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profraw
+            cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
+            cp patomic.dylib.*.*.*.dylib ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
+          else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
+            sudo apt install llvm
+            llvm-profdata merge -output=default.profdata test/working/**/*.profraw
+            cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
+            cp patomic.so.*.*.* ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
+          fi
+
+      - name: Upload Coverage Results
+        if: ${{ matrix.kind == 'coverage' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage
+          path: upload/cov/
