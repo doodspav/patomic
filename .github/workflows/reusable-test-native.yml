@@ -141,10 +141,14 @@ jobs:
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         shell: bash
         run: |
+          # set up directory
           mkdir -p upload/cov/${{ env.UNIQUE_ID }}
           cd patomic/build
-          tree test
 
+          # make sure we can glob with '*' and '**'
+          shopt -s globstar
+          
+          # merge and copy over coverage output
           if [[ "${{ inputs.os }}" == "macos" ]]; then
             xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profraw
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
