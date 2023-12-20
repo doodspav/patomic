@@ -114,7 +114,7 @@ jobs:
       
       - name: Prepare Test Results
         run: |
-          mkdir upload/warning
+          mkdir -p upload/warning
           python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/warning/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
