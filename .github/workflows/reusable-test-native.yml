@@ -145,18 +145,18 @@ jobs:
           cd patomic/build
 
           if [[ "${{ inputs.os }}" == "macos" ]]; then
-            xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profdata
+            xcrun llvm-profdata merge -output=default.profdata test/working/**/*.profraw
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.dylib.*.*.*.dylib ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
-            llvm-profdata merge -output=default.profdata test/working/**/*.profdata
+            llvm-profdata merge -output=default.profdata test/working/**/*.profraw
             cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
             cp patomic.so.*.*.* ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           fi
 
       - name: Upload Coverage Results
-        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage' }}
         uses: actions/upload-artifact@v3
         with:
           name: test-coverage
