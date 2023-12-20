@@ -53,13 +53,13 @@ jobs:
         include:
           # hidden single variables
           - llvm_version: 15
-          - gcc_version: 11
+          - gcc_version: 10
           - cmake_build_type: Release
           - compiler: clang
             compiler_version: 15
             cmake_preset: patomic-ci-qemu-ubuntu-clang-warning
           - compiler: gcc
-            compiler_version: 11
+            compiler_version: 10
             cmake_preset: patomic-ci-qemu-ubuntu-gcc-warning
           # alias variables
           - build_shared: static
@@ -67,7 +67,7 @@ jobs:
           - build_shared: shared
             cmake_build_shared: ON
     env:
-      # these have to be in env context because they depend on matrix context
+      # these have to be in env ctomicontext because they depend on matrix context
       UNIQUE_ID: ${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ matrix.gcc_version }}-${{ matrix.llvm_version }}
       UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
       # env variables used by toolchain file
