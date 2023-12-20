@@ -134,8 +134,8 @@ jobs:
       - name: Download Test Result Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: test-warning-results
-          path: test-warning-results/
+          name: test-results
+          path: test-results/
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -143,4 +143,4 @@ jobs:
           action_fail: true
           action_fail_on_inconclusive: true
           check_name: "Tests Results: Warning"
-          files: test-warning-results/**/*.xml
+          files: test-results/**/*.xml
