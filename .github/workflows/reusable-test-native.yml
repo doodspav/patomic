@@ -144,6 +144,7 @@ jobs:
           # set up directory
           mkdir -p upload/cov/${{ env.UNIQUE_ID }}
           cd patomic/build
+          tree test/working
 
           # merge and copy over coverage output
           # use find because bash on GitHub Actions currently does not support '**'
