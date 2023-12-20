@@ -45,7 +45,7 @@ jobs:
           check_input "architecture" "${{ inputs.architecture }}"
 
   run:
-    needs: checks
+    needs: check
     runs-on: ${{ inputs.os }}-latest
     strategy:
       matrix:

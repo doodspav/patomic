@@ -39,7 +39,7 @@ jobs:
           check_input "architecture" "${{ inputs.architecture }}"
 
   warning:
-    needs:  checks
+    needs:  check
     runs-on: ubuntu-latest
     strategy:
       matrix:
