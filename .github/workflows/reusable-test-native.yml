@@ -167,6 +167,9 @@ jobs:
           cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           
           # debug (keep in case something breaks again)
+          if [[ "${{ inputs.os }}" == "macos" ]]; then
+            sudo brew install tree
+          fi
           tree ../../upload/cov
 
       - name: Upload Coverage Results
