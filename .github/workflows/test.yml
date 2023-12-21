@@ -165,6 +165,23 @@ jobs:
           name: test-coverage-internal
           path: test-coverage-internal/
 
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Symlink patomic to Original Mapping Path
+        run: |
+          # this only contains directories
+          dir_name=(test-coverage-internal/*)
+          
+          # all directories have the same root path
+          root_path=$(cat "${dir_names[0]}/patomic.rootpath")
+          
+          # symlink patomic
+          sudo mkdir -p "${root_path}"
+          ln -s patomic "${root_path}/patomic"
+
       - name: Get Root Compilation Dir
         id: get-path
         run: |
