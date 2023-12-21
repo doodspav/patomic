@@ -170,7 +170,7 @@ jobs:
         with:
           path: patomic
 
-      - name: Symlink patomic to Original Mapping Path
+      - name: Copy patomic to Original Mapping Path
         run: |
           # this directory is guaranteed to only contains directories
           dir_names=(test-coverage-internal/*)
@@ -178,10 +178,10 @@ jobs:
           # all directories have the same root path
           root_path=$(cat "${dir_names[0]}/patomic.rootpath")
           
-          # symlink patomic
+          # copy patomic
           sudo mkdir -p "${root_path}"
           sudo chmod -R a+rwx "${root_path}"
-          ln -s patomic "${root_path}/patomic"
+          cp -r patomic/ "${root_path}/patomic"
           
           # debug info
           tree .
