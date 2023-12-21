@@ -172,8 +172,8 @@ jobs:
 
       - name: Symlink patomic to Original Mapping Path
         run: |
-          # this only contains directories
-          dir_name=(test-coverage-internal/*)
+          # this directory is guaranteed to only contains directories
+          dir_names=(test-coverage-internal/*)
           
           # all directories have the same root path
           root_path=$(cat "${dir_names[0]}/patomic.rootpath")
