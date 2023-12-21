@@ -168,13 +168,11 @@ jobs:
       - name: Get Root Compilation Dir
         id: get-path
         run: |
-          tree .
-          
           # this only contains directories
           dir_names=(test-coverage-internal/*)
           
           # all directories have the same root path
-          root_path="test-coverage-internal/${dir_names[0]}/patomic.rootpath"
+          root_path=$(cat "test-coverage-internal/${dir_names[0]}/patomic.rootpath")
           
           # save path for future steps
           echo "root_compilation_dir=${root_path}" >> $GITHUB_OUTPUT
@@ -186,8 +184,6 @@ jobs:
       
       - name: Create Lcov Config File
         run: |
-          tree .
-          
           touch lcovrc
           echo "genhtml_hi_limit = ${{ env.HI_LIMIT }}" >> lcovrc
           echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> lcovrc
@@ -201,7 +197,6 @@ jobs:
         run: |
           # directory into which to put user artifacts
           mkdir test-coverage
-          tree .
           
           # generate lcov and html files for each separate compilation
           for dir in $(find ./test-coverage-internal -not -path '*/.*' -type d -mindepth 1 -maxdepth 1); do
