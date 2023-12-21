@@ -165,6 +165,12 @@ jobs:
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
           cp "${lib_files[0]}" ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
+          
+          # GitHub issue #65006 on llvm/llvm-project suggests to NOT use -fcoverage-prefix-map
+          # macos runner has AppleClang 14 which doesn't support -fcoverage-compilation-dir
+          # workaround is to store root path to help use coverage directory mappings later
+          cd ../..
+          echo "$PWD" >> upload/cov/${{ env.UNIQUE_ID }}/patomic.rootpath
 
       - name: Upload Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
