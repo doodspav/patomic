@@ -145,16 +145,15 @@ jobs:
           mkdir -p upload/cov/${{ env.UNIQUE_ID }}
           cd patomic/build
           
-          # macos needs xcrun to help with finding stuff through xcode
+          # macos needs xcrun to help use xcode to run llvm tools
+          # ubuntu needs llvm tools to be installed
           prefix=""
-          # macos needs xcrun to help use xcode find llvm tools
           if [[ "${{ inputs.os }}" == "macos" ]]; then
             prefix="xcrun "
-          # ubuntu needs llvm tools to be installed
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
           fi
-          
+
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
           find test/working -type f -name "*.profraw" | while read profraw_file; do
@@ -166,6 +165,9 @@ jobs:
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
           cp "${lib_files[0]}" ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
           cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
+          
+          # debug (keep in case something breaks again)
+          tree ../../upload/cov
 
       - name: Upload Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
