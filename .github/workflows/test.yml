@@ -165,11 +165,6 @@ jobs:
           name: test-coverage-internal
           path: test-coverage-internal/
 
-      - name: Delete Test Coverage Artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          name: test-coverage-internal
-
       - name: Get Root Compilation Dir
         id: get-path
         run: |
@@ -217,3 +212,8 @@ jobs:
         with:
           name: test-coverage
           path: test-coverage/
+
+      - name: Delete Test Coverage Artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: test-coverage-internal
