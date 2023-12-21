@@ -199,6 +199,7 @@ jobs:
           mkdir test-coverage
           
           # generate lcov and html files for each separate compilation
+          tree .
           for dir in $(find ./test-coverage-internal -not -path '*/.*' -type d -mindepth 1 -maxdepth 1); do
             echo "DIR: ${dir}"
             arch=$(basename "${dir}")
