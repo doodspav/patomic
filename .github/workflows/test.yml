@@ -211,12 +211,18 @@ jobs:
             llvm-cov export -format=lcov -instr-profile="${dir}/patomic.profdata" -object="${dir}/patomic.bin" >> "./test-coverage/${arch}/patomic.lcov"
             genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage/${arch}/patomic.lcov"
           done
+          
+          # TODO: generate patomic-universal html/lcov stuff
 
       - name: Upload Coverage Results
         uses: actions/upload-artifact@v3
         with:
           name: test-coverage
           path: test-coverage/
+
+      - name: Publish Coverage Results
+        run: |
+          # TODO
 
       - name: Delete Test Coverage Artifacts
         uses: geekyeggo/delete-artifact@v2
