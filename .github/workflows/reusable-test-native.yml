@@ -138,7 +138,7 @@ jobs:
           name: test-results
           path: upload/test/
 
-      - name: Prepare Coverage Results
+      - name: Generate Lcov Tracefile
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         shell: bash
         run: |
@@ -157,16 +157,17 @@ jobs:
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=default.profdata
+          find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=patomic.profdata
           
-          # copy over merged coverage output and corresponding binary
-          # use variable because cp does not support globbing in file names
+          # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
-          cp "${lib_files[0]}" ../../upload/cov/${{ env.UNIQUE_NAME }}/patomic.bin
-          cp default.profdata ../../upload/cov/${{ env.UNIQUE_NAME }}/patomic.profdata
+          ${prefix}llvm-cov export -format=lcov -instr-profile=patomic.profdata -object="${lib_files[0]}" >> patomic.lcov
+          cp patomic.lcov ../../upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
           
-          # GitHub issue #65006 on llvm/llvm-project suggests to NOT use -fcoverage-prefix-map
-          # macos runner has AppleClang 14 which doesn't support -fcoverage-compilation-dir
+          # we need original source mapping to make use of lcov tracefile
+          # we can't just modify mapping because:
+          # - GitHub issue #65006 on llvm/llvm-project suggests to NOT use -fcoverage-prefix-map
+          # - macos runner has AppleClang 14 which doesn't support -fcoverage-compilation-dir
           # workaround is to store root path to help use coverage directory mappings later
           cd ../..
           echo "$PWD" >> upload/cov/${{ env.UNIQUE_NAME }}/patomic.rootpath

@@ -156,7 +156,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install binutils  # for c++filt
-          sudo apt install llvm
           sudo apt install lcov
 
       - name: Download Test Coverage Artifacts
@@ -170,45 +169,58 @@ jobs:
         with:
           path: patomic
 
-      - name: Copy patomic to Original Mapping Path
+      - name: Copy patomic To All Original Mapping Paths
         run: |
-          # this directory is guaranteed to only contains directories
-          dir_names=(test-coverage-internal/*)
+          # go through all patomic.rootpath files
+          find ./test-coverage-internal -type f -name '*patomic.rootpath' -print0 | while IFS= read -r -d '' rp_file; do
+            root_path=$(cat "${rp_file}")
           
-          # all directories have the same root path
-          root_path=$(cat "${dir_names[0]}/patomic.rootpath")
+            # create root_path if it doesn't exist
+            if [ ! -d "${root_path}" ]; then
+              sudo mkdir -p "${root_path}"
+            fi
           
-          # copy patomic
-          sudo mkdir -p "${root_path}"
-          sudo chmod -R a+rwx "${root_path}"
-          cp -r patomic/ "${root_path}/patomic"
+            # ensure full permissions even if it exists
+            sudo chmod -R a+rwx "${root_path}"
+
+            # copy patomic to root_path if not already there
+            if [ ! -d "${root_path}/patomic" ]; then
+              cp -R ./patomic/ "${root_path}/patomic"
+            fi
+          done
 
       - name: Create Lcov Config File
         run: |
-          touch lcovrc
-          echo "genhtml_hi_limit = ${{ env.HI_LIMIT }}" >> lcovrc
-          echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> lcovrc
-          echo "genhtml_function_hi_limit = ${{ env.HI_LIMIT }}" >> lcovrc
-          echo "genhtml_function_med_limit = ${{ env.MED_LIMIT }}" >> lcovrc
+          touch ./lcovrc
+          echo "genhtml_hi_limit = ${{ env.HI_LIMIT }}" >> ./lcovrc
+          echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
+          echo "genhtml_function_hi_limit = ${{ env.HI_LIMIT }}" >> ./lcovrc
+          echo "genhtml_function_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
           
           echo "Contents of lcovrc:"
-          cat lcovrc
+          cat ./lcovrc
 
       - name: Generate HTML Files
         run: |
           # directory into which to put user artifacts
           mkdir test-coverage
           
-          # generate lcov and html files for each separate compilation
-          for dir in $(find ./test-coverage-internal -not -path '*/.*' -type d -mindepth 1 -maxdepth 1); do
+          # generate html files for each separate compilation
+          find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             arch=$(basename "${dir}")
-            touch "${dir}/patomic.profdata"  # avoid out-of-date warning
             mkdir "./test-coverage/${arch}"
-            llvm-cov export -format=lcov -instr-profile="${dir}/patomic.profdata" -object="${dir}/patomic.bin" >> "./test-coverage/${arch}/patomic.lcov"
             genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage/${arch}/patomic.lcov"
           done
           
-          # TODO: generate patomic-universal html/lcov stuff
+          # generate html files for combined coverage
+          mkdir ./test-coverage/universal
+          lcov_combine_command=("lcov")
+          while IFS= read -r -d '' lcov_file; do
+            lcov_combine_command+=("-a" "${lcov_file}")
+          done < <(find ./test-coverage-internal -type f -name '*patomic.lcov' -print0)
+          lcov_combine_command+=("-o" "./patomic.lcov")
+          "${lcov_combine_command[@]}"
+          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 ./patomic.lcov
 
       - name: Upload Coverage Results
         uses: actions/upload-artifact@v3
@@ -220,6 +232,7 @@ jobs:
         run: |
           # TODO
 
+      # keep this last so that we have it for debugging if something fails
       - name: Delete Test Coverage Artifacts
         uses: geekyeggo/delete-artifact@v2
         with:
