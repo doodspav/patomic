@@ -164,13 +164,7 @@ jobs:
           # use variable because cp does not support globbing in file names
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
           cp "${lib_files[0]}" ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
-          cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.bin
-          
-          # debug (keep in case something breaks again)
-          if [[ "${{ inputs.os }}" == "macos" ]]; then
-            brew install tree
-          fi
-          tree ../../upload/cov
+          cp default.profdata ../../upload/cov/${{ env.UNIQUE_ID }}/patomic.profdata
 
       - name: Upload Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
