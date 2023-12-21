@@ -147,8 +147,12 @@ jobs:
           
           # macos needs xcrun to help with finding stuff through xcode
           prefix=""
+          # macos needs xcrun to help use xcode find llvm tools
           if [[ "${{ inputs.os }}" == "macos" ]]; then
             prefix="xcrun "
+          # ubuntu needs llvm tools to be installed
+          else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
+            sudo apt install llvm
           fi
           
           # merge coverage output from all tests
