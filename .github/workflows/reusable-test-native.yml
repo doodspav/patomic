@@ -156,7 +156,7 @@ jobs:
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=default.profdata
+          find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=default.profdata
           
           # copy over merged coverage output and corresponding binary
           # use variable because cp does not support globbing in file names
@@ -170,7 +170,7 @@ jobs:
           cd ../..
           echo "$PWD" >> upload/cov/${{ env.UNIQUE_NAME }}/patomic.rootpath
 
-      - name: Upload Coverage Results
+      - name: Upload Internal Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         uses: actions/upload-artifact@v3
         with:

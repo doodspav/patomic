@@ -141,3 +141,92 @@ jobs:
 #          action_fail_on_inconclusive: true
 #          check_name: "Tests Results: Warning"
 #          files: test-results/**/*.xml
+
+  publish-coverage:
+    runs-on: ubuntu-latest
+    needs:
+      - test-native
+      # - test-qemu
+    strategy:
+      matrix:
+        include:
+          - hi_limit: 100
+          - lo_limit: 90
+
+    steps:
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install binutils  # for c++filt
+          sudo apt install llvm
+          sudo apt install lcov
+
+      - name: Download Test Coverage Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: test-coverage-internal
+          path: test-coverage-internal/
+
+      - name: Delete Test Coverage Artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: test-coverage-internal
+
+      - name: Get Root Compilation Dir
+        id: get-path
+        run: |
+          # this only contains directories
+          dir_names=(test-coverage-internal/*)
+          
+          # all directories have the same root path
+          root_path="test-coverage-internal/${dir_names[0]}/patomic.rootpath
+          
+          # save path for future steps
+          echo "root_compilation_dir=${root_path}" >> $GITHUB_OUTPUT
+
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          repository: patomic
+          path: "${{ steps.get-path.root_compiler_dir }}/patomic"
+      
+      - name: Create Lcov Config File
+        run: |
+          touch lcovrc
+          
+          echo "genhtml_hi_limit = ${{ matrix.hi_limit }}" >> lcovrc
+          echo "genhtml_med_limit = ${{ matrix.med_limit }}" >> lcovrc
+          echo "genhtml_function_hi_limit = ${{ matrix.hi_limit }}" >> lcovrc
+          echo "genhtml_function_med_limit = ${{ matrix.med_limit }}" >> lcovrc
+          
+          echo "Contents of lcovrc:
+          echo "-------------------"
+          cat lcovrc
+
+      - name: Generate HTML Files
+        run: |
+          # directory into which to put user artifacts
+          mkdir test-coverage
+          
+          # generate lcov and html files for each separate compilation
+          for dir in $(find ./test-coverage-internal -not -path '*/*' -type d -mindepth 1 -maxdepth 1); do
+            arch=$(basename "${dir}")
+            touch "${dir}/patomic.profdata"  # avoid out-of-date warning
+            mkdir "./test-coverage/${arch}"
+            llvm-cov export -format=lcov -instr-profile="${dir}/patomic.profdata" -object="${dir}/patomic.bin" >> "./test-coverage/${arch}/patomic.lcov"
+            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage/${arch}/patomic.lcov"
+          done
+
+      - name: Upload Coverage Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage
+          path: test-coverage/
+
+      - name: Create Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1
+        with:
+          filename: test-coverage/**/patomic.lcov
+          badge: true
+          fail_below_min: true
+          thresholds: '${{ matrix.med_limit }} ${{ matrix.hi_limit }}'
