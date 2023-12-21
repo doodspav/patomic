@@ -182,6 +182,10 @@ jobs:
           sudo mkdir -p "${root_path}"
           sudo chmod -R a+rwx "${root_path}"
           ln -s patomic "${root_path}/patomic"
+          
+          # debug info
+          tree .
+          tree "${root_path}"
 
       - name: Create Lcov Config File
         run: |
