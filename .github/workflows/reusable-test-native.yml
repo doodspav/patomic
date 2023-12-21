@@ -168,7 +168,7 @@ jobs:
           
           # debug (keep in case something breaks again)
           if [[ "${{ inputs.os }}" == "macos" ]]; then
-            sudo brew install tree
+            brew install tree
           fi
           tree ../../upload/cov
 
