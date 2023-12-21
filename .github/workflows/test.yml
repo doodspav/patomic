@@ -209,7 +209,7 @@ jobs:
           find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             arch=$(basename "${dir}")
             mkdir "./test-coverage/${arch}"
-            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage/${arch}/patomic.lcov"
+            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage-internal/${arch}/patomic.lcov"
           done
           
           # generate html files for combined coverage
