@@ -200,7 +200,9 @@ jobs:
           
           # generate lcov and html files for each separate compilation
           for dir in $(find ./test-coverage-internal -not -path '*/.*' -type d -mindepth 1 -maxdepth 1); do
+            echo "DIR: ${dir}"
             arch=$(basename "${dir}")
+            echo "ARCH: ${arch}"
             touch "${dir}/patomic.profdata"  # avoid out-of-date warning
             mkdir "./test-coverage/${arch}"
             llvm-cov export -format=lcov -instr-profile="${dir}/patomic.profdata" -object="${dir}/patomic.bin" >> "./test-coverage/${arch}/patomic.lcov"
