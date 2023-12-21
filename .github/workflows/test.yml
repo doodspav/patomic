@@ -185,7 +185,6 @@ jobs:
       - name: Checkout patomic
         uses: actions/checkout@v4
         with:
-          repository: patomic
           path: "${{ steps.get-path.root_compilation_dir }}/patomic"
       
       - name: Create Lcov Config File
