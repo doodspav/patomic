@@ -107,7 +107,8 @@ jobs:
           cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
           cmake --build . --verbose --config ${{ matrix.cmake_build_type }}
           cmake --install . --config ${{ matrix.cmake_build_type }} --prefix install
-      
+
+      # TODO: figure out how to cache this for builds where we don't change any source code
       - name: Build patomic
         if: env.SKIP_JOB != 'true'
         run: |

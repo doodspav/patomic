@@ -177,7 +177,7 @@ jobs:
           dir_names=(test-coverage-internal/*)
           
           # all directories have the same root path
-          root_path="test-coverage-internal/${dir_names[0]}/patomic.rootpath
+          root_path="test-coverage-internal/${dir_names[0]}/patomic.rootpath"
           
           # save path for future steps
           echo "root_compilation_dir=${root_path}" >> $GITHUB_OUTPUT
@@ -191,13 +191,12 @@ jobs:
       - name: Create Lcov Config File
         run: |
           touch lcovrc
-          
           echo "genhtml_hi_limit = ${{ env.HI_LIMIT }}" >> lcovrc
           echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> lcovrc
           echo "genhtml_function_hi_limit = ${{ env.HI_LIMIT }}" >> lcovrc
           echo "genhtml_function_med_limit = ${{ env.MED_LIMIT }}" >> lcovrc
           
-          echo "Contents of lcovrc:
+          echo "Contents of lcovrc:"
           cat lcovrc
 
       - name: Generate HTML Files
