@@ -64,10 +64,10 @@
       "name": "_patomic-ci-flags-coverage-clang",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping -fcoverage-compilation-dir=${sourceDir}",
-        "CMAKE_CXX_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping -fcoverage-compilation-dir=${sourceDir}",
-        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping -fcoverage-compilation-dir=${sourceDir}",
-        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping -fcoverage-compilation-dir=${sourceDir}"
+        "CMAKE_C_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
+        "CMAKE_CXX_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping"
       }
     },
     {
