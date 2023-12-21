@@ -180,8 +180,9 @@ jobs:
           
           # symlink patomic
           sudo mkdir -p "${root_path}"
-          sudo ln -s patomic "${root_path}/patomic"
-      
+          sudo chmod -R a+rwx "${root_path}"
+          ln -s patomic "${root_path}/patomic"
+
       - name: Create Lcov Config File
         run: |
           touch lcovrc
