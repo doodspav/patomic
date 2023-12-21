@@ -170,9 +170,11 @@ jobs:
         run: |
           # this only contains directories
           dir_names=(test-coverage-internal/*)
+          echo "${dir_names[0]}/patomic.rootpath"
           
           # all directories have the same root path
-          root_path=$(cat "test-coverage-internal/${dir_names[0]}/patomic.rootpath")
+          root_path=$(cat "${dir_names[0]}/patomic.rootpath")
+          echo "${root_path}"
           
           # save path for future steps
           echo "root_compilation_dir=${root_path}" >> $GITHUB_OUTPUT
