@@ -156,9 +156,7 @@ jobs:
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*.profraw" | while read profraw_file; do
-            ${prefix}llvm-profdata merge -output=default.profdata "${profraw_file}"
-          done
+          ${prefix}llvm-profdata merge -output=default.profdata (find test/working -type f -name "*.profraw" | tr '\n' ' ')
           
           # copy over merged coverage output and corresponding binary
           # use variable because cp does not support globbing in file names
