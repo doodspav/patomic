@@ -86,6 +86,7 @@ jobs:
 
     steps:
       - name: Set Up Root Path
+        if: env.SKIP_JOB != 'true'
         shell: bash
         run: |
           # macos and ubuntu need sudo, windows does not
