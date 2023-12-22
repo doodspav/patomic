@@ -69,25 +69,39 @@ jobs:
       UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
       UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
       CMAKE_PRESET: ${{ inputs.preset }}-${{ matrix.kind }}
+      # currently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
         ${{ !(
           ( matrix.kind == 'coverage' && contains(inputs.preset, 'clang') ) ||
           ( matrix.kind == 'warning' )
         ) }}
+      # this job supports multiple os, each with their own root path
+      # this screws up lcov when it tries to merge the coverage path mappings
+      # we can't just modify mappings because:
+      # - GitHub issue #65006 on llvm/llvm-project suggests to NOT use -fcoverage-prefix-map
+      # - macos runner has AppleClang 14 which doesn't support -fcoverage-compilation-dir
+      # workaround is to have a fixed root path that everyone works from
+      ROOT_PATH: /home/native/${{ matrix.kind }}
 
     steps:
+      - name: Set Up Root Path
+        shell: bash
+        run: |
+          sudo mkdir -p "${{ env.ROOT_PATH }}"
+          sudo chmod -R a+rwx "${{ env.ROOT_PATH }}"
+
       - name: Checkout patomic
         if: env.SKIP_JOB != 'true'
         uses: actions/checkout@v4
         with:
-          path: patomic
+          path: ${{ env.ROOT_PATH }}/patomic
 
       - name: Restore Cached GoogleTest
         if: env.SKIP_JOB != 'true'
         id: cache-googletest
         uses: actions/cache@v3
         with:
-          path: googletest/build/install
+          path: ${{ env.ROOT_PATH }}/googletest/build/install
           key: googletest-${{ env.UNIQUE_ID }}
 
       - name: Checkout GoogleTest
@@ -95,11 +109,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: google/googletest
-          path: googletest
+          path: ${{ env.ROOT_PATH }}/googletest
 
       - name: Build and Install GoogleTest
         if: env.SKIP_JOB != 'true' && steps.cache-googletest.outputs.cache-hit != 'true'
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           cd googletest
           cp ../patomic/CMakePresets.json .
           mkdir build
@@ -112,6 +128,8 @@ jobs:
       - name: Build patomic
         if: env.SKIP_JOB != 'true'
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           cd patomic
           mkdir build
           cd build
@@ -122,12 +140,16 @@ jobs:
         if: env.SKIP_JOB != 'true'
         continue-on-error: true
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           cd patomic/build
           ctest --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake_build_type }} .
       
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           mkdir -p upload/test/${{ matrix.kind }}
           python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
 
@@ -136,12 +158,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: upload/test/
+          path: ${{ env.ROOT_PATH }}/upload/test/
 
       - name: Generate Lcov Tracefile
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         shell: bash
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           # set up directory
           mkdir -p upload/cov/${{ env.UNIQUE_NAME }}
           cd patomic/build
@@ -177,4 +201,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-coverage-internal
-          path: upload/cov/
+          path: ${{ env.ROOT_PATH }}/upload/cov/
