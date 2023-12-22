@@ -94,7 +94,12 @@ jobs:
         if: env.SKIP_JOB != 'true'
         uses: actions/checkout@v4
         with:
-          path: ${{ env.ROOT_PATH }}/patomic
+          path: patomic
+
+      - name: Move patomic to Root Path Location
+        if: env.SKIP_JOB != 'true'
+        run: |
+          cp -R ./patomic/ "${{ env.ROOT_PATH }}/patomic"
 
       - name: Restore Cached GoogleTest
         if: env.SKIP_JOB != 'true'
@@ -109,7 +114,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: google/googletest
-          path: ${{ env.ROOT_PATH }}/googletest
+          path: googletest
+
+      - name: Move GoogleTest to Root Path Location
+        if: env.SKIP_JOB != 'true'
+        run: |
+          cp -R ./googletest/ "${{ env.ROOT_PATH }}/googletest"
 
       - name: Build and Install GoogleTest
         if: env.SKIP_JOB != 'true' && steps.cache-googletest.outputs.cache-hit != 'true'
