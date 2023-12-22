@@ -158,19 +158,13 @@ jobs:
       - name: Test patomic
         if: env.SKIP_JOB != 'true'
         continue-on-error: true
-        shell: bash
+        env:
+          LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
         run: |
           cd ${{ env.ROOT_PATH }}
           
-          # only run UTs for coverage
-          label_regex="^(.*)$"
-          if [[ "${{ matrix.kind }}" == 'coverage' ]]; then
-            label_regex="^(ut)$"
-          fi
-          
-          # run test
           cd patomic/build
-          ctest --label-regex "${label_regex}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake_build_type }} .
+          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake_build_type }} .
 
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
