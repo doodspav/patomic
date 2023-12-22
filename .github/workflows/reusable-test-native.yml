@@ -72,7 +72,7 @@ jobs:
       # currently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
         ${{ !(
-          ( matrix.kind == 'coverage' && contains(inputs.preset, 'clang') ) ||
+          ( matrix.kind == 'coverage' && inputs.os != 'windows' ) ||
           ( matrix.kind == 'warning' )
         ) }}
       # this job supports multiple os, each with their own root path
@@ -179,8 +179,8 @@ jobs:
           name: test-results
           path: ${{ env.ROOT_PATH }}/upload/test/
 
-      - name: Generate Lcov Tracefile and Root Path File
-        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
+      - name: Generate Lcov Tracefile and Root Path File (clang)
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage' && matrix.compiler == 'clang'
         shell: bash
         run: |
           cd ${{ env.ROOT_PATH }}
@@ -214,6 +214,16 @@ jobs:
           # workaround is to store root path to help use coverage directory mappings later
           cd ../..
           echo "$PWD" >> upload/cov/${{ env.UNIQUE_NAME }}/patomic.rootpath
+
+      - name: Generate Lcov Tracefile and Root Path File (gcc)
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage' && matrix.compiler == 'gcc'
+        shell: bash
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          # debug helper
+          tree patomic/build
+          exit 1
 
       - name: Upload Internal Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
