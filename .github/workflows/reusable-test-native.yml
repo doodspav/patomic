@@ -231,13 +231,8 @@ jobs:
           
           # merge all .gcda files into an lcov tracefile, and copy to upload
           # all tests have .gcno, but only tests that were executed have .gcda
-          lcov --directory patomic/build --capture --output-file patomic.0.lcov
-          
-          # don't include googletest sources
-          lcov --remove patomic.0.lcov "${{ env.ROOT_PATH }}/googletest/*" --output-file patomic.1.lcov 
-          
-          # copy lcov tracefile to upload
-          cp patomic.1.lcov upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
+          lcov --directory patomic/build --capture --output-file patomic.lcov
+          cp patomic.lcov upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
           
           # we need root path file because next job needs it because clang (above) needs it
           # we might also need it for gcc, but at the moment i have no idea

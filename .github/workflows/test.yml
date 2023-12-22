@@ -205,6 +205,13 @@ jobs:
           # directory into which to put user artifacts
           mkdir test-coverage
           
+          # keep only coverage data relating to patomic source files
+          find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
+            mv "${dir}/patomic.lcov" "${dir}/patomic.lcov.old"
+            root_path=$(cat "${dir}/patomic.rootpath")
+            lcov --output-file "${dir}/patomic.lcov" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/src/*"
+          done
+          
           # generate html files for each separate compilation
           find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             arch=$(basename "${dir}")
