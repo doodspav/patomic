@@ -229,9 +229,19 @@ jobs:
         run: |
           cd ${{ env.ROOT_PATH }}
           
-          # debug helper
-          tree patomic/build
-          exit 1
+          # install lcov
+          sudo apt install lcov
+          
+          # set up directory
+          mkdir -p upload/cov/${{ env.UNIQUE_NAME }}
+          
+          # merge all .gcda files into an lcov tracefile, and copy to upload
+          # all tests have .gcno, but only tests that were executed have .gcda
+          lcov --directory patomic/build --capture --output-file upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
+          
+          # we need root path file because next job needs it because clang (above) needs it
+          # we might also need it for gcc, but at the moment i have no idea
+          echo "$PWD" >> upload/cov/${{ env.UNIQUE_NAME }}/patomic.rootpath
 
       - name: Upload Internal Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
