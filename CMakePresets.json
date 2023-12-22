@@ -71,6 +71,16 @@
       }
     },
     {
+      "name": "_patomic-ci-flags-coverage-gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "--coverage",
+        "CMAKE_CXX_FLAGS_INIT": "--coverage",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "--coverage",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "--coverage"
+      }
+    },
+    {
       "name": "_patomic-ci-flags-sanitize-gnu",
       "hidden": true,
       "cacheVariables": {
@@ -166,6 +176,14 @@
       ]
     },
     {
+      "name": "patomic-ci-native-unix-gcc-coverage",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-gcc",
+        "_patomic-ci-flags-coverage-gcc"
+      ]
+    },
+    {
       "name": "patomic-ci-native-unix-gcc-sanitize",
       "inherits": [
         "_patomic-ci-base",
@@ -216,6 +234,13 @@
       "inherits": [
         "_patomic-ci-qemu-base",
         "_patomic-ci-flags-ansi-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-gcc-coverage",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-coverage-gcc"
       ]
     },
     {
