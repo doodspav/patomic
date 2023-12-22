@@ -234,7 +234,7 @@ jobs:
           lcov --directory patomic/build --capture --output-file patomic.lcov
           
           # don't include googletest sources
-          lcov --remove "*googletest*" patomic.lcov
+          lcov --remove patomic.lcov "*googletest*"
           
           # copy lcov tracefile to upload
           cp patomic.lcov upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
