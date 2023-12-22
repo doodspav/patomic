@@ -88,8 +88,14 @@ jobs:
       - name: Set Up Root Path
         shell: bash
         run: |
-          sudo mkdir -p "${{ env.ROOT_PATH }}"
-          sudo chmod -R a+rwx "${{ env.ROOT_PATH }}"
+          # macos and ubuntu need sudo, windows does not
+          prefix=""
+          if [[ "${{ inputs.os }}" != "windows" ]]; then
+            prefix="sudo "
+          fi
+          
+          ${prefix}mkdir -p "${{ env.ROOT_PATH }}"
+          ${prefix}chmod -R a+rwx "${{ env.ROOT_PATH }}"
 
       - name: Checkout patomic
         if: env.SKIP_JOB != 'true'
