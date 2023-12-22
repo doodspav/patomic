@@ -126,7 +126,7 @@ jobs:
           path: googletest
 
       - name: Move GoogleTest to Root Path Location
-        if: env.SKIP_JOB != 'true'
+        if: env.SKIP_JOB != 'true' && steps.cache-googletest.outputs.cache-hit != 'true'
         run: |
           cp -R ./googletest/ "${{ env.ROOT_PATH }}/googletest"
 
