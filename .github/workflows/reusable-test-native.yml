@@ -179,7 +179,7 @@ jobs:
           name: test-results
           path: ${{ env.ROOT_PATH }}/upload/test/
 
-      - name: Generate Lcov Tracefile
+      - name: Generate Lcov Tracefile and Root Path File
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         shell: bash
         run: |
