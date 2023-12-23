@@ -261,7 +261,7 @@ jobs:
             OUT_FILE = pathlib.Path("./coverage_summary.md")
             
             # set up table with prologue
-            table_text = "## Test Coverage\n\n"
+            table_text = "## Test Coverage\n"
             table_text = "| Target | Lines | Functions | Branches |\n"
             table_text += "| :----- | ----: | --------: | -------: |\n"
             
@@ -271,6 +271,7 @@ jobs:
             
             # keep track if any result is below the thresholds
             any_fail = False
+            universal_warn = False
             
             # helper lambdas
             make_emoji = lambda p: "✅" if p >= HI_LEVEL else ("⚠️" if p >= MED_LEVEL else "🛑")
@@ -310,6 +311,10 @@ jobs:
                 
                 # check if we failed
                 any_fail = any_fail or cov_data[attr_name].percent < MED_LEVEL
+          
+                # check if universal architecture and we warned
+                if arch == "universal":
+                  universal_warn = universal_warn or cov_data[attr_name].percent < HI_LEVEL
               
               # fill out table
               table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
@@ -325,6 +330,7 @@ jobs:
             # set output variable
             with open(os.environ["GITHUB_OUTPUT"], 'a') as f:
               print(f"any_fail={int(any_fail)}", file=f)
+              print(f"universal_warn={int(universal_warn)}", file=f)
 
       - name: Publish Coverage in Job Summary
         run: |
@@ -337,16 +343,15 @@ jobs:
           filePath: coverage_summary.md
           mode: recreate
 
-      - name: Fail if Any Coverage Fails
+      - name: Fail if Any Coverage Fails or Universal Coverage Warns
         run: |
           if [[ '${{ steps.coverage-summary.outputs.any_fail }}' != '0' ]]; then
             >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }} (a.k.a. 🛑)"
             exit 1
+          elif [[ '${{ steps.coverage-summary.outputs.universal_warn }}' != '0' ]]; then
+            >&2 echo "Universal coverage result was below the threshold of ${{ env.HI_LIMIT }} (a.k.a. ⚠️)"
+            exit 1
           fi
-
-      - name: Fail if Universal Coverage Warns
-        run: |
-          # TODO
 
       # keep this last so that we have it for debugging if something fails
       - name: Delete Test Coverage Artifacts
