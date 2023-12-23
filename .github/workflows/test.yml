@@ -313,6 +313,7 @@ jobs:
               table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
           
             # add epilogue after table
+            table_text += f"\n✅ >= {HI_LEVEL}, ⚠️ >= {MED_LEVEL}, 🛑 < {MED_LEVEL}\n"
             table_text += f"\nResults for commit [{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).\n"
             
             # write result to file
@@ -331,6 +332,7 @@ jobs:
         with:
           comment_tag: coverage-summary
           filePath: coverage_summary.md
+          mode: recreate
 
       - name: Fail If Any Coverage Fails
         run: |
