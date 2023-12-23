@@ -8,11 +8,36 @@ on:
         required: true
         type: string
         default: ''
+      preset:
+        description: 'CMake preset used to build patomic and googletest, will be conditionally suffixed with one of ansi, coverage, sanitize, warning'
+        required: true
+        type: string
+        default: ''
       architecture:
         description: 'CPU architecture tests are run on, passed to QEMU'
         required: true
         type: string
         default: ''
+      gcc_version:
+        description: 'Major version of GCC toolchain to use'
+        required: false
+        type: number
+        default: 10
+      llvm_version:
+        description: 'Major version of LLVM toolchain to use'
+        required: false
+        type: number
+        default: 15
+      skip_gcc:
+        description: "Conditionally skip 'run' job if gcc does not support the triple"
+        required: false
+        type: boolean
+        default: false
+      skip_llvm:
+        description: "Conditionally skip 'run' job if llvm does not support the triple"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   check:
@@ -36,114 +61,134 @@ jobs:
 
           # apply function to all inputs
           check_input "triple"       "${{ inputs.triple }}"
+          check_input "preset"       "${{ inputs.preset }}"
           check_input "architecture" "${{ inputs.architecture }}"
 
-  warning:
-    needs:  check
+  run:
+    needs: check
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # have compiler before build_shared for nicer GitHub Actions GUI output
         compiler:
           - clang
           - gcc
+        kind:
+          - warning
         build_shared:
           - static
           - shared
         include:
-          # hidden single variables
-          - llvm_version: 15
-          - gcc_version: 10
-          - cmake_build_type: Release
-          - compiler: clang
-            compiler_version: 15
-            cmake_preset: patomic-ci-qemu-ubuntu-clang-warning
-          - compiler: gcc
-            compiler_version: 10
-            cmake_preset: patomic-ci-qemu-ubuntu-gcc-warning
+          # hidden single variable
+          - sysroot: ~/sysroot
           # alias variables
+          - compiler: clang
+            compiler_version: ${{ inputs.llvm_version }}
+            preset: patomic-ci-qemu-ubuntu-clang
+          - compiler: gcc
+            compiler_version: ${{ inputs.gcc_version }}
+            preset: patomic-ci-qemu-ubuntu-gcc
           - build_shared: static
             cmake_build_shared: OFF
           - build_shared: shared
             cmake_build_shared: ON
     env:
-      # these have to be in env context because they depend on matrix context
-      UNIQUE_ID: warning-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ matrix.gcc_version }}-${{ matrix.llvm_version }}
-      UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
-      # env variables used by toolchain file
+      # required by toolchain file
       PATOMIC_CI_XARCH: ${{ inputs.architecture }}
       PATOMIC_CI_XTRIPLE: ${{ inputs.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler_version }}
-      PATOMIC_CI_SYSROOT: ~/sysroot
+      PATOMIC_CI_SYSROOT: ${{ matrix.sysroot }}
+      # these have to be in env context because they depend on matrix context
+      UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ inputs.gcc_version }}-${{ inputs.llvm_version }}
+      UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
+      CMAKE_PRESET: ${{ inputs.preset }}-${{ matrix.kind }}
+      CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
+      # apparently not possible to skip job using matrix context, so this is the next best thing
+      SKIP_JOB: >-
+        ${{ !(
+          ( matrix.compiler == 'clang' && !inputs.skip_llvm ) ||
+          ( matrix.compiler == 'gcc' && !inputs.skip_gcc )
+        ) }}
 
     steps:
       - name: Install Toolchains and Qemu
+        if: env.SKIP_JOB != 'true'
         run: |
           sudo apt update
-          sudo apt install g++-${{ matrix.gcc_version }}-multilib
-          sudo apt install g++-${{ matrix.gcc_version }}-${{ inputs.triple }}
-          sudo apt install llvm-${{ matrix.llvm_version }}
-          sudo apt install clang-${{ matrix.llvm_version }}
+          sudo apt install g++-${{ inputs.gcc_version }}-multilib
+          sudo apt install g++-${{ inputs.gcc_version }}-${{ inputs.triple }}
+          if [[ '${{ matrix.compiler }}' == 'clang' ]]; then
+            sudo apt install llvm-${{ inputs.llvm_version }}
+            sudo apt install clang-${{ inputs.llvm_version }}
+          fi
           sudo apt install qemu-user
 
       - name: Checkout patomic
+        if: env.SKIP_JOB != 'true'
         uses: actions/checkout@v4
         with:
           path: patomic
 
       - name: Restore Cached Sysroot (with GoogleTest)
+        if: env.SKIP_JOB != 'true'
         id: cache-sysroot
         uses: actions/cache@v3
         with:
-          path: ~/sysroot
+          path: ${{ matrix.sysroot }}
           key: sysroot-${{ env.UNIQUE_ID }}
 
       - name: Set Up Sysroot
-        if: steps.cache-sysroot.outputs.cache-hit != 'true'
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
         run: |
-          cp -r /usr/${{ inputs.triple }}/ ~/sysroot
+          cp -R /usr/${{ inputs.triple }}/ ${{ matrix.sysroot }}
 
       - name: Checkout GoogleTest
-        if: steps.cache-sysroot.outputs.cache-hit != 'true'
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: google/googletest
           path: googletest
 
       - name: Build and Install GoogleTest
-        if: steps.cache-sysroot.outputs.cache-hit != 'true'
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
         run: |
           cd googletest
-          cp -r ../patomic/ci/ ./
+          cp -R ../patomic/ci/ ./
           cp ../patomic/CMakePresets.json .
           mkdir build
           cd build
-          cmake --preset ${{ matrix.cmake_preset }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
           cmake --build . --verbose
-          cmake --install . --prefix ~/sysroot
+          cmake --install . --prefix ${{ matrix.sysroot }}
 
+      # TODO: figure out how to cache this for builds where we don't change any source code
       - name: Build patomic
+        if: env.SKIP_JOB != 'true'
         run: |
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ matrix.cmake_preset }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DGTest_ROOT:PATH="~/sysroot" ..
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="${{ matrix.sysroot }}" ..
           cmake --build . --verbose
 
       - name: Test patomic
+        if: env.SKIP_JOB != 'true'
         continue-on-error: true
+        env:
+          LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
         run: |
           cd patomic/build
-          ctest --verbose --output-junit Testing/Temporary/results.xml .
+          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml .
 
       - name: Prepare Test Results
+        if: env.SKIP_JOB != 'true'
         run: |
-          mkdir -p upload/warning
-          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/warning/${{ env.UNIQUE_NAME }}.xml
+          mkdir -p upload/test/${{ matrix.kind }}
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ matrix.kind }}-${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
+        if: env.SKIP_JOB != 'true'
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: upload/
+          path: upload/test/
