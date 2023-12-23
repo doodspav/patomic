@@ -261,6 +261,7 @@ jobs:
             OUT_FILE = pathlib.Path("./coverage_summary.md")
             
             # set up table with prologue
+            table_text = "## Test Coverage\n\n"
             table_text = "| Target | Lines | Functions | Branches |\n"
             table_text += "| :----- | ----: | --------: | -------: |\n"
             
