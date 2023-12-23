@@ -259,7 +259,7 @@ jobs:
             BASE_DIR = pathlib.Path("./test-coverage-internal")
             OUT_FILE = pathlib.Path("./coverage_summary.md")
             
-            # set up table
+            # set up table with prologue
             table_text = "| Target | Lines | Functions | Branches |\n"
             table_text += "| :----- | ----: | --------: | -------: |\n"
             
@@ -268,7 +268,6 @@ jobs:
             archs.sort()
             
             # keep track if any result is below the thresholds
-            any_warn = False
             any_fail = False
             
             # helper lambdas
@@ -308,18 +307,19 @@ jobs:
                 cov_data[attr_name] = cov
                 
                 # check if we failed
-                any_warn = any_warn or cov_data[attr_name].percent < HI_LEVEL
                 any_fail = any_fail or cov_data[attr_name].percent < MED_LEVEL
               
               # fill out table
               table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
+          
+            # add epilogue after table
+            table_text += f"\nResults for commit [{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).\n"
             
             # write result to file
             with open(OUT_FILE, "w") as f:
               f.write(table_text)
             
-            # set output variables (use old method because idk how to use new one in python)
-            print(f"::set-output name=any_warn::{int(any_warn)}")
+            # set output variable (use old method because idk how to use new one in python)
             print(f"::set-output name=any_fail::{int(any_fail)}")
 
       - name: Publish Coverage in Action Summary
