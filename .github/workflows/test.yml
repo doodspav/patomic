@@ -321,7 +321,7 @@ jobs:
           
             # add epilogue after table
             table_text += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
-            table_text += f"\nResults for commit [{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).\n"
+            table_text += f"\nResults for commit `[{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})`.\n"
             
             # write result to file
             with open(OUT_FILE, "w") as f:
