@@ -252,7 +252,7 @@ jobs:
             json_out[arch] = {}
             
             # get lcov summary
-            cmd = f"lcov --summary {BASE_DIR / arch / "patomic.lcov}"
+            cmd = f"lcov --summary {BASE_DIR / arch / 'patomic.lcov'}"
             lcov_summary = subprocess.run(cmd, capture_output=True, shell=True, check=True).stdout.decode()
             
             # go through lcov summary
