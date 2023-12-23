@@ -220,14 +220,15 @@ jobs:
           done
           
           # generate html files for combined coverage
+          mkdir ./test-coverage-internal/universal
           mkdir ./test-coverage/universal
           lcov_combine_command=("lcov")
           while IFS= read -r -d '' lcov_file; do
             lcov_combine_command+=("-a" "${lcov_file}")
           done < <(find ./test-coverage-internal -type f -name '*patomic.lcov' -print0)
-          lcov_combine_command+=("-o" "./patomic.lcov")
+          lcov_combine_command+=("-o" "./test-coverage-internal/universal/patomic.lcov")
           "${lcov_combine_command[@]}"
-          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 ./patomic.lcov
+          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 ./test-coverage-internal/universal/patomic.lcov
 
       - name: Upload Coverage Results
         uses: actions/upload-artifact@v3
@@ -313,7 +314,7 @@ jobs:
               table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
           
             # add epilogue after table
-            table_text += f"\n✅ >= {HI_LEVEL}, ⚠️ >= {MED_LEVEL}, 🛑 < {MED_LEVEL}\n"
+            table_text += f"\n`✅ >= {HI_LEVEL}`, `⚠️ >= {MED_LEVEL}`, `🛑 < {MED_LEVEL}`\n"
             table_text += f"\nResults for commit [{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).\n"
             
             # write result to file
