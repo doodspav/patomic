@@ -318,7 +318,7 @@ jobs:
           # markdown epilogue
           sha = "${{ github.event.pull_request.head.sha }}"
           md_string += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
-          md_string += f"\nResults for commit [{sha[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/{sha})\n"
+          md_string += f"\nResults for commit [`{sha[:8]}`](${{ github.server_url }}/${{ github.repository }}/commit/{sha}).\n"
           
           # write to file
           with open(OUT_FILE, 'wb') as fp:
