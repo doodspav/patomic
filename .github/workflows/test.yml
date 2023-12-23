@@ -325,9 +325,9 @@ jobs:
             with open(os.environ["GITHUB_OUTPUT"], 'a') as f:
               print(f"any_fail={int(any_fail)}", file=f)
 
-      - name: Publish Coverage in Action Summary
+      - name: Publish Coverage in Job Summary
         run: |
-          # TODO
+          echo "$(cat ./coverage-summary.md)" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Coverage in Pull Request Comment
         uses: thollander/actions-comment-pull-request@v2
@@ -342,6 +342,10 @@ jobs:
             >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }} (a.k.a. 🛑)"
             exit 1
           fi
+
+      - name: Fail if Universal Coverage Warns
+        run: |
+          # TODO
 
       # keep this last so that we have it for debugging if something fails
       - name: Delete Test Coverage Artifacts
