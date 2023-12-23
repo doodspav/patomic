@@ -327,7 +327,7 @@ jobs:
 
       - name: Publish Coverage in Job Summary
         run: |
-          echo "$(cat ./coverage-summary.md)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat ./coverage_summary.md)" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Coverage in Pull Request Comment
         uses: thollander/actions-comment-pull-request@v2
