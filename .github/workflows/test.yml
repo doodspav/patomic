@@ -312,8 +312,8 @@ jobs:
               md_string += line
               
               # check for warnings
-              any_fail = any_fail and "⚠️" in line
-              universal_warn = universal_warn and (arch == 'universal' and "🛑" in line)
+              any_fail = any_fail and "🛑" in line
+              universal_warn = universal_warn and (arch == 'universal' and "⚠️" in line)
           
           # markdown epilogue
           sha = "${{ github.event.pull_request.head.sha }}"
