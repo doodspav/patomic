@@ -279,10 +279,14 @@ jobs:
             for arch in archs:
               cov_data = {}
               
-              # go through all lines in lcov summary
+              # get lcov summary
               lcov_path = BASE_DIR / arch / "patomic.lcov"
               res = subprocess.run(f'lcov --summary "{lcov_path}', capture_output=True, shell=True, check=True)
+              if res.returncode != 0:
+                raise RuntimeError(f"Command '{res.args.join(' ')}' returned non-zero exit status {res.returncode}, with stderr: {res.stderr.decode()}")
               lcov_summary = res.stdout.decode()
+              
+              # go through all lines of lcov summary
               for line in lcov_summary.split('\n'):
                 
                 # skip non-info lines
