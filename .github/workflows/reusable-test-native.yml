@@ -50,15 +50,15 @@ jobs:
     strategy:
       matrix:
         kind:
+          - ansi
           - coverage
           - warning
         build_shared:
           - static
           - shared
         include:
-          # hidden single variables
+          # hidden single variable
           - compiler: ${{ contains(inputs.preset, 'clang') && 'clang' || ( contains(inputs.preset, 'gcc') && 'gcc' || 'msvc' ) }}
-          - cmake_build_type: Release
           # alias variables
           - build_shared: static
             cmake_build_shared: OFF
@@ -69,9 +69,11 @@ jobs:
       UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
       UNIQUE_NAME: ${{ inputs.architecture }}-${{ inputs.os }}-${{ matrix.compiler }}-${{ matrix.build_shared }}
       CMAKE_PRESET: ${{ inputs.preset }}-${{ matrix.kind }}
+      CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # currently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
         ${{ !(
+          ( matrix.kind == 'ansi' && matrix.compiler != 'msvc' )  ||
           ( matrix.kind == 'coverage' && inputs.os != 'windows' ) ||
           ( matrix.kind == 'warning' )
         ) }}
@@ -140,9 +142,9 @@ jobs:
           cp ../patomic/CMakePresets.json .
           mkdir build
           cd build
-          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
-          cmake --build . --verbose --config ${{ matrix.cmake_build_type }}
-          cmake --install . --config ${{ matrix.cmake_build_type }} --prefix install
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
+          cmake --install . --config ${{ env.CMAKE_BUILD_TYPE }} --prefix install
 
       # TODO: figure out how to cache this for builds where we don't change any source code
       - name: Build patomic
@@ -153,8 +155,8 @@ jobs:
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DGTest_ROOT:PATH="../../googletest/build/install" ..
-          cmake --build . --verbose --config ${{ matrix.cmake_build_type }}
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="../../googletest/build/install" ..
+          cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
       
       - name: Test patomic
         if: env.SKIP_JOB != 'true'
@@ -165,7 +167,7 @@ jobs:
           cd ${{ env.ROOT_PATH }}
           
           cd patomic/build
-          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ matrix.cmake_build_type }} .
+          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
 
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
