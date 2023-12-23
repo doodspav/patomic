@@ -128,7 +128,7 @@ jobs:
       triple: ${{ matrix.triple }}
       architecture: ${{ matrix.architecture }}
       skip_gcc: ${{ matrix.skip_gcc == 'true' }}
-      skip_llvm: ${{ matrix.skip_llvm == 'true' }}
+      skip_llvm: true  # ${{ matrix.skip_llvm == 'true' }}
 
   publish-results:
     runs-on: ubuntu-latest
