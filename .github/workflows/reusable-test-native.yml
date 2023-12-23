@@ -86,7 +86,7 @@ jobs:
       # - macos runner has AppleClang 14 which doesn't support -fcoverage-compilation-dir
       # workaround is to have a fixed root path that everyone works from
       # use /Users as root dir because /home is not supported on macos
-      ROOT_PATH: /Users/native/${{ matrix.kind }}
+      ROOT_PATH: /Users/${{ matrix.kind }}
 
     steps:
       - name: Set Up Root Path

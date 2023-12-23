@@ -72,8 +72,6 @@ jobs:
           - static
           - shared
         include:
-          # hidden single variable
-          - sysroot: ~/sysroot
           # alias variables
           - compiler: clang
             compiler_version: ${{ inputs.llvm_version }}
@@ -91,7 +89,7 @@ jobs:
       PATOMIC_CI_XTRIPLE: ${{ inputs.triple }}
       PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
       PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler_version }}
-      PATOMIC_CI_SYSROOT: ${{ matrix.sysroot }}
+      PATOMIC_CI_SYSROOT: /Users/${{ matrix.kind }}
       # these have to be in env context because they depend on matrix context
       UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ inputs.gcc_version }}-${{ inputs.llvm_version }}
       UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
@@ -103,6 +101,8 @@ jobs:
           ( matrix.compiler == 'clang' && !inputs.skip_llvm ) ||
           ( matrix.compiler == 'gcc' && !inputs.skip_gcc )
         ) }}
+      # necessary because publish-coverage job expects everything to have the same root path
+      ROOT_PATH: /Users/${{ matrix.kind }}
 
     steps:
       - name: Install Toolchains and Qemu
@@ -117,35 +117,55 @@ jobs:
           fi
           sudo apt install qemu-user
 
+      - name: Set Up Root Path
+        if: env.SKIP_JOB != 'true'
+        run: |
+          sudo mkdir -p "${{ env.ROOT_PATH }}"
+          sudo chmod -R a+rwx "${{ env.ROOT_PATH }}"
+
       - name: Checkout patomic
         if: env.SKIP_JOB != 'true'
         uses: actions/checkout@v4
         with:
+          # cannot prefix with ROOT_PATH here, so copy over in next step
           path: patomic
+
+      - name: Move patomic to Root Path Location
+        if: env.SKIP_JOB != 'true'
+        run: |
+          cp -R ./patomic/ "${{ env.ROOT_PATH }}/patomic"
 
       - name: Restore Cached Sysroot (with GoogleTest)
         if: env.SKIP_JOB != 'true'
         id: cache-sysroot
         uses: actions/cache@v3
         with:
-          path: ${{ matrix.sysroot }}
+          path: ${{ env.ROOT_PATH }}/sysroot
           key: sysroot-${{ env.UNIQUE_ID }}
 
       - name: Set Up Sysroot
         if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
         run: |
-          cp -R /usr/${{ inputs.triple }}/ ${{ matrix.sysroot }}
+          cp -R /usr/${{ inputs.triple }}/ ${{ env.ROOT_PATH }}/sysroot
 
       - name: Checkout GoogleTest
         if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: google/googletest
+          # cannot prefix with ROOT_PATH here, so copy over in next step
           path: googletest
+
+      - name: Move GoogleTest to Root Path Location
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
+        run: |
+          cp -R ./googletest/ "${{ env.ROOT_PATH }}/googletest"
 
       - name: Build and Install GoogleTest
         if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           cd googletest
           cp -R ../patomic/ci/ ./
           cp ../patomic/CMakePresets.json .
@@ -153,16 +173,18 @@ jobs:
           cd build
           cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
           cmake --build . --verbose
-          cmake --install . --prefix ${{ matrix.sysroot }}
+          cmake --install . --prefix "${{ env.ROOT_PATH }}/sysroot"
 
       # TODO: figure out how to cache this for builds where we don't change any source code
       - name: Build patomic
         if: env.SKIP_JOB != 'true'
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           cd patomic
           mkdir build
           cd build
-          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="${{ matrix.sysroot }}" ..
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="${{ env.ROOT_PATH }}/sysroot" ..
           cmake --build . --verbose
 
       - name: Test patomic
@@ -171,12 +193,16 @@ jobs:
         env:
           LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           cd patomic/build
           ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml .
 
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
         run: |
+          cd ${{ env.ROOT_PATH }}
+          
           mkdir -p upload/test/${{ matrix.kind }}
           python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ matrix.kind }}-${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
 
@@ -185,4 +211,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: upload/test/
+          path: ${{ env.ROOT_PATH }}/upload/test/
