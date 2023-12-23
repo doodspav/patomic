@@ -252,9 +252,8 @@ jobs:
             json_out[arch] = {}
             
             # get lcov summary
-            lcov_path = BASE_DIR / arch / "patomic.lcov"
-            res = subprocess.run(f"lcov --summary {lcov_path}", capture_output=True, shell=True, check=True)
-            lcov_summary = res.stdout.decode()
+            cmd = f"lcov --summary {BASE_DIR / arch / "patomic.lcov}"
+            lcov_summary = subprocess.run(cmd, capture_output=True, shell=True, check=True).stdout.decode()
             
             # go through lcov summary
             for line in lcov_summary.split('\n'):
@@ -266,7 +265,7 @@ jobs:
               
               # parse coverage stats
               if "no data found" in line:
-                json_out[arch][attr_name] = { "percentage": 0.0, "count": 0, "total": 0 }
+                json_out[arch][attr_name] = { "percentage": 100.0, "count": 0, "total": 0 }
               else:
                 pattern = r"(\d+\.\d+)% \((\d+) of (\d+)"
                 matches = re.findall(pattern, line)[0]
@@ -280,107 +279,65 @@ jobs:
         id: coverage-summary
         shell: python
         run: |
-          import dataclasses
-          import os
-          import pathlib
-          import re
-          import subprocess
+          import json, os, pathlib
           
-          @dataclasses.dataclass(frozen=True, kw_only=True)
-          class CoverageStats:
-            percent: float
-            count: int
-            total: int
+          # constants
+          HI_LIMIT, MED_LIMIT = ${{ env.HI_LIMIT }}, ${{ env.MED_LIMIT }}
+          IN_FILE = pathlib.Path("./patomic.json")
+          OUT_FILE = pathlib.Path("./patomic.md")
           
-          if __name__ == "__main__":
+          # markdown prologue
+          md_string = "## Test Coverage\n"
+          md_string += "| Target | Lines | Functions | Branches |\n"
+          md_string += "| :----- | ----: | --------: | -------: |\n"
+          
+          # keep track of issues
+          any_fail = False
+          universal_warn = False
+          
+          # go through json file
+          with open(IN_FILE, 'r') as fp:
+            j = json.load(fp)
             
-            # constants
-            HI_LIMIT = ${{ env.HI_LIMIT }}
-            MED_LIMIT = ${{ env.MED_LIMIT }}
-            BASE_DIR = pathlib.Path("./test-coverage-internal")
-            OUT_FILE = pathlib.Path("./coverage_summary.md")
-            
-            # set up table with prologue
-            table_text = "## Test Coverage\n"
-            table_text += "| Target | Lines | Functions | Branches |\n"
-            table_text += "| :----- | ----: | --------: | -------: |\n"
-            
-            # get all non-hidden directories in ./test-coverage
-            archs = [d for d in next(os.walk(BASE_DIR))[1] if d[0] != '.']
-            archs.sort()
-            
-            # keep track if any result is below the thresholds
-            any_fail = False
-            universal_warn = False
+            # sort archs except for 'universal' first
+            archs = sorted(list(j.keys()), key=lambda a: a if a != 'universal' else '\0')
             
             # helper lambdas
             make_emoji = lambda p: "✅" if p >= HI_LIMIT else ("⚠️" if p >= MED_LIMIT else "🛑")
-            stat_to_str = lambda s: f"{s.percent:.2f}% ({s.count}/{s.total}) {make_emoji(s.percent)}"
+            field_2str = lambda f: f"{float(f['percentage']):.2f}% ({f['count']}/{f['total']}) {make_emoji(float(f['percentage']))}"
             
-            # add all coverage results to table
+            # write summary of each arch to markdown file
             for arch in archs:
-              cov_data = {}
+              line = f"| `{arch}` | `{field_2str(j[arch]['lines'])}` | `{field_2str(j[arch]['functions'])}` | `{field_2str(j[arch]['branches'])}` |\n"
+              md_string += line
               
-              # get lcov summary
-              lcov_path = BASE_DIR / arch / "patomic.lcov"
-              cmd = f'lcov --summary "{lcov_path}"'
-              res = subprocess.run(cmd, capture_output=True, shell=True, check=False)
-              if res.returncode != 0:
-                raise RuntimeError(f"Command '{cmd}' returned non-zero exit status {res.returncode}, with stderr: {res.stderr.decode()}")
-              lcov_summary = res.stdout.decode()
-              
-              # go through all lines of lcov summary
-              for line in lcov_summary.split('\n'):
-                
-                # skip non-info lines
-                if not line.lstrip().startswith(("lines", "functions", "branches")):
-                  continue
-                else:
-                  attr_name = line.lstrip().split('.', maxsplit=1)[0]
-                
-                # parse coverage stats
-                if "no data found" in line:
-                  cov = CoverageStats(percent=100.0, count=0, total=0)
-                else:
-                  pattern = r"(\d+\.\d+)% \((\d+) of (\d+)"
-                  matches = re.findall(pattern, line)[0]
-                  cov = CoverageStats(percent=float(matches[0]), count=int(matches[1]), total=int(matches[2]))
-                
-                # store for next step
-                cov_data[attr_name] = cov
-                
-                # check if we failed
-                any_fail = any_fail or cov_data[attr_name].percent < MED_LIMIT
+              # check for warnings
+              any_fail = any_fail and "⚠️" in line
+              universal_warn = universal_warn and (arch == 'universal' and "🛑" in line)
           
-                # check if universal architecture and we warned
-                if arch == "universal":
-                  universal_warn = universal_warn or cov_data[attr_name].percent < HI_LIMIT
-              
-              # fill out table
-              table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
+          # markdown epilogue
+          md_string += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
           
-            # add epilogue after table
-            table_text += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
-            table_text += f"\nResults for commit `[{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})`.\n"
-            
-            # write result to file
-            with open(OUT_FILE, "w") as f:
-              f.write(table_text)
-            
-            # set output variables
-            with open(os.environ["GITHUB_OUTPUT"], 'a') as f:
-              print(f"any_fail={int(any_fail)}", file=f)
-              print(f"universal_warn={int(universal_warn)}", file=f)
+          # write to file
+          with open(OUT_FILE, 'wb') as fp:
+            fp.write(md_string.encode())
+          
+          # write checks to output
+          with open(os.environ["GITHUB_OUTPUT"], 'a') as fp:
+            print(f"any_fail={int(any_fail)}", file=fp)
+            print(f"universal_warn={int(universal_warn)}", file=fp)
 
       - name: Publish Coverage in Job Summary
         run: |
-          echo "$(cat ./coverage_summary.md)" >> $GITHUB_STEP_SUMMARY
+          sha="$(git rev-parse HEAD)"
+          echo "Results for commit [${sha::8}](${{ github.server_url }}/${{ github.repository }}/commit/${sha})" >> ./patomic.md
+          echo "$(cat ./patomic.md)" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Coverage in Pull Request Comment
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: coverage-summary
-          filePath: coverage_summary.md
+          filePath: patomic.md
 
       - name: Fail if Any Coverage Fails or Universal Coverage Warns
         run: |
