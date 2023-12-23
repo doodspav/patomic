@@ -281,7 +281,7 @@ jobs:
               
               # get lcov summary
               lcov_path = BASE_DIR / arch / "patomic.lcov"
-              res = subprocess.run(f'lcov --summary "{lcov_path}', capture_output=True, shell=True, check=False)
+              res = subprocess.run(f'lcov --summary "{lcov_path}"', capture_output=True, shell=True, check=False)
               if res.returncode != 0:
                 raise RuntimeError(f"Command '{res.args.join(' ')}' returned non-zero exit status {res.returncode}, with stderr: {res.stderr.decode()}")
               lcov_summary = res.stdout.decode()
