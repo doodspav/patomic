@@ -200,6 +200,7 @@ jobs:
           
           echo "Contents of lcovrc:"
           cat ./lcovrc
+          sudo cp ./lcovrc /etc/lcovrc
 
       - name: Generate HTML Files
         run: |
@@ -217,7 +218,7 @@ jobs:
           find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             arch=$(basename "${dir}")
             mkdir "./test-coverage/${arch}"
-            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage-internal/${arch}/patomic.lcov"
+            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 "./test-coverage-internal/${arch}/patomic.lcov"
           done
           
           # generate html files for combined coverage
@@ -229,7 +230,7 @@ jobs:
           done < <(find ./test-coverage-internal -type f -name '*patomic.lcov' -print0)
           lcov_combine_command+=("-o" "./test-coverage-internal/universal/patomic.lcov")
           "${lcov_combine_command[@]}"
-          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 ./test-coverage-internal/universal/patomic.lcov
+          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 ./test-coverage-internal/universal/patomic.lcov
 
       - name: Upload Coverage HTML Results
         uses: actions/upload-artifact@v3
