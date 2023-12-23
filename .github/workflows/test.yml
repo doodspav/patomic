@@ -319,8 +319,8 @@ jobs:
               f.write(table_text)
             
             # set output variables (use old method because idk how to use new one in python)
-            print(f"::set-output name=any_warn::{any_warn}")
-            print(f"::set-output name=any_fail::{any_fail}")
+            print(f"::set-output name=any_warn::{int(any_warn)}")
+            print(f"::set-output name=any_fail::{int(any_fail)}")
 
       - name: Publish Coverage in Action Summary
         run: |
