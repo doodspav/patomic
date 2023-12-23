@@ -316,7 +316,9 @@ jobs:
               universal_warn = universal_warn and (arch == 'universal' and "🛑" in line)
           
           # markdown epilogue
+          sha = "${{ github.event.pull_request.head.sha }}"
           md_string += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
+          md_string += f"\nResults for commit [{sha[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/{sha})\n"
           
           # write to file
           with open(OUT_FILE, 'wb') as fp:
@@ -329,10 +331,6 @@ jobs:
 
       - name: Publish Coverage in Job Summary
         run: |
-          cd ./patomic
-          sha="$(git rev-parse HEAD)"
-          cd ..
-          echo "Results for commit [${sha::8}](${{ github.server_url }}/${{ github.repository }}/commit/${sha})" >> ./patomic.md
           echo "$(cat ./patomic.md)" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Coverage in Pull Request Comment
