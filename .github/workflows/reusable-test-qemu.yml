@@ -95,7 +95,7 @@ jobs:
       # these have to be in env context because they depend on matrix context
       UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ inputs.gcc_version }}-${{ inputs.llvm_version }}
       UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
-      CMAKE_PRESET: ${{ inputs.preset }}-${{ matrix.kind }}
+      CMAKE_PRESET: ${{ matrix.preset }}-${{ matrix.kind }}
       CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # apparently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
