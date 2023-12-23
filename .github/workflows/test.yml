@@ -139,7 +139,7 @@ jobs:
         with:
           action_fail: true
           action_fail_on_inconclusive: true
-          check_name: "Test Results: Warning"
+          check_name: "Test Results"
           files: test-results/**/*.xml
 
   publish-coverage:
@@ -255,8 +255,8 @@ jobs:
           if __name__ == "__main__":
             
             # constants
-            HI_LEVEL = ${{ env.HI_LIMIT }}
-            MED_LEVEL = ${{ env.MED_LIMIT }}
+            HI_LIMIT = ${{ env.HI_LIMIT }}
+            MED_LIMIT = ${{ env.MED_LIMIT }}
             BASE_DIR = pathlib.Path("./test-coverage-internal")
             OUT_FILE = pathlib.Path("./coverage_summary.md")
             
@@ -274,7 +274,7 @@ jobs:
             universal_warn = False
             
             # helper lambdas
-            make_emoji = lambda p: "✅" if p >= HI_LEVEL else ("⚠️" if p >= MED_LEVEL else "🛑")
+            make_emoji = lambda p: "✅" if p >= HI_LIMIT else ("⚠️" if p >= MED_LIMIT else "🛑")
             stat_to_str = lambda s: f"{s.percent:.2f}% ({s.count}/{s.total}) {make_emoji(s.percent)}"
             
             # add all coverage results to table
@@ -310,17 +310,17 @@ jobs:
                 cov_data[attr_name] = cov
                 
                 # check if we failed
-                any_fail = any_fail or cov_data[attr_name].percent < MED_LEVEL
+                any_fail = any_fail or cov_data[attr_name].percent < MED_LIMIT
           
                 # check if universal architecture and we warned
                 if arch == "universal":
-                  universal_warn = universal_warn or cov_data[attr_name].percent < HI_LEVEL
+                  universal_warn = universal_warn or cov_data[attr_name].percent < HI_LIMIT
               
               # fill out table
               table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
           
             # add epilogue after table
-            table_text += f"\n`✅ >= {HI_LEVEL}`, `⚠️ >= {MED_LEVEL}`, `🛑 < {MED_LEVEL}`\n"
+            table_text += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
             table_text += f"\nResults for commit [{'${{ github.sha }}'[:8]}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).\n"
             
             # write result to file
