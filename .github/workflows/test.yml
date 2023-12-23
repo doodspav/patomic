@@ -321,8 +321,9 @@ jobs:
             with open(OUT_FILE, "w") as f:
               f.write(table_text)
             
-            # set output variable (use old method because idk how to use new one in python)
-            print(f"::set-output name=any_fail::{int(any_fail)}")
+            # set output variable
+            with open(os.environ["GITHUB_OUTPUT"], 'a') as f:
+              print(f"any_fail={int(any_fail)}", file=f)
 
       - name: Publish Coverage in Action Summary
         run: |
@@ -335,10 +336,10 @@ jobs:
           filePath: coverage_summary.md
           mode: recreate
 
-      - name: Fail If Any Coverage Fails
+      - name: Fail if Any Coverage Fails
         run: |
           if [[ '${{ steps.coverage-summary.outputs.any_fail }}' != '0' ]]; then
-            >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }}"
+            >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }} (a.k.a. 🛑)"
             exit 1
           fi
 
