@@ -8,11 +8,6 @@ on:
         required: true
         type: string
         default: ''
-      preset:
-        description: 'CMake preset used to build patomic and googletest, will be conditionally suffixed with one of ansi, coverage, sanitize, warning'
-        required: true
-        type: string
-        default: ''
       architecture:
         description: 'CPU architecture tests are run on, passed to QEMU'
         required: true
@@ -61,7 +56,6 @@ jobs:
 
           # apply function to all inputs
           check_input "triple"       "${{ inputs.triple }}"
-          check_input "preset"       "${{ inputs.preset }}"
           check_input "architecture" "${{ inputs.architecture }}"
 
   run:
