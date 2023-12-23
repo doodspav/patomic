@@ -139,7 +139,7 @@ jobs:
 #        with:
 #          action_fail: true
 #          action_fail_on_inconclusive: true
-#          check_name: "Tests Results: Warning"
+#          check_name: "Test Results: Warning"
 #          files: test-results/**/*.xml
 
   publish-coverage:
@@ -235,9 +235,103 @@ jobs:
           name: test-coverage
           path: test-coverage/
 
-      - name: Publish Coverage Results
+      - name: Create Coverage Summary File
+        id: coverage-summary
+        shell: python
+        run: |
+          import dataclasses
+          import os
+          import pathlib
+          import re
+          import subprocess
+          
+          @dataclasses.dataclass(frozen=True, kw_only=True)
+          class CoverageStats:
+            percent: float
+            count: int
+            total: int
+          
+          if __name__ == "__main__":
+            
+            # constants
+            HI_LEVEL = ${{ env.HI_LIMIT }}
+            MED_LEVEL = ${{ env.MED_LIMIT }}
+            BASE_DIR = pathlib.Path("./test-coverage-internal")
+            OUT_FILE = pathlib.Path("./coverage_summary.md")
+            
+            # set up table
+            table_text = "| Target | Lines | Functions | Branches |\n"
+            table_text += "| :----- | ----: | --------: | -------: |\n"
+            
+            # get all non-hidden directories in ./test-coverage
+            archs = [d for d in next(os.walk(BASE_DIR))[1] if d[0] != '.']
+            archs.sort()
+            
+            # keep track if any result is below the thresholds
+            any_warn = False
+            any_fail = False
+            
+            # helper lambdas
+            make_emoji = lambda p: "✅" if p >= HI_LEVEL else ("⚠️" if p >= MED_LEVEL else "🛑")
+            stat_to_str = lambda s: f"{s.percent:.2f}% ({s.count}/{s.total}) {make_emoji(s.percent)}"
+            
+            # add all coverage results to table
+            for arch in archs:
+              cov_data = {}
+              
+              # go through all lines in lcov summary
+              res = subprocess.run(f"lcov --summary ./{arch}/patomic.lcov", capture_output=True, shell=True, check=True)
+              lcov_summary = res.stdout.decode()
+              for line in lcov_summary.split('\n'):
+                
+                # skip non-info lines
+                if not line.lstrip().startswith(("lines", "functions", "branches")):
+                  continue
+                else:
+                  attr_name = line.lstrip().split('.', maxsplit=1)[0]
+                
+                # parse coverage stats
+                if "no data found" in line:
+                  cov = CoverageStats(percent=100.0, count=0, total=0)
+                else:
+                  pattern = r"(\d+\.\d+)% \((\d+) of (\d+)"
+                  matches = re.findall(pattern, line)[0]
+                  cov = CoverageStats(percent=float(matches[0]), count=int(matches[1]), total=int(matches[2]))
+                
+                # store for next step
+                cov_data[attr_name] = cov
+                
+                # check if we failed
+                any_warn = any_warn or cov_data[attr_name].percent < HI_LEVEL
+                any_fail = any_fail or cov_data[attr_name].percent < MED_LEVEL
+              
+              # fill out table
+              table_text += f"| `{arch}` | `{stat_to_str(cov_data['lines'])}` | `{stat_to_str(cov_data['functions'])}` | `{stat_to_str(cov_data['branches'])}` |\n"
+            
+            # write result to file
+            with open(OUT_FILE, "w") as f:
+              f.write(table_text)
+            
+            # set output variables
+            subprocess.run(f"echo 'any_warn={int(any_warn)}' >> $GITHUB_OUTPUT", shell=True, check=True)
+            subprocess.run(f"echo 'any_warn={int(any_fail)}' >> $GITHUB_OUTPUT", shell=True, check=True)
+
+      - name: Publish Coverage in Action Summary
         run: |
           # TODO
+
+      - name: Publish Coverage in Pull Request Comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: coverage-summary
+          filePath: coverage_summary.md
+
+      - name: Fail If Any Coverage Fails
+        run: |
+          if [[ '${{ steps.coverage-summary.outputs.any_fail }}' != '0' ]]; then
+            >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }}"
+            exit 1
+          fi
 
       # keep this last so that we have it for debugging if something fails
       - name: Delete Test Coverage Artifacts
