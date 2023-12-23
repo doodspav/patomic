@@ -236,6 +236,56 @@ jobs:
           name: test-coverage
           path: test-coverage/
 
+      - name: Parse Lcov Files Into Json
+        shell: python
+        run: |
+          import json
+          import os
+          import pathlib
+          import re
+          import subprocess
+
+          if __name__ == "__main__":
+            
+            # constants
+            BASE_DIR = pathlib.Path("./test-coverage-internal")
+            OUT_FILE = pathlib.Path("./patomic.json")
+            
+            # iterate through all non-hidden directories
+            archs = [d for d in next(os.walk(BASE_DIR))[1] if d[0] != '.']
+            json_out = {}
+            for arch in archs:
+              json_out[arch] = {}
+              
+              # get lcov summary
+              lcov_path = BASE_DIR / arch / "patomic.lcov"
+              res = subprocess.run(f"lcov --summary {lcov_path}", capture_output=True, shell=True, check=True)
+              lcov_summary = res.stdout.decode()
+              
+              # go through lcov summary
+              for line in lcov_summary.split('\n'):
+                
+                # skip non-info lines
+                if not line.lstrip().startswith(("lines", "functions", "branches")):
+                  continue
+                attr_name = line.lstrip().split('.', maxsplit=1)[0]
+                
+                # parse coverage stats
+                if "no data found" in line:
+                  json_out[arch][attr_name] = { "percentage": 0.0, "count": 0, "total": 0 }
+                else:
+                  pattern = r"(\d+\.\d+)% \((\d+) of (\d+)"
+                  matches = re.findall(pattern, line)[0]
+                  json_out[arch][attr_name] = { "percentage": float(matches[0]), "count": int(matches[1]), "total": int(matches[2]) }
+            
+            # write results to json file
+            with open(OUT_FILE, 'w') as f:
+              json.dump(json_out, f, indent=4)
+
+      - name: Debug Json Step
+        run: |
+          cat patomic.json
+
       - name: Create Coverage Summary File
         id: coverage-summary
         shell: python
@@ -341,7 +391,6 @@ jobs:
         with:
           comment_tag: coverage-summary
           filePath: coverage_summary.md
-          mode: recreate
 
       - name: Fail if Any Coverage Fails or Universal Coverage Warns
         run: |
