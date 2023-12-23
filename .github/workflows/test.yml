@@ -280,7 +280,8 @@ jobs:
               cov_data = {}
               
               # go through all lines in lcov summary
-              res = subprocess.run(f"lcov --summary ./{arch}/patomic.lcov", capture_output=True, shell=True, check=True)
+              lcov_path = BASE_DIR / arch / "patomic.lcov"
+              res = subprocess.run(f'lcov --summary "{lcov_path}', capture_output=True, shell=True, check=True)
               lcov_summary = res.stdout.decode()
               for line in lcov_summary.split('\n'):
                 
