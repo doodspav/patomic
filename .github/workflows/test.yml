@@ -342,11 +342,11 @@ jobs:
       - name: Fail if Any Coverage Fails or Universal Coverage Warns
         run: |
           if [[ '${{ steps.coverage-summary.outputs.any_fail }}' != '0' ]]; then
-            >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }} (a.k.a. 🛑)"
-            exit 1
+            msg="At least one coverage result was below the threshold of ${{ env.MED_LIMIT }} (a.k.a. 🛑)"
+            echo "::error title='Any Failure'::${msg}"
           elif [[ '${{ steps.coverage-summary.outputs.universal_warn }}' != '0' ]]; then
-            >&2 echo "Universal coverage result was below the threshold of ${{ env.HI_LIMIT }} (a.k.a. ⚠️)"
-            exit 1
+            msg="Universal coverage result was below the threshold of ${{ env.HI_LIMIT }} (a.k.a. ⚠️)"
+            echo "::error title='Universal Warning'::${msg}"
           fi
 
       # keep this last so that we have it for debugging if something fails
