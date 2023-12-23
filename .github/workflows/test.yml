@@ -318,9 +318,9 @@ jobs:
             with open(OUT_FILE, "w") as f:
               f.write(table_text)
             
-            # set output variables
-            subprocess.run(f"echo 'any_warn={int(any_warn)}' >> $GITHUB_OUTPUT", shell=True, check=True)
-            subprocess.run(f"echo 'any_warn={int(any_fail)}' >> $GITHUB_OUTPUT", shell=True, check=True)
+            # set output variables (use old method because idk how to use new one in python)
+            print(f"::set-output name=any_warn::{any_warn}")
+            print(f"::set-output name=any_fail::{any_fail}")
 
       - name: Publish Coverage in Action Summary
         run: |
