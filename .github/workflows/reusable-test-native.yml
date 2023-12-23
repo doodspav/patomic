@@ -236,7 +236,7 @@ jobs:
           
           # merge all .gcda files into an lcov tracefile, and copy to upload
           # all tests have .gcno, but only tests that were executed have .gcda
-          lcov --directory patomic/build --capture --output-file patomic.lcov
+          lcov --directory --rc lcov_branch_coverage=1 patomic/build --capture --output-file patomic.lcov
           cp patomic.lcov upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
           
           # we need root path file because next job needs it because clang (above) needs it

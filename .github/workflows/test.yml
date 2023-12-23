@@ -196,9 +196,11 @@ jobs:
           echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
           echo "genhtml_function_hi_limit = ${{ env.HI_LIMIT }}" >> ./lcovrc
           echo "genhtml_function_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
+          echo "lcov_branch_coverage = 1" >> ./lcovrc
           
           echo "Contents of lcovrc:"
           cat ./lcovrc
+          sudo cp ./lcovrc /etc/lcovrc
 
       - name: Generate HTML Files
         run: |
@@ -216,7 +218,7 @@ jobs:
           find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             arch=$(basename "${dir}")
             mkdir "./test-coverage/${arch}"
-            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 "./test-coverage-internal/${arch}/patomic.lcov"
+            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 "./test-coverage-internal/${arch}/patomic.lcov"
           done
           
           # generate html files for combined coverage
@@ -228,7 +230,7 @@ jobs:
           done < <(find ./test-coverage-internal -type f -name '*patomic.lcov' -print0)
           lcov_combine_command+=("-o" "./test-coverage-internal/universal/patomic.lcov")
           "${lcov_combine_command[@]}"
-          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --config-file ./lcovrc --precision 2 ./test-coverage-internal/universal/patomic.lcov
+          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 ./test-coverage-internal/universal/patomic.lcov
 
       - name: Upload Coverage HTML Results
         uses: actions/upload-artifact@v3
@@ -312,8 +314,8 @@ jobs:
               md_string += line
               
               # check for warnings
-              any_fail = any_fail and "⚠️" in line
-              universal_warn = universal_warn and (arch == 'universal' and "🛑" in line)
+              any_fail = any_fail or "🛑" in line
+              universal_warn = universal_warn or (arch == 'universal' and "⚠️" in line)
           
           # markdown epilogue
           sha = "${{ github.event.pull_request.head.sha }}"
@@ -342,10 +344,12 @@ jobs:
       - name: Fail if Any Coverage Fails or Universal Coverage Warns
         run: |
           if [[ '${{ steps.coverage-summary.outputs.any_fail }}' != '0' ]]; then
-            >&2 echo "At least one coverage result was below the threshold of ${{ env.MED_LIMIT }} (a.k.a. 🛑)"
+            msg="At least one coverage result was below the threshold of ${{ env.MED_LIMIT }}% (a.k.a. 🛑)"
+            echo "::error title=Any Coverage Failure::${msg}"
             exit 1
           elif [[ '${{ steps.coverage-summary.outputs.universal_warn }}' != '0' ]]; then
-            >&2 echo "Universal coverage result was below the threshold of ${{ env.HI_LIMIT }} (a.k.a. ⚠️)"
+            msg="Universal coverage result was below the threshold of ${{ env.HI_LIMIT }}% (a.k.a. ⚠️)"
+            echo "::error title=Universal Coverage Warning::${msg}"
             exit 1
           fi
 
