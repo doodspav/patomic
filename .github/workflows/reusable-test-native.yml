@@ -175,7 +175,7 @@ jobs:
           cd ${{ env.ROOT_PATH }}
           
           mkdir -p upload/test/${{ matrix.kind }}
-          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ matrix.kind }}-${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
 
       - name: Upload Test Results
         if: env.SKIP_JOB != 'true'
