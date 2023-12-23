@@ -196,6 +196,7 @@ jobs:
           echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
           echo "genhtml_function_hi_limit = ${{ env.HI_LIMIT }}" >> ./lcovrc
           echo "genhtml_function_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
+          echo "lcov_branch_coverage = 1" >> ./lcovrc
           
           echo "Contents of lcovrc:"
           cat ./lcovrc
