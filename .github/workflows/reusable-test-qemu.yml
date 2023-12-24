@@ -98,7 +98,7 @@ jobs:
       CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # apparently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
-        ${{ matrix.compiler == 'clang' || !(
+        ${{ !(
           ( matrix.compiler == 'clang' && !inputs.skip_llvm ) ||
           ( matrix.compiler == 'gcc' && !inputs.skip_gcc )
         ) }}
