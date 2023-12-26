@@ -69,6 +69,7 @@ jobs:
         kind:
           - ansi
           # - coverage
+          - sanitize
           - warning
         build_shared:
           - static
