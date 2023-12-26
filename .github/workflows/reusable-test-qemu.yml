@@ -67,6 +67,7 @@ jobs:
           - clang
           - gcc
         kind:
+          - ansi
           # - coverage
           - warning
         build_shared:
