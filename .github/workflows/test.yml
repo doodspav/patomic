@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - '**'
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   test-native:
@@ -46,7 +48,7 @@ jobs:
             preset: patomic-ci-native-unix-gcc
             architecture: x86_64
 
-    uses: doodspav/patomic/.github/workflows/reusable-test-native.yml@feature/ghi-20-inner-stuff
+    uses: ./.github/workflows/reusable-test-native.yml
     with:
       os: ${{ matrix.os }}
       preset: ${{ matrix.preset }}
@@ -123,7 +125,7 @@ jobs:
           - architecture: x86_32
             triple: i686-linux-gnu
             skip_llvm: true  # fixme: supported but not sure how (GHI #25)
-    uses: doodspav/patomic/.github/workflows/reusable-test-qemu.yml@feature/ghi-20-inner-stuff
+    uses: ./.github/workflows/reusable-test-qemu.yml
     with:
       triple: ${{ matrix.triple }}
       architecture: ${{ matrix.architecture }}
