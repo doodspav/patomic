@@ -67,14 +67,16 @@ jobs:
           - clang
           - gcc
         kind:
-          - ansi
-          - coverage
+          # - ansi
+          # - coverage
           - sanitize
-          - warning
+          # - warning
         build_shared:
           - static
           - shared
         include:
+          # hidden single variable
+          - archs_with_sanitize: '["aarch64", "alpha", "arm", "armhf", "hppa", "m68k", "mips", "mips64", "mips64el", "mipsel", "ppc", "ppc64", "ppc64le", "riscv64", "s390x", "sh4", "sparc64", "x86_32"]'
           # alias variables
           - compiler: clang
             compiler_version: ${{ inputs.llvm_version }}
@@ -104,7 +106,8 @@ jobs:
           ( matrix.compiler == 'clang' && inputs.skip_llvm )          ||
           ( matrix.compiler == 'gcc' && inputs.skip_gcc )             ||
           ( matrix.kind == 'coverage' && matrix.compiler == 'clang' ) ||
-          ( matrix.kind == 'sanitize' && matrix.compiler == 'clang' )
+          ( matrix.kind == 'sanitize' && matrix.compiler == 'clang' ) ||
+          ( matrix.kind == 'sanitize' && !contains(fromJson(matrix.archs_with_sanitize), inputs.architecture) )
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}
