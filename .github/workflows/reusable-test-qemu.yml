@@ -102,7 +102,8 @@ jobs:
       SKIP_JOB: >-
         ${{ !(
           ( matrix.compiler == 'clang' && !inputs.skip_llvm ) ||
-          ( matrix.compiler == 'gcc' && !inputs.skip_gcc )
+          ( matrix.compiler == 'gcc' && !inputs.skip_gcc )    ||
+          ( matrix.kind == 'sanitize' && contains(fromJson('["x86_32"]'), inputs.architecture) )
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}
