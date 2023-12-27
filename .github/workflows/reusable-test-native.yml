@@ -73,11 +73,10 @@ jobs:
       CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # currently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
-        ${{ !(
-          ( matrix.kind == 'ansi' && matrix.compiler != 'msvc' )  ||
-          ( matrix.kind == 'coverage' && inputs.os != 'windows' ) ||
-          ( matrix.kind == 'sanitize' && inputs.os != 'windows' ) ||
-          ( matrix.kind == 'warning' )
+        ${{ (
+          ( matrix.kind == 'ansi' && matrix.compiler == 'msvc' )  ||
+          ( matrix.kind == 'coverage' && inputs.os == 'windows' ) ||
+          ( matrix.kind == 'sanitize' && inputs.os == 'windows' )
         ) }}
       # this job supports multiple os, each with their own root path
       # this screws up lcov when it tries to merge the coverage path mappings
