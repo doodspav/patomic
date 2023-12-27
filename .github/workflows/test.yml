@@ -12,35 +12,35 @@ jobs:
         # verbose labels make things easier to read in GitHub Actions
         # platform gets converted to os, preset, compiler, architecture
         platform:
-          # - windows-gcc-x86_64
-          # - windows-msvc-x86_32
-          # - windows-msvc-x86_64
-          # - macos-clang-x86_64
-          # - linux-clang-x86_64
+          - windows-gcc-x86_64
+          - windows-msvc-x86_32
+          - windows-msvc-x86_64
+          - macos-clang-x86_64
+          - linux-clang-x86_64
           - linux-gcc-x86_64
         # convert verbose labels to usable values (which don't appear in GitHub Actions GUI)
         include:
           # platform -> os, preset, compiler, architecture
-          # - platform: windows-gcc-x86_64
-          #   os: windows
-          #   preset: patomic-ci-native-unix-gcc
-          #   architecture: x86_64
-          # - platform: windows-msvc-x86_32
-          #   os: windows
-          #   preset: patomic-ci-native-win32-msvc
-          #   architecture: x86_32
-          # - platform: windows-msvc-x86_64
-          #   os: windows
-          #   preset: patomic-ci-native-win64-msvc
-          #   architecture: x86_64
-          # - platform: macos-clang-x86_64
-          #   os: macos
-          #   preset: patomic-ci-native-unix-clang
-          #   architecture: x86_64
-          # - platform: linux-clang-x86_64
-          #   os: ubuntu
-          #   preset: patomic-ci-native-unix-clang
-          #   architecture: x86_64
+          - platform: windows-gcc-x86_64
+            os: windows
+            preset: patomic-ci-native-unix-gcc
+            architecture: x86_64
+          - platform: windows-msvc-x86_32
+            os: windows
+            preset: patomic-ci-native-win32-msvc
+            architecture: x86_32
+          - platform: windows-msvc-x86_64
+            os: windows
+            preset: patomic-ci-native-win64-msvc
+            architecture: x86_64
+          - platform: macos-clang-x86_64
+            os: macos
+            preset: patomic-ci-native-unix-clang
+            architecture: x86_64
+          - platform: linux-clang-x86_64
+            os: ubuntu
+            preset: patomic-ci-native-unix-clang
+            architecture: x86_64
           - platform: linux-gcc-x86_64
             os: ubuntu
             preset: patomic-ci-native-unix-gcc

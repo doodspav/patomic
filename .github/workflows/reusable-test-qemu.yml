@@ -62,7 +62,6 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false  # TODO: remove
       matrix:
         compiler:
           - clang
