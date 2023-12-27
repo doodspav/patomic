@@ -62,6 +62,7 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         compiler:
           - clang
@@ -69,11 +70,17 @@ jobs:
         kind:
           - ansi
           - coverage
-          # - sanitize
+          - sanitize
           - warning
         build_shared:
           - static
           - shared
+        exclude:
+          # fixme: clang can't find runtime coverage libraries (GHI #28)
+          - kind: coverage
+            compiler: clang
+          # fixme: not sure which archs asan/ubsan support (GHI #29)
+          - kind: sanitize
         include:
           # alias variables
           - compiler: clang
@@ -102,8 +109,7 @@ jobs:
       SKIP_JOB: >-
         ${{ (
           ( matrix.compiler == 'clang' && inputs.skip_llvm ) ||
-          ( matrix.compiler == 'gcc' && inputs.skip_gcc )    ||
-          ( matrix.kind == 'coverage' && matrix.compiler == 'clang' )
+          ( matrix.compiler == 'gcc' && inputs.skip_gcc )
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}

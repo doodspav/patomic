@@ -48,6 +48,7 @@ jobs:
     needs: check
     runs-on: ${{ inputs.os }}-latest
     strategy:
+      fail-fast: false
       matrix:
         kind:
           - ansi
