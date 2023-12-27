@@ -68,7 +68,7 @@ jobs:
           - gcc
         kind:
           - ansi
-          # - coverage
+          - coverage
           - sanitize
           - warning
         build_shared:
@@ -100,10 +100,11 @@ jobs:
       CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # apparently not possible to skip job using matrix context, so this is the next best thing
       SKIP_JOB: >-
-        ${{ !(
-          ( matrix.compiler == 'clang' && !inputs.skip_llvm ) ||
-          ( matrix.compiler == 'gcc' && !inputs.skip_gcc )    ||
-          ( matrix.kind == 'sanitize' && contains(fromJson('["x86_32"]'), inputs.architecture) )
+        ${{ (
+          ( matrix.compiler == 'clang' && inputs.skip_llvm )          ||
+          ( matrix.compiler == 'gcc' && inputs.skip_gcc )             ||
+          ( matrix.kind == 'coverage' && matrix.compiler == 'clang' ) ||
+          ( matrix.kind == 'sanitize' && matrix.compiler == 'clang' )
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}
