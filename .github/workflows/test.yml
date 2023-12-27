@@ -1,0 +1,369 @@
+name: Run All Tests
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test-native:
+    strategy:
+      matrix:
+        # verbose labels make things easier to read in GitHub Actions
+        # platform gets converted to os, preset, compiler, architecture
+        platform:
+          - windows-gcc-x86_64
+          - windows-msvc-x86_32
+          - windows-msvc-x86_64
+          - macos-clang-x86_64
+          - linux-clang-x86_64
+          - linux-gcc-x86_64
+        # convert verbose labels to usable values (which don't appear in GitHub Actions GUI)
+        include:
+          # platform -> os, preset, compiler, architecture
+          - platform: windows-gcc-x86_64
+            os: windows
+            preset: patomic-ci-native-unix-gcc
+            architecture: x86_64
+          - platform: windows-msvc-x86_32
+            os: windows
+            preset: patomic-ci-native-win32-msvc
+            architecture: x86_32
+          - platform: windows-msvc-x86_64
+            os: windows
+            preset: patomic-ci-native-win64-msvc
+            architecture: x86_64
+          - platform: macos-clang-x86_64
+            os: macos
+            preset: patomic-ci-native-unix-clang
+            architecture: x86_64
+          - platform: linux-clang-x86_64
+            os: ubuntu
+            preset: patomic-ci-native-unix-clang
+            architecture: x86_64
+          - platform: linux-gcc-x86_64
+            os: ubuntu
+            preset: patomic-ci-native-unix-gcc
+            architecture: x86_64
+
+    uses: doodspav/patomic/.github/workflows/reusable-test-native.yml@feature/ghi-20-inner-stuff
+    with:
+      os: ${{ matrix.os }}
+      preset: ${{ matrix.preset }}
+      architecture: ${{ matrix.architecture }}
+
+  test-qemu:
+    strategy:
+      matrix:
+        # architecture gets converted to triple
+        # short form here so that it doesn't take up the whole GitHub Action name
+        architecture:
+          - aarch64
+          - alpha
+          - arm
+          - armhf
+          - hppa
+          - m68k
+          - mips
+          - mips64
+          - mips64el
+          - mipsel
+          - ppc
+          - ppc64
+          - ppc64le
+          - riscv64
+          - s390x
+          - sh4
+          - sparc64
+          - x86_32
+        # convert architectures to triples
+        include:
+          - architecture: aarch64
+            triple: aarch64-linux-gnu
+          - architecture: alpha
+            triple: alpha-linux-gnu
+            skip_llvm: true  # unsupported
+          - architecture: arm
+            triple: arm-linux-gnueabi
+          - architecture: armhf
+            triple: arm-linux-gnueabihf
+          - architecture: hppa
+            triple: hppa-linux-gnu
+            skip_llvm: true  # unsupported
+          - architecture: m68k
+            triple: m68k-linux-gnu
+            skip_gcc: true  # fixme: segfaults qemu (GHI #25)
+            skip_llvm: true  # fixme: ICEs clang (GHI #25)
+          - architecture: mips
+            triple: mips-linux-gnu
+          - architecture: mips64
+            triple: mips64-linux-gnuabi64
+          - architecture: mips64el
+            triple: mips64el-linux-gnuabi64
+          - architecture: mipsel
+            triple: mipsel-linux-gnu
+          - architecture: ppc
+            triple: powerpc-linux-gnu
+          - architecture: ppc64
+            triple: powerpc64-linux-gnu
+          - architecture: ppc64le
+            triple: powerpc64le-linux-gnu
+          - architecture: riscv64
+            triple: riscv64-linux-gnu
+            skip_gcc: true  # fixme: errors on system header (GHI #25)
+          - architecture: s390x
+            triple: s390x-linux-gnu
+          - architecture: sh4
+            triple: sh4-linux-gnu
+            skip_gcc: true  # fixme: segfaults qemu (GHI #25)
+            skip_llvm: true  # unsupported
+          - architecture: sparc64
+            triple: sparc64-linux-gnu
+            skip_gcc: true  # fixme: segfaults qemu (GHI #25)
+          - architecture: x86_32
+            triple: i686-linux-gnu
+            skip_llvm: true  # fixme: supported but not sure how (GHI #25)
+    uses: doodspav/patomic/.github/workflows/reusable-test-qemu.yml@feature/ghi-20-inner-stuff
+    with:
+      triple: ${{ matrix.triple }}
+      architecture: ${{ matrix.architecture }}
+      skip_gcc: ${{ matrix.skip_gcc == true }}
+      skip_llvm: ${{ matrix.skip_llvm == true }}
+
+  publish-results:
+    runs-on: ubuntu-latest
+    needs:
+      - test-native
+      - test-qemu
+
+    steps:
+      - name: Download Test Result Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: test-results
+          path: test-results/
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          action_fail: true
+          action_fail_on_inconclusive: true
+          check_name: "Test Results"
+          files: test-results/**/*.xml
+
+  publish-coverage:
+    runs-on: ubuntu-latest
+    needs:
+      - test-native
+      - test-qemu
+    env:
+      HI_LIMIT: 100
+      MED_LIMIT: 90
+
+    steps:
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install binutils  # for c++filt
+          sudo apt install lcov
+
+      - name: Download Test Coverage Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: test-coverage-internal
+          path: test-coverage-internal/
+
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Copy patomic To All Original Mapping Paths
+        run: |
+          # go through all patomic.rootpath files
+          find ./test-coverage-internal -type f -name '*patomic.rootpath' -print0 | while IFS= read -r -d '' rp_file; do
+            root_path=$(cat "${rp_file}")
+          
+            # create root_path if it doesn't exist
+            if [ ! -d "${root_path}" ]; then
+              sudo mkdir -p "${root_path}"
+            fi
+          
+            # ensure full permissions even if it exists
+            sudo chmod -R a+rwx "${root_path}"
+
+            # copy patomic to root_path if not already there
+            if [ ! -d "${root_path}/patomic" ]; then
+              cp -R ./patomic/ "${root_path}/patomic"
+            fi
+          done
+
+      - name: Create Lcov Config File
+        run: |
+          touch ./lcovrc
+          echo "genhtml_hi_limit = ${{ env.HI_LIMIT }}" >> ./lcovrc
+          echo "genhtml_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
+          echo "genhtml_function_hi_limit = ${{ env.HI_LIMIT }}" >> ./lcovrc
+          echo "genhtml_function_med_limit = ${{ env.MED_LIMIT }}" >> ./lcovrc
+          echo "lcov_branch_coverage = 1" >> ./lcovrc
+          
+          echo "Contents of lcovrc:"
+          cat ./lcovrc
+          sudo cp ./lcovrc /etc/lcovrc
+
+      - name: Generate HTML Files
+        run: |
+          # directory into which to put user artifacts
+          mkdir test-coverage
+          
+          # keep only coverage data relating to patomic source files
+          find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
+            mv "${dir}/patomic.lcov" "${dir}/patomic.lcov.old"
+            root_path=$(cat "${dir}/patomic.rootpath")
+            lcov --output-file "${dir}/patomic.lcov" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/src/*"
+          done
+          
+          # generate html files for each separate compilation
+          find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
+            arch=$(basename "${dir}")
+            mkdir "./test-coverage/${arch}"
+            genhtml --output-directory "./test-coverage/${arch}" --title "patomic-${arch}" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 "./test-coverage-internal/${arch}/patomic.lcov"
+          done
+          
+          # generate html files for combined coverage
+          mkdir ./test-coverage-internal/universal
+          mkdir ./test-coverage/universal
+          lcov_combine_command=("lcov")
+          while IFS= read -r -d '' lcov_file; do
+            lcov_combine_command+=("-a" "${lcov_file}")
+          done < <(find ./test-coverage-internal -type f -name '*patomic.lcov' -print0)
+          lcov_combine_command+=("-o" "./test-coverage-internal/universal/patomic.lcov")
+          "${lcov_combine_command[@]}"
+          genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 ./test-coverage-internal/universal/patomic.lcov
+
+      - name: Upload Coverage HTML Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage
+          path: test-coverage/
+
+      - name: Parse Lcov Files Into Json
+        shell: python
+        run: |
+          import json, os, pathlib, re, subprocess
+            
+          # constants
+          BASE_DIR = pathlib.Path("./test-coverage-internal")
+          OUT_FILE = pathlib.Path("./patomic.json")
+          
+          # iterate through all non-hidden directories
+          archs = [d for d in next(os.walk(BASE_DIR))[1] if d[0] != '.']
+          json_out = {}
+          for arch in archs:
+            json_out[arch] = {}
+            
+            # get lcov summary
+            cmd = f"lcov --summary {BASE_DIR / arch / 'patomic.lcov'}"
+            lcov_summary = subprocess.run(cmd, capture_output=True, shell=True, check=True).stdout.decode()
+            
+            # go through lcov summary
+            for line in lcov_summary.split('\n'):
+              
+              # skip non-info lines
+              if not line.lstrip().startswith(("lines", "functions", "branches")):
+                continue
+              attr_name = line.lstrip().split('.', maxsplit=1)[0]
+              
+              # parse coverage stats
+              if "no data found" in line:
+                json_out[arch][attr_name] = { "percentage": 100.0, "count": 0, "total": 0 }
+              else:
+                pattern = r"(\d+\.\d+)% \((\d+) of (\d+)"
+                matches = re.findall(pattern, line)[0]
+                json_out[arch][attr_name] = { "percentage": float(matches[0]), "count": int(matches[1]), "total": int(matches[2]) }
+          
+          # write results to json file
+          with open(OUT_FILE, 'w') as f:
+            json.dump(json_out, f, indent=4)
+
+      - name: Create Coverage Summary File
+        id: coverage-summary
+        shell: python
+        run: |
+          import json, os, pathlib
+          
+          # constants
+          HI_LIMIT, MED_LIMIT = ${{ env.HI_LIMIT }}, ${{ env.MED_LIMIT }}
+          IN_FILE = pathlib.Path("./patomic.json")
+          OUT_FILE = pathlib.Path("./patomic.md")
+          
+          # markdown prologue
+          md_string = "## Test Coverage\n"
+          md_string += "| Target | Lines | Functions | Branches |\n"
+          md_string += "| :----- | ----: | --------: | -------: |\n"
+          
+          # keep track of issues
+          any_fail = False
+          universal_warn = False
+          
+          # go through json file
+          with open(IN_FILE, 'r') as fp:
+            j = json.load(fp)
+            
+            # sort archs except for 'universal' first
+            archs = sorted(list(j.keys()), key=lambda a: a if a != 'universal' else '\0')
+            
+            # helper lambdas
+            make_emoji = lambda p: "✅" if p >= HI_LIMIT else ("⚠️" if p >= MED_LIMIT else "🛑")
+            field_2str = lambda f: f"{float(f['percentage']):.2f}% ({f['count']}/{f['total']}) {make_emoji(float(f['percentage']))}"
+            
+            # write summary of each arch to markdown file
+            for arch in archs:
+              line = f"| `{arch}` | `{field_2str(j[arch]['lines'])}` | `{field_2str(j[arch]['functions'])}` | `{field_2str(j[arch]['branches'])}` |\n"
+              md_string += line
+              
+              # check for warnings
+              any_fail = any_fail or "🛑" in line
+              universal_warn = universal_warn or (arch == 'universal' and "⚠️" in line)
+          
+          # markdown epilogue
+          sha = "${{ github.event.pull_request.head.sha }}"
+          md_string += f"\n`✅ >= {HI_LIMIT}`, `⚠️ >= {MED_LIMIT}`, `🛑 < {MED_LIMIT}`\n"
+          md_string += f"\nResults for commit [`{sha[:8]}`](${{ github.server_url }}/${{ github.repository }}/commit/{sha}).\n"
+          
+          # write to file
+          with open(OUT_FILE, 'wb') as fp:
+            fp.write(md_string.encode())
+          
+          # write checks to output
+          with open(os.environ["GITHUB_OUTPUT"], 'a') as fp:
+            print(f"any_fail={int(any_fail)}", file=fp)
+            print(f"universal_warn={int(universal_warn)}", file=fp)
+
+      - name: Publish Coverage in Job Summary
+        run: |
+          echo "$(cat ./patomic.md)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Publish Coverage in Pull Request Comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: coverage-summary
+          filePath: patomic.md
+
+      - name: Fail if Any Coverage Fails or Universal Coverage Warns
+        run: |
+          if [[ '${{ steps.coverage-summary.outputs.any_fail }}' != '0' ]]; then
+            msg="At least one coverage result was below the threshold of ${{ env.MED_LIMIT }}% (a.k.a. 🛑)"
+            echo "::error title=Any Coverage Failure::${msg}"
+            exit 1
+          elif [[ '${{ steps.coverage-summary.outputs.universal_warn }}' != '0' ]]; then
+            msg="Universal coverage result was below the threshold of ${{ env.HI_LIMIT }}% (a.k.a. ⚠️)"
+            echo "::error title=Universal Coverage Warning::${msg}"
+            exit 1
+          fi
+
+      # keep this last so that we have it for debugging if something fails
+      - name: Delete Test Coverage Artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: test-coverage-internal

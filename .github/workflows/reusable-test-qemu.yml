@@ -1,0 +1,276 @@
+name: Run Tests on Emulated Platforms
+
+on:
+  workflow_call:
+    inputs:
+      triple:
+        description: 'Platform triple to compile for, used to install correct compiler and sysroot'
+        required: true
+        type: string
+        default: ''
+      architecture:
+        description: 'CPU architecture tests are run on, passed to QEMU'
+        required: true
+        type: string
+        default: ''
+      gcc_version:
+        description: 'Major version of GCC toolchain to use'
+        required: false
+        type: number
+        default: 10
+      llvm_version:
+        description: 'Major version of LLVM toolchain to use'
+        required: false
+        type: number
+        default: 15
+      skip_gcc:
+        description: "Conditionally skip 'run' job if gcc does not support the triple"
+        required: false
+        type: boolean
+        default: false
+      skip_llvm:
+        description: "Conditionally skip 'run' job if llvm does not support the triple"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check No Empty Inputs
+        shell: bash
+        run: |
+          # checks input is not empty
+          check_input() {
+            input_name="${1}"
+            input_value="${2}"
+            if [[ -z "${input_value}" ]]; then
+              echo "Error: required input '${input_name}' is empty or was not specified."
+              exit 1
+            else
+              echo "${input_name}: ${input_value}"
+            fi
+          }
+
+          # apply function to all inputs
+          check_input "triple"       "${{ inputs.triple }}"
+          check_input "architecture" "${{ inputs.architecture }}"
+
+  run:
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - clang
+          - gcc
+        kind:
+          - ansi
+          - coverage
+          - sanitize
+          - warning
+        build_shared:
+          - static
+          - shared
+        exclude:
+          # fixme: clang can't find runtime coverage libraries (GHI #28)
+          - kind: coverage
+            compiler: clang
+          # fixme: not sure which archs asan/ubsan support (GHI #29)
+          - kind: sanitize
+        include:
+          # alias variables
+          - compiler: clang
+            compiler_version: ${{ inputs.llvm_version }}
+            preset: patomic-ci-qemu-ubuntu-clang
+          - compiler: gcc
+            compiler_version: ${{ inputs.gcc_version }}
+            preset: patomic-ci-qemu-ubuntu-gcc
+          - build_shared: static
+            cmake_build_shared: OFF
+          - build_shared: shared
+            cmake_build_shared: ON
+    env:
+      # required by toolchain file
+      PATOMIC_CI_XARCH: ${{ inputs.architecture }}
+      PATOMIC_CI_XTRIPLE: ${{ inputs.triple }}
+      PATOMIC_CI_XCOMPILER: ${{ matrix.compiler }}
+      PATOMIC_CI_XCOMPILER_VERSION: ${{ matrix.compiler_version }}
+      PATOMIC_CI_SYSROOT: /Users/${{ matrix.kind }}/sysroot
+      # these have to be in env context because they depend on matrix context
+      UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ inputs.gcc_version }}-${{ inputs.llvm_version }}
+      UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
+      CMAKE_PRESET: ${{ matrix.preset }}-${{ matrix.kind }}
+      CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
+      # apparently not possible to skip job using matrix context, so this is the next best thing
+      SKIP_JOB: >-
+        ${{ (
+          ( matrix.compiler == 'clang' && inputs.skip_llvm ) ||
+          ( matrix.compiler == 'gcc' && inputs.skip_gcc )
+        ) }}
+      # necessary because publish-coverage job expects everything to have the same root path
+      ROOT_PATH: /Users/${{ matrix.kind }}
+
+    steps:
+      - name: Install Toolchains and Qemu
+        if: env.SKIP_JOB != 'true'
+        run: |
+          sudo apt update
+          sudo apt install g++-${{ inputs.gcc_version }}-multilib
+          sudo apt install g++-${{ inputs.gcc_version }}-${{ inputs.triple }}
+          if [[ '${{ matrix.compiler }}' == 'clang' ]]; then
+            sudo apt install llvm-${{ inputs.llvm_version }}
+            sudo apt install clang-${{ inputs.llvm_version }}
+          fi
+          sudo apt install qemu-user
+
+      - name: Set Up Root Path
+        if: env.SKIP_JOB != 'true'
+        run: |
+          sudo mkdir -p "${{ env.ROOT_PATH }}"
+          sudo chmod -R a+rwx "${{ env.ROOT_PATH }}"
+
+      - name: Checkout patomic
+        if: env.SKIP_JOB != 'true'
+        uses: actions/checkout@v4
+        with:
+          # cannot prefix with ROOT_PATH here, so copy over in next step
+          path: patomic
+
+      - name: Move patomic to Root Path Location
+        if: env.SKIP_JOB != 'true'
+        run: |
+          cp -R ./patomic/ "${{ env.ROOT_PATH }}/patomic"
+
+      - name: Restore Cached Sysroot (with GoogleTest)
+        if: env.SKIP_JOB != 'true'
+        id: cache-sysroot
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.ROOT_PATH }}/sysroot
+          key: sysroot-${{ env.UNIQUE_ID }}
+
+      - name: Set Up Sysroot
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
+        run: |
+          cp -R /usr/${{ inputs.triple }}/ ${{ env.ROOT_PATH }}/sysroot
+
+      - name: Checkout GoogleTest
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: google/googletest
+          # cannot prefix with ROOT_PATH here, so copy over in next step
+          path: googletest
+
+      - name: Move GoogleTest to Root Path Location
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
+        run: |
+          cp -R ./googletest/ "${{ env.ROOT_PATH }}/googletest"
+
+      - name: Build and Install GoogleTest
+        if: env.SKIP_JOB != 'true' && steps.cache-sysroot.outputs.cache-hit != 'true'
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          cd googletest
+          cp -R ../patomic/ci/ ./
+          cp ../patomic/CMakePresets.json .
+          mkdir build
+          cd build
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="" -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -Dgtest_force_shared_crt=ON -Dgtest_hide_internal_symbols=ON ..
+          cmake --build . --verbose
+          cmake --install . --prefix "${{ env.ROOT_PATH }}/sysroot"
+
+      # TODO: figure out how to cache this for builds where we don't change any source code
+      - name: Build patomic
+        if: env.SKIP_JOB != 'true'
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          cd patomic
+          mkdir build
+          cd build
+          cmake --preset ${{ env.CMAKE_PRESET }} -DBUILD_SHARED_LIBS=${{ matrix.cmake_build_shared }} -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DGTest_ROOT:PATH="${{ env.ROOT_PATH }}/sysroot" ..
+          cmake --build . --verbose
+
+      - name: Test patomic
+        if: env.SKIP_JOB != 'true'
+        continue-on-error: true
+        env:
+          LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          cd patomic/build
+          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml .
+
+      - name: Prepare Test Results
+        if: env.SKIP_JOB != 'true'
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          mkdir -p upload/test/${{ matrix.kind }}
+          python3 patomic/test/improve_ctest_xml.py --input patomic/build/Testing/Temporary/results.xml --triple ${{ matrix.kind }}-${{ env.UNIQUE_NAME }} --output upload/test/${{ matrix.kind }}/${{ env.UNIQUE_NAME }}.xml
+
+      - name: Upload Test Results
+        if: env.SKIP_JOB != 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: ${{ env.ROOT_PATH }}/upload/test/
+
+      - name: Generate Lcov Tracefile and Root Path File (clang)
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage' && matrix.compiler == 'clang'
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          # set up directory
+          mkdir -p upload/cov/${{ env.UNIQUE_NAME }}
+          cd patomic/build
+          
+          # need llvm tools to be installed
+          sudo apt install llvm
+
+          # merge coverage output from all tests
+          # use find because bash on GitHub Actions currently does not support '**'
+          find test/working -type f -name "*.profraw" -print0 | xargs -0 llvm-profdata merge -output=patomic.profdata
+          
+          # convert profdata to lcov tracefile, and copy to upload
+          lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
+          llvm-cov export -format=lcov -instr-profile=patomic.profdata -object="${lib_files[0]}" >> patomic.lcov
+          cp patomic.lcov ../../upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
+          
+          # necessary because publish-coverage expects this file due to workaround for native test coverage
+          cd ../..
+          echo "$PWD" >> upload/cov/${{ env.UNIQUE_NAME }}/patomic.rootpath
+
+      - name: Generate Lcov Tracefile and Root Path File (gcc)
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage' && matrix.compiler == 'gcc'
+        run: |
+          cd ${{ env.ROOT_PATH }}
+          
+          # install lcov
+          sudo apt install lcov
+          
+          # set up directory
+          mkdir -p upload/cov/${{ env.UNIQUE_NAME }}
+          
+          # merge all .gcda files into an lcov tracefile, and copy to upload
+          # all tests have .gcno, but only tests that were executed have .gcda
+          lcov --directory --rc lcov_branch_coverage=1 patomic/build --capture --output-file patomic.lcov
+          cp patomic.lcov upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
+          
+          # we need root path file because next job needs it because clang (above) needs it
+          # we might also need it for gcc, but at the moment i have no idea
+          echo "$PWD" >> upload/cov/${{ env.UNIQUE_NAME }}/patomic.rootpath
+
+      - name: Upload Internal Coverage Results
+        if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage-internal
+          path: ${{ env.ROOT_PATH }}/upload/cov/

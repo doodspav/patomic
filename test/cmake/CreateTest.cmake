@@ -9,6 +9,10 @@
 # - executable name -> ${name} (e.g. SomeExample on Unix or SomeExample.exe on Windows)
 # - install directory -> ${CMAKE_INSTALL_TESTDIR}/${kind} (e.g. share/test/bt)
 #
+# Labels:
+# - each test (not target) will have ${kind} appended to its LABELS property
+# - main use case is for code coverage to be able to only run unit tests
+#
 # Working Directory (CTest):
 # - each test target has its working directory set to ${PROJECT_BINARY_DIR}/working/${kind}/${name}
 # - if a multi-config generator is used, 'working' is replaced with 'working/$<CONFIG>'
@@ -185,6 +189,12 @@ function(_create_test)
         TARGET ${target}
         TEST_LIST added_tests
         WORKING_DIRECTORY "${test_working_dir}"
+    )
+
+    # add label to tests so ctest can run them by kind
+    set_property(
+        TEST "${added_tests}"
+        APPEND PROPERTY LABELS "${kind}"
     )
 
     # custom target to make sure the working directory exists for the test

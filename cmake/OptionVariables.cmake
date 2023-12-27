@@ -122,7 +122,7 @@ include(GNUInstallDirs)
 # to DEC before calling find_package.
 set(
     PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION}"
-    CACHE STRING "CMake package config location relative to the install prefix"
+    CACHE STRING "CMake ${package_name} package's config location relative to the install prefix"
 )
 # depends on CMAKE_INSTALL_LIBDIR which is marked as advanced in GNUInstallDirs
 mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)
