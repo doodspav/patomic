@@ -1,24 +1,25 @@
 #include <gtest/gtest.h>
+#include <gtest/gtest-spi.h>
 
 
-class StAsanDeathTest : public testing::Test
+class StAsan : public testing::Test
 {};
 
 /*
-TEST_F(StAsanDeathTest, UseAfterFree)
+TEST_F(StAsan, UseAfterFree)
 {
 #if PATOMIC_HAS_ASAN
-    // EXPECT_NONFATAL_FAILURE({
+    EXPECT_NONFATAL_FAILURE({
         int *p = new int(5);
         volatile int val = *p;
         delete p;
 
         volatile int _ = *p;
-    // }, "asan");
+    }, "asan");
 #endif
 }
 
-TEST_F(StAsanDeathTest, HeapBufferOverflow)
+TEST_F(StAsan, HeapBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
     auto fn = []() noexcept -> void {
@@ -33,7 +34,7 @@ TEST_F(StAsanDeathTest, HeapBufferOverflow)
 #endif
 }
 
-TEST_F(StAsanDeathTest, StackBufferOverflow)
+TEST_F(StAsan, StackBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
     auto fn = []() noexcept -> void {
@@ -46,7 +47,7 @@ TEST_F(StAsanDeathTest, StackBufferOverflow)
 #endif
 }
 
-TEST_F(StAsanDeathTest, GlobalBufferOverflow)
+TEST_F(StAsan, GlobalBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
     auto fn = []() noexcept -> void {

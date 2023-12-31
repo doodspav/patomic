@@ -5,11 +5,11 @@
 #include <limits>
 
 
-class StUbsanDeathTest : public testing::Test
+class StUbsan : public testing::Test
 {};
 
 
-TEST_F(StUbsanDeathTest, ShiftExponentTooLarge)
+TEST_F(StUbsan, ShiftExponentTooLarge)
 {
 #if PATOMIC_HAS_UBSAN
     EXPECT_FATAL_FAILURE({
@@ -22,7 +22,7 @@ TEST_F(StUbsanDeathTest, ShiftExponentTooLarge)
 #endif
 }
 
-TEST_F(StUbsanDeathTest, SignedIntegerOverflow)
+TEST_F(StUbsan, SignedIntegerOverflow)
 {
 #if PATOMIC_HAS_UBSAN
     EXPECT_FATAL_FAILURE({
@@ -36,7 +36,7 @@ TEST_F(StUbsanDeathTest, SignedIntegerOverflow)
 #endif
 }
 
-TEST_F(StUbsanDeathTest, FloatCastOverflow)
+TEST_F(StUbsan, FloatCastOverflow)
 {
 #if PATOMIC_HAS_UBSAN
     EXPECT_FATAL_FAILURE({
