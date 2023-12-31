@@ -4,6 +4,11 @@
 # Expects a target named patomic-test-${kind} to exist.
 # E.g. if you call it as create_test(BT ...) then patomic-test-bt must exist.
 #
+# Kinds:
+# - BT (binary test), intended to test public API of compiled library
+# - ST (system test), intended to test host system and frameworks/sanitizers used
+# - UT (unit test), intended to test specific function in library source file
+#
 # Naming:
 # - created target -> patomic-test-${kind}-${name} (e.g. patomic-test-bt-SomeExample)
 # - executable name -> ${name} (e.g. SomeExample on Unix or SomeExample.exe on Windows)
@@ -36,8 +41,8 @@ function(_create_test)
 
     # setup what arguments we expect
 
-    set(all_kinds "BT;UT")  # list of all kinds we can iterate over
-    set(all_kinds_opt_msg "BT|UT")  # string to use in debug message
+    set(all_kinds "BT;ST;UT")  # list of all kinds we can iterate over
+    set(all_kinds_opt_msg "BT|ST|UT")  # string to use in debug message
 
     cmake_parse_arguments(
         "ARG"
@@ -300,6 +305,30 @@ function(create_bt)
         LINK
             patomic::patomic
             ${ARG_LINK}
+    )
+
+endfunction()
+
+
+# Creates target patomic-test-st-${name} corresponding to ST test executable.
+#
+# create_st(
+#     NAME <name>
+# )
+function(create_st)
+
+    cmake_parse_arguments(
+        "ARG"
+        ""
+        "NAME"
+        "SOURCE"
+        ${ARGN}
+    )
+
+    _create_test(
+        ${ARG_UNPARSED_ARGUMENTS}
+        ST     ${ARG_NAME}
+        SOURCE ${ARG_SOURCE}
     )
 
 endfunction()
