@@ -168,7 +168,7 @@ function(_create_test)
     string(TOUPPER "${kind}" kind_upper)
     target_compile_definitions(
         ${target} PRIVATE
-        "PATOMIC_${kind_upper}"
+        "PATOMIC_TEST_KIND_${kind_upper}=1"
     )
 
     # set binary name instead of using default
@@ -197,10 +197,12 @@ function(_create_test)
     )
 
     # add label to tests so ctest can run them by kind
-    set_property(
-        TEST "${added_tests}"
-        APPEND PROPERTY LABELS "${kind}"
-    )
+    foreach(test IN LISTS added_tests)
+        set_property(
+            TEST "${test}"
+            APPEND PROPERTY LABELS "${kind}"
+        )
+    endforeach()
 
     # custom target to make sure the working directory exists for the test
     add_custom_target(
