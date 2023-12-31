@@ -5,16 +5,16 @@
 class StAsan : public testing::Test
 {};
 
-/*
+
 TEST_F(StAsan, UseAfterFree)
 {
 #if PATOMIC_HAS_ASAN
-    EXPECT_NONFATAL_FAILURE({
+    EXPECT_FATAL_FAILURE({
         int *p = new int(5);
         volatile int val = *p;
         delete p;
 
-        volatile int _ = *p;
+        volatile int _ = *p;  // <-- use after free (intentional)
     }, "asan");
 #endif
 }
@@ -22,41 +22,41 @@ TEST_F(StAsan, UseAfterFree)
 TEST_F(StAsan, HeapBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
-    auto fn = []() noexcept -> void {
+    EXPECT_FATAL_FAILURE({
         int *arr = new int[100]{};
         int i = 1;
 
         volatile int _ = arr[100 + i];  // <-- buffer overflow (intentional)
 
         delete[] arr;
-    };
-    EXPECT_DEATH(fn(), ".*AddressSanitizer: heap-buffer-overflow.*");
+    }, "asan");
 #endif
 }
 
 TEST_F(StAsan, StackBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
-    auto fn = []() noexcept -> void {
+    EXPECT_NONFATAL_FAILURE({
+    EXPECT_FATAL_FAILURE({
         int arr[100]{};
         int i = 1;
 
         volatile int _ = arr[100 + i];  // <-- buffer overflow (intentional)
-    };
-    EXPECT_DEATH(fn(), ".*AddressSanitizer: stack-buffer-overflow.*");
+    }, "asan");
+    }, "Actual: 2");  // this is also caught by ubsan
 #endif
 }
 
 TEST_F(StAsan, GlobalBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
-    auto fn = []() noexcept -> void {
+    EXPECT_NONFATAL_FAILURE({
+    EXPECT_FATAL_FAILURE({
         static int arr[100]{};
         int i = 1;
 
         volatile int _ = arr[100 + i];  // <-- buffer overflow (intentional)
-    };
-    EXPECT_DEATH(fn(), ".*AddressSanitizer: global-buffer-overflow.*");
+    }, "asan");
+    }, "Actual: 2");  // this is also caught by ubsan
 #endif
 }
-*/
