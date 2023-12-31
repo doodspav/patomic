@@ -52,4 +52,4 @@ jobs:
 
       - name: Print List
         run: |
-          echo "${{ steps.get-open-issues.output.result }}"
+          echo "${{ steps.get-open-issues.outputs.result }}"
