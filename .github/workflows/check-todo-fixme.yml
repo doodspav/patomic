@@ -1,0 +1,55 @@
+name: Check todo and fixme
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Get Open Issues
+        id: get-open-issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // split repository
+            const [owner, repo] = "${{ github.repository }}".split("/");
+            
+            // make graphql query
+            const graphql = `query listOpenIssues($repository: String!, $owner: String!, $cursor: String) {
+              repository(name: $repository, owner: $owner) {
+                issues(first: 100, states: OPEN, after: $cursor) {
+                  nodes {
+                    number
+                  }
+                  pageInfo {
+                    endCursor
+                    hasNextPage
+                  }
+                }
+              }
+            }`;
+            
+            // get information from graphql api
+            let cursor;
+            let openIssueNumbers = [];
+            do {
+              const response = await github.graphql(graphql, { repository: repo, owner: owner, cursor });
+              response.repository.issues.nodes.forEach(({ number }) => openIssueNumbers.push(number));
+              cursor = response.repository.issues.pageInfo.endCursor;
+            } while (cursor);
+            
+            // save data as json by returning
+            return openIssueNumbers;
+
+      - name: Print List
+        run: |
+          echo "${{ steps.get-open-issues.output.result }}"
