@@ -36,27 +36,35 @@ TEST_F(StAsan, HeapBufferOverflow)
 TEST_F(StAsan, StackBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
+#fdef __clang__
     EXPECT_NONFATAL_FAILURE({
+#endif
     EXPECT_FATAL_FAILURE({
         int arr[100]{};
         int i = 1;
 
         volatile int _ = arr[100 + i];  // <-- buffer overflow (intentional)
     }, "asan");
-    }, "Actual: 2");  // this is also caught by ubsan
+#ifdef __clang__
+    }, "Actual: 2");  // this is also caught by ubsan on clang
+#endif
 #endif
 }
 
 TEST_F(StAsan, GlobalBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
+#ifdef __clang__
     EXPECT_NONFATAL_FAILURE({
+#endif
     EXPECT_FATAL_FAILURE({
         static int arr[100]{};
         int i = 1;
 
         volatile int _ = arr[100 + i];  // <-- buffer overflow (intentional)
     }, "asan");
-    }, "Actual: 2");  // this is also caught by ubsan
+#ifdef __clang__
+    }, "Actual: 2");  // this is also caught by ubsan on clang
+#endif
 #endif
 }

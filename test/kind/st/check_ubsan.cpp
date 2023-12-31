@@ -38,7 +38,7 @@ TEST_F(StUbsan, SignedIntegerOverflow)
 
 TEST_F(StUbsan, FloatCastOverflow)
 {
-#if PATOMIC_HAS_UBSAN
+#if PATOMIC_HAS_UBSAN && defined(__clang__)
     EXPECT_FATAL_FAILURE({
         volatile auto _ = std::numeric_limits<double>::max();
         int x;
