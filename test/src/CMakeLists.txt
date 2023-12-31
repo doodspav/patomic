@@ -2,7 +2,7 @@
 add_library(
     patomic-test-src OBJECT
     # .
-    "gtest_sanitizer.cpp"
+    "sanitizer_error.cpp"
     "sanitizer_options.cpp"
 )
 
