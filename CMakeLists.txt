@@ -44,7 +44,7 @@ target_sources(
 add_subdirectory(src)
 
 
-# ---- Generate Build Info Headers ----
+# ---- Generate Export Headers ----
 
 # used in export header generated below
 if(NOT PATOMIC_BUILD_SHARED)

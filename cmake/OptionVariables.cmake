@@ -85,7 +85,7 @@ mark_as_advanced(PATOMIC_BUILD_TESTING)
 # include paths rather than `<prefix/include`.
 # This doesn't affect include paths used by consumers of this project, but helps
 # prevent consumers having access to other projects in the same include
-# directory (e.g. usr/include).
+# directory (e.g. /usr/include).
 # The variable type is STRING rather than PATH, because otherwise passing
 # -DCMAKE_INSTALL_INCLUDEDIR=include on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to

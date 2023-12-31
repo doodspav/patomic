@@ -1,4 +1,4 @@
-include(../cmake/CreateTest.cmake)
+include(../../cmake/CreateTest.cmake)
 
 
 # ---- Setup Tests ----
