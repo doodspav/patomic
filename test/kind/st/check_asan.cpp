@@ -36,7 +36,7 @@ TEST_F(StAsan, HeapBufferOverflow)
 TEST_F(StAsan, StackBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
-#fdef __clang__
+#ifdef __clang__
     EXPECT_NONFATAL_FAILURE({
 #endif
     EXPECT_FATAL_FAILURE({
