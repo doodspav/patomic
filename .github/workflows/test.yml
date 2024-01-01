@@ -147,11 +147,14 @@ jobs:
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
+        env:
+          COMMENT_MODE: ${{ ( github.event_name == 'pull_request' && github.event.pull_request.draft == false ) && 'always' || 'never' }}
         with:
           action_fail: true
           action_fail_on_inconclusive: true
           check_name: "Test Results"
           files: test-results/**/*.xml
+          comment_mode: ${{ env.COMMENT_MODE }}
 
   publish-coverage:
     runs-on: ubuntu-latest
@@ -347,6 +350,7 @@ jobs:
           echo "$(cat ./patomic.md)" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Coverage in Pull Request Comment
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: coverage-summary
