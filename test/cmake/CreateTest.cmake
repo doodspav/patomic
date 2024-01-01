@@ -143,8 +143,8 @@ function(_create_test)
     # update dependencies list directly because we use it in Windows PATH stuff later
     if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.20.0")
         list(APPEND ARG_LINK GTest::gtest_main)
-        # TODO: this prevents test lookup on Windows; fix once pipeline exists
-        # TODO: see https://github.com/google/googletest/issues/2157
+        # TODO: this prevents test lookup on Windows; fix once pipeline exists (GHI #30)
+        # TODO: see https://github.com/google/googletest/issues/2157 (GHI #30)
         # if ("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.23.0")
         #     list(APPEND ARG_LINK GTest::gmock)
         # endif()
