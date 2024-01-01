@@ -20,7 +20,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // split repository
+            // get repository details
             const [owner, repo] = "${{ github.repository }}".split("/");
             
             // make graphql query
@@ -48,8 +48,74 @@ jobs:
             } while (cursor);
             
             // save data as json by returning
+            console.log(openIssueNumbers);
             return openIssueNumbers;
 
-      - name: Print List
-        run: |
-          echo "${{ steps.get-open-issues.outputs.result }}"
+      - name: Scan Files for Fixme and Todo
+        id: scan-files
+        env:
+          BASE_PATH: './patomic'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // dependencies
+            const fs = require('fs');
+            const path = require('path');
+            
+            // get issue id if line contains todo or fixme
+            // return: null | { issueId: null } | { issueId: 'number' }
+            function parseLine(line) {
+              const regex = /(fixme|todo)/i;
+              const issueIdRegex = /ghi\s#(\d+)/i;
+              if (regex.test(line)) {
+                const match = line.match(issueIdRegex);
+                const issueId = match ? match[1] : null;
+                return { issueId };
+              } else {
+                return null;
+              }
+            }
+            
+            // list all files in directory not starting with .
+            // return: [ path1, path2, ... ]
+            function listFiles(dir) {
+              let result = [];
+              fs.readdirSync(dir).forEach(file => {
+                // base set up
+                let fullPath = path.join(dir, file);
+                let stat = fs.statSync(fullPath);
+                // path is a directory
+                if (stat && stat.isDirectory() && !file.startsWith('.')) {
+                  result = result.concat(listFiles(fullPath));
+                // path is a file
+                } else if (!file.startsWith('.')) {
+                  result.push(fullPath)
+                }
+              });
+              return result;
+            }
+            
+            // parse all lines in all files
+            // return: [ { filePath: <path>, lineNum: <num>, issueId: <id> }, ... ]
+            function parseAll(dir) {
+              const files = listFiles(dir);
+              const items = []
+              files.forEach(file => {
+                const content = fs.readFileSync(file, 'utf-8');
+                const lines = content.split('\n');
+                lines.forEach((line, index) => {
+                  const item = parseLine(line);
+                  if (item) {
+                    item.filePath = file;
+                    item.lineNum = index + 1;
+                    items.push(item);
+                  }
+                });
+              });
+              return items;
+            }
+            
+            // save data as json by returning
+            const ret = parseAll('${{ env.BASE_PATH }}');
+            console.log(ret);
+            return ret;
