@@ -134,7 +134,7 @@ jobs:
               const filePath = item.filePath.replace('patomic/', '');
               if (item.issueId === null) {
                 ++errorCount;
-                const msg = "No GitHub issue mentioned in todo/fixme comment.";
+                const msg = "No GitHub issue mentioned in todo/fixme comment (must match pattern '/ghi\\s#(\\d+)/i').";
                 console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
               } else if (!openIssueIds.includes(item.issueId)) {
                 ++errorCount;
