@@ -136,7 +136,7 @@ jobs:
                 ++errorCount;
                 const msg = "No GitHub issue mentioned in todo/fixme comment (must match pattern '/ghi\\s#(\\d+)/i').";
                 console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
-              } else if (!openIssueIds.includes(item.issueId)) {
+              } else if (!openIssueIds.includes(parseInt(item.issueId))) {
                 ++errorCount;
                 const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }}.`
                 console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
