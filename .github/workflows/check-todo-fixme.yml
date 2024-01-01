@@ -119,3 +119,15 @@ jobs:
             const ret = parseAll('${{ env.BASE_PATH }}');
             console.log(ret);
             return ret;
+
+      - name: Check Issues
+        uses: actions/github-script@v7
+        with:
+          script:
+            // get outputs
+            const openIssueIds = ${{ steps.get-open-issues.outputs.result }};
+            const parsedItems = ${{ steps.scan-files.outputs.result }};
+          
+            // debug
+            console.log(openIssueIds);
+            console.log(parsedItems);
