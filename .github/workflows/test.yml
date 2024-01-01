@@ -14,41 +14,41 @@ jobs:
         # verbose labels make things easier to read in GitHub Actions
         # platform gets converted to os, preset, compiler, architecture
         platform:
-        #  - windows-gcc-x86_64
-        #  - windows-msvc-x86_32
-        #  - windows-msvc-x86_64
-        #  - macos-clang-x86_64
-        #  - linux-clang-x86_64
+          - windows-gcc-x86_64
+          - windows-msvc-x86_32
+          - windows-msvc-x86_64
+          - macos-clang-x86_64
+          - linux-clang-x86_64
           - linux-gcc-x86_64
         # convert verbose labels to usable values (which don't appear in GitHub Actions GUI)
         include:
           # platform -> os, preset, compiler, architecture
-        #  - platform: windows-gcc-x86_64
-        #    os: windows
-        #    preset: patomic-ci-native-unix-gcc
-        #    architecture: x86_64
-        #  - platform: windows-msvc-x86_32
-        #    os: windows
-        #    preset: patomic-ci-native-win32-msvc
-        #    architecture: x86_32
-        #  - platform: windows-msvc-x86_64
-        #    os: windows
-        #    preset: patomic-ci-native-win64-msvc
-        #    architecture: x86_64
-        #  - platform: macos-clang-x86_64
-        #    os: macos
-        #    preset: patomic-ci-native-unix-clang
-        #    architecture: x86_64
-        #  - platform: linux-clang-x86_64
-        #    os: ubuntu
-        #    preset: patomic-ci-native-unix-clang
-        #    architecture: x86_64
+          - platform: windows-gcc-x86_64
+            os: windows
+            preset: patomic-ci-native-unix-gcc
+            architecture: x86_64
+          - platform: windows-msvc-x86_32
+            os: windows
+            preset: patomic-ci-native-win32-msvc
+            architecture: x86_32
+          - platform: windows-msvc-x86_64
+            os: windows
+            preset: patomic-ci-native-win64-msvc
+            architecture: x86_64
+          - platform: macos-clang-x86_64
+            os: macos
+            preset: patomic-ci-native-unix-clang
+            architecture: x86_64
+          - platform: linux-clang-x86_64
+            os: ubuntu
+            preset: patomic-ci-native-unix-clang
+            architecture: x86_64
           - platform: linux-gcc-x86_64
             os: ubuntu
             preset: patomic-ci-native-unix-gcc
             architecture: x86_64
 
-    uses: ./.github/workflows/reusable-test-native.yml
+    uses: ./.github/workflows/_reusable-test-native.yml
     with:
       os: ${{ matrix.os }}
       preset: ${{ matrix.preset }}
@@ -125,7 +125,7 @@ jobs:
         #  - architecture: x86_32
         #    triple: i686-linux-gnu
         #    skip_llvm: true  # fixme: supported but not sure how (GHI #25)
-    uses: ./.github/workflows/reusable-test-qemu.yml
+    uses: ./.github/workflows/_reusable-test-qemu.yml
     with:
       triple: ${{ matrix.triple }}
       architecture: ${{ matrix.architecture }}
