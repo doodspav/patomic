@@ -76,7 +76,7 @@ jobs:
               }
             }
             
-            // list all files in directory not starting with .
+            // list all files in directory (except this file)
             // return: [ path1, path2, ... ]
             function listFiles(dir) {
               let result = [];
@@ -85,10 +85,10 @@ jobs:
                 let fullPath = path.join(dir, file);
                 let stat = fs.statSync(fullPath);
                 // path is a directory
-                if (stat && stat.isDirectory() && !file.startsWith('.')) {
+                if (stat && stat.isDirectory()) {
                   result = result.concat(listFiles(fullPath));
                 // path is a file
-                } else if (!file.startsWith('.')) {
+                } else if (file != 'check-todo-fixme.yml') {
                   result.push(fullPath)
                 }
               });
