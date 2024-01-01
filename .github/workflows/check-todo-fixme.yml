@@ -123,7 +123,7 @@ jobs:
       - name: Check Issues
         uses: actions/github-script@v7
         with:
-          script:
+          script: |
             // get outputs
             const openIssueIds = ${{ steps.get-open-issues.outputs.result }};
             const parsedItems = ${{ steps.scan-files.outputs.result }};
