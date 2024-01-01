@@ -132,9 +132,14 @@ jobs:
             parsedItems.forEach(item => {
               if (item.issueId === null) {
                 const msg = "No GitHub issue mentioned in todo/fixme comment.";
-                console.error(`::error file=${item.filePath}.line=${item.lineNum}::${msg}`);
+                console.error(`::error file=${item.filePath},line=${item.lineNum}::${msg}`);
               } else if (!openIssueIds.includes(item.issueId)) {
                 const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }}.`
                 console.error(`::error file=${item.filePath},line=${item.lineNum}::${msg}`);
               }
             });
+
+            // fail if error was printed
+            if (errorCount > 0) {
+              process.exit(1);
+            }
