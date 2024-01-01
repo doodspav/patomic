@@ -148,7 +148,7 @@ jobs:
           cmake --build . --verbose --config ${{ env.CMAKE_BUILD_TYPE }}
           cmake --install . --config ${{ env.CMAKE_BUILD_TYPE }} --prefix install
 
-      # TODO: figure out how to cache this for builds where we don't change any source code
+      # TODO: figure out how to cache this for builds where we don't change any source code (GHI #31)
       - name: Build patomic
         if: env.SKIP_JOB != 'true'
         run: |

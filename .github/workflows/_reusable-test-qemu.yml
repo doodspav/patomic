@@ -185,7 +185,7 @@ jobs:
           cmake --build . --verbose
           cmake --install . --prefix "${{ env.ROOT_PATH }}/sysroot"
 
-      # TODO: figure out how to cache this for builds where we don't change any source code
+      # TODO: figure out how to cache this for builds where we don't change any source code (GHI #31)
       - name: Build patomic
         if: env.SKIP_JOB != 'true'
         run: |
