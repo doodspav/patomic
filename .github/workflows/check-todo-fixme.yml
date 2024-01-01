@@ -131,14 +131,15 @@ jobs:
             // go through all parsed items
             let errorCount = 0;
             parsedItems.forEach(item => {
+              const filePath = item.filePath.replace('patomic/', '');
               if (item.issueId === null) {
                 ++errorCount;
                 const msg = "No GitHub issue mentioned in todo/fixme comment.";
-                console.error(`::error file=${item.filePath},line=${item.lineNum}::${msg}`);
+                console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
               } else if (!openIssueIds.includes(item.issueId)) {
                 ++errorCount;
                 const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }}.`
-                console.error(`::error file=${item.filePath},line=${item.lineNum}::${msg}`);
+                console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
               }
             });
 
