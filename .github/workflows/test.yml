@@ -148,7 +148,7 @@ jobs:
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         env:
-          COMMENT_MODE: ${{ ( github.event_name == 'pull_request' && github.event.pull_request.draft == false ) && 'always' || 'never' }}
+          COMMENT_MODE: ${{ ( github.event_name == 'pull_request' && github.event.pull_request.draft == false ) && 'always' || 'off' }}
         with:
           action_fail: true
           action_fail_on_inconclusive: true
