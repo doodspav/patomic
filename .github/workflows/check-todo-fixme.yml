@@ -138,7 +138,7 @@ jobs:
                 console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
               } else if (!openIssueIds.includes(parseInt(item.issueId))) {
                 ++errorCount;
-                const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }}.`
+                const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }} (maybe it was resolved and closed).`
                 console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
               }
             });
