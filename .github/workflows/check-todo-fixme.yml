@@ -76,8 +76,10 @@ jobs:
               }
             }
             
-            // list all files in directory (except this file)
+            // list all files in directory (except excluded ones)
             // return: [ path1, path2, ... ]
+            const excludedDirs = ['.git'];
+            const excludedFiles = ['check-todo-fixme.yml'];
             function listFiles(dir) {
               let result = [];
               fs.readdirSync(dir).forEach(file => {
@@ -85,10 +87,10 @@ jobs:
                 let fullPath = path.join(dir, file);
                 let stat = fs.statSync(fullPath);
                 // path is a directory
-                if (stat && stat.isDirectory()) {
+                if (stat && stat.isDirectory() && !excludedDirs.includes(file)) {
                   result = result.concat(listFiles(fullPath));
                 // path is a file
-                } else if (file != 'check-todo-fixme.yml') {
+                } else if (!excludedFiles.includes(file)) {
                   result.push(fullPath)
                 }
               });
