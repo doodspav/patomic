@@ -87,8 +87,10 @@ jobs:
                 let fullPath = path.join(dir, file);
                 let stat = fs.statSync(fullPath);
                 // path is a directory
-                if (stat && stat.isDirectory() && !excludedDirs.includes(file)) {
-                  result = result.concat(listFiles(fullPath));
+                if (stat && stat.isDirectory()) {
+                  if (!excludedDirs.includes(file)) {
+                    result = result.concat(listFiles(fullPath));
+                  }
                 // path is a file
                 } else if (!excludedFiles.includes(file)) {
                   result.push(fullPath)
