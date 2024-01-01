@@ -127,7 +127,14 @@ jobs:
             // get outputs
             const openIssueIds = ${{ steps.get-open-issues.outputs.result }};
             const parsedItems = ${{ steps.scan-files.outputs.result }};
-          
-            // debug
-            console.log(openIssueIds);
-            console.log(parsedItems);
+
+            // go through all parsed items
+            parsedItems.forEach(item => {
+              if (item.issueId === null) {
+                const msg = "No GitHub issue mentioned in todo/fixme comment.";
+                console.error(`::error file=${item.filePath}.line=${item.lineNum}::${msg}`);
+              } else if (!openIssueIds.includes(item.issueId)) {
+                const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }}.`
+                console.error(`::error file=${item.filePath},line=${item.lineNum}::${msg}`);
+              }
+            });
