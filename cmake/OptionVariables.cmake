@@ -4,18 +4,18 @@
 
 # ---- Options Summary ----
 
-# ------------------------------------------------------------------------------------------------
-# | Option                       | Availability  | Default                                       |
-# |==============================|===============|===============================================|
-# | BUILD_SHARED_LIBS            | Top-Level     | OFF                                           |
-# | BUILD_TESTING                | Top-Level     | OFF                                           |
-# | CMAKE_INSTALL_INCLUDEDIR     | Top-Level     | include/${package_name}-${PROJECT_VERSION}    |
-# |------------------------------|---------------|-----------------------------------------------|
-# | PATOMIC_BUILD_SHARED         | Always        | ${BUILD_SHARED_LIBS}                          |
-# | PATOMIC_BUILD_TESTING        | Always        | ${BUILD_TESTING}                              |
-# | PATOMIC_INCLUDES_WITH_SYSTEM | Not Top-Level | ON                                            |
-# | PATOMIC_INSTALL_CMAKEDIR     | Always        | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name} |
-# ------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------
+# | Option                       | Availability  | Default                                                          |
+# |==============================|===============|==================================================================|
+# | BUILD_SHARED_LIBS            | Top-Level     | OFF                                                              |
+# | BUILD_TESTING                | Top-Level     | OFF                                                              |
+# | CMAKE_INSTALL_INCLUDEDIR     | Top-Level     | include/${package_name}-${PROJECT_VERSION}                       |
+# |------------------------------|---------------|------------------------------------------------------------------|
+# | PATOMIC_BUILD_SHARED         | Always        | ${BUILD_SHARED_LIBS}                                             |
+# | PATOMIC_BUILD_TESTING        | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}                     |
+# | PATOMIC_INCLUDES_WITH_SYSTEM | Not Top-Level | ON                                                               |
+# | PATOMIC_INSTALL_CMAKEDIR     | Always        | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION} |
+# -------------------------------------------------------------------------------------------------------------------
 
 
 # ---- Build Shared ----
@@ -66,20 +66,26 @@ endif()
 if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_TESTING "Build tests" OFF)
 endif()
+if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
+    set(build_testing ON)
+endif()
 option(
     PATOMIC_BUILD_TESTING
     "Override BUILD_TESTING for ${package_name} library"
-    ${BUILD_TESTING}
+    ${build_testing}
 )
+set(build_testing )
 mark_as_advanced(PATOMIC_BUILD_TESTING)
 
 
 # ---- Install Include Directory ----
 
 # Adds an extra directory to the include path by default, so that when you link
-# against the target, you get `<prefix>/include/<package>-X.Y.Z` added to your
+# against the target, you get `<prefix>/include/<package>-X` added to your
 # include paths rather than `<prefix/include`.
-# This doesn't affect include paths used by consumers of this project.
+# This doesn't affect include paths used by consumers of this project, but helps
+# prevent consumers having access to other projects in the same include
+# directory (e.g. /usr/include).
 # The variable type is STRING rather than PATH, because otherwise passing
 # -DCMAKE_INSTALL_INCLUDEDIR=include on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to
@@ -95,7 +101,7 @@ endif()
 
 
 # do not include earlier or we can't set CMAKE_INSTALL_INCLUDEDIR above
-# required for CMAKE_INSTALL_LIBDIR below
+# include required for CMAKE_INSTALL_LIBDIR below
 include(GNUInstallDirs)
 
 
@@ -103,14 +109,20 @@ include(GNUInstallDirs)
 
 # This allows package maintainers to freely override the installation path for
 # the CMake configs.
+# The path is versioned so that multiple installed versions can coexist together
+# and uses the full version to aid in debugging.
 # This doesn't affect include paths used by consumers of this project.
 # The variable type is STRING rather than PATH, because otherwise passing
 # -DPATOMIC_INSTALL_CMAKEDIR=lib/cmake on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to
 # unexpected errors.
+#
+# Note: this will yield the lowest compatible version on platforms that sort
+# their directories' contents unless you set CMAKE_FIND_PACKAGE_SORT_DIRECTION
+# to DEC before calling find_package.
 set(
-    PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}"
-    CACHE STRING "CMake package config location relative to the install prefix"
+    PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION}"
+    CACHE STRING "CMake ${package_name} package's config location relative to the install prefix"
 )
 # depends on CMAKE_INSTALL_LIBDIR which is marked as advanced in GNUInstallDirs
 mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)

@@ -26,30 +26,52 @@ if(NOT TARGET patomic::patomic)
     find_package(patomic QUIET)
 endif()
 
-# for Windows: prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# get GTest
 find_package(GTest REQUIRED)
 include(GoogleTest)
+
+# sometimes this variable is not correctly set by GTest's find_package
+if(NOT GTEST_INCLUDE_DIRS)
+    if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.20.0")
+        get_target_property(
+            GTEST_INCLUDE_DIRS
+            GTest::gtest INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+        )
+    else()
+        get_target_property(
+            GTEST_INCLUDE_DIRS
+            GTest::GTest INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+        )
+    endif()
+endif()
+
+# get libatomic if it exists (.so.1 in case of no namelink, e.g. FC19 and Ubuntu)
+# courtesy of HP's foedus_code's FindGccAtomic.cmake (the .so.1 part)
+find_library(libatomic NAMES atomic atomic.so.1 libatomic.so.1)
+
+# link libatomic to GTest if it exists
+# necessary for using GTest on platforms without atomic operations where
+# libatomic is not automatically linked (e.g. clang-15 for arm-linux-gnueabi)
+if(libatomic)
+    set_property(
+        TARGET GTest::gtest
+        APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${libatomic}"
+    )
+endif()
 
 
 # ---- Declare Tests ----
 
+# base target that indirectly depends on all tests
 add_custom_target(patomic-test)
 
-# only add BTs if patomic target is available
-if(TARGET patomic::patomic)
-    add_subdirectory(bt)
-else()
-    message(STATUS "Skipping binary tests; patomic target not available")
-endif()
+# always add include and src; used by and linked to all test targets
+# must be added first to create targets that we use when creating test targets
+add_subdirectory(include)
+add_subdirectory(src)
 
-# only add UTs if patomic files are available
-# these are currently set by patomic before including this project
-if(PATOMIC_BINARY_DIR AND PATOMIC_SOURCE_DIR)
-   add_subdirectory(ut)
-else()
-    message(STATUS "Skipping unit tests; not building as sub-project of patomic")
-endif()
+# add directory with all test kinds
+add_subdirectory(kind)
 
 
 # ---- Support Packaging Library ----

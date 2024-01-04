@@ -44,7 +44,7 @@ target_sources(
 add_subdirectory(src)
 
 
-# ---- Generate Build Info Headers ----
+# ---- Generate Export Headers ----
 
 # used in export header generated below
 if(NOT PATOMIC_BUILD_SHARED)
@@ -102,6 +102,7 @@ endif()
 if(PATOMIC_BUILD_TESTING)
 
     # need to enable testing in case BUILD_TESTING is disabled
+    # CTest expects that the top level project enables testing
     if(PROJECT_IS_TOP_LEVEL)
         enable_testing()
     endif()
