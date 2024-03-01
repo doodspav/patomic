@@ -38,6 +38,8 @@ target_sources(
     ${target_name} PRIVATE
     # include
     include/patomic/patomic.h
+    # include/types
+    include/patomic/types/align.h
 )
 
 # add /src files to target
