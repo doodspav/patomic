@@ -40,6 +40,7 @@ target_sources(
     include/patomic/patomic.h
     # include/types
     include/patomic/types/align.h
+    include/patomic/types/ids.h
 )
 
 # add /src files to target
