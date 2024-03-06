@@ -70,6 +70,7 @@ typedef unsigned long patomic_id_t;
  */
 
 typedef enum {
+
     /** @brief The implementation kind is unknown. */
     patomic_kind_UNKN  = 0x0
 
@@ -94,6 +95,7 @@ typedef enum {
                          patomic_kind_LIB  |
                          patomic_kind_BLTN |
                          patomic_kind_ASM
+
 } patomic_kind_t;
 
 
@@ -137,7 +139,7 @@ patomic_get_kind(
 
 
 #ifdef __cplusplus
-};
+}  /* extern "C" */
 #endif
 
 #endif  /* PATOMIC_IDS_H */

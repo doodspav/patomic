@@ -161,7 +161,7 @@ patomic_align_meets_minimum(
 
 
 #ifdef __cplusplus
-};
+}  /* extern "C" */
 #endif
 
 #endif  /* PATOMIC_ALIGN_H */
