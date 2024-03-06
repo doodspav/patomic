@@ -41,6 +41,7 @@ target_sources(
     # include/types
     include/patomic/types/align.h
     include/patomic/types/ids.h
+    include/patomic/types/options.h
     include/patomic/types/memory_order.h
 )
 
