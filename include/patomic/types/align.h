@@ -1,8 +1,9 @@
 #ifndef PATOMIC_ALIGN_H
 #define PATOMIC_ALIGN_H
 
-#include <stddef.h>
 #include <patomic/patomic_export.h>
+
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,13 +19,6 @@ extern "C" {
  *
  * @warning
  *   Not meeting the alignment requirements will result in undefined behaviour.
- *
- * @details
- *   - recommended: the alignment required by the C language (always valid)     \n
- *   - minimum: the alignment required by the architecture (conditionally valid)\n
- *   - size_within: the size and alignment of a hypothetical buffer within which
- *       the object is to be considered valid, unless it is 0 in which case
- *       "minimum" is always valid                                              \n
  *
  * @note
  *   - "recommended" and "minimum" are always a positive power of 2             \n
@@ -52,9 +46,20 @@ extern "C" {
  */
 
 typedef struct {
+
+    /** @brief Alignment required by the C language (always valid). */
     size_t recommended;
+
+    /** @brief Alignment required by the architecture (conditionally valid). */
     size_t minimum;
+
+    /** @brief
+     *   Size and alignment of a hypothetical buffer within which the object
+     *   must reside for "minimum" to be considered valid, unless it is 0 in
+     *   which case "minimum" is always valid.
+     */
     size_t size_within;
+
 } patomic_align_t;
 
 
