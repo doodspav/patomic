@@ -1,8 +1,9 @@
 #ifndef PATOMIC_TRANSACTION_H
 #define PATOMIC_TRANSACTION_H
 
+#include "align.h"
+
 #include <patomic/patomic_export.h>
-#include <patomic/types/align.h>
 
 #include <stddef.h>
 

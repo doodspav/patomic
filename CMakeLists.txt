@@ -42,8 +42,11 @@ target_sources(
     include/patomic/types/align.h
     include/patomic/types/ids.h
     include/patomic/types/memory_order.h
+    include/patomic/types/ops.h
     include/patomic/types/options.h
     include/patomic/types/transaction.h
+    # include/types/ops
+    include/patomic/types/ops/implicit.h
 )
 
 # add /src files to target
