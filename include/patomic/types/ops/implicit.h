@@ -441,12 +441,12 @@ typedef struct {
     patomic_opsig_exchange_t fp_exchange;
 
     /** @brief Atomic compare-exchange with implicit memory order. Operation may
-     *         spuriously fail even if object's value matches expected value. */
+     *         spuriously fail and act as if the object's value does not compare
+     *         equal to the expected value. */
     patomic_opsig_cmpxchg_t fp_cmpxchg_weak;
 
     /** @brief Atomic compare-exchange with implicit memory order. Operation
-     *         will never spuriously fail if object's value matches expected
-     *         value. */
+     *         will never spuriously fail. */
     patomic_opsig_cmpxchg_t fp_cmpxchg_strong;
 
 } patomic_ops_xchg_t;
