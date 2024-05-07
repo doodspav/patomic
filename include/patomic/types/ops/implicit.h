@@ -98,7 +98,8 @@ typedef void (* patomic_opsig_exchange_t) (
  *   expected object; if these compare equal, replaces the value of the object
  *   with a desired value and returns 1, otherwise stores the value of the
  *   object into the expected object, and returns 0. This is done in a single
- *   read-modify-write atomic operation.
+ *   read-modify-write atomic operation if 1 is returned, otherwise this is a
+ *   single atomic read (load) operation.
  *
  * @param obj
  *   Pointer to object whose value to atomically cmpxchg with expected object

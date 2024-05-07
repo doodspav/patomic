@@ -47,6 +47,7 @@ target_sources(
     include/patomic/types/transaction.h
     # include/types/ops
     include/patomic/types/ops/implicit.h
+    include/patomic/types/ops/explicit.h
 )
 
 # add /src files to target
