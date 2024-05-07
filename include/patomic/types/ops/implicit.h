@@ -215,7 +215,7 @@ typedef int (* patomic_opsig_test_modify_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef int (* patomic_opsig_fetch_t) (
+typedef void (* patomic_opsig_fetch_t) (
     volatile void *obj,
     const void *arg,
     void *ret
