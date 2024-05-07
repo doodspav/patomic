@@ -1,7 +1,9 @@
 #ifndef PATOMIC_OPS_EXPLICIT_H
 #define PATOMIC_OPS_EXPLICIT_H
 
-// TODO: extern "C"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -531,5 +533,9 @@ typedef struct {
 
 } patomic_ops_explicit_t;
 
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
 
 #endif  /* PATOMIC_OPS_EXPLICIT_H */
