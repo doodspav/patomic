@@ -20,12 +20,16 @@
  * @param desired
  *   Pointer to object holding value to be atomically stored.
  *
+ * @param order
+ *   Memory order used for atomic operation. Must be a valid store order.
+ *
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
 typedef void (* patomic_opsig_store_t) (
     volatile void *obj,
-    const void *desired
+    const void *desired,
+    int order
 );
 
 
@@ -41,6 +45,9 @@ typedef void (* patomic_opsig_store_t) (
  * @param obj
  *   Pointer to object from which a value will be atomically loaded.
  *
+ * @param order
+ *   Memory order used for atomic operation. Must be a valid load order.
+ *
  * @param ret
  *   Pointer to object into which to write the atomically loaded value.
  *
@@ -49,6 +56,7 @@ typedef void (* patomic_opsig_store_t) (
  */
 typedef void (* patomic_opsig_load_t) (
     const volatile void *obj,
+    int order,
     void *ret
 );
 
@@ -71,6 +79,9 @@ typedef void (* patomic_opsig_load_t) (
  * @param desired
  *   Pointer to object whose value will replace the existing value of "obj".
  *
+ * @param order
+ *   Memory order used for atomic operation.
+ *
  * @param ret
  *   Pointer to object into which to write the existing value held by "obj".
  *
@@ -80,6 +91,7 @@ typedef void (* patomic_opsig_load_t) (
 typedef void (* patomic_opsig_exchange_t) (
     volatile void *obj,
     const void *desired,
+    int order,
     void *ret
 );
 
@@ -111,6 +123,13 @@ typedef void (* patomic_opsig_exchange_t) (
  * @param desired
  *   Pointer to object whose value will replace the existing value of "obj".
  *
+ * @param succ
+ *   Memory order used for read-modify-write atomic operation on success path.
+ *
+ * @param fail
+ *   Memory order used for read (load) atomic operation on failure path. Must be
+ *   a valid fail order.
+ *
  * @returns
  *   The value 1 if the existing value of "obj" compares equal to the value of
  *   "expected", otherwise the value 0.
@@ -121,7 +140,9 @@ typedef void (* patomic_opsig_exchange_t) (
 typedef int (* patomic_opsig_cmpxchg_t) (
     volatile void *obj,
     void *expected,
-    const void *desired
+    const void *desired,
+    int succ,
+    int fail
 );
 
 
@@ -143,6 +164,9 @@ typedef int (* patomic_opsig_cmpxchg_t) (
  * @param offset
  *   Zero-based bit index.
  *
+ * @param order
+ *   Memory order used for atomic operation. Must be a valid load order.
+ *
  * @returns
  *   The value of the tested bit.
  *
@@ -151,7 +175,8 @@ typedef int (* patomic_opsig_cmpxchg_t) (
  */
 typedef int (* patomic_opsig_test_t) (
     const volatile void *obj,
-    int offset
+    int offset,
+    int order
 );
 
 
@@ -174,6 +199,9 @@ typedef int (* patomic_opsig_test_t) (
  * @param offset
  *   Zero-based bit index.
  *
+ * @param order
+ *   Memory order used for atomic operation.
+ *
  * @returns
  *   The original value of the tested bit before modification.
  *
@@ -182,7 +210,8 @@ typedef int (* patomic_opsig_test_t) (
  */
 typedef int (* patomic_opsig_test_modify_t) (
     volatile void *obj,
-    int offset
+    int offset,
+    int order
 );
 
 
@@ -206,6 +235,9 @@ typedef int (* patomic_opsig_test_modify_t) (
  *   Pointer to object whose value is passed as the second parameter in the
  *   binary operation.
  *
+ * @param order
+ *   Memory order used for atomic operation.
+ *
  * @param ret
  *   Pointer to object into which to write the original value of "obj" before
  *   modification.
@@ -216,6 +248,7 @@ typedef int (* patomic_opsig_test_modify_t) (
 typedef int (* patomic_opsig_fetch_t) (
     volatile void *obj,
     const void *arg,
+    int order,
     void *ret
 );
 
@@ -236,6 +269,9 @@ typedef int (* patomic_opsig_fetch_t) (
  *   Pointer to object whose value will be atomically modified, and passed as
  *   first parameter in the unary operation.
  *
+ * @param order
+ *   Memory order used for atomic operation.
+ *
  * @param ret
  *   Pointer to object into which to write the original value of "obj" before
  *   modification.
@@ -245,6 +281,7 @@ typedef int (* patomic_opsig_fetch_t) (
  */
 typedef void (* patomic_opsig_fetch_noarg_t) (
     volatile void *obj,
+    int order,
     void *ret
 );
 
@@ -269,12 +306,16 @@ typedef void (* patomic_opsig_fetch_noarg_t) (
  *   Pointer to object whose value is passed as the second parameter in the
  *   binary operation.
  *
+ * @param order
+ *   Memory order used for atomic operation.
+ *
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
 typedef void (* patomic_opsig_void_t) (
     volatile void *obj,
-    const void *arg
+    const void *arg,
+    int order
 );
 
 
@@ -294,11 +335,15 @@ typedef void (* patomic_opsig_void_t) (
  *   Pointer to object whose value will be atomically modified, and passed as
  *   first parameter in the unary operation.
  *
+ * @param order
+ *   Memory order used for atomic operation.
+ *
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
 typedef void (* patomic_opsig_void_noarg_t) (
-    volatile void *obj
+    volatile void *obj,
+    int order
 );
 
 
