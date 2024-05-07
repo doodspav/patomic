@@ -355,7 +355,7 @@ typedef struct {
 
     /** @brief Atomic negation using two's complement representation with
      *         implicit memory order, returning original value from before
-     *         operation. */
+     *         operation. There is no undefined behaviour. */
     patomic_opsig_fetch_noarg_t fp_fetch_neg;
 
 } patomic_ops_arithmetic_t;

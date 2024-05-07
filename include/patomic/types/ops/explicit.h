@@ -26,7 +26,7 @@
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_store_t) (
+typedef void (* patomic_opsig_explicit_store_t) (
     volatile void *obj,
     const void *desired,
     int order
@@ -54,7 +54,7 @@ typedef void (* patomic_opsig_store_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_load_t) (
+typedef void (* patomic_opsig_explicit_load_t) (
     const volatile void *obj,
     int order,
     void *ret
@@ -88,7 +88,7 @@ typedef void (* patomic_opsig_load_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_exchange_t) (
+typedef void (* patomic_opsig_explicit_exchange_t) (
     volatile void *obj,
     const void *desired,
     int order,
@@ -137,7 +137,7 @@ typedef void (* patomic_opsig_exchange_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef int (* patomic_opsig_cmpxchg_t) (
+typedef int (* patomic_opsig_explicit_cmpxchg_t) (
     volatile void *obj,
     void *expected,
     const void *desired,
@@ -173,7 +173,7 @@ typedef int (* patomic_opsig_cmpxchg_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef int (* patomic_opsig_test_t) (
+typedef int (* patomic_opsig_explicit_test_t) (
     const volatile void *obj,
     int offset,
     int order
@@ -208,7 +208,7 @@ typedef int (* patomic_opsig_test_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef int (* patomic_opsig_test_modify_t) (
+typedef int (* patomic_opsig_explicit_test_modify_t) (
     volatile void *obj,
     int offset,
     int order
@@ -245,7 +245,7 @@ typedef int (* patomic_opsig_test_modify_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_fetch_t) (
+typedef void (* patomic_opsig_explicit_fetch_t) (
     volatile void *obj,
     const void *arg,
     int order,
@@ -279,7 +279,7 @@ typedef void (* patomic_opsig_fetch_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_fetch_noarg_t) (
+typedef void (* patomic_opsig_explicit_fetch_noarg_t) (
     volatile void *obj,
     int order,
     void *ret
@@ -312,7 +312,7 @@ typedef void (* patomic_opsig_fetch_noarg_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_void_t) (
+typedef void (* patomic_opsig_explicit_void_t) (
     volatile void *obj,
     const void *arg,
     int order
@@ -341,10 +341,195 @@ typedef void (* patomic_opsig_void_t) (
  * @note
  *   Width of all objects is the same, and is known implicitly.
  */
-typedef void (* patomic_opsig_void_noarg_t) (
+typedef void (* patomic_opsig_explicit_void_noarg_t) (
     volatile void *obj,
     int order
 );
+
+
+/**
+ * @addtogroup ops.explicit
+ *
+ * @brief
+ *   Set of function pointers for atomic arithmetic operations with explicit
+ *   memory order. Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic addition using two's complement representation with
+     *         explicit memory order. There is no undefined behaviour. */
+    patomic_opsig_explicit_void_t fp_add;
+
+    /** @brief Atomic subtraction using two's complement representation with
+     *         explicit memory order. There is no undefined behaviour. */
+    patomic_opsig_explicit_void_t fp_sub;
+
+    /** @brief Atomic increment using two's complement representation with
+     *         explicit memory order. There is no undefined behaviour. */
+    patomic_opsig_explicit_void_noarg_t fp_inc;
+
+    /** @brief Atomic decrement using two's complement representation with
+     *         explicit memory order. There is no undefined behaviour. */
+    patomic_opsig_explicit_void_noarg_t fp_dec;
+
+    /** @brief Atomic negation using two's complement representation with
+     *         explicit memory order. There is no undefined behaviour. */
+    patomic_opsig_explicit_void_noarg_t fp_neg;
+
+    /** @brief Atomic addition using two's complement representation with
+     *         explicit memory order, returning original value from before
+     *         operation. There is no undefined behaviour. */
+    patomic_opsig_explicit_fetch_t fp_fetch_add;
+
+    /** @brief Atomic subtraction using two's complement representation with
+     *         explicit memory order, returning original value from before
+     *         operation. There is no undefined behaviour. */
+    patomic_opsig_explicit_fetch_t fp_fetch_sub;
+
+    /** @brief Atomic increment using two's complement representation with
+     *         explicit memory order, returning original value from before
+     *         operation. There is no undefined behaviour. */
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_inc;
+
+    /** @brief Atomic decrement using two's complement representation with
+     *         explicit memory order, returning original value from before
+     *         operation. There is no undefined behaviour. */
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_dec;
+
+    /** @brief Atomic negation using two's complement representation with
+     *         explicit memory order, returning original value from before
+     *         operation. There is no undefined behaviour. */
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_neg;
+
+} patomic_ops_explicit_arithmetic_t;
+
+
+/**
+ * @addtogroup ops.explicit
+ *
+ * @brief
+ *   Set of function pointers for atomic binary operations with explicit
+ *   memory order. Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic OR with explicit memory order. */
+    patomic_opsig_explicit_void_t fp_or;
+
+    /** @brief Atomic XOR with explicit memory order. */
+    patomic_opsig_explicit_void_t fp_xor;
+
+    /** @brief Atomic AND with explicit memory order. */
+    patomic_opsig_explicit_void_t fp_and;
+
+    /** @brief Atomic NOT with explicit memory order. */
+    patomic_opsig_explicit_void_noarg_t fp_not;
+
+    /** @brief Atomic OR with explicit memory order, returning original
+     *         value from before operation. */
+    patomic_opsig_explicit_fetch_t fp_fetch_or;
+
+    /** @brief Atomic XOR with explicit memory order, returning original
+     *         value from before operation. */
+    patomic_opsig_explicit_fetch_t fp_fetch_xor;
+
+    /** @brief Atomic AND with explicit memory order, returning original
+     *         value from before operation. */
+    patomic_opsig_explicit_fetch_t fp_fetch_and;
+
+    /** @brief Atomic NOT with explicit memory order, returning original
+     *         value from before operation. */
+    patomic_opsig_explicit_fetch_noarg_t fp_fetch_not;
+
+} patomic_ops_explicit_binary_t;
+
+
+/**
+ * @addtogroup ops.explicit
+ *
+ * @brief
+ *   Set of function pointers for atomic bitwise operations with explicit
+ *   memory order. Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic bit test with explicit memory order, returning original
+     *         bit value. */
+    patomic_opsig_explicit_test_t fp_test;
+
+    /** @brief Atomic bit test-and-complement with explicit memory order,
+     *         returning original bit value from before operation. */
+    patomic_opsig_explicit_test_modify_t fp_test_compl;
+
+    /** @brief Atomic bit test-and-set with explicit memory order, returning
+     *         original bit value from before operation. */
+    patomic_opsig_explicit_test_modify_t fp_test_set;
+
+    /** @brief Atomic bit test-and-reset with explicit memory order, returning
+     *         original bit value from before operation. */
+    patomic_opsig_explicit_test_modify_t fp_test_reset;
+
+} patomic_ops_explicit_bitwise_t;
+
+
+/**
+ * @addtogroup ops.explicit
+ *
+ * @brief
+ *   Set of function pointers for atomic exchange operations with explicit
+ *   memory order. Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic exchange with explicit memory order. */
+    patomic_opsig_explicit_exchange_t fp_exchange;
+
+    /** @brief Atomic compare-exchange with explicit memory order. Operation may
+     *         spuriously fail and act as if the object's value does not compare
+     *         equal to the expected value. */
+    patomic_opsig_explicit_cmpxchg_t fp_cmpxchg_weak;
+
+    /** @brief Atomic compare-exchange with explicit memory order. Operation
+     *         will never spuriously fail. */
+    patomic_opsig_explicit_cmpxchg_t fp_cmpxchg_strong;
+
+} patomic_ops_explicit_xchg_t;
+
+
+/**
+ * @addtogroup ops.explicit
+ *
+ * @brief
+ *   Set of function pointers for atomic load and store operations and other
+ *   sets of atomic operations, with explicit memory order. Pointers are NULL
+ *   if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic store with explicit memory order. */
+    patomic_opsig_explicit_store_t fp_store;
+
+    /** @brief Atomic load with explicit memory order. */
+    patomic_opsig_explicit_load_t fp_load;
+
+    /** @brief Set of atomic xchg operations with explicit memory order. */
+    patomic_ops_explicit_xchg_t xchg_ops;
+
+    /** @brief Set of atomic bitwise operations with explicit memory order. */
+    patomic_ops_explicit_bitwise_t bitwise_ops;
+
+    /** @brief Set of atomic binary operations with explicit memory order. */
+    patomic_ops_explicit_binary_t binary_ops;
+
+    /** @brief Set of atomic signed arithmetic operations with explicit memory
+     *         order. */
+    patomic_ops_explicit_arithmetic_t signed_ops;
+
+    /** @brief Set of atomic unsigned arithmetic operations with explicit memory
+     *         order. */
+    patomic_ops_explicit_arithmetic_t unsigned_ops;
+
+} patomic_ops_explicit_t;
 
 
 #endif  /* PATOMIC_OPS_EXPLICIT_H */
