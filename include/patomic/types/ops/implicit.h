@@ -131,7 +131,7 @@ typedef int (* patomic_opsig_cmpxchg_t) (
  * @addtogroup ops.implicit
  *
  * @brief
- *   Function signature for an atomic bit test operation wth implicit memory
+ *   Function signature for an atomic bit test operation with implicit memory
  *   order.
  *
  * @details
