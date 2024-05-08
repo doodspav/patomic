@@ -152,8 +152,9 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   with a desired value and returns 1, otherwise stores the value of the
  *   object into the expected object, and returns 0. This is done in a single
  *   read-modify-write atomic operation if 1 is returned, otherwise this is a
- *   single atomic read (load) operation. The transaction may fail, in which
- *   case 0 is returned.
+ *   single atomic read (load) operation. The primary transaction may fail, in
+ *   which case the fallback transaction is tried. If either transaction path
+ *   fails, 0 is returned.
  *
  * @param obj
  *   Pointer to object whose value to atomically cmpxchg with expected object
@@ -186,15 +187,22 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
+ *   The parameter "desired" may be passed a default value of 0 or NULL.
+ *   Execution will pass to the fallback transaction.
+ *
+ * @note
+ *   If config.fallback_attempts == 0, the fallback transaction will not be
+ *   attempted. The fallback status will be set to TABORT_EXPLICIT with reason
+ *   0, and fallback_attempts_made to 0. If config.attempts also == 0, then
+ *   parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
  */
 typedef int (* patomic_opsig_transaction_cmpxchg_t) (
     volatile void *obj,
     void *expected,
     const void *desired,
-    patomic_transaction_config_t config,
-    patomic_transaction_result_t *result
+    patomic_transaction_config_wfb_t config,
+    patomic_transaction_result_wfb_t *result
 );
 
 
