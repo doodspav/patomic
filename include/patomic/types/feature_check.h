@@ -5,7 +5,9 @@
 
 #include <patomic/patomic_export.h>
 
-// TODO: extern C
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -503,5 +505,9 @@ patomic_feature_check_leaf_transaction(
     unsigned int opkinds
 );
 
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
 
 #endif  /* PATOMIC_FEATURE_CHECK_H */
