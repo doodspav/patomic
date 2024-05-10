@@ -677,7 +677,7 @@ typedef int (* patomic_opsig_transaction_flag_test_t) (
  *   The value 0 if the flag object was not set when being tested, otherwise the
  *   value 1.
  */
-typedef int (* patomic_opsig_transaction_flag_test_and_set_t) (
+typedef int (* patomic_opsig_transaction_flag_test_set_t) (
     patomic_transaction_flag_t *flag
 );
 
@@ -739,7 +739,7 @@ typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
  *
  * @warning
  *   Aborting a nested transaction will abort ALL nested transactions, and
- *   execution control will pass back to the called of the outermost tbegin.
+ *   execution control will pass back to the caller of the outermost tbegin.
  *
  * @note
  *   Calling this outside of an active transaction is a no-op.
@@ -780,6 +780,294 @@ typedef void (* patomic_opsig_transaction_tcommit_t) (
 typedef int (* patomic_opsig_transaction_ttest_t) (
     void
 );
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic arithmetic operations implemented using
+ *   a sequentially consistent transaction. Pointers are NULL if operation is
+ *   not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic addition using two's complement representation implemented
+     *         using a sequentially consistent transaction. There is no
+     *         undefined behaviour. */
+    patomic_opsig_transaction_void_t fp_add;
+
+    /** @brief Atomic subtraction using two's complement representation
+     *         implemented using a sequentially consistent transaction. There is
+     *         no undefined behaviour. */
+    patomic_opsig_transaction_void_t fp_sub;
+
+    /** @brief Atomic increment using two's complement representation
+     *         implemented using a sequentially consistent transaction. There is
+     *         no undefined behaviour. */
+    patomic_opsig_transaction_void_noarg_t fp_inc;
+
+    /** @brief Atomic decrement using two's complement representation
+     *         implemented using a sequentially consistent transaction. There is
+     *         no undefined behaviour. */
+    patomic_opsig_transaction_void_noarg_t fp_dec;
+
+    /** @brief Atomic negation using two's complement representation implemented
+     *         using a sequentially consistent transaction. There is no
+     *         undefined behaviour. */
+    patomic_opsig_transaction_void_noarg_t fp_neg;
+
+    /** @brief Atomic addition using two's complement representation implemented
+     *         using a sequentially consistent transaction, returning original
+     *         value from before operation. There is no undefined behaviour. */
+    patomic_opsig_transaction_fetch_t fp_fetch_add;
+
+    /** @brief Atomic subtraction using two's complement representation
+     *         implemented using a sequentially consistent transaction,
+     *         returning original value from before operation. There is no
+     *         undefined behaviour. */
+    patomic_opsig_transaction_fetch_t fp_fetch_sub;
+
+    /** @brief Atomic increment using two's complement representation
+     *         implemented using a sequentially consistent transaction,
+     *         returning original value from before operation. There is no
+     *         undefined behaviour. */
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_inc;
+
+    /** @brief Atomic decrement using two's complement representation
+     *         implemented using a sequentially consistent transaction,
+     *         returning original value from before operation. There is no
+     *         undefined behaviour. */
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_dec;
+
+    /** @brief Atomic negation using two's complement representation implemented
+     *         using a sequentially consistent transaction, returning original
+     *         value from before operation. There is no undefined behaviour. */
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_neg;
+
+} patomic_ops_transaction_arithmetic_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic binary operations implemented using
+ *   a sequentially consistent transaction. Pointers are NULL if operation is
+ *   not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic OR implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_void_t fp_or;
+
+    /** @brief Atomic XOR implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_void_t fp_xor;
+
+    /** @brief Atomic AND implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_void_t fp_and;
+
+    /** @brief Atomic NOT implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_void_noarg_t fp_not;
+
+    /** @brief Atomic OR implemented using a sequentially consistent
+     *         transaction, returning original value from before operation. */
+    patomic_opsig_transaction_fetch_t fp_fetch_or;
+
+    /** @brief Atomic XOR implemented using a sequentially consistent
+     *         transaction, returning original value from before operation. */
+    patomic_opsig_transaction_fetch_t fp_fetch_xor;
+
+    /** @brief Atomic AND implemented using a sequentially consistent
+     *         transaction, returning original value from before operation. */
+    patomic_opsig_transaction_fetch_t fp_fetch_and;
+
+    /** @brief Atomic NOT implemented using a sequentially consistent
+     *         transaction, returning original value from before operation. */
+    patomic_opsig_transaction_fetch_t fp_fetch_not;
+
+} patomic_ops_transaction_binary_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic bitwise operations implemented using
+ *   a sequentially consistent transaction. Pointers are NULL if operation is
+ *   not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic bit test implemented using a sequentially consistent
+     *         transaction, returning original bit value. */
+    patomic_opsig_transaction_test_t fp_test;
+
+    /** @brief Atomic bit test-and-complement implemented using a sequentially
+     *         consistent transaction, returning original bit value from before
+     *         operation. */
+    patomic_opsig_transaction_test_modify_t fp_test_compl;
+
+    /** @brief Atomic bit test-and-set implemented using a sequentially
+     *         consistent transaction, returning original bit value from before
+     *         operation. */
+    patomic_opsig_transaction_test_modify_t fp_test_set;
+
+    /** @brief Atomic bit test-and-reset implemented using a sequentially
+     *         consistent transaction, returning original bit value from before
+     *         operation. */
+    patomic_opsig_transaction_test_modify_t fp_test_reset;
+
+} patomic_ops_transaction_bitwise_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic exchange operations implemented using
+ *   a sequentially consistent transaction. Pointers are NULL if operation is
+ *   not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic exchange implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_exchange_t fp_exchange;
+
+    /** @brief Atomic compare-exchange implemented using a sequentially
+     *         consistent transaction. Operation may spuriously fail and act as
+     *         if the object's value does not compare equal to the expected
+     *         value. */
+    patomic_opsig_transaction_cmpxchg_t fp_cmpxchg_weak;
+
+    /** @brief Atomic compare-exchange implemented using a sequentially
+     *         consistent transaction. Operation will never spuriously fail.
+     *
+     *  @note This will always be NULL as transactions can always spuriously
+     *        fail. It is kept for consistency with implicit/explicit ops. */
+    patomic_opsig_transaction_cmpxchg_t fp_cmpxchg_strong;
+
+} patomic_ops_transaction_xchg_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic flag operations with fixed memory
+ *   order. Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic flag test operation with fixed memory order. */
+    patomic_opsig_transaction_flag_test_t fp_test;
+
+    /** @brief Atomic flag test-and-set operation with fixed memory order. */
+    patomic_opsig_transaction_flag_test_set_t fp_test_set;
+
+    /** @brief Atomic flag clear operation with fixed memory order. */
+    patomic_opsig_transaction_flag_clear_t fp_clear;
+
+} patomic_ops_transaction_flag_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic extended transaction-specific
+ *   operations implemented using a sequentially consistent transaction.
+ *   Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic double compare-exchange implemented using a sequentially
+     *         consistent transaction. */
+    patomic_opsig_transaction_double_cmpxchg_t fp_double_cmpxchg;
+
+    /** @brief Atomic multi compare-exchange implemented using a sequentially
+     *         consistent transaction. */
+    patomic_opsig_transaction_multi_cmpxchg_t fp_multi_cmpxchg;
+
+    /** @brief Atomic generic operation implemented using a sequentially
+     *         consistent transaction. */
+    patomic_opsig_transaction_generic_t fp_generic;
+
+    /** @brief Atomic generic operation with a fallback path implemented using
+     *         a sequentially consistent transaction. */
+    patomic_opsig_transaction_generic_wfb_t fp_generic_wfb;
+
+} patomic_ops_transaction_special_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for raw transaction specific operations. Pointers
+ *   are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Start a transaction. */
+    patomic_opsig_transaction_tbegin_t fp_tbegin;
+
+    /** @brief Explicitly abort a transaction. */
+    patomic_opsig_transaction_tabort_t fp_tabort;
+
+    /** @brief Commit a transaction. */
+    patomic_opsig_transaction_tcommit_t fp_tcommit;
+
+    /** @brief Test if currently executing inside a transaction. */
+    patomic_opsig_transaction_ttest_t fp_ttest;
+
+} patomic_ops_transaction_raw_t;
+
+
+/** @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for atomic load and store operations and other
+ *   sets of atomic operations implemented using a sequentially consistent
+ *   transaction, as well as transaction specific operations. Pointers are NULL
+ *   if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic store implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_store_t fp_store;
+
+    /** @brief Atomic load implemented using a sequentially consistent
+     *         transaction. */
+    patomic_opsig_transaction_load_t fp_load;
+
+    /** @brief Set of atomic xchg operations implemented using a sequentially
+     *         consistent transaction. */
+    patomic_ops_transaction_xchg_t xchg_ops;
+
+    /** @brief Set of atomic bitwise operations implemented using a sequentially
+     *         consistent transaction. */
+    patomic_ops_transaction_bitwise_t bitwise_ops;
+
+    /** @brief Set of atomic binary operations implemented using a sequentially
+     *         consistent transaction. */
+    patomic_ops_transaction_binary_t binary_ops;
+
+    /** @brief Set of atomic signed arithmetic operations implemented using a
+     *         sequentially consistent transaction. */
+    patomic_ops_transaction_arithmetic_t signed_ops;
+
+    /** @brief Set of atomic signed arithmetic operations implemented using a
+     *         sequentially consistent transaction. */
+    patomic_ops_transaction_arithmetic_t unsigned_ops;
+
+} patomic_ops_transaction_t;
 
 
 #endif  /* PATOMIC_OPS_TRANSACTION_H */
