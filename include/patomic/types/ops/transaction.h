@@ -3,6 +3,8 @@
 
 #include "../transaction.h"
 
+#include <stddef.h>
+
 // TODO: extern "C"
 
 
@@ -483,6 +485,155 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
     volatile void *obj,
     patomic_transaction_config_t config,
     patomic_transaction_result_t *result
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for an atomic double compare-exchange (cmpxchg)
+ *   operation implemented using a sequentially consistent transaction.
+ *
+ * @details
+ *   Equivalent to performing two compare-exchange operations in a single
+ *   atomic transaction, where the primary read-modify-write transaction only
+ *   succeeds if both comparisons succeed. The primary transaction may fail, in
+ *   which case the fallback read-only (load) transaction is tried. If either
+ *   transaction path fails, 0 is returned.
+ *
+ * @param cxa
+ *   Holds pointers to objects that will be used in first compare-exchange
+ *   operation.
+ *
+ * @param cxb
+ *   Holds pointers to objects that will be used in second compare-exchange
+ *   operation.
+ *
+ * @param config
+ *   Configuration for transaction.
+ *
+ * @param result
+ *   Pointer to object holding result of transaction, including status code and
+ *   attempts made.
+ *
+ * @returns
+ *   The value 1 if both objects compare equal to their expected values,
+ *   otherwise the value 0. If either transaction fails, 0 is returned.
+ */
+typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
+    patomic_transaction_cmpxchg_t cxa,
+    patomic_transaction_cmpxchg_t cxb,
+    patomic_transaction_config_wfb_t config,
+    patomic_transaction_result_wfb_t *result
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for an atomic multi compare-exchange (cmpxchg)
+ *   operation implemented using a sequentially consistent transaction.
+ *
+ * @details
+ *   Equivalent to performing N compare-exchange operations in a single atomic
+ *   transaction, where the primary read-modify-write transaction only succeeds
+ *   if all N comparisons succeed. The primary transaction may fail, in which
+ *   case the fallback read-only (load) transaction is tried. If either
+ *   transaction path fails, 0 is returned.
+ *
+ * @param cxs_buf
+ *   Array of objects holding pointers to objects that will be used in each
+ *   compare-exchange operation.
+ *
+ * @param cxs_len
+ *   The number of elements in the cxs_buf array.
+ *
+ * @param config
+ *   Configuration for transaction.
+ *
+ * @param result
+ *   Pointer to object holding result of transaction, including status code and
+ *   attempts made.
+ *
+ * @returns
+ *   The value 1 if all N objects compare equal to their expected values,
+ *   otherwise the value 0. If either transaction fails, 0 is returned.
+ */
+typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
+    const patomic_transaction_cmpxchg_t *cxs_buf,
+    size_t cxs_len,
+    patomic_transaction_config_wfb_t config,
+    patomic_transaction_result_wfb_t *result
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for a generic atomic operation implemented using a
+ *   sequentially consistent transaction.
+ *
+ * @details
+ *   The function "fn" is called inside a transaction and is directly passed
+ *   "ctx", which is not dereferenced, accessed, or modified in any way before
+ *   being passed to the function.
+ *
+ * @param fn
+ *   Function to be called inside transaction.
+ *
+ * @param ctx
+ *   Opaque data to be passed to function.
+ *
+ * @param config
+ *   Configuration for transaction.
+ *
+ * @param result
+ *   Pointer to object holding result of transaction, including status code and
+ *   attempts made.
+ */
+typedef void (* patomic_opsig_transaction_generic_t) (
+    void (* fn) (void *),
+    void *ctx,
+    patomic_transaction_config_t config,
+    patomic_transaction_result_t *result
+);
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for a generic atomic operation with a fallback path
+ *   implemented using a sequentially consistent transaction.
+ *
+ * @details
+ *   The function "fn" is called inside a transaction and is directly passed
+ *   "ctx", which is not dereferenced, access, or modified in any way before
+ *   being passed to the function. If this transaction fails, the same is
+ *   attempted with "fallback_fn" and "fallback_ctx". If either transaction
+ *   path fails, 0 is returned.
+ *
+ * @param fn
+ *   Function to be called inside primary transaction.
+ *
+ * @param ctx
+ *   Opaque data to be passed to function called inside primary transaction.
+ *
+ * @param fallback_fn
+ *   Function to be called inside fallback transaction.
+ *
+ * @param fallback_ctx
+ *   Opaque data to be passed to function called inside fallback transaction.
+ */
+typedef int (* patomic_opsig_transaction_generic_wfb_t) (
+    void (* fn) (void *),
+    void *ctx,
+    void (* fallback_fn) (void *),
+    void *fallback_ctx,
+    patomic_transaction_config_wfb_t config,
+    patomic_transaction_result_wfb_t *result
 );
 
 
