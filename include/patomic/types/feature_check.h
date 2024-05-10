@@ -237,4 +237,93 @@ typedef enum {
 } patomic_opkind_t;
 
 
+/**
+ * @addtogroup feature_check
+ *
+ * @brief
+ *   Checks if all of the operations in all the categories in a set of opcats
+ *   are supported by the given implicit ops struct.
+ *
+ * @param opcats
+ *   One or more patomic_opcat_t flags combined.
+ *
+ * @returns
+ *   The input "opcats" value where each bit corresponding to a supported opcat
+ *   has been cleared. An opcat is supported if all of its operations are
+ *   supported. A return value of 0 means that everything requested is
+ *   supported.
+ *
+ * @note
+ *   Invalid bits in "opcats" which do not correspond to a patomic_opcat_t
+ *   label are ignored and remain set in the return value.
+ */
+PATOMIC_EXPORT unsigned int
+patomic_feature_check_all(
+    const patomic_ops_t *ops,
+    unsigned int opcats
+);
+
+
+/**
+ * @addtogroup feature_check
+ *
+ * @brief
+ *   Checks if any of the operations in all the categories in a set of opcats
+ *   are supported by the given implicit ops struct.
+ *
+ * @param opcats
+ *   One or more patomic_opcat_t flags combined.
+ *
+ * @returns
+ *   The input "opcats" value where each bit corresponding to a supported opcat
+ *   has been cleared. An opcat is supported if any of its operations are
+ *   supported. A return value of 0 means that everything requested is
+ *   supported.
+ *
+ * @note
+ *   Invalid bits in "opcats" which do not correspond to a patomic_opcat_t
+ *   label are ignored and remain set in the return value.
+ */
+PATOMIC_EXPORT unsigned int
+patomic_feature_check_any(
+    const patomic_ops_t *ops,
+    unsigned int opcats
+);
+
+
+/**
+ * @addtogroup feature_check
+ *
+ * @brief
+ *   Checks if any operations in the set of opkinds in the category opcat are
+ *   supported by the given implicit ops struct.
+ *
+ * @param opcat
+ *   Any single patomic_opcat_t flag that has a single bit set.
+ *
+ * @param opkinds
+ *   One or more patomic_opkind_t flags combined.
+ *
+ * @returns
+ *   The input "opkinds" value interpreted according to "opcat" where each bit
+ *   corresponding to a supported opkind has been cleared. A return value of 0
+ *   means that everything requested is supported.
+ *
+ * @note
+ *   Invalid bits in "opkinds" which do not correspond to a patomic_opkind_t
+ *   label are ignored and remain set in the return value.
+ *
+ * @warning
+ *   The "opcat" value MUST have exactly 1 bit set. This means that labels such
+ *   as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
+ *   always be asserted (even if NDEBUG is defined).
+ */
+PATOMIC_EXPORT unsigned int
+patomic_feature_check_leaf(
+    const patomic_ops_t *ops,
+    patomic_opcat_t opcat,
+    unsigned int opkinds
+);
+
+
 #endif  /* PATOMIC_FEATURE_CHECK_H */
