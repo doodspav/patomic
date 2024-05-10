@@ -5,7 +5,9 @@
 
 #include <stddef.h>
 
-// TODO: extern "C"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -1069,5 +1071,9 @@ typedef struct {
 
 } patomic_ops_transaction_t;
 
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
 
 #endif  /* PATOMIC_OPS_TRANSACTION_H */
