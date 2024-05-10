@@ -26,6 +26,7 @@ extern "C" {
 
 typedef enum {
     patomic_RELAXED,
+    /** @note Implemented as patomic_ACQUIRE. */
     patomic_CONSUME,
     patomic_ACQUIRE,
     patomic_RELEASE,

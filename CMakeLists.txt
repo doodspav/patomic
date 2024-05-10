@@ -40,6 +40,7 @@ target_sources(
     include/patomic/patomic.h
     # include/types
     include/patomic/types/align.h
+    include/patomic/types/feature_check.h
     include/patomic/types/ids.h
     include/patomic/types/memory_order.h
     include/patomic/types/ops.h
