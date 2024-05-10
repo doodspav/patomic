@@ -637,4 +637,68 @@ typedef int (* patomic_opsig_transaction_generic_wfb_t) (
 );
 
 
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for atomic flag test operation implemented without a
+ *   transaction with at least patomic_ACQUIRE memory order.
+ *
+ * @details
+ *   This function can potentially be available on platforms where an atomic
+ *   load operation is not.
+ *
+ * @param flag
+ *   Pointer to flag object whose value to test.
+ *
+ * @returns
+ *   The value 0 if the flag object not set, otherwise the value 1.
+ */
+typedef int (* patomic_opsig_transaction_flag_test_t) (
+    const patomic_transaction_flag_t *flag
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for atomic flag test-and-set operation implemented
+ *   without a transaction with at least patomic_ACQ_REL memory order.
+ *
+ * @details
+ *   This function can potentially be available on platforms where an atomic
+ *   exchange operation is not.
+ *
+ * @param flag
+ *   Pointer to flag object whose value to test and set.
+ *
+ * @returns
+ *   The value 0 if the flag object was not set when being tested, otherwise the
+ *   value 1.
+ */
+typedef int (* patomic_opsig_transaction_flag_test_and_set_t) (
+    patomic_transaction_flag_t *flag
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for atomic flag clear operation implemented without a
+ *   transaction with at least patomic_RELEASE memory order.
+ *
+ * @details
+ *   This function can potentially be available on platforms where an atomic
+ *   exchange operation is not.
+ *
+ * @param flag
+ *   Pointer to flag object whose value to clear.
+ */
+typedef void (* patomic_opsig_transaction_flag_clear_t) (
+    patomic_transaction_flag_t *flag
+);
+
+
 #endif  /* PATOMIC_OPS_TRANSACTION_H */
