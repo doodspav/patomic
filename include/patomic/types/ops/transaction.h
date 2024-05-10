@@ -701,4 +701,85 @@ typedef void (* patomic_opsig_transaction_flag_clear_t) (
 );
 
 
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for starting a transaction.
+ *
+ * @details
+ *   Starts a transaction. The execution of the transaction will start when this
+ *   function is invoked, and end by returning from this function from the same
+ *   invocation.
+ *
+ * @returns
+ *   A status code which will be 0 if the transaction has been successfully
+ *   committed.
+ *
+ * @note
+ *   On failure, a bitwise-and with patomic_transaction_status_t
+ *   values will tell you the general failure reason. An explicitly passed
+ *   abort reason can be obtained from the return value by passing it to
+ *   patomic_transaction_abort_reason.
+ */
+typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
+    void
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for aborting a transaction.
+ *
+ * @details
+ *   Explicitly aborts a live transaction with a reason that is passed in the
+ *   status code, which itself will always match patomic_TABORT_EXPLICIT.
+ *
+ * @warning
+ *   Aborting a nested transaction will abort ALL nested transactions, and
+ *   execution control will pass back to the called of the outermost tbegin.
+ *
+ * @note
+ *   Calling this outside of an active transaction is a no-op.
+ */
+typedef void (* patomic_opsig_transaction_tabort_t) (
+    unsigned char reason
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for committing a transaction.
+ *
+ * @details
+ *   Commits a transaction, successfully terminating it. Execution control will
+ *   pass back to the caller of tbegin.
+ *
+ * @warning
+ *   Calling this outside of an active transaction results in undefined
+ *   behaviour.
+ */
+typedef void (* patomic_opsig_transaction_tcommit_t) (
+    void
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for testing if currently executing inside a transaction.
+ *
+ * @returns
+ *   A non-zero value if currently executing inside a transaction, otherwise 0.
+ */
+typedef int (* patomic_opsig_transaction_ttest_t) (
+    void
+);
+
+
 #endif  /* PATOMIC_OPS_TRANSACTION_H */
