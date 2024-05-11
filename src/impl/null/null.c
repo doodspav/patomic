@@ -1,6 +1,6 @@
 #include "null.h"
 
-#define PATOMIC_IGNORE_UNUSED(expr) ((void)(expr))
+#include <patomic/macros/ignore_unused.h>
 
 
 patomic_t

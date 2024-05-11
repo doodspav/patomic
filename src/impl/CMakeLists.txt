@@ -5,4 +5,5 @@ add_subdirectory(null)
 target_sources(
     ${target_name} PRIVATE
     # .
+    register.h
 )
