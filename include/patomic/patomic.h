@@ -149,6 +149,12 @@ patomic_combine_explicit(
  *   and ids in an order that yields the least strict alignment requirements,
  *   with recommended alignment being prioritised over minimum alignment.
  *
+ * @param byte_width
+ *   Width in bytes of type to support.
+ *
+ * @param order
+ *   Memory order to implicitly use for all atomic operations.
+ *
  * @param opts
  *   One or more patomic_option_t flags combined. Passed on to each internal
  *   implementation to be used in an unspecified manner.
@@ -181,6 +187,9 @@ patomic_create(
  *   and ids in an order that yields the least strict alignment requirements,
  *   with recommended alignment being prioritised over minimum alignment.
  *
+ * @param byte_width
+ *   Width in bytes of type to support.
+ *
  * @param opts
  *   One or more patomic_option_t flags combined. Passed on to each internal
  *   implementation to be used in an unspecified manner.
@@ -195,7 +204,7 @@ patomic_create(
  *   Combined implementations matching both kinds and ids. If no such
  *   implementations exist, the NULL implementation is returned.
  */
-PATOMIC_EXPORT patomic_t
+PATOMIC_EXPORT patomic_explicit_t
 patomic_create_explicit(
     size_t byte_width,
     unsigned int opts,
@@ -204,7 +213,42 @@ patomic_create_explicit(
 );
 
 
-// TODO: transaction function
+/**
+ * @addtogroup patomic
+ *
+ * @brief
+ *   Provides the implementation implemented using a sequentially consistent
+ *   transaction with the most efficient kind that supports at least a single
+ *   operation. If multiple implementations fulfil these requirements, it is
+ *   unspecified which one will be returned.
+ *
+ * @note
+ *   Implementations are not combined because it is too complicated to do
+ *   properly, and because it is not expected that any platform will have more
+ *   than one set of assembly instructions for performing lock-free
+ *   transactional operations.
+ *
+ * @param opts
+ *   One or more patomic_option_t flags combined. Passed on to each internal
+ *   implementation to be used in an unspecified manner.
+ *
+ * @param kinds
+ *   One or more patomic_kind_t flags combined.
+ *
+ * @param ids
+ *   One or more patomic_id_t flags combined.
+ *
+ * @returns
+ *   The implementation with the most efficient kind that supports at least a
+ *   single operation. If no such implementations exist, the NULL implementation
+ *   is returned.
+ */
+PATOMIC_EXPORT patomic_transaction_t
+patomic_create_transaction(
+    unsigned int opts,
+    unsigned int kinds,
+    unsigned long ids
+);
 
 
 #endif  /* PATOMIC_PATOMIC_H */
