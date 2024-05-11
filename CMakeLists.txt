@@ -113,6 +113,12 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
+# header files from /src/include
+target_include_directories(
+    ${target_name} SYSTEM PRIVATE
+    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/include>"
+)
+
 # require C90 compiler support
 target_compile_features(${target_name} PUBLIC c_std_90)
 

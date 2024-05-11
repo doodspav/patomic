@@ -1,5 +1,6 @@
 # add all subdirectories
 add_subdirectory(impl)
+add_subdirectory(include/patomic)
 
 # add directory files to target
 target_sources(
