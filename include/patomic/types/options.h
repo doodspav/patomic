@@ -19,7 +19,7 @@ extern "C" {
  *   equally correct in terms of thread-safety and memory ordering.             \n
  *   However options MAY affect constraints that are unrelated to thread-safety
  *   and memory ordering, namely alignment requirements and the quality of the
- *   implementation
+ *   implementation.
  *
  * @warning
  *   You should be cautious about using an atomic operation obtained without

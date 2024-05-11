@@ -56,7 +56,7 @@ target_sources(
 add_subdirectory(src)
 
 
-# ---- Generate Export Headers ----
+# ---- Generate Headers ----
 
 # used in export header generated below
 if(NOT PATOMIC_BUILD_SHARED)
@@ -69,6 +69,21 @@ generate_export_header(
     ${target_name}
     BASE_NAME patomic
     EXPORT_FILE_NAME include/patomic/patomic_export.h
+)
+
+# generate header file with version macros and functions
+configure_file(
+    cmake/in/patomic_version.h.in
+    include/patomic/patomic_version.h
+    @ONLY
+)
+
+# add generated headers to target
+target_sources(
+    ${target_name} PRIVATE
+    # include (generated)
+    "${PROJECT_BINARY_DIR}/include/patomic/patomic_export.h"
+    "${PROJECT_BINARY_DIR}/include/patomic/patomic_version.h"
 )
 
 

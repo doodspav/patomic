@@ -1,0 +1,99 @@
+#ifndef PATOMIC_VERSION_H
+#define PATOMIC_VERSION_H
+
+#include <patomic/patomic_export.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/** @brief The full version string the library was built as. */
+#define PATOMIC_VERSION "@patomic_VERSION@"
+
+
+/** @brief The major version the library was built as. */
+#define PATOMIC_VERSION_MAJOR @patomic_VERSION_MAJOR@
+
+
+/** @brief The minor version the library was built as. */
+#define PATOMIC_VERSION_MINOR @patomic_VERSION_MINOR@
+
+
+/** @brief The patch version the library was built as. */
+#define PATOMIC_VERSION_PATCH @patomic_VERSION_PATCH@
+
+
+/** @brief If the library is semver compatible with the requested version. */
+#define PATOMIC_VERSION_COMPATIBLE_WITH(major, minor, patch) \
+    ( (major) == PATOMIC_VERSION_MAJOR &&                    \
+      (minor) <= PATOMIC_VERSION_MINOR &&                    \
+      (patch) <= PATOMIC_VERSION_PATCH )
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the major version the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_MAJOR macro value.
+ *
+ * @returns
+ *   The major version the library was built as.
+ */
+PATOMIC_EXPORT int
+patomic_version_major(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the minor version the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_MINOR macro value.
+ *
+ * @returns
+ *   The minor version the library was built as.
+ */
+PATOMIC_EXPORT int
+patomic_version_minor(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the patch version the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_PATCH macro value.
+ *
+ * @returns
+ *   The patch version the library was built as.
+ */
+PATOMIC_EXPORT int
+patomic_version_patch(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Checks if the version the library was built as is compatible with the
+ *   requested version, using Semantic Versioning. This value is identical to
+ *   the PATOMIC_VERSION_COMPATIBLE_WITH macro value.
+ *
+ * @returns
+ *   If the library is compatible returns 1, otherwise returns 0.
+ */
+PATOMIC_EXPORT int
+patomic_version_compatible_with(
+    int major,
+    int minor,
+    int patch
+);
+
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
+
+#endif  /* PATOMIC_VERSION_H */

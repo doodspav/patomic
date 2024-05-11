@@ -10,6 +10,7 @@
 #include "types/transaction.h"
 
 #include <patomic/patomic_export.h>
+#include <patomic/patomic_version.h>
 
 #include <stddef.h>
 
