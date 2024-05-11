@@ -44,7 +44,6 @@ extern "C" {
  *   - atomic if: whole object sits in a single cache line (e.g. 64 bytes)      \n
  *   - example value: {.recommended=16, .minimum=1, .sie_within=4}              \n
  */
-
 typedef struct {
 
     /** @brief Alignment required by the C language (always valid). */
@@ -76,7 +75,6 @@ typedef struct {
  * @note
  *   The value is always a power of 2.
  */
-
 #undef PATOMIC_MAX_CACHE_LINE_SIZE
 #define PATOMIC_MAX_CACHE_LINE_SIZE ((size_t) 128)
 
@@ -96,7 +94,6 @@ typedef struct {
  * @note
  *   The value is always a power of 2.
  */
-
 #undef PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE
 #define PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE ((size_t) 128)
 
@@ -115,7 +112,6 @@ typedef struct {
  * @note
  *   The value returned is always a power of 2.
  */
-
 PATOMIC_EXPORT size_t
 patomic_cache_line_size(void);
 
@@ -134,7 +130,6 @@ patomic_cache_line_size(void);
  *   A successful check does not imply that the recommended alignment is a valid
  *   alignment for an object according to the C standard.
  */
-
 PATOMIC_EXPORT int
 patomic_align_meets_recommended(
     const volatile void *ptr,
@@ -156,7 +151,6 @@ patomic_align_meets_recommended(
  *   A successful check does not imply that the minimum alignment is a valid
  *   alignment for an object according to the C standard.
  */
-
 PATOMIC_EXPORT int
 patomic_align_meets_minimum(
     const volatile void *ptr,

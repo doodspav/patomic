@@ -29,7 +29,6 @@ extern "C" {
  *   The patomic_ids_ALL is all bits set rather than other values combined in
  *   order to avoid an ABI break if a new id is added.
  */
-
 typedef unsigned long patomic_id_t;
 
 /** @brief Value matching any and all implementation ids. */
@@ -68,7 +67,6 @@ typedef unsigned long patomic_id_t;
  *   a best-faith effort to provide an ASM implementation (e.g. with __atomic),
  *   otherwise LIB, OS, or DYN should be used.
  */
-
 typedef enum {
 
     /** @brief The implementation kind is unknown. */
@@ -109,7 +107,6 @@ typedef enum {
  *   Returns all combined ids for all implementations whose kind matches at
  *   least one bit in kinds.
  */
-
 PATOMIC_EXPORT unsigned long
 patomic_get_ids(
     unsigned int kinds
@@ -131,7 +128,6 @@ patomic_get_ids(
  *   pass patomic_id_ALL. This will always be asserted, even if NDEBUG is
  *   defined.
  */
-
 PATOMIC_EXPORT unsigned int
 patomic_get_kind(
     unsigned long id

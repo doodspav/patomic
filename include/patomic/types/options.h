@@ -31,7 +31,6 @@ extern "C" {
  *   Options are merely hints to an implementation; they may be completely
  *   ignored.
  */
-
 typedef enum {
 
     /** brief The empty option hinting nothing */

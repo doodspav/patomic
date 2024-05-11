@@ -23,7 +23,6 @@ extern "C" {
  *   Consume is only present for compatibility. It is not and will not be
  *   implemented, and will always be treated as patomic_ACQUIRE.
  */
-
 typedef enum {
     patomic_RELAXED,
     /** @note Implemented as patomic_ACQUIRE. */
@@ -44,7 +43,6 @@ typedef enum {
  *
  * @returns If the check succeeds returns 1, else 0.
  */
-
 PATOMIC_EXPORT int
 patomic_is_valid_order(int order);
 
@@ -58,7 +56,6 @@ patomic_is_valid_order(int order);
  *
  * @returns If the check succeeds returns 1, else 0.
  */
-
 PATOMIC_EXPORT int
 patomic_is_valid_store_order(int order);
 
@@ -72,7 +69,6 @@ patomic_is_valid_store_order(int order);
  *
  * @returns If the check succeeds returns 1, else 0.
  */
-
 PATOMIC_EXPORT int
 patomic_is_valid_load_order(int order);
 
@@ -87,7 +83,6 @@ patomic_is_valid_load_order(int order);
  *
  * @returns If the check succeeds returns 1, else 0.
  */
-
 PATOMIC_EXPORT int
 patomic_is_valid_fail_order(int succ, int fail);
 
@@ -103,7 +98,6 @@ patomic_is_valid_fail_order(int succ, int fail);
  *   If an invalid memory order is passed to this function, it will be returned
  *   unmodified.
  */
-
 PATOMIC_EXPORT int
 patomic_cmpxchg_fail_order(int succ);
 

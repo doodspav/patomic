@@ -23,7 +23,6 @@ extern "C" {
  *   Any modification  to any memory in a cache line that is being used in a
  *   transaction will cause it to abort.
  */
-
 typedef volatile unsigned char patomic_transaction_flag_t;
 
 
@@ -44,7 +43,6 @@ typedef volatile unsigned char patomic_transaction_flag_t;
  *   helper type. E.g. in C11 you may use _Alignas or create your own flag
  *   holder type.
  */
-
 typedef struct {
     unsigned char _padding_head[PATOMIC_MAX_CACHE_LINE_SIZE - 1];
     patomic_transaction_flag_t flag;
@@ -70,7 +68,6 @@ typedef struct {
  *   helper type. E.g. in C11 you may use _Alignas or create your own flag
  *   holder type.
  */
-
 typedef struct {
     unsigned char _padding_head[PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE - 1];
     patomic_transaction_flag_t flag;
@@ -90,7 +87,6 @@ typedef struct {
  *   from an object of type patomic_transaction_config(_wfb)_t which is
  *   provided separately.
  */
-
 typedef struct {
 
     /** @brief Object on which to perform transaction. */
@@ -120,7 +116,6 @@ typedef struct {
  *   Width is expected to be non-zero, so the zero value is not explicitly
  *   checked and optimised for, however zero is still a valid value.
  */
-
 typedef struct {
 
     /** @brief Size in bytes of objects to operate on. */
@@ -155,7 +150,6 @@ typedef struct {
  *   Width is expected to be non-zero, so the zero value is not explicitly
  *   checked and optimised for, however zero is still a valid value.
  */
-
 typedef struct {
 
     /** @brief Size in bytes of objects to operate on. */
@@ -188,7 +182,6 @@ typedef struct {
  *   immediately shift execution to the fallback path, regardless of whether
  *   all attempts on the primary path have been exhausted.
  */
-
 typedef enum {
 
     /** @brief The transaction was committed. */
@@ -228,7 +221,6 @@ typedef enum {
  * @note
  *   The abort reason has 8 significant bits.
  */
-
 PATOMIC_EXPORT unsigned char
 patomic_transaction_abort_reason(
     unsigned int status
@@ -245,7 +237,6 @@ patomic_transaction_abort_reason(
  *   If the transaction was configured to run zero attempts, then the status
  *   will default to patomic_TSUCCESS.
  */
-
 typedef struct {
 
     /** @brief Status from the final attempt at committing the transaction. */
@@ -271,7 +262,6 @@ typedef struct {
  *   If fallback_attempts_made is zero, the fallback_status will default to
  *   patomic_TSUCCESS, even if more fallback attempts were configured.
  */
-
 typedef struct {
 
     /** @brief Status from the final attempt at committing the transaction. */
@@ -311,7 +301,6 @@ typedef struct {
  *   sterile conditions with no memory contention. They represent the best
  *   possible outcome, which may not be achievable in real world scenarios.
  */
-
 typedef struct {
 
     /** @brief Test transaction performs the equivalent of a successful
@@ -364,7 +353,6 @@ typedef struct {
  *   - these counterparts will typically be significantly faster than a volatile
  *     char loop
  */
-
 typedef struct {
 
     /** @brief Value is 1 if <string.h> functions may cause a transactional
