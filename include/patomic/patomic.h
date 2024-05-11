@@ -13,7 +13,9 @@
 
 #include <stddef.h>
 
-// TODO: extern "C"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -250,5 +252,9 @@ patomic_create_transaction(
     unsigned long ids
 );
 
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
 
 #endif  /* PATOMIC_PATOMIC_H */
