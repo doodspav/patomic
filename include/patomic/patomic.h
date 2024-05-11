@@ -94,7 +94,7 @@ typedef struct {
  *   now present.
  *
  * @note
- *   it is advisable to sort structs by the .align member when combining more
+ *   It is advisable to sort structs by the .align member when combining more
  *   than two structs, in order to end up with the least restrictive values for
  *   the .align member.
  *
@@ -126,7 +126,7 @@ patomic_combine(
  *   now present.
  *
  * @note
- *   it is advisable to sort structs by the .align member when combining more
+ *   It is advisable to sort structs by the .align member when combining more
  *   than two structs, in order to end up with the least restrictive values for
  *   the .align member.
  *

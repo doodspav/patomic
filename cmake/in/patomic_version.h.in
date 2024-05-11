@@ -8,23 +8,48 @@ extern "C" {
 #endif
 
 
-/** @brief The full version string the library was built as. */
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The full version string the library was built as.
+ */
 #define PATOMIC_VERSION "@patomic_VERSION@"
 
 
-/** @brief The major version the library was built as. */
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The major version the library was built as.
+ */
 #define PATOMIC_VERSION_MAJOR @patomic_VERSION_MAJOR@
 
 
-/** @brief The minor version the library was built as. */
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The minor version the library was built as.
+ */
 #define PATOMIC_VERSION_MINOR @patomic_VERSION_MINOR@
 
 
-/** @brief The patch version the library was built as. */
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The patch version the library was built as.
+ */
 #define PATOMIC_VERSION_PATCH @patomic_VERSION_PATCH@
 
 
-/** @brief If the library is semver compatible with the requested version. */
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   If the library is semver compatible with the requested version.
+ */
 #define PATOMIC_VERSION_COMPATIBLE_WITH(major, minor, patch) \
     ( (major) == PATOMIC_VERSION_MAJOR &&                    \
       (minor) <= PATOMIC_VERSION_MINOR &&                    \
