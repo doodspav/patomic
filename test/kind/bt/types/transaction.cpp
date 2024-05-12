@@ -2,12 +2,16 @@
 
 #include <gtest/gtest.h>
 
-#include <limits>
 #include <vector>
 
 
+/// @brief Test fixture.
+class BtTypesTransaction : public testing::Test
+{};
+
+
 /// @brief Reason returned is 0 if status is not patomic_TABORT_EXPLICIT.
-TEST(TypesTransaction, ReasonIsZeroIfNotExplicitAbort)
+TEST_F(BtTypesTransaction, reason_is_zero_if_not_explicit_abort)
 {
     // create other statuses
     // new status kinds may be added, but they are guaranteed to fit in 8 bits
@@ -33,7 +37,7 @@ TEST(TypesTransaction, ReasonIsZeroIfNotExplicitAbort)
 }
 
 /// @brief Reason is returned if status is patomic_TABORT_EXPLICIT.
-TEST(TypesTransaction, ReasonReturnedIfExplicitAbort)
+TEST_F(BtTypesTransaction, reason_returned_if_explicit_abort)
 {
     // create reasons
     std::vector<unsigned long> reasons {
@@ -54,7 +58,7 @@ TEST(TypesTransaction, ReasonReturnedIfExplicitAbort)
 }
 
 /// @brief Check that only first 8 bits of reason are provided.
-TEST(TypesTransaction, ReasonDoesNotExceedEightBits)
+TEST_F(BtTypesTransaction, reason_only_saves_first_8_bits)
 {
     // create status with extended reason (more than 8 bits)
     unsigned long extended_reason = 0xfffUL;
