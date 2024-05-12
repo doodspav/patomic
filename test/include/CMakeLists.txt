@@ -8,8 +8,8 @@ add_library(
     # .
 )
 
-# require C++14 as minimum
+# require C++17 as minimum
 target_compile_features(
     patomic-test-include INTERFACE
-    cxx_std_14
+    cxx_std_17
 )

@@ -17,8 +17,8 @@ target_include_directories(
 # - the test libraries already link against GTest which should be enough
 # - we shouldn't need anything from patomic here (or UTs would break)
 
-# require C++14 as minimum
+# require C++17 as minimum
 target_compile_features(
     patomic-test-src PRIVATE
-    cxx_std_14
+    cxx_std_17
 )
