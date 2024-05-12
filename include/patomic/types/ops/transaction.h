@@ -18,14 +18,14 @@ extern "C" {
  *   sequentially consistent transaction.
  *
  * @details
- *   Attempts to atomically store a desired value into an object, however the
+ *   Attempts to atomically store a desired value into bytes, however the
  *   transaction may fail.
  *
  * @param obj
- *   Pointer to object into which to atomically store a value.
+ *   Pointer to bytes into which to atomically store a value.
  *
  * @param desired
- *   Pointer to object holding value to be atomically stored.
+ *   Pointer to bytes holding value to be atomically stored.
  *
  * @param config
  *   Configuration for transaction.
@@ -61,13 +61,13 @@ typedef void (* patomic_opsig_transaction_store_t) (
  *   sequentially consistent transaction.
  *
  * @details
- *   Atomically loads a value from an object, however the transaction may fail.
+ *   Atomically loads a value from bytes, however the transaction may fail.
  *
  * @param obj
- *   Pointer to object from which a value will be atomically loaded.
+ *   Pointer to bytes from which a value will be atomically loaded.
  *
  * @param ret
- *   Pointer to object into which to write the atomically loaded value.
+ *   Pointer to bytes into which to write the atomically loaded value.
  *
  * @param config
  *   Configuration for transaction.
@@ -103,18 +103,18 @@ typedef void (* patomic_opsig_transaction_load_t) (
  *   sequentially consistent transaction.
  *
  * @details
- *   Atomically replaces the value of an object with a desired value and returns
- *   the value the object held previously, in a single read-modify-write atomic
+ *   Atomically replaces the value of bytes with a desired value and returns the
+ *   value the bytes held previously, in a single read-modify-write atomic
  *   operation, however the transaction may fail.
  *
  * @param obj
- *   Pointer to object whose value to atomically exchange with desired value.
+ *   Pointer to bytes whose value to atomically exchange with desired value.
  *
  * @param desired
- *   Pointer to object whose value will replace the existing value of "obj".
+ *   Pointer to bytes whose value will replace the existing value of "obj".
  *
  * @param ret
- *   Pointer to object into which to write the existing value held by "obj".
+ *   Pointer to bytes into which to write the existing value held by "obj".
  *
  * @param config
  *   Configuration for transaction.
@@ -151,26 +151,26 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   implemented using a sequentially consistent transaction.
  *
  * @details
- *   Atomically compares the value of the object with with the value of an
- *   expected object; if these compare equal, replaces the value of the object
- *   with a desired value and returns 1, otherwise stores the value of the
- *   object into the expected object, and returns 0. This is done in a single
+ *   Atomically compares the value of the bytes with with the value of expected
+ *   bytes; if these compare equal, replaces the value of the bytes with a
+ *   desired value and returns 1, otherwise stores the value of the bytes into
+ *   the expected bytes, and returns 0. This is done in a single
  *   read-modify-write atomic operation if 1 is returned, otherwise this is a
  *   single atomic read (load) operation. The primary transaction may fail, in
  *   which case the fallback transaction is tried. If either transaction path
  *   fails, 0 is returned.
  *
  * @param obj
- *   Pointer to object whose value to atomically cmpxchg with expected object
+ *   Pointer to bytes whose value to atomically cmpxchg with expected bytes
  *   and desired value.
  *
  * @param expected
- *   Pointer to object whose value is compared against the existing value of
+ *   Pointer to bytes whose value is compared against the existing value of
  *   "obj", and into which "obj"'s existing value will be stored if the
  *   comparison fails.
  *
  * @param desired
- *   Pointer to object whose value will replace the existing value of "obj".
+ *   Pointer to bytes whose value will replace the existing value of "obj".
  *
  * @param config
  *   Configuration for transaction.
@@ -218,12 +218,12 @@ typedef int (* patomic_opsig_transaction_cmpxchg_t) (
  *   sequentially consistent transaction.
  *
  * @details
- *   Atomically tests a single bit from an object, returning 1 if it is set and
- *   0 if it is not set. The whole object is atomically loaded in order to test
- *   the bit. The transaction may fail, in which case 0 is returned.
+ *   Atomically tests a single bit from bytes, returning 1 if it is set and 0 if
+ *   it is not set. All the bytes are atomically loaded in order to test the
+ *   bit. The transaction may fail, in which case 0 is returned.
  *
  * @param obj
- *   Pointer to object from which bit will be atomically loaded.
+ *   Pointer to bytes from which bit will be atomically loaded.
  *
  * @param offset
  *   Zero-based bit index.
@@ -265,13 +265,13 @@ typedef int (* patomic_opsig_transaction_test_t) (
  *   using a sequentially consistent transaction.
  *
  * @details
- *   Atomically modifies a single bit from an object with an implicitly known
- *   unary bitwise operation, returning the original value of the bit (0 or 1).
- *   The whole object is loaded and stored in a single atomic read-modify-write
+ *   Atomically modifies a single bit from bytes with an implicitly known unary
+ *   bitwise operation, returning the original value of the bit (0 or 1). All
+ *   the bytes are loaded and stored in a single atomic read-modify-write
  *   operation. The transaction may fail, in which case 0 is returned.
  *
  * @param obj
- *   Pointer to object from which bit will be atomically modified.
+ *   Pointer to bytes from which bit will be atomically modified.
  *
  * @param offset
  *   Zero-based bit index.
@@ -314,20 +314,20 @@ typedef int (* patomic_opsig_transaction_test_modify_t) (
  *   a sequentially consistent transaction.
  *
  * @details
- *   Atomically loads an object, performs an implicitly known binary operation
- *   on the value, and stores the result in a single atomic read-modify-write
+ *   Atomically loads bytes, performs an implicitly known binary operation on
+ *   the value, and stores the result in a single atomic read-modify-write
  *   operation, however the transaction may fail.
  *
  * @param obj
- *   Pointer to object whose value will be atomically modified, and passed as
+ *   Pointer to bytes whose value will be atomically modified, and passed as
  *   first parameter in the binary operation.
  *
  * @param arg
- *   Pointer to object whose value is passed as the second parameter in the
+ *   Pointer to bytes whose value is passed as the second parameter in the
  *   binary operation.
  *
  * @param ret
- *   Pointer to object into which to write the original value of "obj" before
+ *   Pointer to bytes into which to write the original value of "obj" before
  *   modification.
  *
  * @param config
@@ -365,16 +365,16 @@ typedef void (* patomic_opsig_transaction_fetch_t) (
  *   sequentially consistent transaction.
  *
  * @details
- *   Atomically loads an object, performs an implicitly known unary operation on
- *   the value, and stores the result in a single atomic read-modify-write
+ *   Atomically loads bytes, performs an implicitly known unary operation on the
+ *   value, and stores the result in a single atomic read-modify-write
  *   operation, however the transaction may fail.
  *
  * @param obj
- *   Pointer to object whose value will be atomically modified, and passed as
+ *   Pointer to bytes whose value will be atomically modified, and passed as
  *   first parameter in the unary operation.
  *
  * @param ret
- *   Pointer to object into which to write the original value of "obj" before
+ *   Pointer to bytes into which to write the original value of "obj" before
  *   modification.
  *
  * @param config
@@ -411,16 +411,16 @@ typedef void (* patomic_opsig_transaction_fetch_noarg_t) (
  *   sequentially consistent transaction.
  *
  * @details
- *   Atomically loads an object, performs an implicitly known binary operation
- *   on the value, and stores the result in a single atomic read-modify-write
+ *   Atomically loads bytes, performs an implicitly known binary operation on
+ *   the value, and stores the result in a single atomic read-modify-write
  *   operation, however the transaction may fail.
  *
  * @param obj
- *   Pointer to object whose value will be atomically modified, and passed as
+ *   Pointer to bytes whose value will be atomically modified, and passed as
  *   first parameter in the binary operation.
  *
  * @param arg
- *   Pointer to object whose value is passed as the second parameter in the
+ *   Pointer to bytes whose value is passed as the second parameter in the
  *   binary operation.
  *
  * @param config
@@ -457,12 +457,12 @@ typedef void (* patomic_opsig_transaction_void_t) (
  *   sequentially consistent transaction.
  *
  * @details
- *   Atomically loads an object, performs an implicitly known unary operation on
- *   the value, and stores the result in a single atomic read-modify-write
+ *   Atomically loads bytes, performs an implicitly known unary operation on the
+ *   value, and stores the result in a single atomic read-modify-write
  *   operation, however the transaction may fail.
  *
  * @param obj
- *   Pointer to object whose value will be atomically modified, and passed as
+ *   Pointer to bytes whose value will be atomically modified, and passed as
  *   first parameter in the unary operation.
  *
  * @param config
@@ -505,12 +505,12 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
  *   transaction path fails, 0 is returned.
  *
  * @param cxa
- *   Holds pointers to objects that will be used in first compare-exchange
+ *   Holds pointers to sets of bytes that will be used in first compare-exchange
  *   operation.
  *
  * @param cxb
- *   Holds pointers to objects that will be used in second compare-exchange
- *   operation.
+ *   Holds pointers to sets of bytes that will be used in second
+ *   compare-exchange operation.
  *
  * @param config
  *   Configuration for transaction.
@@ -520,7 +520,7 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
  *   attempts made.
  *
  * @returns
- *   The value 1 if both objects compare equal to their expected values,
+ *   The value 1 if both sets of bytes compare equal to their expected values,
  *   otherwise the value 0. If either transaction fails, 0 is returned.
  */
 typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
@@ -546,7 +546,7 @@ typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
  *   transaction path fails, 0 is returned.
  *
  * @param cxs_buf
- *   Array of objects holding pointers to objects that will be used in each
+ *   Array of objects holding sets of bytes that will be used in each
  *   compare-exchange operation.
  *
  * @param cxs_len
@@ -560,7 +560,7 @@ typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
  *   attempts made.
  *
  * @returns
- *   The value 1 if all N objects compare equal to their expected values,
+ *   The value 1 if all N sets of bytes compare equal to their expected values,
  *   otherwise the value 0. If either transaction fails, 0 is returned.
  */
 typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
@@ -943,7 +943,7 @@ typedef struct {
 
     /** @brief Atomic compare-exchange implemented using a sequentially
      *         consistent transaction. Operation may spuriously fail and act as
-     *         if the object's value does not compare equal to the expected
+     *         if the bytes' value does not compare equal to the expected
      *         value. */
     patomic_opsig_transaction_cmpxchg_t fp_cmpxchg_weak;
 
