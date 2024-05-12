@@ -3,13 +3,13 @@
 # create interface target that is automatically linked to all tests
 # this is solely so that IDEs understand that these are source files
 # include directories are set in test creation
-add_library(
-    patomic-test-include INTERFACE
-    # .
-)
+add_library(patomic-test-include INTERFACE)
 
 # require C++17 as minimum
 target_compile_features(
     patomic-test-include INTERFACE
     cxx_std_17
 )
+
+# add all subdirectories
+add_subdirectory(test)
