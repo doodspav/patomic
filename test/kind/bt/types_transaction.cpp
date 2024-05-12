@@ -10,17 +10,18 @@
 TEST(TypesTransaction, ReasonIsZeroIfNotExplicitAbort)
 {
     // create other statuses
+    // new status kinds may be added, but they are guaranteed to fit in 8 bits
     std::vector<unsigned long> statuses;
-    for (unsigned long value = 0UL; value < 0xffUL; ++value)
+    for (unsigned long kind = 0UL; kind < 0xffUL; ++kind)
     {
         // check we don't test explicit abort
-        if (value == patomic_TABORT_EXPLICIT)
+        if (kind == patomic_TABORT_EXPLICIT)
         {
             continue;
         }
 
         // combine status with a non-zero reason
-        statuses.push_back(value | (0xffUL << 8));
+        statuses.push_back(kind | (0xffUL << 8));
     }
 
     // check that the reason for all of these is zero
