@@ -478,13 +478,9 @@ typedef struct {
     /** @brief Set of atomic binary operations with implicit memory order. */
     patomic_ops_binary_t binary_ops;
 
-    /** @brief Set of atomic signed arithmetic operations with implicit memory
-     *         order. */
-    patomic_ops_arithmetic_t signed_ops;
-
-    /** @brief Set of atomic unsigned arithmetic operations with implicit memory
-     *         order. */
-    patomic_ops_arithmetic_t unsigned_ops;
+    /** @brief Set of atomic arithmetic operations using two's complement
+     *         representation with implicit memory order. */
+    patomic_ops_arithmetic_t arithmetic_ops;
 
 } patomic_ops_t;
 

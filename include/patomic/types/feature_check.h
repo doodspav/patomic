@@ -37,38 +37,26 @@ typedef enum {
     /** @brief Binary fetch operations. */
     patomic_opcat_BIN_F = 0x10,
 
-    /** @brief Signed arithmetic void (non-fetch) operations. */
-    patomic_opcat_SARI_V = 0x20,
+    /** @brief Arithmetic void (non-fetch) operations. */
+    patomic_opcat_ARI_V = 0x20,
 
-    /** @brief Signed arithmetic fetch operations. */
-    patomic_opcat_SARI_F = 0x40,
-
-    /** @brief Unsigned arithmetic void (non-fetch) operations. */
-    patomic_opcat_UARI_V = 0x80,
-
-    /** @brief Unsigned arithmetic fetch operations. */
-    patomic_opcat_UARI_F = 0x100,
+    /** @brief Arithmetic fetch operations. */
+    patomic_opcat_ARI_F = 0x40,
 
     /** @brief Transaction specific special extended operations. */
-    patomic_opcat_TSPEC = 0x200,
+    patomic_opcat_TSPEC = 0x80,
 
     /** @brief Transaction specific flag operations. */
-    patomic_opcat_TFLAG = 0x400,
+    patomic_opcat_TFLAG = 0x100,
 
     /** @brief Transaction specific raw operations. */
-    patomic_opcat_TRAW = 0x800,
+    patomic_opcat_TRAW = 0x200,
 
     /** @brief Binary operations. */
     patomic_opcats_BIN = patomic_opcat_BIN_V | patomic_opcat_BIN_F,
 
-    /** @brief Signed arithmetic operations. */
-    patomic_opcats_SARI = patomic_opcat_SARI_V | patomic_opcat_SARI_F,
-
-    /** @brief Unsigned arithmetic operations. */
-    patomic_opcats_UARI = patomic_opcat_UARI_V | patomic_opcat_UARI_F,
-
     /** @brief Arithmetic operations. */
-    patomic_opcats_ARI = patomic_opcats_SARI | patomic_opcats_UARI,
+    patomic_opcats_ARI = patomic_opcat_ARI_V | patomic_opcat_ARI_F,
 
     /** @brief All implicit operations. */
     patomic_opcats_IMPLICIT = patomic_opcat_LDST |

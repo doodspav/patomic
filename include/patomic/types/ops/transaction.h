@@ -1061,13 +1061,10 @@ typedef struct {
      *         consistent transaction. */
     patomic_ops_transaction_binary_t binary_ops;
 
-    /** @brief Set of atomic signed arithmetic operations implemented using a
-     *         sequentially consistent transaction. */
-    patomic_ops_transaction_arithmetic_t signed_ops;
-
-    /** @brief Set of atomic signed arithmetic operations implemented using a
-     *         sequentially consistent transaction. */
-    patomic_ops_transaction_arithmetic_t unsigned_ops;
+    /** @brief Set of atomic arithmetic operations using two's complement
+     *         representation implemented using a sequentially consistent
+     *         transaction. */
+    patomic_ops_transaction_arithmetic_t arithmetic_ops;
 
 } patomic_ops_transaction_t;
 
