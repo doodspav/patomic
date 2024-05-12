@@ -1,4 +1,8 @@
 # fine with CML file here because include isn't installed for tests
 
-# add all subdirectories
-add_subdirectory(ext)
+# add directory files to target
+target_sources(
+    patomic-test-include PRIVATE
+    # .
+    magic_enum.hpp
+)

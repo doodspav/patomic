@@ -1,6 +1,6 @@
 #include <patomic/types/transaction.h>
 
-#include <test/ext/magic_enum/magic_enum.hpp>
+#include <test/magic_enum.hpp>
 
 #include <gtest/gtest.h>
 
