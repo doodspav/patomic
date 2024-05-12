@@ -737,7 +737,9 @@ typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
  *
  * @details
  *   Explicitly aborts a live transaction with a reason that is passed in the
- *   status code, which itself will always match patomic_TABORT_EXPLICIT.
+ *   status code, which itself will always match patomic_TABORT_EXPLICIT. Only
+ *   the 8 least significant bits of reason are used (if CHAR_BIT happens to be
+ *   larger than 8).
  *
  * @warning
  *   Aborting a nested transaction will abort ALL nested transactions, and
