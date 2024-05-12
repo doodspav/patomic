@@ -412,8 +412,8 @@ patomic_feature_check_any_transaction(
  *   label are ignored and remain set in the return value.
  *
  * @warning
- *   The "opcat" value MUST have exactly 1 bit set. This means that labels such
- *   as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
+ *   The "opcat" value MUST have exactly 1 valid bit set. This means that labels
+ *   such as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
  *   always be asserted (even if NDEBUG is defined).
  */
 PATOMIC_EXPORT unsigned int
@@ -447,8 +447,8 @@ patomic_feature_check_leaf(
  *   label are ignored and remain set in the return value.
  *
  * @warning
- *   The "opcat" value MUST have exactly 1 bit set. This means that labels such
- *   as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
+ *   The "opcat" value MUST have exactly 1 valid bit set. This means that labels
+ *   such as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
  *   always be asserted (even if NDEBUG is defined).
  */
 PATOMIC_EXPORT unsigned int
@@ -482,8 +482,8 @@ patomic_feature_check_leaf_explicit(
  *   label are ignored and remain set in the return value.
  *
  * @warning
- *   The "opcat" value MUST have exactly 1 bit set. This means that labels such
- *   as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
+ *   The "opcat" value MUST have exactly 1 valid bit set. This means that labels
+ *   such as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
  *   always be asserted (even if NDEBUG is defined).
  */
 PATOMIC_EXPORT unsigned int
