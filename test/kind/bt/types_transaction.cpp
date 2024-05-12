@@ -1,7 +1,5 @@
 #include <patomic/types/transaction.h>
 
-#include <test/magic_enum.hpp>
-
 #include <gtest/gtest.h>
 
 #include <limits>
@@ -13,7 +11,7 @@ TEST(TypesTransaction, ReasonIsZeroIfNotExplicitAbort)
 {
     // create other statuses
     std::vector<unsigned long> statuses;
-    for (auto&& value : magic_enum::enum_values<patomic_transaction_status_t>())
+    for (unsigned long value = 0UL; value < 0xffUL; ++value)
     {
         // check we don't test explicit abort
         if (value == patomic_TABORT_EXPLICIT)
@@ -24,8 +22,6 @@ TEST(TypesTransaction, ReasonIsZeroIfNotExplicitAbort)
         // combine status with a non-zero reason
         statuses.push_back(value | (0xffUL << 8));
     }
-    statuses.push_back(0UL);
-    statuses.push_back(std::numeric_limits<unsigned long>::max());
 
     // check that the reason for all of these is zero
     for (unsigned long status : statuses)

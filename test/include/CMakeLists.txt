@@ -5,10 +5,10 @@
 # include directories are set in test creation
 add_library(patomic-test-include INTERFACE)
 
-# require C++17 as minimum
+# require C++14 as minimum
 target_compile_features(
     patomic-test-include INTERFACE
-    cxx_std_17
+    cxx_std_14
 )
 
 # add all subdirectories

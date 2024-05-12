@@ -4,5 +4,4 @@
 target_sources(
     patomic-test-include PRIVATE
     # .
-    magic_enum.hpp
 )

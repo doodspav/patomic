@@ -158,10 +158,10 @@ function(_create_test)
         ${ARG_LINK}
     )
 
-    # require C++17 as minimum
+    # require C++14 as minimum
     target_compile_features(
         ${target} PRIVATE
-        cxx_std_17
+        cxx_std_14
     )
 
     # set macro to know which test kind code is part of
