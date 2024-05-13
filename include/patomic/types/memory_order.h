@@ -59,6 +59,7 @@ typedef enum {
 #define PATOMIC_IS_VALID_STORE_ORDER(order) \
     ( (order == patomic_RELAXED) ||         \
       (order == patomic_RELEASE) ||         \
+      (order == patomic_ACQ_REL) ||         \
       (order == patomic_SEQ_CST) )
 
 
