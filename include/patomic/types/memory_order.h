@@ -101,8 +101,10 @@ typedef enum {
  *   If an invalid memory order is passed to this macro, it will be returned
  *   unmodified.
  */
-#define PATOMIC_CMPXCHG_FAIL_ORDER(succ) \
-    0
+#define PATOMIC_CMPXCHG_FAIL_ORDER(succ)                   \
+    ( (succ == patomic_ACQ_REL || succ == patomic_RELEASE) \
+      ? patomic_ACQUIRE                                    \
+      : succ )
 
 
 /**
