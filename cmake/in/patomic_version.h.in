@@ -1,5 +1,5 @@
-#ifndef PATOMIC_VERSION_H
-#define PATOMIC_VERSION_H
+#ifndef PATOMIC_GENERATED_VERSION_H
+#define PATOMIC_GENERATED_VERSION_H
 
 #include <patomic/patomic_export.h>
 
@@ -121,4 +121,4 @@ patomic_version_compatible_with(
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_VERSION_H */
+#endif  /* PATOMIC_GENERATED_VERSION_H */

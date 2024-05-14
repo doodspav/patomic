@@ -1,5 +1,5 @@
-#ifndef PATOMIC_CONFIG_H
-#define PATOMIC_CONFIG_H
+#ifndef PATOMIC_GENERATED_CONFIG_H
+#define PATOMIC_GENERATED_CONFIG_H
 
 
 #ifndef PATOMIC_HAS_LONG_LONG
@@ -33,4 +33,4 @@
 #endif
 
 
-#endif  /* PATOMIC_CONFIG_H */
+#endif  /* PATOMIC_GENERATED_CONFIG_H */
