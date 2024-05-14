@@ -31,6 +31,20 @@
  * the macro, as a hint to users who may try to manually set their values.
  */
 
+#ifndef PATOMIC_HAS_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__' is available as a keyword.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_EXTN 0
+#endif
+
+
 #ifndef PATOMIC_HAS_LONG_LONG
     /**
      * @addtogroup config.safe

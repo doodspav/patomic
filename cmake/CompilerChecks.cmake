@@ -39,4 +39,8 @@ endfunction()
 
 # include all compiler checks performed by CMake
 # this relies on the previously defined functions above
+#
+# WARNING:
+#   DO NOT change the include order, checks can depend on other checks
+include(cmake/check/HasKeywords.cmake)
 include(cmake/check/HasIntegerTypes.cmake)

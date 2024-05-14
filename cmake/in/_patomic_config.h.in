@@ -2,6 +2,20 @@
 #define PATOMIC_GENERATED_CONFIG_H
 
 
+#ifndef PATOMIC_HAS_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__' is available as a keyword.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_EXTN @COMPILER_HAS_EXTN@
+#endif
+
+
 #ifndef PATOMIC_HAS_LONG_LONG
     /**
      * @addtogroup config.safe
