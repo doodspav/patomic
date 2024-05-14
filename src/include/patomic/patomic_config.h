@@ -102,6 +102,21 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_STDINT_INTPTR_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available and makes '__extension__ intptr_t'
+     *   available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_STDINT_INTPTR_EXTN 0
+#endif
+
+
 #ifndef PATOMIC_HAS_STDDEF_INTPTR
     /**
      * @addtogroup config.safe
@@ -115,6 +130,21 @@
      *   Microsoft puts intptr_t here in old versions of msvc.
      */
     #define PATOMIC_HAS_STDDEF_INTPTR 0
+#endif
+
+
+#ifndef PATOMIC_HAS_STDDEF_INTPTR_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stddef.h> header is available and makes '__extension__ intptr_t'
+     *   available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_STDDEF_INTPTR_EXTN 0
 #endif
 
 
