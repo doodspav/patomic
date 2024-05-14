@@ -17,7 +17,7 @@ include(CheckCSourceCompiles)
 function(check_c_source_compiles_or_zero source resultVar)
 
     # resultVar is intentionally used both as local and parent scope variable
-    # this is so that the status message uses the outer variable name
+    # this is so that the status message uses the parent scope variable name
 
     # defer check to CMake module
     check_c_source_compiles(
