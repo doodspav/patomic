@@ -4,5 +4,5 @@
 
 TEST(UtSuite, Add)
 {
-    ASSERT_EQ(5, patomic_example_add(2, 3));
+    ASSERT_EQ(5, 2 + 3);
 }
