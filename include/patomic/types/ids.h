@@ -17,7 +17,8 @@ extern "C" {
  *
  * @details
  *   - each id must have a unique name globally                                 \n
- *   - each id must have a unique value which is 0 or a positive power of 2     \n
+ *   - each id must have a unique value which is 0 or a positive power of 2, and
+ *     must sequentially follow the value of the last id                        \n
  *   - the value of each implementation's id does not correspond to its kind    \n
  *   - the order and value of ids does not confer any ranking or priority       \n
  *
@@ -31,7 +32,9 @@ extern "C" {
  */
 typedef unsigned long patomic_id_t;
 
-/** @brief Value matching any and all implementation ids. */
+/** @brief Value matching any and all implementation ids.
+ *  @note  To get all currently available implementation ids at runtime, you
+ *         can call patomic_get_ids(patomic_kinds_ALL). */
 #define patomic_ids_ALL (~0UL)
 
 /** @brief The id corresponding to the NULL implementation (i.e. none). */
