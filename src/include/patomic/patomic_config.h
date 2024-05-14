@@ -31,6 +31,91 @@
  * the macro, as a hint to users who may try to manually set their values.
  */
 
+#ifndef PATOMIC_HAS_LONG_LONG
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'long long' is available as a type.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_LONG_LONG 0
+#endif
+
+
+#ifndef PATOMIC_HAS_LONG_LONG_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ long long' is available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_LONG_LONG_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_INT128
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__int128' is available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_INT128 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_INT128_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __int128' is available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_INT128_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_STDINT_INTPTR
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available and makes 'intptr_t' available as a
+     *   type.
+     *
+     * @note
+     *   Usually requires: C99 (but the type is optional even then).
+     */
+    #define PATOMIC_HAS_STDINT_INTPTR 0
+#endif
+
+
+#ifndef PATOMIC_HAS_STDDEF_INTPTR
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stddef.h> header is available and makes 'intptr_t' available as a
+     *   type.
+     *
+     * @note
+     *   Usually requires: old compilers not supporting <stdint.h> (pre-C99).
+     *   Microsoft puts intptr_t here in old versions of msvc.
+     */
+    #define PATOMIC_HAS_STDDEF_INTPTR 0
+#endif
 
 
 /*
