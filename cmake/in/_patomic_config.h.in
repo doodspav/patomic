@@ -1,0 +1,36 @@
+#ifndef PATOMIC_CONFIG_H
+#define PATOMIC_CONFIG_H
+
+
+#ifndef PATOMIC_HAS_LONG_LONG
+    /** @brief long long is supported. */
+    #define PATOMIC_HAS_LONG_LONG @COMPILER_HAS_LONG_LONG@
+#endif
+
+#ifndef PATOMIC_HAS_LONG_LONG_EXTN
+    /** @brief long long is supported with __extension__. */
+    #define PATOMIC_HAS_LONG_LONG_EXTN @COMPILER_HAS_LONG_LONG_EXTN@
+#endif
+
+#ifndef PATOMIC_HAS_MS_INT128
+    /** @brief __int128 is supported. */
+    #define PATOMIC_HAS_MS_INT128 @COMPILER_HAS_MS_INT128@
+#endif
+
+#ifndef PATOMIC_HAS_MS_INT128_EXTN
+    /** @brief __int128 is supported with __extension__. */
+    #define PATOMIC_HAS_MS_INT128_EXTN @COMPILER_HAS_MS_INT128_EXTN@
+#endif
+
+#ifndef PATOMIC_HAS_STDINT_INTPTR
+    /** @brief <stdint.h> provides intptr_t. */
+    #define PATOMIC_HAS_STDINT_INTPTR @COMPILER_HAS_STDINT_INTPTR@
+#endif
+
+#ifndef PATOMIC_HAS_STDDEF_INTPTR
+    /** @brief <stddef.h> provides intptr_t. */
+    #define PATOMIC_HAS_STDDEF_INTPTR @COMPILER_HAS_STDDEF_INTPTR@
+#endif
+
+
+#endif  /* PATOMIC_CONFIG_H */
