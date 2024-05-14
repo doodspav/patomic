@@ -17,8 +17,7 @@ extern "C" {
  *
  * @details
  *   - each id must have a unique name globally                                 \n
- *   - each id must have a unique value which is 0 or a positive power of 2, and
- *     must sequentially follow the value of the last id                        \n
+ *   - each id must have a unique value which is 0 or a positive power of 2     \n
  *   - the value of each implementation's id does not correspond to its kind    \n
  *   - the order and value of ids does not confer any ranking or priority       \n
  *
