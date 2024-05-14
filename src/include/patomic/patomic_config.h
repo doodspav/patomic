@@ -20,6 +20,9 @@
 
 
 /*
+ * SAFE CONSTANTS
+ * ==============
+ *
  * The following macros may be modified and overridden safely, At worst, this
  * may cause a compile-time warning/error or limit runtime functionality
  * exposed by this library.
@@ -31,6 +34,9 @@
 
 
 /*
+ * UNSAFE CONSTANTS
+ * ================
+ *
  * The following macros should never be modified unless cross-compiling for a
  * target platform which does not define them to have the same value as the host
  * platform (and for some reason the compiler defines them with the host
@@ -51,7 +57,7 @@
     #error "Integer representation macro values MUST be changed in source"
 #endif
 /**
- * @addtogroup config.dangerous
+ * @addtogroup config.unsafe
  *
  * @brief
  *   Integer representation on the target platform is sign-magnitude.
@@ -69,7 +75,7 @@
     #error "Integer representation macro values MUST be changed in source"
 #endif
 /**
- * @addtogroup config.dangerous
+ * @addtogroup config.unsafe
  *
  * @brief
  *   Integer representation on the target platform is one's complement.
@@ -87,7 +93,7 @@
     #error "Integer representation macro values MUST be changed in source"
 #endif
 /**
- * @addtogroup config.dangerous
+ * @addtogroup config.unsafe
  *
  * @brief
  *   Integer representation on the target platform is two's complement.
@@ -100,14 +106,14 @@
     (-INT_MAX != INT_MIN)
 
 
-/* check exactly one integer representation is supported */
-#if PATOMIC_HAS_IR_SIGN_MAGNITUDE && \
-    PATOMIC_HAS_IR_ONES_COMPL     && \
-    PATOMIC_HAS_IR_TWOS_COMPL
+/* check that exactly one integer representation is supported */
+#if ( PATOMIC_HAS_IR_SIGN_MAGNITUDE + \
+      PATOMIC_HAS_IR_ONES_COMPL     + \
+      PATOMIC_HAS_IR_TWOS_COMPL ) > 1
     #error "Multiple integer representations are configured as supported"
-#elif !( PATOMIC_HAS_IR_SIGN_MAGNITUDE || \
-         PATOMIC_HAS_IR_ONES_COMPL     || \
-         PATOMIC_HAS_IR_TWOS_COMPL )
+#elif ( PATOMIC_HAS_IR_SIGN_MAGNITUDE + \
+        PATOMIC_HAS_IR_ONES_COMPL     + \
+        PATOMIC_HAS_IR_TWOS_COMPL ) < 1
     #error "No integer representation is configured as supported"
 #endif
 
