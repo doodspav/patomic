@@ -7,12 +7,17 @@ include(CheckCSourceCompiles)
 # output variable to 1 if it does, and 0 if it does not.
 #
 # If all the conditions passed to WILL_SUCCEED_IF_ALL are true, then the check
-# is skipped, and the output variable is set to 1.
+# is skipped, and the output variable is set to 1. If no conditions are passed
+# then this does nothing.
 #
 # If WILL_FAIL_IF_ALL_SUCCEED_FALSE is set and all the conditions passed to
 # WILL_SUCCEED_IF_ALL are false, then the check is skipped, and the output
 # variable is set to 0. If no conditions were passed to WILL_SUCCEED_IF_ALL
 # then this does nothing.
+#
+# If any of the conditions passed to WILL_FAIL_IF_ANY_NOT are false, then the
+# check is skipped, and the output variable is set to 0. If no conditions are
+# passed then this does nothing.
 #
 # This function is necessary because check_c_source_compiles will set the
 # output variable to an empty string, which cannot directly be used in a C
@@ -22,6 +27,7 @@ include(CheckCSourceCompiles)
 #     SOURCE <source>
 #     OUTPUT_VARIABLE <outputVar>
 #     [WILL_SUCCEED_IF_ALL <condition>...]
+#     [WILL_FAIL_IF_ANY_NOT <condition>...]
 #     [WILL_FAIL_IF_ALL_SUCCEED_FALSE]
 # )
 function(check_c_source_compiles_or_zero)
@@ -32,7 +38,7 @@ function(check_c_source_compiles_or_zero)
         "ARG"
         "WILL_FAIL_IF_ALL_SUCCEED_FALSE"
         "OUTPUT_VARIABLE"
-        "SOURCE;WILL_SUCCEED_IF_ALL"
+        "SOURCE;WILL_SUCCEED_IF_ALL;WILL_FAIL_IF_ANY_NOT"
         ${ARGN}
     )
 
@@ -80,7 +86,7 @@ function(check_c_source_compiles_or_zero)
         endif()
     endforeach()
 
-    # skip if we can
+    # skip if we can (all conditions are true or all conditions are false)
     if(ARG_WILL_SUCCEED_IF_ALL)
         if(success_count_true EQUAL success_count)
             message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
@@ -93,6 +99,27 @@ function(check_c_source_compiles_or_zero)
             set(${ARG_OUTPUT_VARIABLE} 0 PARENT_SCOPE)
             return()
         endif()
+    endif()
+
+
+    # see if we can skip check due to implicit failure
+
+    # setup
+    set(failure_count_false 0)
+
+    # check the conditions provided
+    foreach(cond IN LISTS ARG_WILL_FAIL_IF_ANY_NOT)
+        if(NOT cond)
+            math(EXPR failure_count_false "${failure_count_false} + 1")
+        endif()
+    endforeach()
+
+    # skip if we can (any conditions are false)
+    if(ARG_WILL_FAIL_IF_ANY_NOT AND NOT failure_count_false EQUAL 0)
+        message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
+        message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Failed (implicit)")
+        set(${ARG_OUTPUT_VARIABLE} 0 PARENT_SCOPE)
+        return()
     endif()
 
 
