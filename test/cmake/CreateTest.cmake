@@ -94,7 +94,7 @@ function(_create_test)
     endif()
 
     # check there are no leftover arguments
-    if(DEFINED ARG_UNPARSED_ARGUMENTS)
+    if(ARG_UNPARSED_ARGUMENTS)
         message(WARNING "The following arguments were not recognised when invoking '${func_name}': ${ARG_UNPARSED_ARGUMENTS}")
         set(args_valid FALSE)
     endif()

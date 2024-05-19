@@ -16,52 +16,68 @@
 
 # 'long long' is available as a type
 check_c_source_compiles_or_zero(
-    "int main(void) { long long x = 0; return (int) x; }"
-    COMPILER_HAS_LONG_LONG
+    SOURCE
+        "int main(void) { long long x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_LONG_LONG
 )
 
 # '__extension__ long long' is available as a type
 check_c_source_compiles_or_zero(
-    "int main(void) { __extension__ long long x = 0; return (int) x; }"
-    COMPILER_HAS_LONG_LONG_EXTN
+    SOURCE
+        "int main(void) { __extension__ long long x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_LONG_LONG_EXTN
 )
 
 # '__int128' is available as a type
 check_c_source_compiles_or_zero(
-    "int main(void) { __int128 x = 0; return (int) x; }"
-    COMPILER_HAS_MS_INT128
+    SOURCE
+        "int main(void) { __int128 x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_MS_INT128
 )
 
 # '__extension__ __int128' is available as a type
 check_c_source_compiles_or_zero(
-    "int main(void) { __extension__ __int128 x = 0; return (int) x; }"
-    COMPILER_HAS_MS_INT128_EXTN
+    SOURCE
+        "int main(void) { __extension__ __int128 x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_MS_INT128_EXTN
 )
 
 # <stdint.h> header is available and makes 'intptr_t' available as a type
 check_c_source_compiles_or_zero(
-    "#include <stdint.h> \n\
-     int main(void) { intptr_t x = 0; return (int) x; }"
-    COMPILER_HAS_STDINT_INTPTR
+    SOURCE
+        "#include <stdint.h> \n\
+         int main(void) { intptr_t x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_STDINT_INTPTR
 )
 
 # <stdint.h> header is available and makes '__extension__ intptr_t' available as a type
 check_c_source_compiles_or_zero(
-    "#include <stdint.h> \n\
-     int main(void) { __extension__ intptr_t x = 0; return (int) x; }"
-    COMPILER_HAS_STDINT_INTPTR_EXTN
+    SOURCE
+        "#include <stdint.h> \n\
+         int main(void) { __extension__ intptr_t x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_STDINT_INTPTR_EXTN
 )
 
 # <stddef.h> header is available and makes 'intptr_t' available as a type
 check_c_source_compiles_or_zero(
-    "#include <stddef.h> \n\
-     int main(void) { intptr_t x = 0; return (int) x; }"
-    COMPILER_HAS_STDDEF_INTPTR
+    SOURCE
+        "#include <stddef.h> \n\
+         int main(void) { intptr_t x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_STDDEF_INTPTR
 )
 
 # <stddef.h> header is available and makes '__extension__ intptr_t' available as a type
 check_c_source_compiles_or_zero(
-    "#include <stddef.h> \n\
-     int main(void) { __extension__ intptr_t x = 0; return (int) x; }"
-    COMPILER_HAS_STDDEF_INTPTR_EXTN
+    SOURCE
+        "#include <stddef.h> \n\
+         int main(void) { __extension__ intptr_t x = 0; return (int) x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_STDDEF_INTPTR_EXTN
 )
