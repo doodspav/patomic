@@ -32,6 +32,8 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_LONG_LONG}
         ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
 )
 
 # '__int128' is available as a type
@@ -51,6 +53,8 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_MS_INT128}
         ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
 )
 
 # <stdint.h> header is available
@@ -69,6 +73,8 @@ check_c_source_compiles_or_zero(
          int main(void) { intptr_t x = 0; return (int) x; }"
     OUTPUT_VARIABLE
         COMPILER_HAS_STDINT_INTPTR
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_STDINT}
 )
 
 # <stdint.h> header is available and makes '__extension__ intptr_t' available as a type
@@ -81,6 +87,9 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_STDINT_INTPTR}
         ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
+        ${COMPILER_HAS_STDINT}
 )
 
 # <stddef.h> header is available and makes 'intptr_t' available as a type
@@ -93,6 +102,7 @@ check_c_source_compiles_or_zero(
 )
 
 # <stddef.h> header is available and makes '__extension__ intptr_t' available as a type
+math(EXPR intptr_in_stdint_not_in_stddef "${COMPILER_HAS_STDINT_INTPTR} & (1 ^ ${COMPILER_HAS_STDDEF_INTPTR})")
 check_c_source_compiles_or_zero(
     SOURCE
         "#include <stddef.h> \n\
@@ -102,7 +112,8 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_STDDEF_INTPTR}
         ${COMPILER_HAS_EXTN}
-
-    # fail: COMPILER_HAS_STDINT_INTPTR and not COMPILER_HAS_STDDEF_INTPTR
-    # fail: not COMPILER_HAS_EXTN and not COMPILER_HAS_STDDEF_
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
+        ${inptr_in_stdint_not_in_stddef}
 )
+set(intptr_in_stdint_not_in_stddef )
