@@ -28,6 +28,9 @@ check_c_source_compiles_or_zero(
         "int main(void) { __extension__ long long x = 0; return (int) x; }"
     OUTPUT_VARIABLE
         COMPILER_HAS_LONG_LONG_EXTN
+    WILL_SUCCEED_IF
+        ${COMPILER_HAS_LONG_LONG}
+        ${COMPILER_HAS_EXTN}
 )
 
 # '__int128' is available as a type
@@ -44,6 +47,9 @@ check_c_source_compiles_or_zero(
         "int main(void) { __extension__ __int128 x = 0; return (int) x; }"
     OUTPUT_VARIABLE
         COMPILER_HAS_MS_INT128_EXTN
+    WILL_SUCCEED_IF
+        ${COMPILER_HAS_MS_INT128}
+        ${COMPILER_HAS_EXTN}
 )
 
 # <stdint.h> header is available and makes 'intptr_t' available as a type
@@ -62,6 +68,9 @@ check_c_source_compiles_or_zero(
          int main(void) { __extension__ intptr_t x = 0; return (int) x; }"
     OUTPUT_VARIABLE
         COMPILER_HAS_STDINT_INTPTR_EXTN
+    WILL_SUCCEED_IF
+        ${COMPILER_HAS_STDINT_INTPTR}
+        ${COMPILER_HAS_EXTN}
 )
 
 # <stddef.h> header is available and makes 'intptr_t' available as a type
@@ -80,4 +89,7 @@ check_c_source_compiles_or_zero(
          int main(void) { __extension__ intptr_t x = 0; return (int) x; }"
     OUTPUT_VARIABLE
         COMPILER_HAS_STDDEF_INTPTR_EXTN
+    WILL_SUCCEED_IF
+        ${COMPILER_HAS_STDDEF_INTPTR}
+        ${COMPILER_HAS_EXTN}
 )

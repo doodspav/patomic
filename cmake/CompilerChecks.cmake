@@ -93,7 +93,7 @@ function(check_c_source_compiles_or_zero)
     # defer check to CMake module
 
     # perform check
-    # shadow parent scope variable so that output message uses it
+    # shadow parent scope variable so that output message uses its name
     check_c_source_compiles(
         "${ARG_SOURCE}"
         ${ARG_OUTPUT_VARIABLE}
