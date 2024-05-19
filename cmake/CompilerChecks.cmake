@@ -17,6 +17,9 @@ include(CheckCSourceCompiles)
 # This function is necessary because check_c_source_compiles will set the
 # output variable to an empty string, which cannot directly be used in a C
 # preprocessing directive in the desired manner.
+# It has the added benefit of skipping costly compilation checks if it can
+# be predetermined that the check will succeed or fail without needing to
+# run it.
 #
 # check_c_source_compiles_or_zero(
 #     SOURCE <source>
