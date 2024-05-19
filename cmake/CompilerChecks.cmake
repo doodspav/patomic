@@ -6,8 +6,8 @@ include(CheckCSourceCompiles)
 # Checks that a string containing complete C source code compiles, and sets an
 # output variable to 1 if it does, and 0 if it does not.
 #
-# If all the conditions passed to WILL_SUCCEED_IF are true, then all checks are
-# skipped and the output variable is set to 1.
+# If all the conditions passed to WILL_SUCCEED_IF_ALL are true, then the check
+# is skipped and the output variable is set to 1.
 #
 # This function is necessary because check_c_source_compiles will set the
 # output variable to an empty string, which cannot directly be used in a C
@@ -16,7 +16,7 @@ include(CheckCSourceCompiles)
 # check_c_source_compiles_or_zero(
 #     SOURCE <source>
 #     OUTPUT_VARIABLE <outputVar>
-#     [WILL_SUCCEED_IF <condition>...]
+#     [WILL_SUCCEED_IF_ALL <condition>...]
 # )
 function(check_c_source_compiles_or_zero)
 
@@ -26,7 +26,7 @@ function(check_c_source_compiles_or_zero)
         "ARG"
         ""
         "OUTPUT_VARIABLE"
-        "SOURCE;WILL_SUCCEED_IF"
+        "SOURCE;WILL_SUCCEED_IF_ALL"
         ${ARGN}
     )
 
@@ -65,17 +65,15 @@ function(check_c_source_compiles_or_zero)
 
     # setup
     set(skip 0)
-    if(ARG_WILL_SUCCEED_IF)
+    if(ARG_WILL_SUCCEED_IF_ALL)
         set(skip 1)
     endif()
 
     # check the conditions provided
-    foreach(cond IN LISTS ARG_WILL_SUCCEED_IF)
+    foreach(cond IN LISTS ARG_WILL_SUCCEED_IF_ALL)
         if(cond)
-            message("Condition ${cond}: 1")
             set(cond_ok 1)
         else()
-            message("Condition ${cond}: 0")
             set(cond_ok 0)
         endif()
         math(EXPR skip "${skip} * ${cond_ok}" OUTPUT_FORMAT DECIMAL)
