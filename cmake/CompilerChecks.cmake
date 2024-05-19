@@ -7,7 +7,12 @@ include(CheckCSourceCompiles)
 # output variable to 1 if it does, and 0 if it does not.
 #
 # If all the conditions passed to WILL_SUCCEED_IF_ALL are true, then the check
-# is skipped and the output variable is set to 1.
+# is skipped, and the output variable is set to 1.
+#
+# If WILL_FAIL_IF_ALL_SUCCEED_FALSE is set and all the conditions passed to
+# WILL_SUCCEED_IF_ALL are false, then the check is skipped, and the output
+# variable is set to 0. If no conditions were passed to WILL_SUCCEED_IF_ALL
+# then this does nothing.
 #
 # This function is necessary because check_c_source_compiles will set the
 # output variable to an empty string, which cannot directly be used in a C
@@ -17,6 +22,7 @@ include(CheckCSourceCompiles)
 #     SOURCE <source>
 #     OUTPUT_VARIABLE <outputVar>
 #     [WILL_SUCCEED_IF_ALL <condition>...]
+#     [WILL_FAIL_IF_ALL_SUCCEED_FALSE]
 # )
 function(check_c_source_compiles_or_zero)
 
@@ -24,7 +30,7 @@ function(check_c_source_compiles_or_zero)
 
     cmake_parse_arguments(
         "ARG"
-        ""
+        "WILL_FAIL_IF_ALL_SUCCEED_FALSE"
         "OUTPUT_VARIABLE"
         "SOURCE;WILL_SUCCEED_IF_ALL"
         ${ARGN}
@@ -64,27 +70,29 @@ function(check_c_source_compiles_or_zero)
     # see if we can skip check due to implicit success
 
     # setup
-    set(skip 0)
-    if(ARG_WILL_SUCCEED_IF_ALL)
-        set(skip 1)
-    endif()
+    set(success_count_true 0)
+    list(LENGTH ARG_WILL_SUCCEED_IF_ALL success_count)
 
     # check the conditions provided
     foreach(cond IN LISTS ARG_WILL_SUCCEED_IF_ALL)
         if(cond)
-            set(cond_ok 1)
-        else()
-            set(cond_ok 0)
+            math(EXPR success_count_true "${success_count_true} + 1")
         endif()
-        math(EXPR skip "${skip} * ${cond_ok}" OUTPUT_FORMAT DECIMAL)
     endforeach()
 
     # skip if we can
-    if(skip)
-        message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
-        message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Success (implicit)")
-        set(${ARG_OUTPUT_VARIABLE} 1 PARENT_SCOPE)
-        return()
+    if(ARG_WILL_SUCCEED_IF_ALL)
+        if(success_count_true EQUAL success_count)
+            message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
+            message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Success (implicit)")
+            set(${ARG_OUTPUT_VARIABLE} 1 PARENT_SCOPE)
+            return()
+        elseif(success_count_true EQUAL 0)
+            message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
+            message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Failed (implicit)")
+            set(${ARG_OUTPUT_VARIABLE} 0 PARENT_SCOPE)
+            return()
+        endif()
     endif()
 
 
