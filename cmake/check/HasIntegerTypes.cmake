@@ -102,7 +102,10 @@ check_c_source_compiles_or_zero(
 )
 
 # <stddef.h> header is available and makes '__extension__ intptr_t' available as a type
-math(EXPR intptr_in_stdint_not_in_stddef "${COMPILER_HAS_STDINT_INTPTR} & (1 ^ ${COMPILER_HAS_STDDEF_INTPTR})")
+set(intptr_in_stddef_if_in_stdint 1)
+if(COMPILER_HAS_STDINT_INTPTR AND NOT COMPILER_HAS_STDDEF_INTPTR)
+    set(intptr_in_stddef_if_in_stdint 0)
+endif()
 check_c_source_compiles_or_zero(
     SOURCE
         "#include <stddef.h> \n\
@@ -114,6 +117,6 @@ check_c_source_compiles_or_zero(
         ${COMPILER_HAS_EXTN}
     WILL_FAIL_IF_ANY_NOT
         ${COMPILER_HAS_EXTN}
-        ${inptr_in_stdint_not_in_stddef}
+        ${intptr_in_stddef_if_in_stdint}
 )
-set(intptr_in_stdint_not_in_stddef )
+set(intptr_in_stddef_if_in_stdint )
