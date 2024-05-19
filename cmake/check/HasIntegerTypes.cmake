@@ -31,7 +31,6 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_LONG_LONG}
         ${COMPILER_HAS_EXTN}
-    WILL_FAIL_IF_ALL_SUCCEED_FALSE
 )
 
 # '__int128' is available as a type
@@ -51,7 +50,6 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_MS_INT128}
         ${COMPILER_HAS_EXTN}
-    WILL_FAIL_IF_ALL_SUCCEED_FALSE
 )
 
 # <stdint.h> header is available and makes 'intptr_t' available as a type
@@ -73,7 +71,6 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_STDINT_INTPTR}
         ${COMPILER_HAS_EXTN}
-    WILL_FAIL_IF_ALL_SUCCEED_FALSE
 )
 
 # <stddef.h> header is available and makes 'intptr_t' available as a type
@@ -95,7 +92,6 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_STDDEF_INTPTR}
         ${COMPILER_HAS_EXTN}
-    WILL_FAIL_IF_ALL_SUCCEED_FALSE
 
     # fail: COMPILER_HAS_STDINT_INTPTR and not COMPILER_HAS_STDDEF_INTPTR
     # fail: not COMPILER_HAS_EXTN and not COMPILER_HAS_STDDEF_

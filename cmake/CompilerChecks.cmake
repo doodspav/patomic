@@ -10,11 +10,6 @@ include(CheckCSourceCompiles)
 # is skipped, and the output variable is set to 1. If no conditions are passed
 # then this does nothing.
 #
-# If WILL_FAIL_IF_ALL_SUCCEED_FALSE is set and all the conditions passed to
-# WILL_SUCCEED_IF_ALL are false, then the check is skipped, and the output
-# variable is set to 0. If no conditions were passed to WILL_SUCCEED_IF_ALL
-# then this does nothing.
-#
 # If any of the conditions passed to WILL_FAIL_IF_ANY_NOT are false, then the
 # check is skipped, and the output variable is set to 0. If no conditions are
 # passed then this does nothing.
@@ -28,7 +23,6 @@ include(CheckCSourceCompiles)
 #     OUTPUT_VARIABLE <outputVar>
 #     [WILL_SUCCEED_IF_ALL <condition>...]
 #     [WILL_FAIL_IF_ANY_NOT <condition>...]
-#     [WILL_FAIL_IF_ALL_SUCCEED_FALSE]
 # )
 function(check_c_source_compiles_or_zero)
 
@@ -36,7 +30,7 @@ function(check_c_source_compiles_or_zero)
 
     cmake_parse_arguments(
         "ARG"
-        "WILL_FAIL_IF_ALL_SUCCEED_FALSE"
+        ""
         "OUTPUT_VARIABLE"
         "SOURCE;WILL_SUCCEED_IF_ALL;WILL_FAIL_IF_ANY_NOT"
         ${ARGN}
@@ -77,7 +71,6 @@ function(check_c_source_compiles_or_zero)
 
     # setup
     set(success_count_true 0)
-    list(LENGTH ARG_WILL_SUCCEED_IF_ALL success_count)
 
     # check the conditions provided
     foreach(cond IN LISTS ARG_WILL_SUCCEED_IF_ALL)
@@ -88,15 +81,11 @@ function(check_c_source_compiles_or_zero)
 
     # skip if we can (all conditions are true or all conditions are false)
     if(ARG_WILL_SUCCEED_IF_ALL)
+        list(LENGTH ARG_WILL_SUCCEED_IF_ALL success_count)
         if(success_count_true EQUAL success_count)
             message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
             message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Success (implicit)")
             set(${ARG_OUTPUT_VARIABLE} 1 PARENT_SCOPE)
-            return()
-        elseif(success_count_true EQUAL 0)
-            message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
-            message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Failed (implicit)")
-            set(${ARG_OUTPUT_VARIABLE} 0 PARENT_SCOPE)
             return()
         endif()
     endif()
