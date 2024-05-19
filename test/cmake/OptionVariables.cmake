@@ -61,5 +61,5 @@ elseif(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
         WARNING
         "Option 'PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV' for 'patomic_test' requires CMake 3.22+, currently running ${CMAKE_VERSION}, option is disabled"
     )
-    set(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV )
+    unset(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
 endif()

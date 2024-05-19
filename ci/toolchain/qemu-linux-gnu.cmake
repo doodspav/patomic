@@ -69,7 +69,7 @@ endif()
 
 # ---- Force Use of Cache Variables ----
 
-set(cache_variables )
+unset(cache_variables)
 list(APPEND cache_variables
     "PATOMIC_CI_SYSROOT"
     "PATOMIC_CI_XARCH"

@@ -74,7 +74,7 @@ option(
     "Override BUILD_TESTING for ${package_name} library"
     ${build_testing}
 )
-set(build_testing )
+unset(build_testing)
 mark_as_advanced(PATOMIC_BUILD_TESTING)
 
 

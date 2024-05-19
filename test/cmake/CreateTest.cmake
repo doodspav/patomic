@@ -222,7 +222,7 @@ function(_create_test)
 
         # get paths to all shared library dependencies (DLLs)
         # this should just be patomic and gtest
-        set(deps_paths )
+        unset(deps_paths)
         foreach(dep_target IN LISTS ARG_LINK)
             # This will fail if passed a link option that isn't a target
             # This is intentional; don't do that.

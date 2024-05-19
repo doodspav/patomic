@@ -119,4 +119,4 @@ check_c_source_compiles_or_zero(
         ${COMPILER_HAS_EXTN}
         ${intptr_in_stddef_if_in_stdint}
 )
-set(intptr_in_stddef_if_in_stdint )
+unset(intptr_in_stddef_if_in_stdint)
