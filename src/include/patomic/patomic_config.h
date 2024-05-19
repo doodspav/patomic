@@ -101,6 +101,20 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_STDINT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_STDINT 0
+#endif
+
+
 #ifndef PATOMIC_HAS_STDINT_INTPTR
     /**
      * @addtogroup config.safe

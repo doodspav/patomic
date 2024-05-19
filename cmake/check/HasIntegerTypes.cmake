@@ -7,6 +7,7 @@
 # | COMPILER_HAS_LONG_LONG_EXTN     | '__extension__ long long' is available as a type                                      |
 # | COMPILER_HAS_MS_INT128          | '__int128' is available as a type                                                     |
 # | COMPILER_HAS_MS_INT128_EXTN     | '__extension__ __int128' is available as a type                                       |
+# | COMPILER_HAS_STDINT             | <stdint.h> header is available                                                        |
 # | COMPILER_HAS_STDINT_INTPTR      | <stdint.h> header is available and makes 'intptr_t' available as a type               |
 # | COMPILER_HAS_STDINT_INTPTR_EXTN | <stdint.h> header is available and makes '__extension__ intptr_t' available as a type |
 # | COMPILER_HAS_STDDEF_INTPTR      | <stddef.h> header is available and makes 'intptr_t' available as a type               |
@@ -50,6 +51,15 @@ check_c_source_compiles_or_zero(
     WILL_SUCCEED_IF_ALL
         ${COMPILER_HAS_MS_INT128}
         ${COMPILER_HAS_EXTN}
+)
+
+# <stdint.h> header is available
+check_c_source_compiles_or_zero(
+    SOURCE
+        "#include <stdint.h> \n\
+         int main(void) {}"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_STDINT
 )
 
 # <stdint.h> header is available and makes 'intptr_t' available as a type
