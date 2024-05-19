@@ -61,7 +61,7 @@ function(check_c_source_compiles_or_zero)
     endif()
 
 
-    # see if we can skip check
+    # see if we can skip check due to implicit success
 
     # setup
     set(skip 0)
@@ -72,8 +72,10 @@ function(check_c_source_compiles_or_zero)
     # check the conditions provided
     foreach(cond IN LISTS ARG_WILL_SUCCEED_IF)
         if(cond)
+            message("Condition ${cond}: 1")
             set(cond_ok 1)
         else()
+            message("Condition ${cond}: 0")
             set(cond_ok 0)
         endif()
         math(EXPR skip "${skip} * ${cond_ok}" OUTPUT_FORMAT DECIMAL)
@@ -81,8 +83,10 @@ function(check_c_source_compiles_or_zero)
 
     # skip if we can
     if(skip)
-        message(STATUS "Skipping Test ${ARG_OUTPUT_VARIABLE} - Would Succeed")
-        set(ARG_OUTPUT_VARIABLE 1 PARENT_SCOPE)
+        message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE}")
+        message(STATUS "Performing Test ${ARG_OUTPUT_VARIABLE} - Success (implicit)")
+        set(${ARG_OUTPUT_VARIABLE} 1 PARENT_SCOPE)
+        return()
     endif()
 
 
@@ -94,7 +98,7 @@ function(check_c_source_compiles_or_zero)
         "${ARG_SOURCE}"
         ${ARG_OUTPUT_VARIABLE}
     )
-    set(result "${ARG_OUTPUT_VARIABLE}")
+    set(result "${${ARG_OUTPUT_VARIABLE}}")
 
     # propagate result
     if(result)
