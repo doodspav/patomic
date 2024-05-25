@@ -114,10 +114,16 @@ if(PROJECT_IS_TOP_LEVEL)
     mark_as_advanced(CMAKE_INSTALL_CMAKEDIR)
     # generate absolute path version
     set(dir "LIBDIR")  # use LIBDIR since that forms the root of CMAKEDIR
+    set(dir_param )
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
+        set(dir_param "${dir}")
+    endif()
     GNUInstallDirs_get_absolute_install_dir(
         CMAKE_INSTALL_FULL_CMAKEDIR
         CMAKE_INSTALL_CMAKEDIR
+        ${dir_param}
     )
+    unset(dir_param)
     unset(dir)
 elseif(NOT CMAKE_INSTALL_CMAKEDIR AND NOT CMAKE_SKIP_INSTALL_RULES)
     # required because this is unofficial and has no default set by GNUInstallDirs
