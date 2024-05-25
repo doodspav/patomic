@@ -13,7 +13,6 @@
 # |------------------------------|---------------|------------------------------------------------------------------|
 # | PATOMIC_BUILD_SHARED         | Always        | ${BUILD_SHARED_LIBS}                                             |
 # | PATOMIC_BUILD_TESTING        | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}                     |
-# | PATOMIC_INCLUDES_WITH_SYSTEM | Not Top-Level | ON                                                               |
 # | PATOMIC_INSTALL_CMAKEDIR     | Always        | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION} |
 # -------------------------------------------------------------------------------------------------------------------
 
@@ -34,26 +33,6 @@ mark_as_advanced(PATOMIC_BUILD_SHARED)
 set(build_type STATIC)
 if(PATOMIC_BUILD_SHARED)
     set(build_type SHARED)
-endif()
-
-
-# ---- Warning Guard ----
-
-# target_include_directories with SYSTEM modifier will request the compiler to
-# omit warnings from the provided paths, if the compiler supports that.
-# This is to provide a user experience similar to find_package when
-# add_subdirectory or FetchContent is used to consume this project.
-set(warning_guard "")
-if(NOT PROJECT_IS_TOP_LEVEL)
-    option(
-        PATOMIC_INCLUDES_WITH_SYSTEM
-        "Use SYSTEM modifier for ${package_name}'s includes, disabling warnings"
-        ON
-    )
-    mark_as_advanced(PATOMIC_INCLUDES_WITH_SYSTEM)
-    if(PATOMIC_INCLUDES_WITH_SYSTEM)
-        set(warning_guard SYSTEM)
-    endif()
 endif()
 
 

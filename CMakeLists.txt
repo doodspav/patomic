@@ -125,7 +125,7 @@ target_include_directories(
 
 # header files from /include
 target_include_directories(
-    ${target_name} ${warning_guard} PUBLIC
+    ${target_name} SYSTEM PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
