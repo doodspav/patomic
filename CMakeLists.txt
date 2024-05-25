@@ -60,7 +60,7 @@ add_subdirectory(src)
 # ---- Generate Headers ----
 
 # used in export header generated below
-if(NOT PATOMIC_BUILD_SHARED)
+if(NOT PATOMIC_BUILD_SHARED_LIBS)
     target_compile_definitions(${target_name} PUBLIC PATOMIC_STATIC_DEFINE)
 endif()
 

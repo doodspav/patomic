@@ -4,17 +4,17 @@
 
 # ---- Options Summary ----
 
-# ---------------------------------------------------------------------------------------------------------------
-# | Option                   | Availability  | Default                                                          |
-# |==========================|===============|==================================================================|
-# | BUILD_SHARED_LIBS        | Top-Level     | OFF                                                              |
-# | BUILD_TESTING            | Top-Level     | OFF                                                              |
-# | CMAKE_INSTALL_CMAKEDIR   | Top-Level     | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION} |
-# | CMAKE_INSTALL_INCLUDEDIR | Top-Level     | include/${package_name}-${PROJECT_VERSION}                       |
-# |--------------------------|---------------|------------------------------------------------------------------|
-# | PATOMIC_BUILD_SHARED     | Always        | ${BUILD_SHARED_LIBS}                                             |
-# | PATOMIC_BUILD_TESTING    | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}                     |
-# ---------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------
+# | Option                    | Availability  | Default                                                          |
+# |===========================|===============|==================================================================|
+# | BUILD_SHARED_LIBS         | Top-Level     | OFF                                                              |
+# | BUILD_TESTING             | Top-Level     | OFF                                                              |
+# | CMAKE_INSTALL_CMAKEDIR    | Top-Level     | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION} |
+# | CMAKE_INSTALL_INCLUDEDIR  | Top-Level     | include/${package_name}-${PROJECT_VERSION}                       |
+# |---------------------------|---------------|------------------------------------------------------------------|
+# | PATOMIC_BUILD_SHARED_LIBS | Always        | ${BUILD_SHARED_LIBS}                                             |
+# | PATOMIC_BUILD_TESTING     | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}                     |
+# ----------------------------------------------------------------------------------------------------------------
 
 
 # ---- Build Shared ----
@@ -25,13 +25,13 @@ if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_SHARED_LIBS "Build shared libs" OFF)
 endif()
 option(
-    PATOMIC_BUILD_SHARED
-    "Override BUILD_SHARED_LIBS for ${package_name} library"
+    PATOMIC_BUILD_SHARED_LIBS
+    "Override BUILD_SHARED_LIBS for ${package_name} package"
     ${BUILD_SHARED_LIBS}
 )
-mark_as_advanced(PATOMIC_BUILD_SHARED)
+mark_as_advanced(PATOMIC_BUILD_SHARED_LIBS)
 set(build_type STATIC)
-if(PATOMIC_BUILD_SHARED)
+if(PATOMIC_BUILD_SHARED_LIBS)
     set(build_type SHARED)
 endif()
 
@@ -50,7 +50,7 @@ if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
 endif()
 option(
     PATOMIC_BUILD_TESTING
-    "Override BUILD_TESTING for ${package_name} library"
+    "Override BUILD_TESTING for ${package_name} package"
     ${build_testing}
 )
 unset(build_testing)
