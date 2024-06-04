@@ -9,9 +9,9 @@
  * generates the <patomic/_patomic_config.h> file which is included below.
  *
  * If you are building this project without CMake, you have three options:
- * 1. provide your own version of <patomic/_patomic_config.h>.
- * 2. modify the defaults for those macros in this file and remove the include.
- * 3. define those macros via compiler flags and remove the include.
+ * 1. Provide your own version of <patomic/_patomic_config.h>.
+ * 2. Modify the defaults for those macros in this file and remove the include.
+ * 3. Define those macros via compiler flags and remove the include.
  *
  * Some macros may error if predefined as a safety measure, requiring option 2.
  */

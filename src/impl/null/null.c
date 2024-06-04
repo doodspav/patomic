@@ -5,9 +5,9 @@
 
 patomic_t
 patomic_impl_create_null(
-    size_t byte_width,
-    patomic_memory_order_t order,
-    unsigned int opts
+    const size_t byte_width,
+    const patomic_memory_order_t order,
+    const unsigned int opts
 )
 {
     /* zero all fields */
@@ -29,8 +29,8 @@ patomic_impl_create_null(
 
 patomic_explicit_t
 patomic_impl_create_explicit_null(
-    size_t byte_width,
-    unsigned int opts
+    const size_t byte_width,
+    const unsigned int opts
 )
 {
     /* zero all fields */
@@ -51,7 +51,7 @@ patomic_impl_create_explicit_null(
 
 patomic_transaction_t
 patomic_impl_create_transaction_null(
-    unsigned int opts
+    const unsigned int opts
 )
 {
     /* zero all fields */

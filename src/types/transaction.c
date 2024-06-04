@@ -3,7 +3,7 @@
 
 unsigned char
 patomic_transaction_abort_reason(
-    unsigned int status
+    const unsigned int status
 )
 {
     /* declarations */
