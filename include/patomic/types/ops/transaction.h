@@ -151,7 +151,7 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   implemented using a sequentially consistent transaction.
  *
  * @details
- *   Atomically compares the value of the bytes with with the value of expected
+ *   Atomically compares the value of the bytes with the value of expected
  *   bytes; if these compare equal, replaces the value of the bytes with a
  *   desired value and returns 1, otherwise stores the value of the bytes into
  *   the expected bytes, and returns 0. This is done in a single
@@ -628,6 +628,13 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  *
  * @param fallback_ctx
  *   Opaque data to be passed to function called inside fallback transaction.
+ *
+ * @param config
+ *   Configuration for transaction.
+ *
+ * @param result
+ *   Pointer to object holding result of transaction, including status code and
+ *   attempts made.
  */
 typedef int (* patomic_opsig_transaction_generic_wfb_t) (
     void (* fn) (void *),

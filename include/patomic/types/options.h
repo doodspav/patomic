@@ -17,7 +17,7 @@ extern "C" {
  *   Options do NOT affect the correctness of any implementation. Any atomic
  *   operation that is obtained both when passing and not passing an option is
  *   equally correct in terms of thread-safety and memory ordering.             \n
- *   However options MAY affect constraints that are unrelated to thread-safety
+ *   However, options MAY affect constraints that are unrelated to thread-safety
  *   and memory ordering, namely alignment requirements and the quality of the
  *   implementation.
  *
@@ -33,7 +33,7 @@ extern "C" {
  */
 typedef enum {
 
-    /** brief The empty option hinting nothing */
+    /** @brief The empty option hinting nothing */
     patomic_option_NONE = 0x0
 
 } patomic_option_t;

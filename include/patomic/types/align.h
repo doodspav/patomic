@@ -92,7 +92,8 @@ typedef struct {
  *   match the true value on a wider range of platforms as they become known.
  *
  * @note
- *   The value is always a power of 2.
+ *   The value is always a power of 2, and will not be larger than its stable
+ *   counterpart.
  */
 #undef PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE
 #define PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE ((size_t) 128)

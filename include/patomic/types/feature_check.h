@@ -231,8 +231,11 @@ typedef enum {
  * @addtogroup feature_check
  *
  * @brief
- *   Checks if all of the operations in all the categories in a set of opcats
- *   are supported by the given implicit ops struct.
+ *   Checks if all the operations in all the categories in a set of opcats are
+ *   supported by the given implicit ops struct.
+ *
+ * @param ops
+ *   Pointer to a set of atomic operations with implicit memory ordering.
  *
  * @param opcats
  *   One or more patomic_opcat_t flags combined.
@@ -258,8 +261,11 @@ patomic_feature_check_all(
  * @addtogroup feature_check
  *
  * @brief
- *   Checks if all of the operations in all the categories in a set of opcats
- *   are supported by the given explicit ops struct.
+ *   Checks if all the operations in all the categories in a set of opcats are
+ *   supported by the given explicit ops struct.
+ *
+ * @param ops
+ *   Pointer to a set of atomic operations with explicit memory ordering.
  *
  * @param opcats
  *   One or more patomic_opcat_t flags combined.
@@ -285,8 +291,12 @@ patomic_feature_check_all_explicit(
  * @addtogroup feature_check
  *
  * @brief
- *   Checks if all of the operations in all the categories in a set of opcats
- *   are supported by the given transaction ops struct.
+ *   Checks if all the operations in all the categories in a set of opcats are
+ *   supported by the given transaction ops struct.
+ *
+ * @param ops
+ *   Pointer to a set of atomic operations implemented using a sequentially
+ *   consistent transaction, as well as transaction specific operations
  *
  * @param opcats
  *   One or more patomic_opcat_t flags combined.
@@ -315,6 +325,9 @@ patomic_feature_check_all_transaction(
  *   Checks if any of the operations in all the categories in a set of opcats
  *   are supported by the given implicit ops struct.
  *
+ * @param ops
+ *   Pointer to a set of atomic operations with implicit memory ordering.
+ *
  * @param opcats
  *   One or more patomic_opcat_t flags combined.
  *
@@ -341,6 +354,9 @@ patomic_feature_check_any(
  * @brief
  *   Checks if any of the operations in all the categories in a set of opcats
  *   are supported by the given explicit ops struct.
+ *
+ * @param ops
+ *   Pointer to a set of atomic operations with explicit memory ordering.
  *
  * @param opcats
  *   One or more patomic_opcat_t flags combined.
@@ -369,6 +385,10 @@ patomic_feature_check_any_explicit(
  *   Checks if any of the operations in all the categories in a set of opcats
  *   are supported by the given transaction ops struct.
  *
+ * @param ops
+ *   Pointer to a set of atomic operations implemented using a sequentially
+ *   consistent transaction, as well as transaction specific operations
+ *
  * @param opcats
  *   One or more patomic_opcat_t flags combined.
  *
@@ -395,6 +415,9 @@ patomic_feature_check_any_transaction(
  * @brief
  *   Checks if any operations in the set of opkinds in the category opcat are
  *   supported by the given implicit ops struct.
+ *
+ * @param ops
+ *   Pointer to a set of atomic operations with implicit memory ordering.
  *
  * @param opcat
  *   Any single patomic_opcat_t flag that has a single bit set.
@@ -431,6 +454,9 @@ patomic_feature_check_leaf(
  *   Checks if any operations in the set of opkinds in the category opcat are
  *   supported by the given explicit ops struct.
  *
+ * @param ops
+ *   Pointer to a set of atomic operations with explicit memory ordering.
+ *
  * @param opcat
  *   Any single patomic_opcat_t flag that has a single bit set.
  *
@@ -465,6 +491,10 @@ patomic_feature_check_leaf_explicit(
  * @brief
  *   Checks if any operations in the set of opkinds in the category opcat are
  *   supported by the given transaction ops struct.
+ *
+ * @param ops
+ *   Pointer to a set of atomic operations implemented using a sequentially
+ *   consistent transaction, as well as transaction specific operations
  *
  * @param opcat
  *   Any single patomic_opcat_t flag that has a single bit set.
