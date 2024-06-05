@@ -356,7 +356,7 @@ function(create_ut)
     )
 
     # visibility macros will break UTs on Windows
-    set(target_name patomic-test-ut-${ARG_NAME})
+    set(target_name ${test_target_name}-ut-${ARG_NAME})
     target_compile_definitions(${target_name} PRIVATE PATOMIC_STATIC_DEFINE)
 
 endfunction()
