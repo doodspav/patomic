@@ -17,28 +17,28 @@
 size_t
 patomic_cache_line_size(void)
 {
-    return (size_t) PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
+    return PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
 }
 
 
 int
 patomic_align_meets_recommended(
-    const volatile void *ptr,
-    patomic_align_t align
+    const volatile void *const ptr,
+    const patomic_align_t align
 )
 {
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
 
     /* check that addr pointer is aligned to recommended alignment */
-    return (PATOMIC_MOD_CPOW2(addr, align.recommended) == 0);
+    return PATOMIC_MOD_CPOW2(addr, align.recommended) == 0;
 }
 
 
 int
 patomic_align_meets_minimum(
-    const volatile void *ptr,
-    patomic_align_t align,
-    size_t width
+    const volatile void *const ptr,
+    const patomic_align_t align,
+    const size_t width
 )
 {
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
