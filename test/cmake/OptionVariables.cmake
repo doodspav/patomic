@@ -1,13 +1,15 @@
+include(GNUInstallDirs)
+
 # ---- Options Summary ----
 
-# -----------------------------------------------------------------------
-# | Option                                | Availability   | Default    |
-# |=======================================|================|============|
-# | CMAKE_INSTALL_TESTDIR (unofficial)    | Always         | share/test |
-# |---------------------------------------|----------------|------------|
-# | PATOMIC_CREATE_TEST_TARGETS_MATCHING  | Always         | ^(.*)$     |
-# | PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV | Always (3.22+) | ON         |
-# -----------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------
+# | Option                                | Availability   | Default                           |
+# |=======================================|================|===================================|
+# | CMAKE_INSTALL_TESTDIR (unofficial)    | Always         | ${CMAKE_INSTALL_DATAROOTDIR}/test |
+# |---------------------------------------|----------------|-----------------------------------|
+# | PATOMIC_CREATE_TEST_TARGETS_MATCHING  | Always         | ^(.*)$                            |
+# | PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV | Always (3.22+) | ON                                |
+# ----------------------------------------------------------------------------------------------
 
 
 # ---- Test Install Directory ----
@@ -16,17 +18,35 @@
 # they're executables.
 # This is undesirable, so this variable exists to override the install location
 # of test binaries separately.
-# It's not prefixed with PATOMIC_ because it's ok for it to be shared and
+# It's not project-specific because it's ok for it to be shared and
 # overridden by parent projects.
-# Note: this is not an official CMake variable
 # The variable type is STRING rather than PATH, because otherwise passing
 # -DCMAKE_INSTALL_TESTDIR=share/test on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to
 # unexpected errors.
+#
+# Note: this is not an official CMake variable
 set(
-    CMAKE_INSTALL_TESTDIR "share/test"
-    CACHE STRING "(unofficial) Default test install location"
+    CMAKE_INSTALL_TESTDIR "${CMAKE_INSTALL_DATAROOTDIR}/test"
+    CACHE STRING "(unofficial) CMake top level test location relative to the install prefix"
 )
+# set it back to a PATH type for GUI assistance
+set_property(CACHE CMAKE_INSTALL_TESTDIR PROPERTY TYPE PATH)
+# depends on CMAKE_INSTALL_DATAROOTDIR which is marked as advanced in GNUInstallDirs
+mark_as_advanced(CMAKE_INSTALL_TESTDIR)
+# generate absolute path version
+set(dir "DATAROOTDIR")  # use DATAROOTDIR since that forms the root of CMAKE_INSTALL_TESTDIR
+set(dir_param )
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
+    set(dir_param "${dir}")
+endif()
+GNUInstallDirs_get_absolute_install_dir(
+    CMAKE_INSTALL_FULL_TESTDIR
+    CMAKE_INSTALL_TESTDIR
+    ${dir_param}
+)
+unset(dir_param)
+unset(dir)
 
 
 # ---- Test Build Selection ----
@@ -61,5 +81,6 @@ elseif(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
         WARNING
         "Option 'PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV' for 'patomic_test' requires CMake 3.22+, currently running ${CMAKE_VERSION}, option is disabled"
     )
+    unset(CACHE PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
     unset(PATOMIC_WINDOWS_MODIFY_CTEST_PATH_ENV)
 endif()

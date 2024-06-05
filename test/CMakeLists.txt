@@ -9,12 +9,12 @@ project(
     LANGUAGES CXX
 )
 
+include(cmake/ProjectIsTopLevel.cmake)
 include(cmake/OptionVariables.cmake)
+include(cmake/CreateTest.cmake)
 
 
 # ---- Dependencies ----
-
-include(cmake/ProjectIsTopLevel.cmake)
 
 # need to enable testing ourselves if we're the root project
 if(PROJECT_IS_TOP_LEVEL)
@@ -53,9 +53,8 @@ find_library(libatomic NAMES atomic atomic.so.1 libatomic.so.1)
 # necessary for using GTest on platforms without atomic operations where
 # libatomic is not automatically linked (e.g. clang-15 for arm-linux-gnueabi)
 if(libatomic)
-    set_property(
-        TARGET GTest::gtest
-        APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${libatomic}"
+    target_link_libraries(GTest::gtest
+        INTERFACE "${libatomic}"
     )
 endif()
 
@@ -63,7 +62,8 @@ endif()
 # ---- Declare Tests ----
 
 # base target that indirectly depends on all tests
-add_custom_target(patomic-test)
+set(test_target_name "patomic-test")
+add_custom_target(${test_target_name})
 
 # always add include and src; used by and linked to all test targets
 # must be added first to create targets that we use when creating test targets
@@ -72,10 +72,3 @@ add_subdirectory(src)
 
 # add directory with all test kinds
 add_subdirectory(kind)
-
-
-# ---- Support Packaging Library ----
-
-if(PROJECT_IS_TOP_LEVEL AND NOT CMAKE_SKIP_INSTALL_RULES)
-    include(CPack)
-endif()

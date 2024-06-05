@@ -6,7 +6,7 @@ else()
     message(STATUS "Skipping binary tests; patomic target not available")
 endif()
 
-# always STs since they don't require patomic in any way
+# always add STs since they don't require patomic in any way
 add_subdirectory(st)
 message(STATUS "Enabled system tests")
 

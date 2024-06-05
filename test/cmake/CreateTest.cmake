@@ -32,7 +32,7 @@
 # - patomic-test-${kind}-${name} -> executable target for a single test
 #
 # _create_test(
-#     BT|UT <name>
+#     BT|ST|UT <name>
 #     [INCLUDE <item>...]
 #     [SOURCE <item>...]
 #     [LINK <item>...]
@@ -108,7 +108,7 @@ function(_create_test)
     # create test target
 
     # setup
-    set(base_target patomic-test)              # patomic-test
+    set(base_target ${test_target_name})       # patomic-test
     set(parent_target ${base_target}-${kind})  # patomic-test-bt
     set(target ${parent_target}-${name})       # patomic-test-bt-SomeExample
 
@@ -121,23 +121,20 @@ function(_create_test)
     add_executable(${target})
 
     # add sources to target
-    target_sources(
-        ${target} PRIVATE
+    target_sources(${target} PRIVATE
         ${ARG_SOURCE}
     )
 
     # add include directories
-    target_include_directories(
-        ${target} PRIVATE
-        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+    # include/ is added as part of patomic-test-include target
+    target_include_directories(${target} PRIVATE
         ${ARG_INCLUDE}
     )
 
     # add /src and /include sources that apply to all test targets
-    target_link_libraries(
-        ${target} PRIVATE
-        patomic-test-include
-        patomic-test-src
+    target_link_libraries(${target} PRIVATE
+        ${test_target_name}-include
+        ${test_target_name}-src
     )
 
     # update dependencies list directly because we use it in Windows PATH stuff later
@@ -153,27 +150,23 @@ function(_create_test)
     endif()
 
     # link dependencies (all tests use GTest framework)
-    target_link_libraries(
-        ${target} PRIVATE
+    target_link_libraries(${target} PRIVATE
         ${ARG_LINK}
     )
 
     # require C++14 as minimum
-    target_compile_features(
-        ${target} PRIVATE
+    target_compile_features(${target} PRIVATE
         cxx_std_14
     )
 
     # set macro to know which test kind code is part of
     string(TOUPPER "${kind}" kind_upper)
-    target_compile_definitions(
-        ${target} PRIVATE
+    target_compile_definitions(${target} PRIVATE
         "PATOMIC_TEST_KIND_${kind_upper}=1"
     )
 
     # set binary name instead of using default
-    set_target_properties(
-        ${target} PROPERTIES
+    set_target_properties(${target} PROPERTIES
         OUTPUT_NAME "${name}"
     )
 
@@ -205,8 +198,7 @@ function(_create_test)
     endforeach()
 
     # custom target to make sure the working directory exists for the test
-    add_custom_target(
-        ${target}-create-working-dir
+    add_custom_target(${target}-create-working-dir
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${test_working_dir}"
     )
 
@@ -245,8 +237,7 @@ function(_create_test)
 
         # modify environment variable for each test so that CTest can find DLLs
         foreach(test IN LISTS added_tests)
-            set_tests_properties(
-                "${test}" PROPERTIES
+            set_tests_properties("${test}" PROPERTIES
                 ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${deps_paths}"
             )
         endforeach()
