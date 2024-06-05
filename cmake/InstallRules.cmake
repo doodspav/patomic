@@ -7,6 +7,8 @@ install(
     "${PROJECT_BINARY_DIR}/include/"  # generated header files
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT ${package_name}-development
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN "CMake*" EXCLUDE
 )
 
 # copy target build output artifacts to OS dependent locations
