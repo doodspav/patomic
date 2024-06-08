@@ -29,6 +29,12 @@ patomic_align_meets_recommended(
 {
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
 
+    /* check that recommended alignment is valid */
+    if(!PATOMIC_IS_POW2(align.recommended))
+    {
+        return 0;
+    }
+
     /* check that addr pointer is aligned to recommended alignment */
     return PATOMIC_MOD_CPOW2(addr, align.recommended) == 0;
 }
@@ -42,6 +48,12 @@ patomic_align_meets_minimum(
 )
 {
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
+
+    /* check that minimum alignment is valid */
+    if(!PATOMIC_IS_POW2(align.minimum))
+    {
+        return 0;
+    }
 
     /* check that addr ptr is aligned to minimum alignment */
     if(PATOMIC_MOD_CPOW2(addr, align.minimum) == 0)
