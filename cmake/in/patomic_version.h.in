@@ -57,7 +57,7 @@ extern "C" {
 #define PATOMIC_VERSION_COMPATIBLE_WITH(major, minor, patch) \
     ( (major) == PATOMIC_VERSION_MAJOR &&                    \
       (minor) <= PATOMIC_VERSION_MINOR &&                    \
-      (patch) <= PATOMIC_VERSION_PATCH )
+      ((minor) < PATOMIC_VERSION_MINOR || (patch) <= PATOMIC_VERSION_PATCH) )
 
 
 /**
