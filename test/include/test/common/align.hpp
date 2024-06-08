@@ -22,7 +22,15 @@ aligned_pointer(
 ) noexcept;
 
 
-/// @copydoc test::aligned_pointer
+/// @brief
+///   Returns a pointer to memory inside the buffer aligned at least to "align"
+///   where pointer + "size" does not extend outside the buffer, or nullptr if
+///   no such pointer exists.
+///
+/// @note
+///   This function supports invalid alignments which are not powers of 2. If
+///   "align" is zero, "buf_ptr" is returned directly as long as "size" is not
+///   larger than "buf_size" (in which case nullptr is returned).
 const void *
 aligned_pointer(
     const void *buf_ptr, std::size_t buf_size, std::size_t align,
