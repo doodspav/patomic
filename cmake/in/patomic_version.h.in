@@ -15,7 +15,8 @@ extern "C" {
  *   The full version string the library was built as.
  *
  * @note
- *   The format of this string depends on how the library is built.
+ *   The format of this string depends on how the library is built. It will
+ *   always be a valid Semantic Version string.
  */
 #define PATOMIC_VERSION_STRING "@patomic_VERSION@"
 
@@ -57,6 +58,24 @@ extern "C" {
     ( (major) == PATOMIC_VERSION_MAJOR &&                    \
       (minor) <= PATOMIC_VERSION_MINOR &&                    \
       (patch) <= PATOMIC_VERSION_PATCH )
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the full version string the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_STRING macro value.
+ *
+ * @note
+ *   The format of this string depends on how the library is built. It will
+ *   always be a valid Semantic Version string.
+ *
+ * @returns
+ *   The full version string the library was built as.
+ */
+PATOMIC_EXPORT const char *
+patomic_version_string(void);
 
 
 /**
