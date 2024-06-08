@@ -1,6 +1,8 @@
 #ifndef PATOMIC_TEST_COMMON_ALIGN_HPP
 #define PATOMIC_TEST_COMMON_ALIGN_HPP
 
+#include <cstddef>
+
 namespace test
 {
 
@@ -16,14 +18,15 @@ namespace test
 ///   larger than "buf_size" (in which case nullptr is returned).
 void *
 aligned_pointer(
-    void *buf_ptr, size_t buf_size, size_t align, size_t size
+    void *buf_ptr, std::size_t buf_size, std::size_t align, std::size_t size
 ) noexcept;
 
 
 /// @copydoc test::aligned_pointer
 const void *
 aligned_pointer(
-    const void *buf_ptr, size_t buf_size, size_t align, size_t size
+    const void *buf_ptr, std::size_t buf_size, std::size_t align,
+    std::size_t size
 ) noexcept;
 
 

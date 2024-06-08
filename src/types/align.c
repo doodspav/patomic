@@ -27,6 +27,7 @@ patomic_align_meets_recommended(
     const patomic_align_t align
 )
 {
+    /* declarations */
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
 
     /* check that recommended alignment is valid */
@@ -47,6 +48,7 @@ patomic_align_meets_minimum(
     const size_t width
 )
 {
+    /* declarations */
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
 
     /* check that minimum alignment is valid */
