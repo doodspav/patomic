@@ -21,14 +21,20 @@ extern "C" {
  *   Not meeting the alignment requirements will result in undefined behaviour.
  *
  * @note
- *   - "recommended" and "minimum" are always a positive power of 2             \n
- *   - "minimum" is never larger than "recommended"                             \n
- *   - "size_within" has no restrictions on its value                           \n
- *   - the "minimum" alignment is only valid if the object resides entirely
- *     within the buffer specified with "size_within", unless "size_within" is
- *     0, in which case "minimum" is always valid                               \n
- *   - the intention of this is to communicate on x86 that operations on a type
- *     are atomic if the object doesn't cross a cache line                      \n
+ *   All patomic APIs returning this type guarantee that "recommended" and
+ *   "minimum" are a positive power of 2, and that "minimum" is never larger
+ *   than "recommended". The "size_within" value has no restrictions.
+ *
+ * @details
+ *   Within the semantics of this type, buffers are considered aligned to the
+ *   "recommended" alignment if they meet its alignment requirement.           \n
+ *   If "size_within" is zero, buffers are considered aligned to the "minimum"
+ *   alignment if they meet its alignment requirement.                         \n
+ *   However, if "size_within" is non-zero, then in addition to meeting the
+ *   "minimum" alignment requirement, the buffer would also need to entirely
+ *   reside within a buffer with size and alignment of "size_within".          \n
+ *   The intention of this is to communicate that an object is suitably aligned
+ *   if it does not cross a cache-line boundary.
  *
  * @example
  *   - type: int (size=4, align=4)                                              \n
@@ -125,6 +131,10 @@ patomic_cache_line_size(void);
  *   semantics of patomic_align_t.
  *
  * @note
+ *   The check will always fail if the recommended alignment is not a positive
+ *   power of 2.
+ *
+ * @note
  *   Internal casts may rely on implementation defined behaviour.
  *
  * @warning
@@ -144,6 +154,10 @@ patomic_align_meets_recommended(
  * @brief
  *   Checks that the buffer represented by the pointer and its width meets the
  *   minimum alignment according to the semantics of patomic_align_t.
+ *
+ * @note
+ *   The check will always fail if the minimum alignment is not a positive
+ *   power of 2.
  *
  * @note
  *   Internal casts may rely on implementation defined behaviour.
