@@ -2,12 +2,6 @@
 # excluded from compilation unless a test is built
 add_library(${test_target_name}-src OBJECT EXCLUDE_FROM_ALL)
 
-# add directory files to target
-target_sources(${test_target_name}-src PRIVATE
-    sanitizer_error.cpp
-    sanitizer_options.cpp
-)
-
 # add dependencies
 # don't need to link against GTest or patomic:
 # - the test libraries already link against GTest which should be enough
@@ -20,3 +14,7 @@ target_link_libraries(${test_target_name}-src PRIVATE
 target_compile_features(${test_target_name}-src PRIVATE
     cxx_std_14
 )
+
+# add all subdirectories
+add_subdirectory(common)
+add_subdirectory(sanitizer)

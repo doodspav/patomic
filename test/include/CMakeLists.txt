@@ -14,11 +14,3 @@ target_compile_features(${test_target_name}-include INTERFACE
 
 # add all subdirectories
 add_subdirectory(test)
-
-# mark all header files as C++ in case of IDE confusion thinking they're C
-# this does not affect compilation
-get_target_property(sources ${test_target_name}-include INTERFACE_SOURCES)
-set_source_files_properties("${sources}" PROPERTIES
-    LANGUAGE CXX
-)
-unset(sources)
