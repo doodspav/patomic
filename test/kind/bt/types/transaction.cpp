@@ -29,9 +29,9 @@ TEST_F(BtTypesTransaction, reason_is_zero_if_not_explicit_abort)
     }
 
     // check that the reason for all of these is zero
-    for (unsigned long status : statuses)
+    for (const unsigned long status : statuses)
     {
-        unsigned char reason = patomic_transaction_abort_reason(status);
+        const unsigned char reason = patomic_transaction_abort_reason(status);
         EXPECT_EQ(0U, reason);
     }
 }
@@ -40,7 +40,7 @@ TEST_F(BtTypesTransaction, reason_is_zero_if_not_explicit_abort)
 TEST_F(BtTypesTransaction, reason_returned_if_explicit_abort)
 {
     // create reasons
-    std::vector<unsigned long> reasons {
+    const std::vector<unsigned long> reasons {
         0x55UL,
         0xaaUL,
         0x0fUL,
@@ -50,9 +50,9 @@ TEST_F(BtTypesTransaction, reason_returned_if_explicit_abort)
     };
 
     // check that reason is returned from status
-    for (unsigned long reason : reasons)
+    for (const unsigned long reason : reasons)
     {
-        unsigned long status = (reason << 8) | patomic_TABORT_EXPLICIT;
+        const unsigned long status = (reason << 8) | patomic_TABORT_EXPLICIT;
         EXPECT_EQ(reason, patomic_transaction_abort_reason(status));
     }
 }
@@ -61,8 +61,8 @@ TEST_F(BtTypesTransaction, reason_returned_if_explicit_abort)
 TEST_F(BtTypesTransaction, reason_only_saves_first_8_bits)
 {
     // create status with extended reason (more than 8 bits)
-    unsigned long extended_reason = 0xfffUL;
-    unsigned long status = (extended_reason << 8) | patomic_TABORT_EXPLICIT;
+    constexpr unsigned long extended_reason = 0xfffUL;
+    constexpr unsigned long status = (extended_reason << 8) | patomic_TABORT_EXPLICIT;
 
     // check that reason is truncated
     EXPECT_NE(extended_reason, patomic_transaction_abort_reason(status));

@@ -51,9 +51,9 @@ public:
 
     static bool
     contains(const std::vector<patomic_memory_order_t>& orders,
-             patomic_memory_order_t order) noexcept
+             const patomic_memory_order_t order) noexcept
     {
-        auto it = std::find(std::begin(orders), std::end(orders), order);
+        const auto it = std::find(std::begin(orders), std::end(orders), order);
         return it != std::end(orders);
     }
 };
@@ -63,7 +63,7 @@ public:
 TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_allows_all_valid_orders)
 {
     // test orders on function and macro
-    for (patomic_memory_order_t order : this->valid_orders)
+    for (const patomic_memory_order_t order : this->valid_orders)
     {
         EXPECT_EQ(1, patomic_is_valid_order(order));
         EXPECT_EQ(1, PATOMIC_IS_VALID_ORDER(order));
@@ -74,7 +74,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_allows_all_valid_orders)
 TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_rejects_invalid_orders)
 {
     // test orders on function and macro
-    for (int order : this->invalid_orders)
+    for (const int order : this->invalid_orders)
     {
         EXPECT_EQ(0, patomic_is_valid_order(order));
         EXPECT_EQ(0, PATOMIC_IS_VALID_ORDER(order));
@@ -85,7 +85,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_rejects_invalid_orders)
 TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_allows_all_valid_store_orders)
 {
     // test orders on function and macro
-    for (patomic_memory_order_t order : this->store_orders)
+    for (const patomic_memory_order_t order : this->store_orders)
     {
         EXPECT_EQ(1, patomic_is_valid_store_order(order));
         EXPECT_EQ(1, PATOMIC_IS_VALID_STORE_ORDER(order));
@@ -97,13 +97,13 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_rejects_invalid_store_or
 {
     // orders to test
     std::vector<int> bad_orders = this->invalid_orders;
-    for (int order : this->non_store_orders)
+    for (const int order : this->non_store_orders)
     {
         bad_orders.push_back(order);
     }
 
     // test orders on function and macro
-    for (int order : bad_orders)
+    for (const int order : bad_orders)
     {
         EXPECT_EQ(0, patomic_is_valid_store_order(order));
         EXPECT_EQ(0, PATOMIC_IS_VALID_STORE_ORDER(order));
@@ -114,7 +114,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_rejects_invalid_store_or
 TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_allows_all_valid_load_orders)
 {
     // test orders on function and macro
-    for (patomic_memory_order_t order : this->load_orders)
+    for (const patomic_memory_order_t order : this->load_orders)
     {
         EXPECT_EQ(1, patomic_is_valid_load_order(order));
         EXPECT_EQ(1, PATOMIC_IS_VALID_LOAD_ORDER(order));
@@ -126,13 +126,13 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_rejects_invalid_load_orde
 {
     // orders to test
     std::vector<int> bad_orders = this->invalid_orders;
-    for (int order : this->non_load_orders)
+    for (const int order : this->non_load_orders)
     {
         bad_orders.push_back(order);
     }
 
     // test orders on function and macro
-    for (int order : bad_orders)
+    for (const int order : bad_orders)
     {
         EXPECT_EQ(0, patomic_is_valid_load_order(order));
         EXPECT_EQ(0, PATOMIC_IS_VALID_LOAD_ORDER(order));
@@ -143,9 +143,9 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_rejects_invalid_load_orde
 TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_allows_all_valid_pairs)
 {
     // go through all combinations of orders
-    for (patomic_memory_order_t succ : this->valid_orders)
+    for (const patomic_memory_order_t succ : this->valid_orders)
     {
-        for (patomic_memory_order_t fail : this->valid_orders)
+        for (const patomic_memory_order_t fail : this->valid_orders)
         {
             // skip non-load fail orders or fail > succ
             if (fail > succ || contains(this->non_load_orders, fail))
@@ -186,9 +186,9 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_succ_lt_fail)
 TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_succ_order)
 {
     // go through all combinations of orders
-    for (int succ : this->invalid_orders)
+    for (const int succ : this->invalid_orders)
     {
-        for (patomic_memory_order_t fail : this->valid_orders)
+        for (const patomic_memory_order_t fail : this->valid_orders)
         {
             // test orders on function and macro
             EXPECT_EQ(0, patomic_is_valid_fail_order(succ, fail));
@@ -202,15 +202,15 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_fail_orde
 {
     // fail is also invalid if it's a non-load order
     std::vector<int> bad_orders = this->invalid_orders;
-    for (int order : this->non_load_orders)
+    for (const int order : this->non_load_orders)
     {
         bad_orders.push_back(order);
     }
 
     // go through all combinations of orders
-    for (int fail : bad_orders)
+    for (const int fail : bad_orders)
     {
-        for (patomic_memory_order_t succ : this->valid_orders)
+        for (const patomic_memory_order_t succ : this->valid_orders)
         {
             // test orders on function and macro
             EXPECT_EQ(0, patomic_is_valid_fail_order(succ, fail));
@@ -223,14 +223,14 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_fail_orde
 TEST_F(BtTypesMemoryOrder, patomic_cmpxchg_fail_order_converts_valid_succ_order)
 {
     // test load orders on function and macro, stay the same
-    for (patomic_memory_order_t order : this->load_orders)
+    for (const patomic_memory_order_t order : this->load_orders)
     {
         EXPECT_EQ(order, patomic_cmpxchg_fail_order(order));
         EXPECT_EQ(order, PATOMIC_CMPXCHG_FAIL_ORDER(order));
     }
 
     // test non-load orders on function and macro, are converted
-    for (patomic_memory_order_t order : this->non_load_orders)
+    for (const patomic_memory_order_t order : this->non_load_orders)
     {
         EXPECT_EQ(patomic_ACQUIRE, patomic_cmpxchg_fail_order(order));
         EXPECT_EQ(patomic_ACQUIRE, PATOMIC_CMPXCHG_FAIL_ORDER(order));
@@ -241,7 +241,7 @@ TEST_F(BtTypesMemoryOrder, patomic_cmpxchg_fail_order_converts_valid_succ_order)
 TEST_F(BtTypesMemoryOrder, patomic_cmpxchg_fail_order_returns_invalid_succ_order)
 {
     // test orders on function and macro
-    for (int order : this->invalid_orders)
+    for (const int order : this->invalid_orders)
     {
         EXPECT_EQ(order, patomic_cmpxchg_fail_order(order));
         EXPECT_EQ(order, PATOMIC_CMPXCHG_FAIL_ORDER(order));
