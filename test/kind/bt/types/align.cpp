@@ -126,9 +126,9 @@ TEST_F(BtTypesAlign, meets_recommended_fails_recommended_non_pow2)
     // recommended is positive but not a power of 2
     EXPECT_NE(0, align.recommended);
     EXPECT_FALSE(test::is_positive_pow2(align.recommended));
-    // pointer is aligned to recommended
+    // pointer is aligned to recommended (don't use runtime_alignof because non-pow2)
     ASSERT_NE(ptr, nullptr);
-    EXPECT_GE(test::runtime_alignof(ptr), align.recommended);
+    EXPECT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.recommended);
     // check fails
     EXPECT_FALSE(patomic_align_meets_recommended(ptr, align));
 }
@@ -233,9 +233,9 @@ TEST_F(BtTypesAlign, meets_minimum_fails_minimum_non_pow2)
     EXPECT_NE(0, align.minimum);
     EXPECT_FALSE(test::is_positive_pow2(align.minimum));
     EXPECT_EQ(0, align.size_within);
-    // pointer is aligned to minimum
+    // pointer is aligned to minimum (don't use runtime_alignof because non-pow2)
     ASSERT_NE(ptr, nullptr);
-    ASSERT_GE(test::runtime_alignof(ptr), align.minimum);
+    EXPECT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.minimum);
     // check fails
     EXPECT_FALSE(patomic_align_meets_minimum(ptr, align, 1));
 }
@@ -304,8 +304,8 @@ TEST_F(BtTypesAlign, meets_minimum_succeeds_zero_size_buffer_any_size_within)
 {
     // setup
     constexpr OverAlignedBuffer buf;
-    patomic_align_t align { 0, OverAlignedBuffer::align, 0 };
     const void *ptr = buf.data;
+    patomic_align_t align { 0, test::runtime_alignof(ptr), 0 };
 
     // test
     // minimum is valid
