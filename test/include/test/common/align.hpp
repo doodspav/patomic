@@ -38,6 +38,13 @@ aligned_pointer(
 ) noexcept;
 
 
+/// @brief
+///   Provides the runtime alignment of the pointed-to object. This will always
+///   be a positive power of 2.
+std::size_t
+runtime_alignof(const void *ptr) noexcept;
+
+
 }
 
 #endif  // PATOMIC_TEST_COMMON_ALIGN_HPP

@@ -47,4 +47,28 @@ aligned_pointer(
 }
 
 
+std::size_t
+runtime_alignof(const void *ptr) noexcept
+{
+    // get raw address
+    auto raw_addr = reinterpret_cast<std::uintptr_t>(ptr);
+
+    // handle special case of zero (would cause infinite loop below)
+    std::size_t alignment = 1;
+    if (raw_addr == 0)
+    {
+        // return minimal alignment
+        return alignment;
+    }
+
+    // manually perform std::countr_zero from C++20 (a.k.a. __builtin_clz)
+    while ((raw_addr & 1) == 0)
+    {
+        raw_addr >>= 1;
+        alignment <<= 1;
+    }
+    return alignment;
+}
+
+
 }  // namespace test
