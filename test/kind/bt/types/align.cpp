@@ -128,7 +128,7 @@ TEST_F(BtTypesAlign, meets_recommended_fails_recommended_non_pow2)
     EXPECT_FALSE(test::is_positive_pow2(align.recommended));
     // pointer is aligned to recommended
     ASSERT_NE(ptr, nullptr);
-    EXPECT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.recommended);
+    EXPECT_GE(test::runtime_alignof(ptr), align.recommended);
     // check fails
     EXPECT_FALSE(patomic_align_meets_recommended(ptr, align));
 }
@@ -139,33 +139,51 @@ TEST_F(BtTypesAlign, meets_recommended_fails_cmp_gt_pointer_align)
 {
     // setup
     constexpr OverAlignedBuffer buf;
-    constexpr patomic_align_t align { OverAlignedBuffer::align * 16, 0, 0 };
     const void *ptr = buf.data;
+    const patomic_align_t align { test::runtime_alignof(ptr) * 2, 0, 0 };
 
     // test
     // recommended is valid
     EXPECT_TRUE(test::is_positive_pow2(align.recommended));
-    // pointer is aligned to less than recommended
-    EXPECT_NE(0, reinterpret_cast<std::uintptr_t>(ptr) % align.recommended);
+    // pointer is aligned less than recommended
+    EXPECT_LT(test::runtime_alignof(ptr), align.recommended);
     // check fails
     EXPECT_FALSE(patomic_align_meets_recommended(ptr, align));
 
 }
 
 /// @brief The check patomic_align_meets_recommended(...) succeeds when
-///        the given pointer's alignment equals or exceeds "recommended".
-TEST_F(BtTypesAlign, meets_recommended_succeeds_cmp_le_pointer_align)
+///        the given pointer's alignment equals "recommended".
+TEST_F(BtTypesAlign, meets_recommended_succeeds_cmp_eq_pointer_align)
 {
     // setup
     constexpr OverAlignedBuffer buf;
-    constexpr patomic_align_t align { OverAlignedBuffer::align, 0, 0 };
     const void *ptr = buf.data;
+    const patomic_align_t align { test::runtime_alignof(ptr), 0, 0 };
 
     // test
     // recommended is valid
     EXPECT_TRUE(test::is_positive_pow2(align.recommended));
-    // pointer is aligned to at least recommended
-    EXPECT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.recommended);
+    // pointer is aligned to exactly recommended
+    EXPECT_EQ(test::runtime_alignof(ptr), align.recommended);
+    // check succeeds
+    EXPECT_TRUE(patomic_align_meets_recommended(ptr, align));
+}
+
+/// @brief The check patomic_align_meets_recommended(...) succeeds when
+///        the given pointer's alignment exceeds "recommended".
+TEST_F(BtTypesAlign, meets_recommended_succeeds_cmp_lt_pointer_align)
+{
+    // setup
+    constexpr OverAlignedBuffer buf;
+    const void *ptr = buf.data;
+    const patomic_align_t align { test::runtime_alignof(ptr) / 2, 0, 0 };
+
+    // test
+    // recommended is valid
+    EXPECT_TRUE(test::is_positive_pow2(align.recommended));
+    // pointer is aligned more than recommended
+    EXPECT_GT(test::runtime_alignof(ptr), align.recommended);
     // check succeeds
     EXPECT_TRUE(patomic_align_meets_recommended(ptr, align));
 }
@@ -217,7 +235,7 @@ TEST_F(BtTypesAlign, meets_minimum_fails_minimum_non_pow2)
     EXPECT_EQ(0, align.size_within);
     // pointer is aligned to minimum
     ASSERT_NE(ptr, nullptr);
-    ASSERT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.minimum);
+    ASSERT_GE(test::runtime_alignof(ptr), align.minimum);
     // check fails
     EXPECT_FALSE(patomic_align_meets_minimum(ptr, align, 1));
 }
@@ -228,35 +246,53 @@ TEST_F(BtTypesAlign, meets_minimum_fails_cmp_gt_pointer_align)
 {
     // setup
     constexpr OverAlignedBuffer buf;
-    constexpr patomic_align_t align { 0, OverAlignedBuffer::align * 16, 0 };
     const void *ptr = buf.data;
+    const patomic_align_t align { 0, test::runtime_alignof(ptr) * 2, 0 };
 
     // test
     // minimum is valid
     EXPECT_TRUE(test::is_positive_pow2(align.minimum));
     EXPECT_EQ(0, align.size_within);
     // pointer is aligned to less than minimum
-    EXPECT_NE(0, reinterpret_cast<std::uintptr_t>(ptr) % align.minimum);
+    EXPECT_LT(test::runtime_alignof(ptr), align.minimum);
     // check fails
     EXPECT_FALSE(patomic_align_meets_minimum(ptr, align, 1));
 }
 
 /// @brief The check patomic_align_meets_minimum(...) succeeds when the given
-///        pointer's alignment equals or exceeds "minimum", and "size_within"
-///        is zero.
-TEST_F(BtTypesAlign, meets_minimum_succeeds_cmp_le_pointer_align)
+///        pointer's alignment equals "minimum", and "size_within" is zero.
+TEST_F(BtTypesAlign, meets_minimum_succeeds_cmp_eq_pointer_align)
 {
     // setup
     constexpr OverAlignedBuffer buf;
-    constexpr patomic_align_t align { 0, OverAlignedBuffer::align, 0 };
     const void *ptr = buf.data;
+    const patomic_align_t align { 0, test::runtime_alignof(ptr), 0 };
 
     // test
     // minimum is valid
     EXPECT_TRUE(test::is_positive_pow2(align.minimum));
     EXPECT_EQ(0, align.size_within);
     // pointer is aligned to at least minimum
-    EXPECT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.minimum);
+    EXPECT_EQ(test::runtime_alignof(ptr), align.minimum);
+    // check succeeds
+    EXPECT_TRUE(patomic_align_meets_minimum(ptr, align, 1));
+}
+
+/// @brief The check patomic_align_meets_minimum(...) succeeds when the given
+///        pointer's alignment exceeds "minimum", and "size_within" is zero.
+TEST_F(BtTypesAlign, meets_minimum_succeeds_cmp_lt_pointer_align)
+{
+    // setup
+    constexpr OverAlignedBuffer buf;
+    const void *ptr = buf.data;
+    const patomic_align_t align { 0, test::runtime_alignof(ptr) / 2, 0 };
+
+    // test
+    // minimum is valid
+    EXPECT_TRUE(test::is_positive_pow2(align.minimum));
+    EXPECT_EQ(0, align.size_within);
+    // pointer is aligned to at least minimum
+    EXPECT_GT(test::runtime_alignof(ptr), align.minimum);
     // check succeeds
     EXPECT_TRUE(patomic_align_meets_minimum(ptr, align, 1));
 }
@@ -276,7 +312,7 @@ TEST_F(BtTypesAlign, meets_minimum_succeeds_zero_size_buffer_any_size_within)
     EXPECT_TRUE(test::is_positive_pow2(align.minimum));
     EXPECT_EQ(0, align.size_within);
     // pointer is aligned to at least minimum
-    EXPECT_EQ(0, reinterpret_cast<std::uintptr_t>(ptr) % align.minimum);
+    EXPECT_GE(test::runtime_alignof(ptr), align.minimum);
     // check succeeds for successive values of size_within with a zero sized buffer
     for (int i = 0; i < 10; ++i)
     {
