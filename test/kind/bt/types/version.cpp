@@ -18,7 +18,7 @@ public:
 
 /// @brief Return value of patomic_version_string() compares equal to
 ///        PATOMIC_VERSION_STRING.
-TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_string)
+TEST_F(BtTypesVersion, version_string_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_STRING;
@@ -31,7 +31,7 @@ TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_string)
 
 /// @brief Return value of patomic_version_major() compares equal to
 ///        PATOMIC_VERSION_MAJOR.
-TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_major)
+TEST_F(BtTypesVersion, version_major_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_MAJOR;
@@ -44,7 +44,7 @@ TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_major)
 
 /// @brief Return value of patomic_version_minor() compares equal to
 ///        PATOMIC_VERSION_MINOR.
-TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_minor)
+TEST_F(BtTypesVersion, version_minor_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_MINOR;
@@ -57,7 +57,7 @@ TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_minor)
 
 /// @brief Return value of patomic_version_patch() compares equal to
 ///        PATOMIC_VERSION_PATCH.
-TEST_F(BtTypesVersion, fn_cmp_eq_macro_version_patch)
+TEST_F(BtTypesVersion, version_patch_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_PATCH;
