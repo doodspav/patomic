@@ -60,7 +60,7 @@ public:
 
 
 /// @brief Valid orders are allowed by patomic_is_valid_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_allows_all_valid_orders)
+TEST_F(BtTypesMemoryOrder, is_valid_order_allows_all_valid_orders)
 {
     // test orders on function and macro
     for (const patomic_memory_order_t order : this->valid_orders)
@@ -71,7 +71,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_allows_all_valid_orders)
 }
 
 /// @brief Invalid orders are rejected by patomic_is_valid_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_rejects_invalid_orders)
+TEST_F(BtTypesMemoryOrder, is_valid_order_rejects_invalid_orders)
 {
     // test orders on function and macro
     for (const int order : this->invalid_orders)
@@ -82,7 +82,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_order_rejects_invalid_orders)
 }
 
 /// @brief Valid store orders are allowed by patomic_is_valid_store_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_allows_all_valid_store_orders)
+TEST_F(BtTypesMemoryOrder, is_valid_store_order_allows_all_valid_store_orders)
 {
     // test orders on function and macro
     for (const patomic_memory_order_t order : this->store_orders)
@@ -93,7 +93,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_allows_all_valid_store_o
 }
 
 /// @brief Invalid store orders are rejected by patomic_is_valid_store_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_rejects_invalid_store_orders)
+TEST_F(BtTypesMemoryOrder, is_valid_store_order_rejects_invalid_store_orders)
 {
     // orders to test
     std::vector<int> bad_orders = this->invalid_orders;
@@ -111,7 +111,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_store_order_rejects_invalid_store_or
 }
 
 /// @brief Valid load orders are allowed by patomic_is_valid_load_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_allows_all_valid_load_orders)
+TEST_F(BtTypesMemoryOrder, is_valid_load_order_allows_all_valid_load_orders)
 {
     // test orders on function and macro
     for (const patomic_memory_order_t order : this->load_orders)
@@ -122,7 +122,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_allows_all_valid_load_ord
 }
 
 /// @brief Invalid load orders are rejected by patomic_is_valid_load_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_rejects_invalid_load_orders)
+TEST_F(BtTypesMemoryOrder, is_valid_load_order_rejects_invalid_load_orders)
 {
     // orders to test
     std::vector<int> bad_orders = this->invalid_orders;
@@ -140,7 +140,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_load_order_rejects_invalid_load_orde
 }
 
 /// @brief Valid succ-fail order pairs are allowed by patomic_is_valid_fail_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_allows_all_valid_pairs)
+TEST_F(BtTypesMemoryOrder, is_valid_fail_order_allows_all_valid_pairs)
 {
     // go through all combinations of orders
     for (const patomic_memory_order_t succ : this->valid_orders)
@@ -161,7 +161,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_allows_all_valid_pairs)
 }
 
 /// @brief Succ order less than fail order is rejected by patomic_is_valid_fail_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_succ_lt_fail)
+TEST_F(BtTypesMemoryOrder, is_valid_fail_order_rejects_succ_lt_fail)
 {
     // setup iterators
     const auto begin = std::begin(this->valid_orders);
@@ -183,7 +183,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_succ_lt_fail)
 }
 
 /// @brief Invalid succ order is rejected by patomic_is_valid_fail_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_succ_order)
+TEST_F(BtTypesMemoryOrder, is_valid_fail_order_rejects_invalid_succ_order)
 {
     // go through all combinations of orders
     for (const int succ : this->invalid_orders)
@@ -198,7 +198,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_succ_orde
 }
 
 /// @brief Invalid fail order is rejected by patomic_is_valid_fail_order.
-TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_fail_order)
+TEST_F(BtTypesMemoryOrder, is_valid_fail_order_rejects_invalid_fail_order)
 {
     // fail is also invalid if it's a non-load order
     std::vector<int> bad_orders = this->invalid_orders;
@@ -220,7 +220,7 @@ TEST_F(BtTypesMemoryOrder, patomic_is_valid_fail_order_rejects_invalid_fail_orde
 }
 
 /// @brief Fail order is created from valid succ order by patomic_cmpxchg_fail_order.
-TEST_F(BtTypesMemoryOrder, patomic_cmpxchg_fail_order_converts_valid_succ_order)
+TEST_F(BtTypesMemoryOrder, cmpxchg_fail_order_converts_valid_succ_order)
 {
     // test load orders on function and macro, stay the same
     for (const patomic_memory_order_t order : this->load_orders)
@@ -238,7 +238,7 @@ TEST_F(BtTypesMemoryOrder, patomic_cmpxchg_fail_order_converts_valid_succ_order)
 }
 
 /// @brief Invalid succ order is returned directly by patomic_cmpxchg_fail_order.
-TEST_F(BtTypesMemoryOrder, patomic_cmpxchg_fail_order_returns_invalid_succ_order)
+TEST_F(BtTypesMemoryOrder, cmpxchg_fail_order_returns_invalid_succ_order)
 {
     // test orders on function and macro
     for (const int order : this->invalid_orders)
