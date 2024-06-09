@@ -51,7 +51,7 @@ std::size_t
 runtime_alignof(const void *ptr) noexcept
 {
     // get the least significant set bit
-    auto raw_addr = reinterpret_cast<std::uintptr_t>(ptr);
+    const auto raw_addr = reinterpret_cast<std::uintptr_t>(ptr);
     return raw_addr ? (raw_addr & (~raw_addr + 1)) : 1;
 }
 

@@ -71,7 +71,7 @@ patomic_align_meets_minimum(
             PATOMIC_MOD_CPOW2(addr, align.size_within);
 
         /* check that buffer starting at addr doesn't extend past size_within */
-        return (addr + width) < align.size_within;
+        return (addr + width) <= align.size_within;
     }
 
     /* addr ptr is not aligned to minimum alignment */

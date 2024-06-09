@@ -325,26 +325,96 @@ TEST_F(BtTypesAlign, meets_minimum_succeeds_zero_size_buffer_any_size_within)
 ///        fulfills "minimum" and the buffer fits within a non-zero
 ///        "size_within" with extra space remaining.
 TEST_F(BtTypesAlign, meets_minimum_succeeds_buffer_smaller_fits_in_size_within)
-{}
+{
+    // setup
+    constexpr OverAlignedBuffer buf;
+    const void *ptr = buf.data + 1;
+    constexpr patomic_align_t align { 0, 1, 8 };
+
+    // test
+    // minimum is valid
+    EXPECT_TRUE(test::is_positive_pow2(align.minimum));
+    EXPECT_GT(align.size_within, 2);
+    // buffer is aligned to at least minimum and size_within
+    // check this because pointer is offset from buffer
+    EXPECT_GE(test::runtime_alignof(buf.data), align.minimum);
+    EXPECT_GE(test::runtime_alignof(buf.data), align.size_within);
+    // pointer is aligned to at least minimum
+    EXPECT_GE(test::runtime_alignof(ptr), align.minimum);
+    // check succeeds
+    EXPECT_TRUE(patomic_align_meets_minimum(ptr, align, align.size_within - 2));
+}
 
 /// @brief The check patomic_align_meets_minimum(...) succeeds when the pointer
 ///        fulfills "minimum" and the buffer fits within a non-zero
 ///        "size_within" buffer exactly.
 TEST_F(BtTypesAlign, meets_minimum_succeeds_buffer_exactly_fits_in_size_within)
-{}
+{
+    // setup
+    constexpr OverAlignedBuffer buf;
+    const void *ptr = buf.data;
+    constexpr patomic_align_t align { 0, 1, 8 };
+
+    // test
+    // minimum is valid
+    EXPECT_TRUE(test::is_positive_pow2(align.minimum));
+    EXPECT_NE(0, align.size_within);
+    // pointer is aligned to at least minimum and size_within
+    EXPECT_GE(test::runtime_alignof(ptr), align.minimum);
+    EXPECT_GE(test::runtime_alignof(ptr), align.size_within);
+    // check succeeds
+    EXPECT_TRUE(patomic_align_meets_minimum(ptr, align, align.size_within));
+
+}
 
 /// @brief The check patomic_align_meets_minimum(...) fails when the pointer
 ///        fulfills "minimum" but the buffer's size is larger than a non-zero
 ///        "size_within".
 TEST_F(BtTypesAlign, meets_minimum_fails_buffer_larger_than_size_within)
-{}
+{
+    // setup
+    constexpr OverAlignedBuffer buf;
+    const void *ptr = buf.data;
+    constexpr patomic_align_t align { 0, 1, 8 };
+
+    // test
+    // minimum is valid
+    EXPECT_TRUE(test::is_positive_pow2(align.minimum));
+    EXPECT_NE(0, align.size_within);
+    // pointer is aligned to at least minimum and size_within
+    EXPECT_GE(test::runtime_alignof(ptr), align.minimum);
+    EXPECT_GE(test::runtime_alignof(ptr), align.size_within);
+    // check fails
+    EXPECT_FALSE(patomic_align_meets_minimum(ptr, align, align.size_within + 1));
+}
 
 /// @brief The check patomic_align_meets_minimum(...) fails when the pointer
 ///        fulfills "minimum" and the buffer's size is smaller than a non-zero
 ///        "size_within", but the buffer does not fit within the "size_within"
 ///        due to alignment constraints.
 TEST_F(BtTypesAlign, meets_minimum_fails_buffer_fits_but_misaligned_for_size_within)
-{}
+{
+    // setup
+    // we need a pointer that is 16 bytes offset from a 64 byte aligned address
+    // the buffer is 32 bytes, crossing the 64 byte alignment boundary
+    alignas(64) constexpr char buffer[80] {};
+    const void *ptr = buffer + (64 - 16);
+    constexpr std::size_t size = 32;
+    constexpr patomic_align_t align { 0, 16, 64 };
+
+    // test
+    // minimum is valid
+    EXPECT_TRUE(test::is_positive_pow2(align.minimum));
+    // size_within is 64 bytes but pointer is only aligned to 16 bytes
+    EXPECT_EQ(64, align.size_within);
+    EXPECT_EQ(16, align.minimum);
+    EXPECT_EQ(16, test::runtime_alignof(ptr));
+    // pointer is 16 bytes from a 64 byte alignment boundary and crosses it
+    EXPECT_GE(64, test::runtime_alignof(static_cast<const char *>(ptr) + 16));
+    EXPECT_GT(size, 16);
+    // check fails
+    EXPECT_FALSE(patomic_align_meets_minimum(ptr, align, size));
+}
 
 /// @brief The check patomic_align_meets_minimum(...) always succeeds when the
 ///        given pointer is null.
