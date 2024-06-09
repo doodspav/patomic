@@ -142,11 +142,7 @@ patomic_version_patch(void);
  *   If the library is compatible returns 1, otherwise returns 0.
  */
 PATOMIC_EXPORT int
-patomic_version_compatible_with(
-    int major,
-    int minor,
-    int patch
-);
+patomic_version_compatible_with(int major, int minor, int patch);
 
 
 #ifdef __cplusplus
