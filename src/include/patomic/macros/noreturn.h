@@ -6,13 +6,13 @@
 #undef PATOMIC_NORETURN_
 
 #if PATOMIC_HAS_NORETURN
-#define PATOMIC_NORETURN_ _Noreturn
+    #define PATOMIC_NORETURN_ _Noreturn
 #elif PATOMIC_HAS_NORETURN_ATTR
-#define PATOMIC_NORETURN_ __attribute__((noreturn))
+    #define PATOMIC_NORETURN_ __attribute__((noreturn))
 #elif PATOMIC_HAS_NORETURN_DSPC
-#define PATOMIC_NORETURN_ __declspec(noreturn)
+    #define PATOMIC_NORETURN_ __declspec(noreturn)
 #else
-#define PATOMIC_NORETURN_
+    #define PATOMIC_NORETURN_
 #endif
 
 /**
