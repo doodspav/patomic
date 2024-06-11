@@ -258,6 +258,48 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_NORETURN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Noreturn' is available as a function attribute.
+     *
+     * @note
+     *   Usually requires: C11.
+     */
+    #define PATOMIC_HAS_NORETURN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_NORETURN_ATTR
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__attribute__((noreturn))' is available as a function attribute.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_NORETURN_ATTR 0
+#endif
+
+
+#ifndef PATOMIC_HAS_NORETURN_DSPC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__declspec(noreturn)' is available as a function attribute.
+     *
+     * @note
+     *   Usually requires: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_NORETURN_DSPC 0
+#endif
+
+
 /*
  * UNSAFE CONSTANTS
  * ================
