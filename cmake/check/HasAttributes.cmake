@@ -12,7 +12,7 @@
 # '_Noreturn' is available as a function attribute
 check_c_source_compiles_or_zero(
     SOURCE
-        "_Noreturn static void loop(void) { while (1); } \n\
+        "static _Noreturn void loop(void) { while (1); } \n\
          int main(void) { loop(); }"
     OUTPUT_VARIABLE
         COMPILER_HAS_NORETURN
@@ -21,7 +21,7 @@ check_c_source_compiles_or_zero(
 # '__attribute__((noreturn))' is available as a function attribute
 check_c_source_compiles_or_zero(
     SOURCE
-        "__attribute__((noreturn)) static void loop(void) { while (1); } \n\
+        "static __attribute__((noreturn)) void loop(void) { while (1); } \n\
          int main(void) { loop(); }"
     OUTPUT_VARIABLE
         COMPILER_HAS_NORETURN_ATTR
@@ -30,7 +30,7 @@ check_c_source_compiles_or_zero(
 # '__declspec(noreturn)' is available as a function attribute
 check_c_source_compiles_or_zero(
     SOURCE
-        "__declspec(noreturn) static void loop(void) { while (1); } \n\
+        "static __declspec(noreturn) void loop(void) { while (1); } \n\
          int main(void) { loop(); }"
     OUTPUT_VARIABLE
         COMPILER_HAS_NORETURN_DSPC
