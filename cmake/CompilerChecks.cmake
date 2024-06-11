@@ -144,3 +144,4 @@ endfunction()
 #   DO NOT change the include order, checks can depend on other checks
 include(cmake/check/HasKeywords.cmake)
 include(cmake/check/HasIntegerTypes.cmake)
+include(cmake/check/HasIdentifiers.cmake)

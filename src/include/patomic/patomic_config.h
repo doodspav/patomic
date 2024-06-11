@@ -174,6 +174,90 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_FUNC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__func__' is a pre-defined identifier.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_FUNC 0
+#endif
+
+
+#ifndef PATOMIC_HAS_FUNC_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __func__' is a pre-defined identifier.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_FUNC_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_FUNCTION
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__FUNCTION__' is a pre-defined identifier.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_FUNCTION 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_FUNCTION_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __FUNCTION__' is a pre-defined identifier.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_FUNCTION_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_PRETTY_FUNCTION
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__PRETTY_FUNCTION__' is a pre-defined identifier.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_PRETTY_FUNCTION 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_PRETTY_FUNCTION_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __PRETTY_FUNCTION__' is a pre-defined identifier.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_PRETTY_FUNCTION_EXTN 0
+#endif
+
+
 /*
  * UNSAFE CONSTANTS
  * ================
