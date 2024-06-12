@@ -143,7 +143,7 @@ endfunction()
 # WARNING:
 #   DO NOT change the include order, checks can depend on other checks
 include(cmake/check/HasKeyword.cmake)
-include(cmake/check/HasIntegerType.cmake)
+include(cmake/check/HasType.cmake)
 include(cmake/check/HasIdentifier.cmake)
 include(cmake/check/HasAttribute.cmake)
 include(cmake/check/HasBuiltin.cmake)
