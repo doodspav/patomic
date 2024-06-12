@@ -179,7 +179,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__func__' is a pre-defined identifier.
+     *   '__func__' is available as a variable.
      *
      * @note
      *   Usually requires: C99.
@@ -193,7 +193,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__extension__ __func__' is a pre-defined identifier.
+     *   '__extension__ __func__' is available as a variable.
      *
      * @note
      *   Usually requires: GNU compatible(-ish) compiler.
@@ -207,7 +207,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__FUNCTION__' is a pre-defined identifier.
+     *   '__FUNCTION__' is available as a variable.
      *
      * @note
      *   Usually requires: GNU compatible(-ish) compiler.
@@ -221,7 +221,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__extension__ __FUNCTION__' is a pre-defined identifier.
+     *   '__extension__ __FUNCTION__' is available as a variable.
      *
      * @note
      *   Usually requires: GNU compatible(-ish) compiler.
@@ -235,7 +235,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__PRETTY_FUNCTION__' is a pre-defined identifier.
+     *   '__PRETTY_FUNCTION__' is available as a variable.
      *
      * @note
      *   Usually requires: GNU compatible(-ish) compiler.
@@ -249,7 +249,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__extension__ __PRETTY_FUNCTION__' is a pre-defined identifier.
+     *   '__extension__ __PRETTY_FUNCTION__' is available as a variable.
      *
      * @note
      *   Usually requires: GNU compatible(-ish) compiler.
