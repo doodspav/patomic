@@ -4,7 +4,7 @@
 #include <patomic/patomic_config.h>
 
 #include <stddef.h>
-#if PATOMIC_HAS_STDINT
+#if PATOMIC_HAS_STDINT_H
     #include <stdint.h>
 #endif
 

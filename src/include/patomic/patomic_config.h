@@ -43,7 +43,7 @@
 #endif
 
 
-#ifndef PATOMIC_HAS_STDINT
+#ifndef PATOMIC_HAS_STDINT_H
     /**
      * @addtogroup config.safe
      *
@@ -53,7 +53,21 @@
      * @note
      *   Usually requires: C99.
      */
-    #define PATOMIC_HAS_STDINT 0
+    #define PATOMIC_HAS_STDINT_H 0
+#endif
+
+
+#ifndef PATOMIC_HAS_WCHAR_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_H 0
 #endif
 
 

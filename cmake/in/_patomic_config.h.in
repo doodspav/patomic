@@ -16,7 +16,7 @@
 #endif
 
 
-#ifndef PATOMIC_HAS_STDINT
+#ifndef PATOMIC_HAS_STDINT_H
     /**
      * @addtogroup config.safe
      *
@@ -26,7 +26,21 @@
      * @note
      *   Usually requires: C99.
      */
-    #define PATOMIC_HAS_STDINT @COMPILER_HAS_STDINT@
+    #define PATOMIC_HAS_STDINT_H @COMPILER_HAS_STDINT_H@
+#endif
+
+
+#ifndef PATOMIC_HAS_WCHAR_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_H @COMPILER_HAS_WCHAR_H@
 #endif
 
 
