@@ -43,6 +43,20 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_STDINT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_STDINT 0
+#endif
+
+
 #ifndef PATOMIC_HAS_LONG_LONG
     /**
      * @addtogroup config.safe
@@ -96,20 +110,6 @@
      *   Usually requires: GNU compatible(-ish) compiler.
      */
     #define PATOMIC_HAS_MS_INT128_EXTN 0
-#endif
-
-
-#ifndef PATOMIC_HAS_STDINT
-    /**
-     * @addtogroup config.safe
-     *
-     * @brief
-     *   <stdint.h> header is available.
-     *
-     * @note
-     *   Usually requires: C99.
-     */
-    #define PATOMIC_HAS_STDINT 0
 #endif
 
 

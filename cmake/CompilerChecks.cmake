@@ -142,6 +142,7 @@ endfunction()
 #
 # WARNING:
 #   DO NOT change the include order, checks can depend on other checks
+include(cmake/check/HasHeader.cmake)
 include(cmake/check/HasKeyword.cmake)
 include(cmake/check/HasType.cmake)
 include(cmake/check/HasVariable.cmake)
