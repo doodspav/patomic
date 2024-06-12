@@ -1,5 +1,6 @@
 # add directory files to target
 target_sources(${target_name} PRIVATE
     assert.h
+    math.h
     stdint.h
 )

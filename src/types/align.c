@@ -1,17 +1,7 @@
 #include <patomic/types/align.h>
 
+#include <patomic/stdlib/math.h>
 #include <patomic/stdlib/stdint.h>
-
-
-/** @brief Checks if a value is a power of 2. */
-#define PATOMIC_IS_POW2(x) (((x) != 0) && (((x) & ((x) - 1u)) == 0))
-
-/** @brief Computes (x % y) assuming that y is a power of 2. */
-#define PATOMIC_MOD_POW2(x, y) ((x) & ((y) - 1u))
-
-/** @brief Computes (x % y) with a fast path if y is a power of 2. */
-#define PATOMIC_MOD_CPOW2(x, y) \
-    (PATOMIC_IS_POW2(y) ? PATOMIC_MOD_POW2(x, y) : ((x) % (y)))
 
 
 size_t
@@ -31,13 +21,13 @@ patomic_align_meets_recommended(
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
 
     /* check that recommended alignment is valid */
-    if(!PATOMIC_IS_POW2(align.recommended))
+    if(!patomic_unsigned_is_pow2(align.recommended))
     {
         return 0;
     }
 
     /* check that addr pointer is aligned to recommended alignment */
-    return PATOMIC_MOD_CPOW2(addr, align.recommended) == 0;
+    return patomic_unsigned_mod_pow2(addr, align.recommended) == 0;
 }
 
 
@@ -52,13 +42,13 @@ patomic_align_meets_minimum(
     patomic_intptr_unsigned_t addr = (patomic_intptr_unsigned_t) ptr;
 
     /* check that minimum alignment is valid */
-    if(!PATOMIC_IS_POW2(align.minimum))
+    if(!patomic_unsigned_is_pow2(align.minimum))
     {
         return 0;
     }
 
     /* check that addr ptr is aligned to minimum alignment */
-    if(PATOMIC_MOD_CPOW2(addr, align.minimum) == 0)
+    if(patomic_unsigned_mod_pow2(addr, align.minimum) == 0)
     {
         /* check if minimum alignment is always valid */
         if (align.size_within == 0)
@@ -68,7 +58,7 @@ patomic_align_meets_minimum(
 
         /* make addr value less than size_within */
         addr = (patomic_intptr_unsigned_t) \
-            PATOMIC_MOD_CPOW2(addr, align.size_within);
+            patomic_unsigned_mod(addr, align.size_within);
 
         /* check that buffer starting at addr doesn't extend past size_within */
         return (addr + width) <= align.size_within;
