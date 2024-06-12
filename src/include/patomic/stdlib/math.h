@@ -28,7 +28,7 @@
  *   An object of integer type holding a non-negative value.
  *
  * @param y
- *   An object of integer type holding a positive non-zero value.
+ *   An object of integer type holding a positive power of 2 value.
  *
  * @return
  *   The non-negative value 'x % y' of unsigned integer type.
