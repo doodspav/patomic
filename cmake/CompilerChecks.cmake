@@ -142,8 +142,8 @@ endfunction()
 #
 # WARNING:
 #   DO NOT change the include order, checks can depend on other checks
-include(cmake/check/HasKeywords.cmake)
-include(cmake/check/HasIntegerTypes.cmake)
-include(cmake/check/HasIdentifiers.cmake)
-include(cmake/check/HasAttributes.cmake)
-include(cmake/check/HasBuiltins.cmake)
+include(cmake/check/HasKeyword.cmake)
+include(cmake/check/HasIntegerType.cmake)
+include(cmake/check/HasIdentifier.cmake)
+include(cmake/check/HasAttribute.cmake)
+include(cmake/check/HasBuiltin.cmake)
