@@ -9,7 +9,7 @@
  *   Checks if 'x' is a power of 2.
  *
  * @param x
- *   An object of integer type holding a non-negative value.
+ *   An object of unsigned integer type holding a non-negative value.
  *
  * @return
  *   The value 1 if 'x' is a power of 2, otherwise the value 0.
@@ -25,10 +25,10 @@
  *   Computes 'x % y' assuming that 'y' is a power of 2.
  *
  * @param x
- *   An object of integer type holding a non-negative value.
+ *   An object of unsigned integer type holding a non-negative value.
  *
  * @param y
- *   An object of integer type holding a positive power of 2 value.
+ *   An object of unsigned integer type holding a positive power of 2 value.
  *
  * @return
  *   The non-negative value 'x % y' of unsigned integer type.
@@ -44,10 +44,10 @@
  *   Computes 'x % y' with no assumptions about their values.
  *
  * @param x
- *   An object of integer type holding a non-negative value.
+ *   An object of unsigned integer type holding a non-negative value.
  *
  * @param y
- *   An object of integer type holding a positive non-zero value.
+ *   An object of unsigned integer type holding a positive non-zero value.
  *
  * @return
  *   A non-negative value 'x % y' of unsigned integer type.
