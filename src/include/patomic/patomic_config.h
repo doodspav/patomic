@@ -342,6 +342,36 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_WCHAR_FWIDE
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available and makes 'fwide(FILE*, int)' available
+     *   as a function.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_FWIDE 0
+#endif
+
+
+#ifndef PATOMIC_HAS_WCHAR_FWPRINTF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available and makes
+     *   'fwprintf(FILE*, const wchar_t*, ...)' available as a function.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_FWPRINTF 0
+#endif
+
+
 /*
  * UNSAFE CONSTANTS
  * ================

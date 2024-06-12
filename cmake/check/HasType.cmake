@@ -64,7 +64,7 @@ check_c_source_compiles_or_zero(
     OUTPUT_VARIABLE
         COMPILER_HAS_STDINT_INTPTR
     WILL_FAIL_IF_ANY_NOT
-        ${COMPILER_HAS_STDINT}
+        ${COMPILER_HAS_STDINT_H}
 )
 
 # <stdint.h> header is available and makes '__extension__ intptr_t' available as a type
@@ -79,7 +79,7 @@ check_c_source_compiles_or_zero(
         ${COMPILER_HAS_EXTN}
     WILL_FAIL_IF_ANY_NOT
         ${COMPILER_HAS_EXTN}
-        ${COMPILER_HAS_STDINT}
+        ${COMPILER_HAS_STDINT_H}
 )
 
 # <stddef.h> header is available and makes 'intptr_t' available as a type

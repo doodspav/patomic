@@ -1,10 +1,11 @@
 # ---- Has Header ----
 
-# --------------------------------------------------------
-# | Variable            | Check                          |
-# |=====================|================================|
-# | COMPILER_HAS_STDINT | <stdint.h> header is available |
-# --------------------------------------------------------
+# ----------------------------------------------------------
+# | Variable              | Check                          |
+# |=======================|================================|
+# | COMPILER_HAS_STDINT_H | <stdint.h> header is available |
+# | COMPILER_HAS_WCHAR_H  | <wchar.h> header is available  |
+# ----------------------------------------------------------
 
 
 # <stdint.h> header is available
