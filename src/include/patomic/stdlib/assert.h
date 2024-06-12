@@ -1,4 +1,4 @@
-#ifndef PATOMIC_STDLIB_ASSERT_H
+#ifdef PATOMIC_STDLIB_ASSERT_H
     #undef PATOMIC_STDLIB_ASSERT_H
     #undef patomic_assert
     #undef patomic_assert_always

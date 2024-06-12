@@ -37,3 +37,5 @@
  *   and is implemented as a void cast zero ((void) 0).
  */
 #define PATOMIC_UNREACHABLE_IS_VCZ PATOMIC_UNREACHABLE_IS_VCZ_
+
+#endif  /* PATOMIC_UNREACHABLE */
