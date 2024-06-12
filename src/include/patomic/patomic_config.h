@@ -300,6 +300,34 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_MS_ASSUME
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__assume(int)' is available as a builtin.
+     *
+     * @note
+     *   Usually requires: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_ASSUME 0
+#endif
+
+
+#ifndef PATOMIC_HAS_BUILTIN_UNREACHABLE
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__builtin_unreachable()' is available as a builtin.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_BUILTIN_UNREACHABLE 0
+#endif
+
+
 /*
  * UNSAFE CONSTANTS
  * ================
