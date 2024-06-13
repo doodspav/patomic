@@ -62,6 +62,13 @@ patomic_impl_register[] = {
         patomic_impl_create_null,
         patomic_impl_create_explicit_null,
         patomic_impl_create_transaction_null
+    },
+    {
+        patomic_id_STDC,
+        patomic_kind_BLTN,
+        patomic_impl_create_null,
+        patomic_impl_create_explicit_null,
+        patomic_impl_create_transaction_null
     }
 };
 
