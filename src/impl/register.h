@@ -52,7 +52,7 @@ typedef struct {
  *
  * @note
  *   An implementation may use the NULL implementation's creation functions if
- *   it does not support implicit, explicit, or transaction operations.
+ *   it cannot create any implicit, explicit, or transaction operations.
  */
 static const patomic_impl_t
 patomic_impl_register[] = {
