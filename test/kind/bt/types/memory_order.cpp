@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <vector>
 
 
 /// @brief Test fixture.

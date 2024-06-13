@@ -28,7 +28,6 @@ TEST_F(BtTypesVersion, version_string_fn_cmp_eq_macro)
     EXPECT_STREQ(macro, fnval);
 }
 
-
 /// @brief Return value of patomic_version_major() compares equal to
 ///        PATOMIC_VERSION_MAJOR.
 TEST_F(BtTypesVersion, version_major_fn_cmp_eq_macro)
@@ -40,7 +39,6 @@ TEST_F(BtTypesVersion, version_major_fn_cmp_eq_macro)
     // test
     EXPECT_EQ(macro, fnval);
 }
-
 
 /// @brief Return value of patomic_version_minor() compares equal to
 ///        PATOMIC_VERSION_MINOR.
@@ -54,7 +52,6 @@ TEST_F(BtTypesVersion, version_minor_fn_cmp_eq_macro)
     EXPECT_EQ(macro, fnval);
 }
 
-
 /// @brief Return value of patomic_version_patch() compares equal to
 ///        PATOMIC_VERSION_PATCH.
 TEST_F(BtTypesVersion, version_patch_fn_cmp_eq_macro)
@@ -67,14 +64,12 @@ TEST_F(BtTypesVersion, version_patch_fn_cmp_eq_macro)
     EXPECT_EQ(macro, fnval);
 }
 
-
 /// @brief PATOMIC_VERSION_STRING matches SemVer regex.
 TEST_F(BtTypesVersion, version_string_matches_semver_regex)
 {
     // test
     EXPECT_TRUE(std::regex_match(PATOMIC_VERSION_STRING, semver_regex));
 }
-
 
 /// @brief PATOMIC_VERSION_STRING major component compares equal to
 ///        PATOMIC_VERSION_MAJOR.
@@ -90,7 +85,6 @@ TEST_F(BtTypesVersion, version_string_major_component_matches_version_major)
     EXPECT_EQ(major, PATOMIC_VERSION_MAJOR);
 }
 
-
 /// @brief PATOMIC_VERSION_STRING minor component compares equal to
 ///        PATOMIC_VERSION_MINOR.
 TEST_F(BtTypesVersion, version_string_minor_component_matches_version_minor)
@@ -105,7 +99,6 @@ TEST_F(BtTypesVersion, version_string_minor_component_matches_version_minor)
     EXPECT_EQ(minor, PATOMIC_VERSION_MINOR);
 }
 
-
 /// @brief PATOMIC_VERSION_STRING major component compares equal to
 ///        PATOMIC_VERSION_MAJOR.
 TEST_F(BtTypesVersion, version_string_patch_component_matches_version_patch)
@@ -119,7 +112,6 @@ TEST_F(BtTypesVersion, version_string_patch_component_matches_version_patch)
     // test
     EXPECT_EQ(patch, PATOMIC_VERSION_PATCH);
 }
-
 
 /// @brief Library is not compatible with major versions that do not compare
 ///        equal to PATOMIC_VERSION_MAJOR.
@@ -136,7 +128,6 @@ TEST_F(BtTypesVersion, version_not_compatible_major_ne)
     }
 }
 
-
 /// @brief Library is not compatible with minor versions that compare greater
 ///        than PATOMIC_VERSION_MINOR when the major version compares equal
 ///        to PATOMIC_VERSION_MAJOR.
@@ -150,7 +141,6 @@ TEST_F(BtTypesVersion, version_not_compatible_major_eq_minor_gt)
     EXPECT_FALSE(PATOMIC_VERSION_COMPATIBLE_WITH(major, minor_gt, 0));
     EXPECT_FALSE(patomic_version_compatible_with(major, minor_gt, 0));
 }
-
 
 /// @brief Library is not compatible with patch versions that compare greater
 ///        than PATOMIC_VERSION_PATCH when the major and minor versions compare
@@ -167,7 +157,6 @@ TEST_F(BtTypesVersion, version_not_compatible_major_eq_minor_eq_patch_gt)
     EXPECT_FALSE(PATOMIC_VERSION_COMPATIBLE_WITH(major, minor, patch_gt));
     EXPECT_FALSE(patomic_version_compatible_with(major, minor, patch_gt));
 }
-
 
 /// @brief Library is compatible with minor versions that compare less than
 ///        PATOMIC_VERSION_MINOR when the major version compares equal to
@@ -186,7 +175,6 @@ TEST_F(BtTypesVersion, version_compatible_major_eq_minor_lt_patch_any)
         EXPECT_TRUE(patomic_version_compatible_with(major, minor_lt, patch_any));
     }
 }
-
 
 /// @brief Library is compatible with minor versions that compare equal to
 ///        PATOMIC_VERSION_MINOR when the major version compares equal to
