@@ -410,7 +410,7 @@ TEST_F(BtTypesAlign, meets_minimum_fails_buffer_fits_but_misaligned_for_size_wit
     EXPECT_EQ(16, align.minimum);
     EXPECT_EQ(16, test::runtime_alignof(ptr));
     // pointer is 16 bytes from a 64 byte alignment boundary and crosses it
-    EXPECT_GE(64, test::runtime_alignof(static_cast<const char *>(ptr) + 16));
+    EXPECT_LE(64, test::runtime_alignof(static_cast<const char *>(ptr) + 16));
     EXPECT_GT(size, 16);
     // check fails
     EXPECT_FALSE(patomic_align_meets_minimum(ptr, align, size));
