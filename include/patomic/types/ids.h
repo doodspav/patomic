@@ -34,10 +34,13 @@ typedef unsigned long patomic_id_t;
 /** @brief Value matching any and all implementation ids.
  *  @note  To get all currently available implementation ids at runtime, you
  *         can call patomic_get_ids(patomic_kinds_ALL). */
-#define patomic_ids_ALL (~0UL)
+#define patomic_ids_ALL (~0ul)
 
 /** @brief The id corresponding to the NULL implementation (i.e. none). */
-#define patomic_id_NULL (0UL)
+#define patomic_id_NULL (0ul)
+
+/** @brief The id corresponding to the C standard implementation. */
+#define patomic_id_STDC (1ul << 0ul)
 
 
 /**
