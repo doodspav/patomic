@@ -7,6 +7,7 @@
 #include <csignal>
 #include <map>
 #include <set>
+#include <vector>
 
 
 /// @brief Test fixture.
@@ -18,7 +19,12 @@ public:
         { patomic_id_STDC, patomic_kind_BLTN}
     };
 
-    const std::set<patomic_kind_t> kinds {
+    const std::vector<patomic_id_t> ids {
+        patomic_id_NULL,
+        patomic_id_STDC
+    };
+
+    const std::vector<patomic_kind_t> kinds {
         patomic_kind_UNKN,
         patomic_kind_DYN,
         patomic_kind_OS,
@@ -32,6 +38,27 @@ public:
 class BtTypesIds_DeathTest : public testing::Test
 {};
 
+
+/// @brief All ids are unique.
+TEST_F(BtTypesIds, all_ids_are_unique)
+{
+    // setup
+    const std::set<patomic_id_t> ids_set { ids.begin(), ids.end() };
+
+    // test
+    EXPECT_EQ(ids.size(), impls_id_to_kind.size());
+    EXPECT_EQ(ids.size(), ids_set.size());
+}
+
+/// @brief All kinds are unique.
+TEST_F(BtTypesIds, all_kinds_are_unique)
+{
+    // setup
+    const std::set<patomic_kind_t> kinds_set { kinds.begin(), kinds.end() };
+
+    // test
+    EXPECT_EQ(kinds.size(), kinds_set.size());
+}
 
 /// @brief All ids have exactly zero or one bits set (except for ALL).
 TEST_F(BtTypesIds, all_ids_have_zero_or_one_bits_set)
@@ -151,7 +178,19 @@ TEST_F(BtTypesIds, get_ids_gives_correct_ids_for_all_kind_combinations)
 {
     // calculate all kind combinations
     std::vector<int> all_kind_combos;
-    // TODO
+    all_kind_combos.resize(1 << kinds.size());
+    for (std::size_t i = 1; i < all_kind_combos.size(); ++i)
+    {
+        int kind_combo = 0;
+        for (std::size_t j = 0; j < kinds.size(); ++j)
+        {
+            if (i & (1 << j))
+            {
+                kind_combo |= kinds[j];
+            }
+        }
+        all_kind_combos[i] = kind_combo;
+    }
 
     // calculate resulting ids
     std::vector<unsigned long> all_id_results;
@@ -170,9 +209,9 @@ TEST_F(BtTypesIds, get_ids_gives_correct_ids_for_all_kind_combinations)
 
     // test
     ASSERT_EQ(all_kind_combos.size(), all_id_results.size());
-    for (int i = 0; i < static_cast<int>(all_kind_combos.size()); ++i)
+    for (std::size_t i = 0; i < all_kind_combos.size(); ++i)
     {
-        const unsigned long kinds = all_kind_combos[i];
+        const int kinds = all_kind_combos[i];
         const unsigned long ids = all_id_results[i];
         EXPECT_EQ(ids, patomic_get_ids(kinds));
     }
@@ -184,8 +223,7 @@ TEST_F(BtTypesIds, get_ids_ignores_invalid_kinds)
 {
     // setup
     ASSERT_FALSE(kinds.empty());
-    const auto kinds_size = std::distance(kinds.begin(), kinds.end());
-    const auto invalid_kind = *std::next(kinds.begin(), kinds_size - 1) + 1;
+    const auto invalid_kind = kinds.back() + 1;
     const auto stdc_kind = impls_id_to_kind.at(patomic_id_STDC);
 
     // test
