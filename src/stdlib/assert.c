@@ -57,7 +57,6 @@ patomic_assert_fxprint(
         PATOMIC_IGNORE_UNUSED(mbstowcs(file_wide, file, file_size));
         PATOMIC_IGNORE_UNUSED(mbstowcs(func_wide, func, func_size));
 
-
         /* print assertion */
         PATOMIC_IGNORE_UNUSED(fwprintf(
             stream, L"%s:%d: %s: Assertion `%s` failed.\n",
@@ -114,7 +113,7 @@ __patomic_assert_fail(
     _ = fflush(stderr);
     PATOMIC_IGNORE_UNUSED(_);
 
-    /* stop execution */
+    /* failed assertions should not return */
     abort();
 
     /* if unreachable is vcz ((void) 0), we may get a compiler warning for
