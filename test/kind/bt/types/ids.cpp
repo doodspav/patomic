@@ -179,7 +179,7 @@ TEST_F(BtTypesIds, get_ids_gives_correct_ids_for_all_kind_combinations)
     // calculate all kind combinations
     std::vector<int> all_kind_combos;
     all_kind_combos.resize(1 << kinds.size());
-    for (std::size_t i = 1; i < all_kind_combos.size(); ++i)
+    for (std::size_t i = 0; i < all_kind_combos.size(); ++i)
     {
         int kind_combo = 0;
         for (std::size_t j = 0; j < kinds.size(); ++j)
@@ -191,6 +191,10 @@ TEST_F(BtTypesIds, get_ids_gives_correct_ids_for_all_kind_combinations)
         }
         all_kind_combos[i] = kind_combo;
     }
+
+    // skip empty set (in case there is no valid kind with value 0)
+    all_kind_combos.erase(all_kind_combos.begin());
+
 
     // calculate resulting ids
     std::vector<unsigned long> all_id_results;
