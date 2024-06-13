@@ -45,15 +45,23 @@ typedef struct {
  * @brief
  *   Array containing set of all existing implementations, regardless of whether
  *   they are supported on the current platform.
+ *
+ * @warning
+ *   Each implementation element must have a unique ID, which may not have more
+ *   than a single bit set.
+ *
+ * @note
+ *   An implementation may use the NULL implementation's creation functions if
+ *   it does not support implicit, explicit, or transaction operations.
  */
 static const patomic_impl_t
 patomic_impl_register[] = {
     {
         patomic_id_NULL,
         patomic_kind_UNKN,
-        NULL,
-        NULL,
-        NULL
+        patomic_impl_create_null,
+        patomic_impl_create_explicit_null,
+        patomic_impl_create_transaction_null
     }
 };
 
