@@ -10,6 +10,11 @@
 #include <vector>
 
 
+#ifdef _MSC_VER
+    #define KilledBySignal(_sig) ExitedWithCode(3)
+#endif
+
+
 /// @brief Test fixture.
 class BtTypesIds : public testing::Test
 {
@@ -178,13 +183,13 @@ TEST_F(BtTypesIds, get_ids_gives_correct_ids_for_all_kind_combinations)
 {
     // calculate all kind combinations
     std::vector<int> all_kind_combos;
-    all_kind_combos.resize(1 << kinds.size());
+    all_kind_combos.resize(static_cast<std::size_t>(1) << kinds.size());
     for (std::size_t i = 0; i < all_kind_combos.size(); ++i)
     {
         int kind_combo = 0;
         for (std::size_t j = 0; j < kinds.size(); ++j)
         {
-            if (i & (1 << j))
+            if (i & (static_cast<std::size_t>(1) << j))
             {
                 kind_combo |= kinds[j];
             }
