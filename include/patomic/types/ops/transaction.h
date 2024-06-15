@@ -970,27 +970,6 @@ typedef struct {
  * @addtogroup ops.transaction
  *
  * @brief
- *   Set of function pointers for atomic flag operations with fixed memory
- *   order. Pointers are NULL if operation is not supported.
- */
-typedef struct {
-
-    /** @brief Atomic flag test operation with fixed memory order. */
-    patomic_opsig_transaction_flag_test_t fp_test;
-
-    /** @brief Atomic flag test-and-set operation with fixed memory order. */
-    patomic_opsig_transaction_flag_test_set_t fp_test_set;
-
-    /** @brief Atomic flag clear operation with fixed memory order. */
-    patomic_opsig_transaction_flag_clear_t fp_clear;
-
-} patomic_ops_transaction_flag_t;
-
-
-/**
- * @addtogroup ops.transaction
- *
- * @brief
  *   Set of function pointers for atomic extended transaction-specific
  *   operations implemented using a sequentially consistent transaction.
  *   Pointers are NULL if operation is not supported.
@@ -1020,7 +999,28 @@ typedef struct {
  * @addtogroup ops.transaction
  *
  * @brief
- *   Set of function pointers for raw transaction specific operations. Pointers
+ *   Set of function pointers for atomic flag operations with fixed memory
+ *   order. Pointers are NULL if operation is not supported.
+ */
+typedef struct {
+
+    /** @brief Atomic flag test operation with fixed memory order. */
+    patomic_opsig_transaction_flag_test_t fp_test;
+
+    /** @brief Atomic flag test-and-set operation with fixed memory order. */
+    patomic_opsig_transaction_flag_test_set_t fp_test_set;
+
+    /** @brief Atomic flag clear operation with fixed memory order. */
+    patomic_opsig_transaction_flag_clear_t fp_clear;
+
+} patomic_ops_transaction_flag_t;
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Set of function pointers for raw transaction-specific operations. Pointers
  *   are NULL if operation is not supported.
  */
 typedef struct {
@@ -1074,6 +1074,19 @@ typedef struct {
      *         representation implemented using a sequentially consistent
      *         transaction. */
     patomic_ops_transaction_arithmetic_t arithmetic_ops;
+
+    /** @brief Set of function pointers for atomic extended
+     *         transaction-specific operations implemented using a sequentially
+     *         consistent transaction. */
+    patomic_ops_transaction_special_t special_ops;
+
+    /** @brief Set of function pointers for atomic flag operations with fixed
+     *         memory order. */
+    patomic_ops_transaction_flag_t flag_ops;
+
+    /** @brief Set of function pointers for raw transaction-specific
+     *         operations. */
+    patomic_ops_transaction_raw_t raw_ops;
 
 } patomic_ops_transaction_t;
 
