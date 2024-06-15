@@ -2,4 +2,5 @@
 target_sources(${test_target_name}-include INTERFACE
     align.hpp
     math.hpp
+    type_traits.hpp
 )
