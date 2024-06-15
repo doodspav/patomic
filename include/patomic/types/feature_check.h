@@ -434,6 +434,10 @@ patomic_feature_check_any_transaction(
  *   Invalid bits in "opkinds" which do not correspond to a patomic_opkind_t
  *   label are ignored and remain set in the return value.
  *
+ * @note
+ *   If the "opcat" provided does not apply to the "ops" (e.g. it is
+ *   transaction specific), then "opkinds" is returned directly unmodified.
+ *
  * @warning
  *   The "opcat" value MUST have exactly 1 valid bit set. This means that labels
  *   such as patomic_opcat_NONE and patomic_opcats_* are not allowed. This will
@@ -471,6 +475,10 @@ patomic_feature_check_leaf(
  * @note
  *   Invalid bits in "opkinds" which do not correspond to a patomic_opkind_t
  *   label are ignored and remain set in the return value.
+ *
+ * @note
+ *   If the "opcat" provided does not apply to the "ops" (e.g. it is
+ *   transaction specific), then "opkinds" is returned directly unmodified.
  *
  * @warning
  *   The "opcat" value MUST have exactly 1 valid bit set. This means that labels
