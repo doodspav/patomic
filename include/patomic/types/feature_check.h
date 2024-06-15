@@ -69,7 +69,7 @@ typedef enum {
     patomic_opcats_EXPLICIT = patomic_opcats_IMPLICIT,
 
     /** @brief All transaction operations. */
-    patomic_opcats_transaction = patomic_opcats_EXPLICIT |
+    patomic_opcats_TRANSACTION = patomic_opcats_EXPLICIT |
                                  patomic_opcat_TSPEC     |
                                  patomic_opcat_TFLAG     |
                                  patomic_opcat_TRAW
