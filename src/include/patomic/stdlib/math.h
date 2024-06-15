@@ -6,6 +6,22 @@
  * @addtogroup stdlib
  *
  * @brief
+ *   Checks if 'x' is 0 or a power of 2.
+ *
+ * @param x
+ *   An object of unsigned integer type holding a non-negative value.
+ *
+ * @return
+ *   The value 1 if 'x' is 0 or a power of 2, otherwise the value 0.
+ */
+#define patomic_unsigned_is_pow2_or_zero(x) \
+    (((x) & ((x) - 1u)) == 0)
+
+
+/**
+ * @addtogroup stdlib
+ *
+ * @brief
  *   Checks if 'x' is a power of 2.
  *
  * @param x
@@ -15,7 +31,7 @@
  *   The value 1 if 'x' is a power of 2, otherwise the value 0.
  */
 #define patomic_unsigned_is_pow2(x) \
-    (((x) != 0) && (((x) & ((x) - 1u)) == 0))
+    (((x) != 0) && patomic_unsigned_is_pow2_or_zero(x))
 
 
 /**

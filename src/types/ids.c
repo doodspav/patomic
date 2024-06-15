@@ -42,7 +42,7 @@ patomic_get_kind(
     patomic_impl_t const *const end = begin + PATOMIC_IMPL_REGISTER_SIZE;
 
     /* always assert because we have no other way to surface error */
-    patomic_assert_always(id == 0 || patomic_unsigned_is_pow2(id));
+    patomic_assert_always(patomic_unsigned_is_pow2_or_zero(id));
 
     /* find kind */
     for (; begin != end; ++begin)
