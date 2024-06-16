@@ -278,6 +278,7 @@ TEST_F(BtTypesIds, get_kind_gives_kind_unkn_for_invalid_id)
     }
 }
 
+
 /// @brief Passing multiple ids (multiple bits set) is fatally asserted.
 TEST_F(BtTypesIds_DeathTest, get_kinds_asserts_on_multiple_ids)
 {
