@@ -250,7 +250,7 @@ make_ops_bitwise_combinations()
     CREATE_SETTER_LAMBDA(test_compl);
     CREATE_SETTER_LAMBDA(test_set);
     CREATE_SETTER_LAMBDA(test_reset);
-    std::vector<void(*)(T&)> setters {
+    const std::vector<void(*)(T&)> setters {
         set_test,
         set_test_compl,
         set_test_set,
@@ -275,7 +275,7 @@ make_ops_binary_combinations()
     CREATE_SETTER_LAMBDA(fetch_xor);
     CREATE_SETTER_LAMBDA(fetch_and);
     CREATE_SETTER_LAMBDA(fetch_not);
-    std::vector<SettersVf<T>> setters {
+    const std::vector<SettersVf<T>> setters {
         SettersVf<T>().v(set_or).f(set_fetch_or),
         SettersVf<T>().v(set_xor).f(set_fetch_xor),
         SettersVf<T>().v(set_and).f(set_fetch_and),
@@ -302,7 +302,7 @@ make_ops_arithmetic_combinations()
     CREATE_SETTER_LAMBDA(fetch_inc);
     CREATE_SETTER_LAMBDA(fetch_dec);
     CREATE_SETTER_LAMBDA(fetch_neg);
-    std::vector<SettersVf<T>> setters {
+    const std::vector<SettersVf<T>> setters {
         SettersVf<T>().v(set_add).f(set_fetch_add),
         SettersVf<T>().v(set_sub).f(set_fetch_sub),
         SettersVf<T>().v(set_inc).f(set_fetch_inc),
@@ -344,7 +344,9 @@ make_ops_nonnull_transaction() noexcept
     // setup
     using OpsT = patomic_ops_transaction_t;
     OpsT ops = make_ops_nonnull_non_transaction_specific<OpsT>();
-    test::convertible_to_any<void(*)(void)> non_null { only_for_address };
+    constexpr test::convertible_to_any<void(*)(void)> non_null {
+        only_for_address
+    };
 
     // initialize all transaction specific members to be non-null
     // TSPEC
@@ -391,7 +393,7 @@ make_ops_special_combinations_transaction()
     CREATE_SETTER_LAMBDA(multi_cmpxchg);
     CREATE_SETTER_LAMBDA(generic);
     CREATE_SETTER_LAMBDA(generic_wfb);
-    std::vector<void(*)(T&)> setters {
+    const std::vector<void(*)(T&)> setters {
         set_double_cmpxchg,
         set_multi_cmpxchg,
         set_generic,
@@ -411,7 +413,7 @@ make_ops_flag_combinations_transaction()
     CREATE_SETTER_LAMBDA(test);
     CREATE_SETTER_LAMBDA(test_set);
     CREATE_SETTER_LAMBDA(clear);
-    std::vector<void(*)(T&)> setters {
+    const std::vector<void(*)(T&)> setters {
         set_test,
         set_test_set,
         set_clear
@@ -431,7 +433,7 @@ make_ops_raw_combinations_transaction()
     CREATE_SETTER_LAMBDA(tabort);
     CREATE_SETTER_LAMBDA(tcommit);
     CREATE_SETTER_LAMBDA(ttest);
-    std::vector<void(*)(T&)> setters {
+    const std::vector<void(*)(T&)> setters {
         set_tbegin,
         set_tabort,
         set_tcommit,
