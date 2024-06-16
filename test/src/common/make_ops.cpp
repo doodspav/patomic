@@ -3,27 +3,27 @@
 
 
 #define CREATE_SETTER_LAMBDA(name)                                \
-    auto set_##name = [](T& ops) noexcept -> void {               \
+    const auto set_##name = [](T& ops) noexcept -> void {         \
         ops.fp_##name = test::convertible_to_any<void(*)(void)> { \
             only_for_address                                      \
         };                                                        \
     }
 
 
-#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name)                               \
-    std::vector<OpsAnyAll<patomic_ops##type_name##t>>                                      \
+#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name, ops_holder_type)              \
+    std::vector<ops_holder_type<patomic_ops##type_name##t>>                                \
     make_ops_##fn_name##_combinations_implicit()                                           \
     {                                                                                      \
         return make_ops_##fn_name##_combinations<patomic_ops##type_name##t>();             \
     }                                                                                      \
                                                                                            \
-    std::vector<OpsAnyAll<patomic_ops_explicit##type_name##t>>                             \
+    std::vector<ops_holder_type<patomic_ops_explicit##type_name##t>>                       \
     make_ops_##fn_name##_combinations_explicit()                                           \
     {                                                                                      \
         return make_ops_##fn_name##_combinations<patomic_ops_explicit##type_name##t>();    \
     }                                                                                      \
                                                                                            \
-    std::vector<OpsAnyAll<patomic_ops_transaction##type_name##t>>                          \
+    std::vector<ops_holder_type<patomic_ops_transaction##type_name##t>>                    \
     make_ops_##fn_name##_combinations_transaction()                                        \
     {                                                                                      \
         return make_ops_##fn_name##_combinations<patomic_ops_transaction##type_name##t>(); \
@@ -105,8 +105,11 @@ make_ops_combinations(const std::vector<void(*)(T&)>& setters)
     // go through all combinations
     for (std::size_t i = 0; i < combinations.size(); ++i)
     {
+        // set initial values
         combinations[i].all = true;
         combinations[i].any = false;
+
+        // set necessary members and update values
         for (std::size_t j = 0; j < setters.size(); ++j)
         {
             if (i & (1u << j))
@@ -127,13 +130,89 @@ make_ops_combinations(const std::vector<void(*)(T&)>& setters)
 
 
 template <class T>
+class SettersVf
+{
+public:
+    SettersVf() noexcept = default;
+
+    SettersVf& v(void(*set_v)(T&)) noexcept
+    {
+        this->set_void = set_v;
+        return *this;
+    }
+
+    SettersVf& f(void(*set_f)(T&)) noexcept
+    {
+        this->set_fetch = set_f;
+        return *this;
+    }
+
+    void (*set_void)(T&) = nullptr;
+    void (*set_fetch)(T&) = nullptr;
+};
+
+
+template <class T>
+std::vector<test::OpsAnyAllVf<T>>
+make_ops_combinations(const std::vector<SettersVf<T>>& setters)
+{
+    // setup
+    const auto sqrt_size = (1u << setters.size());
+    std::vector<test::OpsAnyAllVf<T>> combinations;
+    combinations.resize(sqrt_size * sqrt_size);
+
+    // go through all combinations
+    for (std::size_t i_fetch = 0; i_fetch < sqrt_size; ++i_fetch)
+    {
+        for (std::size_t i_void = 0; i_void < sqrt_size; ++i_void)
+        {
+            // set initial values
+            const auto i = i_void + (i_fetch * sqrt_size);
+            combinations[i].all_void = true;
+            combinations[i].all_fetch = true;
+            combinations[i].any_void = false;
+            combinations[i].any_fetch = false;
+
+            for (std::size_t j = 0; j < setters.size(); ++j)
+            {
+                // conditionally set void operations
+                if (i_void & (1u << j))
+                {
+                    setters[j].set_void(combinations[i].ops);
+                    combinations[i].any_void = true;
+                }
+                else
+                {
+                    combinations[i].all_void = false;
+                }
+
+                // conditionally set fetch operations
+                if (i_fetch & (1u << j))
+                {
+                    setters[j].set_fetch(combinations[i].ops);
+                    combinations[i].any_fetch = true;
+                }
+                else
+                {
+                    combinations[i].all_fetch = false;
+                }
+            }
+        }
+    }
+
+    // return
+    return combinations;
+}
+
+
+template <class T>
 std::vector<test::OpsAnyAll<T>>
 make_ops_ldst_combinations()
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(store);
     CREATE_SETTER_LAMBDA(load);
-    std::vector<void(*)(T&)> setters {
+    const std::vector<void(*)(T&)> setters {
         set_store,
         set_load
     };
@@ -151,7 +230,7 @@ make_ops_xchg_combinations()
     CREATE_SETTER_LAMBDA(exchange);
     CREATE_SETTER_LAMBDA(cmpxchg_weak);
     CREATE_SETTER_LAMBDA(cmpxchg_strong);
-    std::vector<void(*)(T&)> setters {
+    const std::vector<void(*)(T&)> setters {
         set_exchange,
         set_cmpxchg_weak,
         set_cmpxchg_strong
@@ -184,40 +263,23 @@ make_ops_bitwise_combinations()
 
 
 template <class T>
-std::vector<test::OpsAnyAll<T>>
-make_ops_binary_void_combinations()
+std::vector<test::OpsAnyAllVf<T>>
+make_ops_binary_combinations()
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(or);
     CREATE_SETTER_LAMBDA(xor);
     CREATE_SETTER_LAMBDA(and);
     CREATE_SETTER_LAMBDA(not);
-    std::vector<void(*)(T&)> setters {
-        set_or,
-        set_xor,
-        set_and,
-        set_not
-    };
-
-    // create all combinations
-    return make_ops_combinations(setters);
-}
-
-
-template <class T>
-std::vector<test::OpsAnyAll<T>>
-make_ops_binary_fetch_combinations()
-{
-    // lambda helpers
     CREATE_SETTER_LAMBDA(fetch_or);
     CREATE_SETTER_LAMBDA(fetch_xor);
     CREATE_SETTER_LAMBDA(fetch_and);
     CREATE_SETTER_LAMBDA(fetch_not);
-    std::vector<void(*)(T&)> setters {
-        set_fetch_or,
-        set_fetch_xor,
-        set_fetch_and,
-        set_fetch_not
+    std::vector<SettersVf<T>> setters {
+        SettersVf<T>().v(set_or).f(set_fetch_or),
+        SettersVf<T>().v(set_xor).f(set_fetch_xor),
+        SettersVf<T>().v(set_and).f(set_fetch_and),
+        SettersVf<T>().v(set_not).f(set_fetch_not)
     };
 
     // create all combinations
@@ -226,8 +288,8 @@ make_ops_binary_fetch_combinations()
 
 
 template <class T>
-std::vector<test::OpsAnyAll<T>>
-make_ops_arithmetic_void_combinations()
+std::vector<test::OpsAnyAllVf<T>>
+make_ops_arithmetic_combinations()
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(add);
@@ -235,35 +297,17 @@ make_ops_arithmetic_void_combinations()
     CREATE_SETTER_LAMBDA(inc);
     CREATE_SETTER_LAMBDA(dec);
     CREATE_SETTER_LAMBDA(neg);
-    std::vector<void(*)(T&)> setters {
-        set_add,
-        set_sub,
-        set_inc,
-        set_dec,
-        set_neg
-    };
-
-    // create all combinations
-    return make_ops_combinations(setters);
-}
-
-
-template <class T>
-std::vector<test::OpsAnyAll<T>>
-make_ops_arithmetic_fetch_combinations()
-{
-    // lambda helpers
     CREATE_SETTER_LAMBDA(fetch_add);
     CREATE_SETTER_LAMBDA(fetch_sub);
     CREATE_SETTER_LAMBDA(fetch_inc);
     CREATE_SETTER_LAMBDA(fetch_dec);
     CREATE_SETTER_LAMBDA(fetch_neg);
-    std::vector<void(*)(T&)> setters {
-        set_fetch_add,
-        set_fetch_sub,
-        set_fetch_inc,
-        set_fetch_dec,
-        set_fetch_neg
+    std::vector<SettersVf<T>> setters {
+        SettersVf<T>().v(set_add).f(set_fetch_add),
+        SettersVf<T>().v(set_sub).f(set_fetch_sub),
+        SettersVf<T>().v(set_inc).f(set_fetch_inc),
+        SettersVf<T>().v(set_dec).f(set_fetch_dec),
+        SettersVf<T>().v(set_neg).f(set_fetch_neg),
     };
 
     // create all combinations
@@ -323,25 +367,19 @@ make_ops_nonnull_transaction() noexcept
 }
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(ldst, _);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(ldst, _, OpsAnyAll);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(xchg, _xchg_);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(xchg, _xchg_, OpsAnyAll);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(bitwise, _bitwise_);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(bitwise, _bitwise_, OpsAnyAll);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(binary_void, _binary_);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(binary, _binary_, OpsAnyAllVf);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(binary_fetch, _binary_);
-
-
-DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic_void, _arithmetic_);
-
-
-DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic_fetch, _arithmetic_);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic, _arithmetic_, OpsAnyAllVf);
 
 
 std::vector<OpsAnyAll<patomic_ops_transaction_special_t>>
