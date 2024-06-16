@@ -10,25 +10,25 @@
     }
 
 
-#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name)                                 \
-    std::vector<OpsAnyAll<patomic_ops_##type_name##_t>>                                      \
-    make_ops_##fn_name##_combinations_implicit()                                             \
-    {                                                                                        \
-        return make_ops_##fn_name##_combinations<patomic_ops_##type_name##_t>();             \
-    }                                                                                        \
-                                                                                             \
-    std::vector<OpsAnyAll<patomic_ops_explicit_##type_name##_t>>                             \
-    make_ops_##fn_name##_combinations_explicit()                                             \
-    {                                                                                        \
-        return make_ops_##fn_name##_combinations<patomic_ops_explicit_##type_name##_t>();    \
-    }                                                                                        \
-                                                                                             \
-    std::vector<OpsAnyAll<patomic_ops_transaction_##type_name##_t>>                          \
-    make_ops_##fn_name##_combinations_transaction()                                          \
-    {                                                                                        \
-        return make_ops_##fn_name##_combinations<patomic_ops_transaction_##type_name##_t>(); \
-    }                                                                                        \
-                                                                                             \
+#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name)                               \
+    std::vector<OpsAnyAll<patomic_ops##type_name##t>>                                      \
+    make_ops_##fn_name##_combinations_implicit()                                           \
+    {                                                                                      \
+        return make_ops_##fn_name##_combinations<patomic_ops##type_name##t>();             \
+    }                                                                                      \
+                                                                                           \
+    std::vector<OpsAnyAll<patomic_ops_explicit##type_name##t>>                             \
+    make_ops_##fn_name##_combinations_explicit()                                           \
+    {                                                                                      \
+        return make_ops_##fn_name##_combinations<patomic_ops_explicit##type_name##t>();    \
+    }                                                                                      \
+                                                                                           \
+    std::vector<OpsAnyAll<patomic_ops_transaction##type_name##t>>                          \
+    make_ops_##fn_name##_combinations_transaction()                                        \
+    {                                                                                      \
+        return make_ops_##fn_name##_combinations<patomic_ops_transaction##type_name##t>(); \
+    }                                                                                      \
+                                                                                           \
     static_assert(!!true, "require semicolon")
 
 
@@ -123,6 +123,23 @@ make_ops_combinations(const std::vector<void(*)(T&)>& setters)
 
     // return
     return combinations;
+}
+
+
+template <class T>
+std::vector<test::OpsAnyAll<T>>
+make_ops_ldst_combinations()
+{
+    // lambda helpers
+    CREATE_SETTER_LAMBDA(store);
+    CREATE_SETTER_LAMBDA(load);
+    std::vector<void(*)(T&)> setters {
+        set_store,
+        set_load
+    };
+
+    // create all combinations
+    return make_ops_combinations(setters);
 }
 
 
@@ -306,22 +323,25 @@ make_ops_nonnull_transaction() noexcept
 }
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(xchg, xchg);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(ldst, _);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(bitwise, bitwise);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(xchg, _xchg_);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(binary_void, binary);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(bitwise, _bitwise_);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(binary_fetch, binary);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(binary_void, _binary_);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic_void, arithmetic);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(binary_fetch, _binary_);
 
 
-DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic_fetch, arithmetic);
+DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic_void, _arithmetic_);
+
+
+DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic_fetch, _arithmetic_);
 
 
 std::vector<OpsAnyAll<patomic_ops_transaction_special_t>>

@@ -56,6 +56,30 @@ struct OpsAnyAll
 
 
 /// @brief
+///   Create a set of patomic_ops_t objects with all combinations of fp_store
+///   and fp_load members set to null and non-null values. All other members
+///   are null.
+std::vector<OpsAnyAll<patomic_ops_t>>
+make_ops_ldst_combinations_implicit();
+
+
+/// @brief
+///   Create a set of patomic_ops_explicit_t objects with all combinations of
+///   fp_store and fp_load members set to null and non-null values. All other
+///   members are null.
+std::vector<OpsAnyAll<patomic_ops_explicit_t>>
+make_ops_ldst_combinations_explicit();
+
+
+/// @brief
+///   Create a set of patomic_ops_transaction_t objects with all combinations
+///   of fp_store and fp_load members set to null and non-null values. All
+///   other members are null.
+std::vector<OpsAnyAll<patomic_ops_transaction_t>>
+make_ops_ldst_combinations_transaction();
+
+
+/// @brief
 ///   Create a set of patomic_ops_xchg_t objects with all combinations of
 ///   members set to null and non-null values.
 std::vector<OpsAnyAll<patomic_ops_xchg_t>>
