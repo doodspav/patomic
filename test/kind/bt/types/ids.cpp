@@ -2,6 +2,7 @@
 
 #include <test/common/math.hpp>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <csignal>
@@ -230,9 +231,14 @@ TEST_F(BtTypesIds, get_ids_gives_correct_ids_for_all_kind_combinations)
 ///        NULL implementation id is returned.
 TEST_F(BtTypesIds, get_ids_ignores_invalid_kinds)
 {
+    // mock helpers
+    using testing::Contains;
+    using testing::Not;
+
     // setup
     ASSERT_FALSE(kinds.empty());
-    const auto invalid_kind = kinds.back() + 1;
+    const auto invalid_kind = kinds.back() << 1;
+    EXPECT_THAT(kinds, Not(Contains(invalid_kind)));
     const auto stdc_kind = impls_id_to_kind.at(patomic_id_STDC);
 
     // test
