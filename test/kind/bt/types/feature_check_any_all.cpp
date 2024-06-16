@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include <bitset>
 #include <vector>
 
 
@@ -199,11 +200,13 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_all_all_combinations_unset_correct_bits)
 
     for (const auto& bin : test::make_ops_binary_combinations_implicit())
     {
+        ops.binary_ops = bin.ops;
         const auto bin_v_all_bit = bin.all_void ? patomic_opcat_BIN_V : 0;
         const auto bin_f_all_bit = bin.all_fetch ? patomic_opcat_BIN_F : 0;
 
     for (const auto& ari : test::make_ops_arithmetic_combinations_implicit())
     {
+        ops.arithmetic_ops = ari.ops;
         const auto ari_v_all_bit = ari.all_void ? patomic_opcat_ARI_V : 0;
         const auto ari_f_all_bit = ari.all_fetch ? patomic_opcat_ARI_F : 0;
 
@@ -222,6 +225,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_all_all_combinations_unset_correct_bits)
 
         // test
         std::bitset<bit_width> actual_result = patomic_feature_check_all(&ops, input_opcats);
+        // assert, because if we expect and there's an error, there'll be too much output to parse
         ASSERT_EQ(expected_result, actual_result);
 
     }}}}}
