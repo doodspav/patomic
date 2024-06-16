@@ -22,13 +22,6 @@ public:
     {}
 
     /// @brief
-    ///    Public constructor to provide value which will be converted.
-    explicit constexpr convertible_to_any(T&& value)
-        noexcept(std::is_nothrow_move_constructible<T>::value)
-        : m_val(std::move(value))
-    {}
-
-    /// @brief
     ///   Implicit conversion operator.
     template <class U>
     constexpr operator U() const noexcept

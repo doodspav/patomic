@@ -16,7 +16,7 @@ namespace test
 ///   It is undefined behaviour to call function pointers set to the
 ///   unspecified value. Value comparison is valid.
 patomic_ops_t
-make_ops_implicit_nonnull() noexcept;
+make_ops_nonnull_implicit() noexcept;
 
 
 /// @brief
@@ -27,7 +27,7 @@ make_ops_implicit_nonnull() noexcept;
 ///   It is undefined behaviour to call function pointers set to the
 ///   unspecified value. Value comparison is valid.
 patomic_ops_explicit_t
-make_ops_explicit_nonnull() noexcept;
+make_ops_nonnull_explicit() noexcept;
 
 
 /// @brief
@@ -38,7 +38,7 @@ make_ops_explicit_nonnull() noexcept;
 ///   It is undefined behaviour to call function pointers set to the
 ///   unspecified value. Value comparison is valid.
 patomic_ops_transaction_t
-make_ops_transaction_nonnull() noexcept;
+make_ops_nonnull_transaction() noexcept;
 
 
 }  // namespace test
