@@ -10,21 +10,28 @@
     }
 
 
-#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name, ops_holder_type)              \
-    template <>                                                                            \
-    std::vector<ops_holder_type<patomic_ops##type_name##t>>                                \
-    make_ops_##fn_name##_combinations<ops_domain::IMPLICIT>()                              \
-    {                                                                                      \
-        return make_ops_##fn_name##_combinations<patomic_ops##type_name##t>();             \
-    }                                                                                      \
-                                                                                           \
-    template <>                                                                            \
-    std::vector<ops_holder_type<patomic_ops##type_name##t>>                                \
-    make_ops_##fn_name##_combinations<ops_domain::EXPLICIT>()                              \
-    {                                                                                      \
-        return make_ops_##fn_name##_combinations<patomic_ops##type_name##t>();             \
-    }                                                                                      \
-                                                                                           \
+#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name, ops_holder_type)                \
+    template <>                                                                              \
+    std::vector<ops_holder_type<patomic_ops##type_name##t>>                                  \
+    make_ops_##fn_name##_combinations<ops_domain::IMPLICIT>()                                \
+    {                                                                                        \
+        return ::make_ops_##fn_name##_combinations<patomic_ops##type_name##t>();             \
+    }                                                                                        \
+                                                                                             \
+    template <>                                                                              \
+    std::vector<ops_holder_type<patomic_ops_explicit##type_name##t>>                         \
+    make_ops_##fn_name##_combinations<ops_domain::EXPLICIT>()                                \
+    {                                                                                        \
+        return ::make_ops_##fn_name##_combinations<patomic_ops_explicit##type_name##t>();    \
+    }                                                                                        \
+                                                                                             \
+    template <>                                                                              \
+    std::vector<ops_holder_type<patomic_ops_transaction##type_name##t>>                      \
+    make_ops_##fn_name##_combinations<ops_domain::TRANSACTION>()                             \
+    {                                                                                        \
+        return ::make_ops_##fn_name##_combinations<patomic_ops_transaction##type_name##t>(); \
+    }                                                                                        \
+                                                                                             \
     static_assert(!!true, "require semicolon")
 
 
