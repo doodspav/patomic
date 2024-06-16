@@ -1,6 +1,7 @@
 #include <patomic/types/feature_check.h>
 
-#include <test/common/make_ops.hpp>
+#include <test/common/math.hpp>
+#include <test/common/make_ops_nonnull.hpp>
 
 #include <gtest/gtest.h>
 
@@ -48,24 +49,108 @@ public:
 
 
 /// @brief All "opcat" opcats have exactly zero or one bits set.
-TEST_F(BtTypesFeatureCheckAnyAll, opcat_have_zero_or_one_bits_set)
-{}
+TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
+{
+    // test
+    for (const patomic_opcat_t opcat : solo_opcats)
+    {
+        if (opcat == patomic_opcat_NONE)
+        {
+            EXPECT_EQ(0, opcat);
+        }
+        else
+        {
+            EXPECT_TRUE(test::is_positive_pow2(static_cast<int>(opcat)));
+        }
+    }
+}
 
 /// @brief All "opcat" values are unique.
-TEST_F(BtTypesFeatureCheckAnyAll, opcat_are_unique)
-{}
+TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_are_unique)
+{
+    // setup
+    const std::set<patomic_opcat_t> solo_opcats_set {
+        solo_opcats.begin(), solo_opcats.end()
+    };
+
+    // test
+    EXPECT_EQ(solo_opcats.size(), solo_opcats_set.size());
+}
 
 /// @brief All "opcats" opcats have multiple bits set.
-TEST_F(BtTypesFeatureCheckAnyAll, opcats_have_multiple_bits_set)
-{}
+TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_multiple_bits_set)
+{
+    // test
+    for (const int opcats : combined_opcats)
+    {
+        EXPECT_GT(opcats, 0);
+        EXPECT_FALSE(test::is_positive_pow2(opcats));
+    }
+}
 
 /// @brief All "opcats" opcats have expected combination of bits.
-TEST_F(BtTypesFeatureCheckAnyAll, opcats_have_expected_bits)
-{}
+TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
+{
+    // setup
+    // values
+    constexpr auto expected_bin = patomic_opcat_BIN_V | patomic_opcat_BIN_F;
+    constexpr auto expected_ari = patomic_opcat_ARI_V | patomic_opcat_ARI_F;
+    constexpr auto expected_implicit =
+        patomic_opcat_LDST |
+        patomic_opcat_XCHG |
+        patomic_opcat_BIT |
+        expected_bin      |
+        expected_ari;
+    constexpr auto expected_explicit = expected_implicit;
+    constexpr auto expected_transaction =
+        expected_implicit   |
+        patomic_opcat_TSPEC |
+        patomic_opcat_TFLAG |
+        patomic_opcat_TRAW;
+    // sets of values
+    const std::set<int> expected_set = {
+        expected_bin,
+        expected_ari,
+        expected_implicit,
+        expected_explicit,
+        expected_transaction
+    };
+    const std::set<int> actual_set = {
+        combined_opcats.begin(), combined_opcats.end()
+    };
+
+    // test
+    // checks that all values are expected
+    EXPECT_EQ(expected_set, actual_set);
+    // checks that each value is assigned the correct variable
+    EXPECT_EQ(patomic_opcats_BIN, expected_bin);
+    EXPECT_EQ(patomic_opcats_ARI, expected_ari);
+    EXPECT_EQ(patomic_opcats_IMPLICIT, expected_implicit);
+    EXPECT_EQ(patomic_opcats_EXPLICIT, expected_explicit);
+    EXPECT_EQ(patomic_opcats_TRANSACTION, expected_transaction);
+    // can't check set sizes in case two opcats have the same value
+    EXPECT_EQ(5, combined_opcats.size());
+}
 
 /// @brief Each "opcats" opcats consist only of known "opcat" opcat bits.
-TEST_F(BtTypesFeatureCheckAnyAll, opcats_only_contain_known_opcat_bits)
-{}
+TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_only_contain_known_opcat_bits)
+{
+    // setup
+    for (unsigned int opcats : combined_opcats)
+    {
+        for (unsigned int opcat : solo_opcats)
+        {
+            opcats &= ~opcat;
+        }
+
+        // test
+        EXPECT_EQ(0, opcats);
+    }
+}
+
+
+
+
 
 /// @brief The values of patomic_opcats_IMPLICIT and patomic_opcats_EXPLICIT
 ///        are the same.
@@ -131,3 +216,6 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_tflag_bits_expected)
 ///        TRAW ops exactly matches all bits set in patomic_opcat_TRAW.
 TEST_F(BtTypesFeatureCheckAnyAll, check_traw_bits_expected)
 {}
+
+
+// TODO: how to test multiple ???
