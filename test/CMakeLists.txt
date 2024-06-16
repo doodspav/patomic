@@ -21,14 +21,24 @@ if(PROJECT_IS_TOP_LEVEL)
     enable_testing()
 endif()
 
-# patomic is not a required dependency
-if(NOT TARGET patomic::patomic)
-    find_package(patomic QUIET)
-endif()
-
 # get GTest
 find_package(GTest REQUIRED)
 include(GoogleTest)
+
+# check patomic target is available
+if(NOT TARGET patomic::patomic)
+    message(FATAL_ERROR "Target patomic::patomic required to build tests, not available.")
+endif()
+
+# check patomic dir variables are set
+if(NOT PATOMIC_BINARY_DIR)
+    message(FATAL_ERROR "Variable PATOMIC_BINARY_DIR required to build tests, not set.")
+elseif(NOT PATOMIC_SOURCE_DIR)
+    message(FATAL_ERROR "Variable PATOMIC_SOURCE_DIR required to build tests, not set.")
+endif()
+
+
+# ---- Fix GoogleTest ----
 
 # sometimes this variable is not correctly set by GTest's find_package
 if(NOT GTEST_INCLUDE_DIRS)
