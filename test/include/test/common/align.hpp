@@ -45,6 +45,6 @@ std::size_t
 runtime_alignof(const void *ptr) noexcept;
 
 
-}
+}  // namespace test
 
 #endif  // PATOMIC_TEST_COMMON_ALIGN_HPP

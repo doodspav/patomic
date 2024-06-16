@@ -41,6 +41,6 @@ private:
 };
 
 
-}
+}  // namespace test
 
 #endif  // PATOMIC_TEST_COMMON_TYPE_TRAITS_HPP
