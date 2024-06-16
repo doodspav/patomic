@@ -56,6 +56,20 @@ struct OpsAnyAll
 
 
 /// @brief
+///   Helper struct to indicate if any/all function pointers are set in the ops
+///   member. Differentiates between void and fetch operations.
+template <class T>
+struct OpsAnyAllVf
+{
+    T ops {};
+    bool any_void {};
+    bool any_fetch {};
+    bool all_void {};
+    bool all_fetch {};
+};
+
+
+/// @brief
 ///   Create a set of patomic_ops_t objects with all combinations of fp_store
 ///   and fp_load members set to null and non-null values. All other members
 ///   are null.
@@ -123,86 +137,44 @@ make_ops_bitwise_combinations_transaction();
 
 /// @brief
 ///   Create a set of patomic_ops_binary_t objects with all combinations of
-///   void members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_binary_t>>
-make_ops_binary_void_combinations_implicit();
+///   void and fetch members set to null and non-null values.
+std::vector<OpsAnyAllVf<patomic_ops_binary_t>>
+make_ops_binary_combinations_implicit();
 
 
 /// @brief
 ///   Create a set of patomic_ops_explicit_binary_t objects with all
-///   combinations of void members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_explicit_binary_t>>
-make_ops_binary_void_combinations_explicit();
+///   combinations of void and fetch members set to null and non-null values.
+std::vector<OpsAnyAllVf<patomic_ops_explicit_binary_t>>
+make_ops_binary_combinations_explicit();
 
 
 /// @brief
 ///   Create a set of patomic_ops_transaction_binary_t objects with all
-///   combinations of void members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_transaction_binary_t>>
-make_ops_binary_void_combinations_transaction();
-
-
-/// @brief
-///   Create a set of patomic_ops_binary_t objects with all combinations of
-///   fetch members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_binary_t>>
-make_ops_binary_fetch_combinations_implicit();
-
-
-/// @brief
-///   Create a set of patomic_ops_explicit_binary_t objects with all
-///   combinations of fetch members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_explicit_binary_t>>
-make_ops_binary_fetch_combinations_explicit();
-
-
-/// @brief
-///   Create a set of patomic_ops_transaction_binary_t objects with all
-///   combinations of fetch members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_transaction_binary_t>>
-make_ops_binary_fetch_combinations_transaction();
+///   combinations of void and fetch members set to null and non-null values.
+std::vector<OpsAnyAllVf<patomic_ops_transaction_binary_t>>
+make_ops_binary_combinations_transaction();
 
 
 /// @brief
 ///   Create a set of patomic_ops_arithmetic_t objects with all combinations of
-///   void members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_arithmetic_t>>
-make_ops_arithmetic_void_combinations_implicit();
+///   void and fetch members set to null and non-null values.
+std::vector<OpsAnyAllVf<patomic_ops_arithmetic_t>>
+make_ops_arithmetic_combinations_implicit();
 
 
 /// @brief
 ///   Create a set of patomic_ops_explicit_arithmetic_t objects with all
-///   combinations of void members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_explicit_arithmetic_t>>
-make_ops_arithmetic_void_combinations_explicit();
+///   combinations of void and fetch members set to null and non-null values.
+std::vector<OpsAnyAllVf<patomic_ops_explicit_arithmetic_t>>
+make_ops_arithmetic_combinations_explicit();
 
 
 /// @brief
 ///   Create a set of patomic_ops_transaction_arithmetic_t objects with all
-///   combinations of void members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_transaction_arithmetic_t>>
-make_ops_arithmetic_void_combinations_transaction();
-
-
-/// @brief
-///   Create a set of patomic_ops_arithmetic_t objects with all combinations of
-///   fetch members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_arithmetic_t>>
-make_ops_arithmetic_fetch_combinations_implicit();
-
-
-/// @brief
-///   Create a set of patomic_ops_explicit_arithmetic_t objects with all
-///   combinations of fetch members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_explicit_arithmetic_t>>
-make_ops_arithmetic_fetch_combinations_explicit();
-
-
-/// @brief
-///   Create a set of patomic_ops_transaction_arithmetic_t objects with all
-///   combinations of fetch members set to null and non-null values.
-std::vector<OpsAnyAll<patomic_ops_transaction_arithmetic_t>>
-make_ops_arithmetic_fetch_combinations_transaction();
+///   combinations of void and fetch members set to null and non-null values.
+std::vector<OpsAnyAllVf<patomic_ops_transaction_arithmetic_t>>
+make_ops_arithmetic_combinations_transaction();
 
 
 /// @brief
