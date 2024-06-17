@@ -82,6 +82,7 @@ struct ops_any_all
     T ops {};
     bool any {};
     bool all {};
+    unsigned int opkinds {};
 };
 
 
@@ -96,6 +97,8 @@ struct ops_any_all_vf
     bool any_fetch {};
     bool all_void {};
     bool all_fetch {};
+    unsigned int opkinds_void {};
+    unsigned int opkinds_fetch {};
 };
 
 
