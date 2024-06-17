@@ -381,6 +381,30 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
     EXPECT_EQ(expected_result, actual_result_fetch);
 }
 
+/// @brief Calling check_leaf with all combinations of BIN(_V/F) function
+///        pointers set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
+    {
+        ops.binary_ops = binary.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result_void = ~binary.opkinds_void;
+        const std::bitset<bit_width> expected_result_fetch = ~binary.opkinds_fetch;
+
+        // test
+        const std::bitset<bit_width> actual_result_void =
+            TTestHelper::check_leaf(ops, patomic_opcat_BIN_V, input_opkinds);
+        const std::bitset<bit_width> actual_result_fetch =
+            TTestHelper::check_leaf(ops, patomic_opcat_BIN_F, input_opkinds);
+        EXPECT_EQ(expected_result_void, actual_result_void);
+        EXPECT_EQ(expected_result_fetch, actual_result_fetch);
+    }
+}
+
 /// @brief Calling check_leaf with all ARI(_V/F) function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_ARI.
 TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expected)
@@ -400,6 +424,30 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expec
         TTestHelper::check_leaf(ops, patomic_opcat_ARI_F, input_opkinds);
     EXPECT_EQ(expected_result, actual_result_void);
     EXPECT_EQ(expected_result, actual_result_fetch);
+}
+
+/// @brief Calling check_leaf with all combinations of ARI(_V/F) function
+///        pointers set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_arithmetic_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
+    {
+        ops.arithmetic_ops = arithmetic.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result_void = ~arithmetic.opkinds_void;
+        const std::bitset<bit_width> expected_result_fetch = ~arithmetic.opkinds_fetch;
+
+        // test
+        const std::bitset<bit_width> actual_result_void =
+            TTestHelper::check_leaf(ops, patomic_opcat_ARI_V, input_opkinds);
+        const std::bitset<bit_width> actual_result_fetch =
+            TTestHelper::check_leaf(ops, patomic_opcat_ARI_F, input_opkinds);
+        EXPECT_EQ(expected_result_void, actual_result_void);
+        EXPECT_EQ(expected_result_fetch, actual_result_fetch);
+    }
 }
 
 /// @brief Calling check_leaf with all TSPEC function pointers set in
