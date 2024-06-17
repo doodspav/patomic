@@ -1,4 +1,4 @@
-#include <patomic/types/version.h>
+#include <patomic/api/version.h>
 
 
 const char *

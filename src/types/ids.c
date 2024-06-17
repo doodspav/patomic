@@ -1,6 +1,6 @@
 #include "../impl/register.h"
 
-#include <patomic/types/ids.h>
+#include <patomic/api/ids.h>
 
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/math.h>

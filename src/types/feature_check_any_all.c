@@ -1,4 +1,4 @@
-#include <patomic/types/feature_check.h>
+#include <patomic/api/feature_check.h>
 
 
 #define PATOMIC_UNSET_OPCAT_LDST(ops, cats, and_or) \

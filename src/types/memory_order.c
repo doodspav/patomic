@@ -1,4 +1,4 @@
-#include <patomic/types/memory_order.h>
+#include <patomic/api/memory_order.h>
 
 
 int
