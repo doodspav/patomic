@@ -6,6 +6,8 @@
 #include <gtest/gtest.h>
 
 #include <bitset>
+#include <string>
+#include <type_traits>
 #include <vector>
 
 
@@ -36,9 +38,88 @@ public:
     };
 };
 
-/// @brief Test fixture for tests which might take a long time to execute.
-class BtTypesFeatureCheckAnyAll_SlowTest : public testing::Test
+/// @brief Templated test fixture.
+template <class T>
+class BtTypesFeatureCheckAnyAllT : public testing::Test
 {};
+
+using BtTypesFeatureCheckAnyAllT_Types = ::testing::Types<
+    std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>,
+    std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>,
+    std::integral_constant<test::ops_domain, test::ops_domain::TRANSACTION>
+>;
+
+/// @brief Helper type for templated test fixture.
+class TTestHelper
+{
+public:
+    template <class T>
+    static std::string
+    GetName(int);
+
+    template <>
+    std::string
+    GetName<std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>>(int)
+    {
+        return "implicit";
+    }
+
+    template <>
+    std::string
+    GetName<std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>>(int)
+    {
+        return "explicit";
+    }
+
+    template <>
+    std::string
+    GetName<std::integral_constant<test::ops_domain, test::ops_domain::TRANSACTION>>(int)
+    {
+        return "transaction";
+    }
+
+    static unsigned int
+    check_any(const patomic_ops_t& ops, unsigned int opcats) noexcept
+    {
+        return patomic_feature_check_any(&ops, opcats);
+    }
+
+    static unsigned int
+    check_any(const patomic_ops_explicit_t& ops, unsigned int opcats) noexcept
+    {
+        return patomic_feature_check_any_explicit(&ops, opcats);
+    }
+
+    static unsigned int
+    check_any(const patomic_ops_transaction_t& ops, unsigned int opcats) noexcept
+    {
+        return patomic_feature_check_any_transaction(&ops, opcats);
+    }
+
+    static unsigned int
+    check_all(const patomic_ops_t& ops, unsigned int opcats) noexcept
+    {
+        return patomic_feature_check_all(&ops, opcats);
+    }
+
+    static unsigned int
+    check_all(const patomic_ops_explicit_t& ops, unsigned int opcats) noexcept
+    {
+        return patomic_feature_check_all_explicit(&ops, opcats);
+    }
+
+    static unsigned int
+    check_all(const patomic_ops_transaction_t& ops, unsigned int opcats) noexcept
+    {
+        return patomic_feature_check_all_transaction(&ops, opcats);
+    }
+};
+
+TYPED_TEST_SUITE(
+    BtTypesFeatureCheckAnyAllT,
+    BtTypesFeatureCheckAnyAllT_Types,
+    TTestHelper
+);
 
 
 /// @brief All "opcat" opcats have exactly zero or one bits set.
@@ -169,413 +250,42 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction
 TEST_F(BtTypesFeatureCheckAnyAll, check_invalid_opcats_unmodified)
 {}
 
-
-/// @brief Calling check_any with all combinations of function pointers set in
-///        patomic_ops_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll_SlowTest, check_any_implicit_all_combinations_unset_correct_bits)
+/// @brief Calling check_any with all combinations of LDST function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 {
     // setup
-    // create all combinations
-    for (auto& ldst : test::make_ops_ldst_combinations_implicit())
+    constexpr test::ops_domain domain = TypeParam::value;
+    for (auto& ldst : test::make_ops_ldst_combinations<domain>())
     {
-        auto& ops = ldst.ops;
-        const auto ldst_any_bit = ldst.any ? patomic_opcat_LDST : 0;
-
-    for (const auto& xchg : test::make_ops_xchg_combinations_implicit())
-    {
-        ops.xchg_ops = xchg.ops;
-        const auto xchg_any_bit = xchg.any ? patomic_opcat_XCHG : 0;
-
-    for (const auto& bit : test::make_ops_bitwise_combinations_implicit())
-    {
-        ops.bitwise_ops = bit.ops;
-        const auto bit_any_bit = bit.any ? patomic_opcat_BIT : 0;
-
-    for (const auto& bin : test::make_ops_binary_combinations_implicit())
-    {
-        ops.binary_ops = bin.ops;
-        const auto bin_v_any_bit = bin.any_void ? patomic_opcat_BIN_V : 0;
-        const auto bin_f_any_bit = bin.any_fetch ? patomic_opcat_BIN_F : 0;
-
-    for (const auto& ari : test::make_ops_arithmetic_combinations_implicit())
-    {
-        ops.arithmetic_ops = ari.ops;
-        const auto ari_v_any_bit = ari.any_void ? patomic_opcat_ARI_V : 0;
-        const auto ari_f_any_bit = ari.any_fetch ? patomic_opcat_ARI_F : 0;
-
-        // combine bits
-        constexpr unsigned int input_opcats = ~0u;
-        const unsigned int set_opcats =
-            ldst_any_bit  |
-            xchg_any_bit  |
-            bit_any_bit   |
-            bin_v_any_bit |
-            bin_f_any_bit |
-            ari_v_any_bit |
-            ari_f_any_bit;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = ldst.any ? patomic_opcat_LDST : 0;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~set_opcats;
 
         // test
         const std::bitset<bit_width> actual_result =
-            patomic_feature_check_any(&ops, input_opcats);
-        // assert, because if we expect and there's an error, there'll be too much output to parse
-        // bitset makes error easier to understand
-        ASSERT_EQ(expected_result, actual_result);
-
-    }}}}}
+            TTestHelper::check_any(ldst.ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
 }
 
-/// @brief Calling check_all with all combinations of function pointers set in
-///        patomic_ops_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll_SlowTest, check_all_implicit_all_combinations_unset_correct_bits)
+/// @brief Calling check_all with all combinations of LDST function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
 {
     // setup
-    // create all combinations
-    for (auto& ldst : test::make_ops_ldst_combinations_implicit())
+    constexpr test::ops_domain domain = TypeParam::value;
+    for (auto& ldst : test::make_ops_ldst_combinations<domain>())
     {
-        auto& ops = ldst.ops;
-        const auto ldst_all_bit = ldst.all ? patomic_opcat_LDST : 0;
-
-    for (const auto& xchg : test::make_ops_xchg_combinations_implicit())
-    {
-        ops.xchg_ops = xchg.ops;
-        const auto xchg_all_bit = xchg.all ? patomic_opcat_XCHG : 0;
-
-    for (const auto& bit : test::make_ops_bitwise_combinations_implicit())
-    {
-        ops.bitwise_ops = bit.ops;
-        const auto bit_all_bit = bit.all ? patomic_opcat_BIT : 0;
-
-    for (const auto& bin : test::make_ops_binary_combinations_implicit())
-    {
-        ops.binary_ops = bin.ops;
-        const auto bin_v_all_bit = bin.all_void ? patomic_opcat_BIN_V : 0;
-        const auto bin_f_all_bit = bin.all_fetch ? patomic_opcat_BIN_F : 0;
-
-    for (const auto& ari : test::make_ops_arithmetic_combinations_implicit())
-    {
-        ops.arithmetic_ops = ari.ops;
-        const auto ari_v_all_bit = ari.all_void ? patomic_opcat_ARI_V : 0;
-        const auto ari_f_all_bit = ari.all_fetch ? patomic_opcat_ARI_F : 0;
-
-        // combine bits
-        constexpr unsigned int input_opcats = ~0u;
-        const unsigned int set_opcats =
-            ldst_all_bit  |
-            xchg_all_bit  |
-            bit_all_bit   |
-            bin_v_all_bit |
-            bin_f_all_bit |
-            ari_v_all_bit |
-            ari_f_all_bit;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = ldst.all ? patomic_opcat_LDST : 0;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~set_opcats;
 
         // test
         const std::bitset<bit_width> actual_result =
-            patomic_feature_check_all(&ops, input_opcats);
-        // assert, because if we expect and there's an error, there'll be too much output to parse
-        // bitset makes error easier to understand
-        ASSERT_EQ(expected_result, actual_result);
-
-    }}}}}
+            TTestHelper::check_all(ldst.ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
 }
-
-/// @brief Calling check_any with all combinations of function pointers set in
-///        patomic_ops_explicit_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll_SlowTest, check_any_explicit_all_combinations_unset_correct_bits)
-{
-    // setup
-    // create all combinations
-    for (auto& ldst : test::make_ops_ldst_combinations_explicit())
-    {
-        auto& ops = ldst.ops;
-        const auto ldst_any_bit = ldst.any ? patomic_opcat_LDST : 0;
-
-    for (const auto& xchg : test::make_ops_xchg_combinations_explicit())
-    {
-        ops.xchg_ops = xchg.ops;
-        const auto xchg_any_bit = xchg.any ? patomic_opcat_XCHG : 0;
-
-    for (const auto& bit : test::make_ops_bitwise_combinations_explicit())
-    {
-        ops.bitwise_ops = bit.ops;
-        const auto bit_any_bit = bit.any ? patomic_opcat_BIT : 0;
-
-    for (const auto& bin : test::make_ops_binary_combinations_explicit())
-    {
-        ops.binary_ops = bin.ops;
-        const auto bin_v_any_bit = bin.any_void ? patomic_opcat_BIN_V : 0;
-        const auto bin_f_any_bit = bin.any_fetch ? patomic_opcat_BIN_F : 0;
-
-    for (const auto& ari : test::make_ops_arithmetic_combinations_explicit())
-    {
-        ops.arithmetic_ops = ari.ops;
-        const auto ari_v_any_bit = ari.any_void ? patomic_opcat_ARI_V : 0;
-        const auto ari_f_any_bit = ari.any_fetch ? patomic_opcat_ARI_F : 0;
-
-        // combine bits
-        constexpr unsigned int input_opcats = ~0u;
-        const unsigned int set_opcats =
-            ldst_any_bit  |
-            xchg_any_bit  |
-            bit_any_bit   |
-            bin_v_any_bit |
-            bin_f_any_bit |
-            ari_v_any_bit |
-            ari_f_any_bit;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
-
-        // test
-        const std::bitset<bit_width> actual_result =
-            patomic_feature_check_any_explicit(&ops, input_opcats);
-        // assert, because if we expect and there's an error, there'll be too much output to parse
-        // bitset makes error easier to understand
-        ASSERT_EQ(expected_result, actual_result);
-
-    }}}}}
-}
-
-/// @brief Calling check_all with all combinations of function pointers set in
-///        patomic_ops_explicit_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll_SlowTest, check_all_explicit_all_combinations_unset_correct_bits)
-{
-    // setup
-    // create all combinations
-    for (auto& ldst : test::make_ops_ldst_combinations_explicit())
-    {
-        auto& ops = ldst.ops;
-        const auto ldst_all_bit = ldst.all ? patomic_opcat_LDST : 0;
-
-    for (const auto& xchg : test::make_ops_xchg_combinations_explicit())
-    {
-        ops.xchg_ops = xchg.ops;
-        const auto xchg_all_bit = xchg.all ? patomic_opcat_XCHG : 0;
-
-    for (const auto& bit : test::make_ops_bitwise_combinations_explicit())
-    {
-        ops.bitwise_ops = bit.ops;
-        const auto bit_all_bit = bit.all ? patomic_opcat_BIT : 0;
-
-    for (const auto& bin : test::make_ops_binary_combinations_explicit())
-    {
-        ops.binary_ops = bin.ops;
-        const auto bin_v_all_bit = bin.all_void ? patomic_opcat_BIN_V : 0;
-        const auto bin_f_all_bit = bin.all_fetch ? patomic_opcat_BIN_F : 0;
-
-    for (const auto& ari : test::make_ops_arithmetic_combinations_explicit())
-    {
-        ops.arithmetic_ops = ari.ops;
-        const auto ari_v_all_bit = ari.all_void ? patomic_opcat_ARI_V : 0;
-        const auto ari_f_all_bit = ari.all_fetch ? patomic_opcat_ARI_F : 0;
-
-        // combine bits
-        constexpr unsigned int input_opcats = ~0u;
-        const unsigned int set_opcats =
-            ldst_all_bit  |
-            xchg_all_bit  |
-            bit_all_bit   |
-            bin_v_all_bit |
-            bin_f_all_bit |
-            ari_v_all_bit |
-            ari_f_all_bit;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
-
-        // test
-        const std::bitset<bit_width> actual_result =
-            patomic_feature_check_all_explicit(&ops, input_opcats);
-        // assert, because if we expect and there's an error, there'll be too much output to parse
-        // bitset makes error easier to understand
-        ASSERT_EQ(expected_result, actual_result);
-
-    }}}}}
-}
-
-/// @brief Calling check_any with all combinations of function pointers set in
-///        patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll_SlowTest, check_any_transaction_all_combinations_unset_correct_bits)
-{
-    // setup
-    // create all combinations
-    for (auto& ldst : test::make_ops_ldst_combinations_transaction())
-    {
-        auto& ops = ldst.ops;
-        const auto ldst_any_bit = ldst.any ? patomic_opcat_LDST : 0;
-
-    for (const auto& xchg : test::make_ops_xchg_combinations_transaction())
-    {
-        ops.xchg_ops = xchg.ops;
-        const auto xchg_any_bit = xchg.any ? patomic_opcat_XCHG : 0;
-
-    for (const auto& bit : test::make_ops_bitwise_combinations_transaction())
-    {
-        ops.bitwise_ops = bit.ops;
-        const auto bit_any_bit = bit.any ? patomic_opcat_BIT : 0;
-
-    for (const auto& bin : test::make_ops_binary_combinations_transaction())
-    {
-        ops.binary_ops = bin.ops;
-        const auto bin_v_any_bit = bin.any_void ? patomic_opcat_BIN_V : 0;
-        const auto bin_f_any_bit = bin.any_fetch ? patomic_opcat_BIN_F : 0;
-
-    for (const auto& ari : test::make_ops_arithmetic_combinations_transaction())
-    {
-        ops.arithmetic_ops = ari.ops;
-        const auto ari_v_any_bit = ari.any_void ? patomic_opcat_ARI_V : 0;
-        const auto ari_f_any_bit = ari.any_fetch ? patomic_opcat_ARI_F : 0;
-
-    for (const auto& spec : test::make_ops_special_combinations_transaction())
-    {
-        ops.special_ops = spec.ops;
-        const auto spec_any_bit = spec.any ? patomic_opcat_TSPEC : 0;
-
-    for (const auto& flag : test::make_ops_flag_combinations_transaction())
-    {
-        ops.flag_ops = flag.ops;
-        const auto flag_any_bit = flag.any ? patomic_opcat_TFLAG : 0;
-
-    for (const auto& raw : test::make_ops_raw_combinations_transaction())
-    {
-        ops.raw_ops = raw.ops;
-        const auto raw_any_bit = raw.any ? patomic_opcat_TRAW : 0;
-
-        // combine bits
-        constexpr unsigned int input_opcats = ~0u;
-        const unsigned int set_opcats =
-            ldst_any_bit  |
-            xchg_any_bit  |
-            bit_any_bit   |
-            bin_v_any_bit |
-            bin_f_any_bit |
-            ari_v_any_bit |
-            ari_f_any_bit |
-            spec_any_bit  |
-            flag_any_bit  |
-            raw_any_bit;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
-
-        // test
-        const std::bitset<bit_width> actual_result =
-            patomic_feature_check_any_transaction(&ops, input_opcats);
-        // assert, because if we expect and there's an error, there'll be too much output to parse
-        // bitset makes error easier to understand
-        ASSERT_EQ(expected_result, actual_result);
-
-    }}}}}}}}
-}
-
-/// @brief Calling check_all with all combinations of function pointers set in
-///        patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll_SlowTest, check_all_transaction_all_combinations_unset_correct_bits)
-{
-    // setup
-    // create all combinations
-    for (auto& ldst : test::make_ops_ldst_combinations_explicit())
-    {
-        auto& ops = ldst.ops;
-        const auto ldst_all_bit = ldst.all ? patomic_opcat_LDST : 0;
-
-    for (const auto& xchg : test::make_ops_xchg_combinations_explicit())
-    {
-        ops.xchg_ops = xchg.ops;
-        const auto xchg_all_bit = xchg.all ? patomic_opcat_XCHG : 0;
-
-    for (const auto& bit : test::make_ops_bitwise_combinations_explicit())
-    {
-        ops.bitwise_ops = bit.ops;
-        const auto bit_all_bit = bit.all ? patomic_opcat_BIT : 0;
-
-    for (const auto& bin : test::make_ops_binary_combinations_explicit())
-    {
-        ops.binary_ops = bin.ops;
-        const auto bin_v_all_bit = bin.all_void ? patomic_opcat_BIN_V : 0;
-        const auto bin_f_all_bit = bin.all_fetch ? patomic_opcat_BIN_F : 0;
-
-    for (const auto& ari : test::make_ops_arithmetic_combinations_explicit())
-    {
-        ops.arithmetic_ops = ari.ops;
-        const auto ari_v_all_bit = ari.all_void ? patomic_opcat_ARI_V : 0;
-        const auto ari_f_all_bit = ari.all_fetch ? patomic_opcat_ARI_F : 0;
-
-        // combine bits
-        constexpr unsigned int input_opcats = ~0u;
-        const unsigned int set_opcats =
-            ldst_all_bit  |
-            xchg_all_bit  |
-            bit_all_bit   |
-            bin_v_all_bit |
-            bin_f_all_bit |
-            ari_v_all_bit |
-            ari_f_all_bit;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
-
-        // test
-        const std::bitset<bit_width> actual_result =
-            patomic_feature_check_all_explicit(&ops, input_opcats);
-        // assert, because if we expect and there's an error, there'll be too much output to parse
-        // bitset makes error easier to understand
-        ASSERT_EQ(expected_result, actual_result);
-
-    }}}}}
-}
-
-
-
-/*
-/// @brief All bits unset for patomic_ops*_t which only supports LDST ops
-///        exactly matches all bits set in patomic_opcat_LDST.
-TEST_F(BtTypesFeatureCheckAnyAll, check_ldst_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops*_t which only supports XCHG ops
-///        exactly matches all bits set in patomic_opcat_XCHG.
-TEST_F(BtTypesFeatureCheckAnyAll, check_xchg_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops*_t which only supports BIT ops
-///        exactly matches all bits set in patomic_opcat_BIT.
-TEST_F(BtTypesFeatureCheckAnyAll, check_bit_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops*_t which only supports BIN_V ops
-///        exactly matches all bits set in patomic_opcat_BIN_V.
-TEST_F(BtTypesFeatureCheckAnyAll, check_bin_v_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops*_t which only supports BIN_F ops
-///        exactly matches all bits set in patomic_opcat_BIN_F.
-TEST_F(BtTypesFeatureCheckAnyAll, check_bin_f_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops*_t which only supports ARI_V ops
-///        exactly matches all bits set in patomic_opcat_ARI_V.
-TEST_F(BtTypesFeatureCheckAnyAll, check_ari_v_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops*_t which only supports ARI_F ops
-///        exactly matches all bits set in patomic_opcat_ARI_F.
-TEST_F(BtTypesFeatureCheckAnyAll, check_ari_f_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops_transaction_t which only supports
-///        TSPEC ops exactly matches all bits set in patomic_opcat_TSPEC.
-TEST_F(BtTypesFeatureCheckAnyAll, check_tspec_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops_transaction_t which only supports
-///        TFLAG ops exactly matches all bits set in patomic_opcat_TFLAG.
-TEST_F(BtTypesFeatureCheckAnyAll, check_tflag_bits_expected)
-{}
-
-/// @brief All bits unset for patomic_ops_transaction_t which only supports
-///        TRAW ops exactly matches all bits set in patomic_opcat_TRAW.
-TEST_F(BtTypesFeatureCheckAnyAll, check_traw_bits_expected)
-{}*/
-
-
-// TODO: how to test multiple ???
