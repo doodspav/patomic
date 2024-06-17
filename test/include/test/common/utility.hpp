@@ -1,5 +1,5 @@
-#ifndef PATOMIC_TEST_COMMON_TYPE_TRAITS_HPP
-#define PATOMIC_TEST_COMMON_TYPE_TRAITS_HPP
+#ifndef PATOMIC_TEST_COMMON_UTILITY_HPP
+#define PATOMIC_TEST_COMMON_UTILITY_HPP
 
 #include <utility>
 #include <type_traits>
@@ -36,4 +36,4 @@ private:
 
 }  // namespace test
 
-#endif  // PATOMIC_TEST_COMMON_TYPE_TRAITS_HPP
+#endif  // PATOMIC_TEST_COMMON_UTILITY_HPP

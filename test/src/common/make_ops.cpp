@@ -1,5 +1,5 @@
 #include <test/common/make_ops.hpp>
-#include <test/common/type_traits.hpp>
+#include <test/common/utility.hpp>
 
 
 #define CREATE_SETTER_LAMBDA(name, opkind)                                       \
