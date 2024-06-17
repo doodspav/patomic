@@ -343,6 +343,90 @@ to_string(ops_domain domain)
 }
 
 
+std::vector<patomic_opcat_t>
+make_opcats_all_solo()
+{
+    return {
+        patomic_opcat_NONE,
+        patomic_opcat_LDST,
+        patomic_opcat_XCHG,
+        patomic_opcat_BIT,
+        patomic_opcat_BIN_V,
+        patomic_opcat_BIN_F,
+        patomic_opcat_ARI_V,
+        patomic_opcat_ARI_F,
+        patomic_opcat_TSPEC,
+        patomic_opcat_TFLAG,
+        patomic_opcat_TRAW
+    };
+}
+
+
+std::vector<patomic_opcat_t>
+make_opcats_all_combined()
+{
+    return {
+        patomic_opcats_BIN,
+        patomic_opcats_ARI,
+        patomic_opcats_IMPLICIT,
+        patomic_opcats_EXPLICIT,
+        patomic_opcats_TRANSACTION
+    };
+}
+
+
+std::vector<patomic_opkind_t>
+make_opkinds_all_solo()
+{
+    return {
+        patomic_opkind_NONE,
+        patomic_opkind_LOAD,
+        patomic_opkind_STORE,
+        patomic_opkind_EXCHANGE,
+        patomic_opkind_CMPXCHG_WEAK,
+        patomic_opkind_CMPXCHG_STRONG,
+        patomic_opkind_TEST,
+        patomic_opkind_TEST_SET,
+        patomic_opkind_TEST_RESET,
+        patomic_opkind_TEST_COMPL,
+        patomic_opkind_CLEAR,
+        patomic_opkind_OR,
+        patomic_opkind_XOR,
+        patomic_opkind_AND,
+        patomic_opkind_NOT,
+        patomic_opkind_ADD,
+        patomic_opkind_SUB,
+        patomic_opkind_INC,
+        patomic_opkind_DEC,
+        patomic_opkind_NEG,
+        patomic_opkind_DOUBLE_CMPXCHG,
+        patomic_opkind_MULTI_CMPXCHG,
+        patomic_opkind_GENERIC,
+        patomic_opkind_GENERIC_WFB,
+        patomic_opkind_TBEGIN,
+        patomic_opkind_TABORT,
+        patomic_opkind_TCOMMIT,
+        patomic_opkind_TTEST
+    };
+}
+
+
+std::vector<patomic_opkind_t>
+make_opkinds_all_combined()
+{
+    return {
+        patomic_opkinds_LDST,
+        patomic_opkinds_XCHG,
+        patomic_opkinds_BIT,
+        patomic_opkinds_BIN,
+        patomic_opkinds_ARI,
+        patomic_opkinds_TSPEC,
+        patomic_opkinds_TFLAG,
+        patomic_opkinds_TRAW
+    };
+}
+
+
 template <>
 patomic_ops_t
 make_ops_all_nonnull<ops_domain::IMPLICIT>()

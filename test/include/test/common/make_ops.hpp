@@ -103,6 +103,34 @@ struct ops_any_all_vf
 
 
 /// @brief
+///   Create a list of all valid patomic_opcat_t values with exactly zero or
+///   one bits set.
+std::vector<patomic_opcat_t>
+make_opcats_all_solo();
+
+
+/// @brief
+///   Create a list of all valid patomic_opcat_t values with more than one bit
+///   set.
+std::vector<patomic_opcat_t>
+make_opcats_all_combined();
+
+
+/// @brief
+///   Create a list of all valid patomic_opkind_t values with exactly zero or
+///   one bits set.
+std::vector<patomic_opkind_t>
+make_opkinds_all_solo();
+
+
+/// @brief
+///   Create a list of all valid patomic_opkind_t values with more than one bit
+///   set.
+std::vector<patomic_opkind_t>
+make_opkinds_all_combined();
+
+
+/// @brief
 ///   Create a patomic_ops*_t object where all members are set to a non-null
 ///   value.
 template <ops_domain D>
