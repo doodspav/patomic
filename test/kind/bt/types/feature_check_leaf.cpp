@@ -269,7 +269,20 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_ldst_bits_match_expected)
 /// @brief Calling check_leaf with all combinations of LDST function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
 TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ldst_bits_match_expected)
-{}
+{
+    // setup
+    for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
+    {
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~ldst.opkinds;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ldst.ops, patomic_opcat_LDST, input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
 
 /// @brief Calling check_leaf with all XCHG function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_XCHG.
@@ -289,6 +302,26 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
     EXPECT_EQ(expected_result, actual_result);
 }
 
+/// @brief Calling check_leaf with all combinations of XCHG function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
+    {
+        ops.xchg_ops = xchg.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~xchg.opkinds;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, patomic_opcat_XCHG, input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
 /// @brief Calling check_leaf with all BIT function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_BIT.
 TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected)
@@ -305,6 +338,26 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected
     const std::bitset<bit_width> actual_result =
         TTestHelper::check_leaf(ops, patomic_opcat_BIT, input_opkinds);
     EXPECT_EQ(expected_result, actual_result);
+}
+
+/// @brief Calling check_leaf with all combinations of BIT function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
+    {
+        ops.bitwise_ops = bitwise.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~bitwise.opkinds;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, patomic_opcat_BIT, input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
 }
 
 /// @brief Calling check_leaf with all BIN(_V/F) function pointers set in
