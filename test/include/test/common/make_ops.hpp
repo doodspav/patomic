@@ -86,6 +86,14 @@ struct ops_any_all_vf
 
 
 /// @brief
+///   Create a patomic_ops*_t object where all members are set to a non-null
+///   value.
+template <ops_domain D>
+typename ops_types<D>::base_t
+make_ops_all_nonnull();
+
+
+/// @brief
 ///   Create a set of patomic_ops*_t objects with all combinations of fp_store
 ///   and fp_load members set to null and non-null values. All other members
 ///   are null.
