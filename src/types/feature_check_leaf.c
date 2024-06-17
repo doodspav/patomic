@@ -93,14 +93,14 @@ patomic_feature_check_leaf(
     unsigned int opkinds
 )
 {
+    /* ensure that a single opcat is being checked */
+    patomic_assert_always(patomic_unsigned_is_pow2(opcat));
+
     /* short circuit if possible */
-    if (opcat == 0 || opkinds == 0)
+    if (opkinds == 0)
     {
         return opkinds;
     }
-
-    /* ensure that a single opcat is being checked */
-    patomic_assert_always(patomic_unsigned_is_pow2(opcat));
 
     /* check which opcat's opkinds we want to unset */
     switch (opcat)
@@ -146,14 +146,14 @@ patomic_feature_check_leaf_explicit(
     unsigned int opkinds
 )
 {
+    /* ensure that a single opcat is being checked */
+    patomic_assert_always(patomic_unsigned_is_pow2(opcat));
+
     /* short circuit if possible */
-    if (opcat == 0 || opkinds == 0)
+    if (opkinds == 0)
     {
         return opkinds;
     }
-
-    /* ensure that a single opcat is being checked */
-    patomic_assert_always(patomic_unsigned_is_pow2(opcat));
 
     /* check which opcat's opkinds we want to unset */
     switch (opcat)
@@ -199,14 +199,14 @@ patomic_feature_check_leaf_transaction(
     unsigned int opkinds
 )
 {
+    /* ensure that a single opcat is being checked */
+    patomic_assert_always(patomic_unsigned_is_pow2(opcat));
+
     /* short circuit if possible */
-    if (opcat == 0 || opkinds == 0)
+    if (opkinds == 0)
     {
         return opkinds;
     }
-
-    /* ensure that a single opcat is being checked */
-    patomic_assert_always(patomic_unsigned_is_pow2(opcat));
 
     /* check which opcat's opkinds we want to unset */
     switch (opcat)

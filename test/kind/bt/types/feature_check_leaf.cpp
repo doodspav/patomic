@@ -573,7 +573,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_op
 
 /// @brief Calling check_leaf with an opcat value which has more than one bit
 ///        set is fatally asserted.
-TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_no_multi_bit_opcat)
+TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_multi_bit_opcat)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
