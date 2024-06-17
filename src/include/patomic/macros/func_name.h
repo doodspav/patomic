@@ -1,6 +1,6 @@
 #ifndef PATOMIC_FUNC_NAME
 
-#include <patomic/patomic_config.h>
+#include <patomic/config.h>
 
 /* used internally */
 #undef PATOMIC_FUNC_NAME_

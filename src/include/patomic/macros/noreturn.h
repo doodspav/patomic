@@ -1,6 +1,6 @@
 #ifndef PATOMIC_NORETURN
 
-#include <patomic/patomic_config.h>
+#include <patomic/config.h>
 
 /* used internally */
 #undef PATOMIC_NORETURN_

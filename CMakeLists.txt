@@ -62,8 +62,8 @@ configure_file(
 
 # generate header file with compiler feature support macros
 configure_file(
-    cmake/in/_patomic_config.h.in
-    src/include/patomic/_patomic_config.h
+    cmake/in/_config.h.in
+    src/include/patomic/_config.h
     @ONLY
 )
 
@@ -73,7 +73,7 @@ target_sources(${target_name} PRIVATE
     "${PROJECT_BINARY_DIR}/include/patomic/api/export.h"
     "${PROJECT_BINARY_DIR}/include/patomic/api/version.h"
     # src/include (generated)
-    "${PROJECT_BINARY_DIR}/src/include/patomic/_patomic_config.h"
+    "${PROJECT_BINARY_DIR}/src/include/patomic/_config.h"
 )
 
 

@@ -1,6 +1,6 @@
 #ifndef PATOMIC_UNREACHABLE
 
-#include <patomic/patomic_config.h>
+#include <patomic/config.h>
 
 /* used internally */
 #undef PATOMIC_UNREACHABLE_

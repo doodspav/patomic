@@ -8,7 +8,7 @@
 #include <patomic/macros/ignore_unused.h>
 #include <patomic/macros/unreachable.h>
 
-#include <patomic/patomic_config.h>
+#include <patomic/config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
