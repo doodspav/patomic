@@ -26,6 +26,15 @@ public:
     using OpsTypes = test::ops_types<domain>;
 };
 
+/// @brief Templated test fixture for death tests.
+template <class T>
+class BtTypesFeatureCheckLeafT_DeathTest : public testing::Test
+{
+public:
+    static constexpr test::ops_domain domain = T::value;
+    using OpsTypes = test::ops_types<domain>;
+};
+
 using BtTypesFeatureCheckLeafT_Types = ::testing::Types<
     std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>,
     std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>,
@@ -81,9 +90,11 @@ TYPED_TEST_SUITE(
     TTestHelper
 );
 
-/// @brief Test fixture for death tests.
-class BtTypesFeatureCheckLeaf_DeathTest : public testing::Test
-{};
+TYPED_TEST_SUITE(
+    BtTypesFeatureCheckLeafT_DeathTest,
+    BtTypesFeatureCheckLeafT_Types,
+    TTestHelper
+);
 
 
 /// @brief All "opkind" opkinds have exactly zero or one bits set.
@@ -205,9 +216,14 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
     }
 }
 
-/// @brief Invalid opkind bits remain set in the return value of leaf feature
-///        check.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_invalid_opkinds_unmodified)
+/// @brief Calling check_leaf with invalid opkind bits for any valid opcat does
+///        not unset the invalid opkind bits.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
+{}
+
+/// @brief Calling check_leaf with a valid opkind that does not apply to the
+///        domain does not unset any opkind bits.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bits)
 {}
 
 /// @brief Calling check_leaf with all LDST function pointers set in
@@ -533,4 +549,12 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
     }
 }
 
-// TODO: death
+/// @brief Calling check_leaf with an opcat value which has no bits set is
+///        fatally asserted.
+TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_opcat)
+{}
+
+/// @brief Calling check_leaf with an opcat value which has more than one bit
+///        set is fatally asserted.
+TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_no_multi_bit_opcat)
+{}
