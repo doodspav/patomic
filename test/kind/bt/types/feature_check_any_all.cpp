@@ -333,3 +333,45 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
         EXPECT_EQ(expected_result, actual_result);
     }
 }
+
+/// @brief Calling check_any with all combinations of BIT function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
+    {
+        ops.bitwise_ops = bitwise.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = bitwise.any ? patomic_opcat_BIT : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_any(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_all with all combinations of BIT function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
+    {
+        ops.bitwise_ops = bitwise.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = bitwise.all ? patomic_opcat_BIT : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_all(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
