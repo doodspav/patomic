@@ -13,6 +13,11 @@
 #include <vector>
 
 
+#ifdef _MSC_VER
+    #define KilledBySignal(_sig) ExitedWithCode(3)
+#endif
+
+
 /// @brief Test fixture.
 class BtTypesFeatureCheckLeaf : public testing::Test
 {};
@@ -552,9 +557,46 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
 /// @brief Calling check_leaf with an opcat value which has no bits set is
 ///        fatally asserted.
 TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_opcat)
-{}
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr auto zero_bit_opcat = static_cast<patomic_opcat_t>(0);
+
+    // test
+    EXPECT_EQ(0, zero_bit_opcat);
+    EXPECT_EXIT(
+        TTestHelper::check_leaf(ops, zero_bit_opcat, 0u),
+        testing::KilledBySignal(SIGABRT),
+        ".*"
+    );
+}
 
 /// @brief Calling check_leaf with an opcat value which has more than one bit
 ///        set is fatally asserted.
 TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_no_multi_bit_opcat)
-{}
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr auto multi_valid_bit_opcat = TestFixture::OpsTypes::full_opcat;
+    constexpr auto multi_invalid_bit_opcat = ~multi_valid_bit_opcat;
+    constexpr auto multi_mixed_bit_opcat =
+        multi_valid_bit_opcat | multi_invalid_bit_opcat;
+    constexpr unsigned int multi_opcats[] {
+        multi_valid_bit_opcat,
+        multi_invalid_bit_opcat,
+        multi_mixed_bit_opcat
+    };
+
+    // test
+    for (const unsigned int multi_opcat : multi_opcats)
+    {
+        EXPECT_NE(0, multi_opcat);
+        EXPECT_FALSE(test::is_positive_pow2(multi_opcat));
+        EXPECT_EXIT(
+            TTestHelper::check_leaf(
+                ops, static_cast<patomic_opcat_t>(multi_opcat), 0u),
+            testing::KilledBySignal(SIGABRT),
+            ".*"
+        );
+    }
+}
