@@ -9,8 +9,8 @@
 #include "types/options.h"
 #include "types/transaction.h"
 
-#include <patomic/patomic_export.h>
-#include <patomic/patomic_version.h>
+#include <patomic/types/export.h>
+#include <patomic/types/version.h>
 
 #include <stddef.h>
 

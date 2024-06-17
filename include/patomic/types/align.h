@@ -1,7 +1,7 @@
 #ifndef PATOMIC_ALIGN_H
 #define PATOMIC_ALIGN_H
 
-#include <patomic/patomic_export.h>
+#include <patomic/types/export.h>
 
 #include <stddef.h>
 

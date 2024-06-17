@@ -1,7 +1,7 @@
 #ifndef PATOMIC_IDS_H
 #define PATOMIC_IDS_H
 
-#include <patomic/patomic_export.h>
+#include <patomic/types/export.h>
 
 #ifdef __cplusplus
 extern "C" {

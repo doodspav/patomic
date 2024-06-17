@@ -1,4 +1,4 @@
-#include <patomic/patomic_version.h>
+#include <patomic/types/version.h>
 
 #include <gtest/gtest.h>
 

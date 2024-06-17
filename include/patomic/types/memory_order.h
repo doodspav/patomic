@@ -1,7 +1,7 @@
 #ifndef PATOMIC_MEMORY_ORDER_H
 #define PATOMIC_MEMORY_ORDER_H
 
-#include <patomic/patomic_export.h>
+#include <patomic/types/export.h>
 
 #ifdef __cplusplus
 extern "C" {

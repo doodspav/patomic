@@ -3,7 +3,7 @@
 
 #include "ops.h"
 
-#include <patomic/patomic_export.h>
+#include <patomic/types/export.h>
 
 #ifdef __cplusplus
 extern "C" {

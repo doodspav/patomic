@@ -3,7 +3,7 @@
 
 #include "align.h"
 
-#include <patomic/patomic_export.h>
+#include <patomic/types/export.h>
 
 #include <stddef.h>
 
