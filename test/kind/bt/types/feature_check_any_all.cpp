@@ -421,3 +421,49 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
         EXPECT_EQ(expected_result, actual_result);
     }
 }
+
+/// @brief Calling check_any with all combinations of ARI(_V/F) function
+///        pointers set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
+    {
+        ops.arithmetic_ops = arithmetic.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats =
+            (arithmetic.any_void ? patomic_opcat_ARI_V : 0) |
+            (arithmetic.any_fetch ? patomic_opcat_ARI_F : 0);
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_any(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_all with all combinations of ARI(_V/F) function
+///        pointers set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_arithmetic_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
+    {
+        ops.arithmetic_ops = arithmetic.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats =
+            (arithmetic.all_void ? patomic_opcat_ARI_V : 0) |
+            (arithmetic.all_fetch ? patomic_opcat_ARI_F : 0);
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_all(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
