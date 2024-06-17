@@ -325,6 +325,23 @@ namespace test
 {
 
 
+std::string
+to_string(ops_domain domain)
+{
+    switch (domain)
+    {
+        case ops_domain::IMPLICIT:
+            return "IMPLICIT";
+        case ops_domain::EXPLICIT:
+            return "EXPLICIT";
+        case ops_domain::TRANSACTION:
+            return "TRANSACTION";
+        default:
+            return "(unknown)";
+    }
+}
+
+
 template <>
 patomic_ops_t
 make_ops_all_nonnull<ops_domain::IMPLICIT>()

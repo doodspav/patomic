@@ -4,6 +4,7 @@
 #include <patomic/types/feature_check.h>
 #include <patomic/types/ops.h>
 
+#include <string>
 #include <vector>
 
 
@@ -19,6 +20,12 @@ enum class ops_domain
     EXPLICIT,
     TRANSACTION
 };
+
+
+/// @brief
+///   Convert enum labels to strings.
+std::string
+to_string(ops_domain domain);
 
 
 /// @brief
