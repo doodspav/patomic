@@ -15,50 +15,7 @@
 
 /// @brief Test fixture.
 class BtTypesFeatureCheckLeaf : public testing::Test
-{
-public:
-    const std::vector<patomic_opkind_t> solo_opkinds {
-        patomic_opkind_NONE,
-        patomic_opkind_LOAD,
-        patomic_opkind_STORE,
-        patomic_opkind_EXCHANGE,
-        patomic_opkind_CMPXCHG_WEAK,
-        patomic_opkind_CMPXCHG_STRONG,
-        patomic_opkind_TEST,
-        patomic_opkind_TEST_SET,
-        patomic_opkind_TEST_RESET,
-        patomic_opkind_TEST_COMPL,
-        patomic_opkind_CLEAR,
-        patomic_opkind_OR,
-        patomic_opkind_XOR,
-        patomic_opkind_AND,
-        patomic_opkind_NOT,
-        patomic_opkind_ADD,
-        patomic_opkind_SUB,
-        patomic_opkind_INC,
-        patomic_opkind_DEC,
-        patomic_opkind_NEG,
-        patomic_opkind_DOUBLE_CMPXCHG,
-        patomic_opkind_MULTI_CMPXCHG,
-        patomic_opkind_GENERIC,
-        patomic_opkind_GENERIC_WFB,
-        patomic_opkind_TBEGIN,
-        patomic_opkind_TABORT,
-        patomic_opkind_TCOMMIT,
-        patomic_opkind_TTEST
-    };
-
-    const std::vector<patomic_opkind_t> combined_opkinds {
-        patomic_opkinds_LDST,
-        patomic_opkinds_XCHG,
-        patomic_opkinds_BIT,
-        patomic_opkinds_BIN,
-        patomic_opkinds_ARI,
-        patomic_opkinds_TSPEC,
-        patomic_opkinds_TFLAG,
-        patomic_opkinds_TRAW
-    };
-};
+{};
 
 /// @brief Templated test fixture.
 template <class T>
@@ -133,7 +90,7 @@ class BtTypesFeatureCheckLeaf_DeathTest : public testing::Test
 TEST_F(BtTypesFeatureCheckLeaf, all_opkind_have_zero_or_one_bits_set)
 {
     // test
-    for (const patomic_opkind_t opkind : solo_opkinds)
+    for (const patomic_opkind_t opkind : test::make_opkinds_all_solo())
     {
         if (opkind == patomic_opkind_NONE)
         {
@@ -150,7 +107,7 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkind_have_zero_or_one_bits_set)
 TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_multiple_bits_set)
 {
     // test
-    for (const int opkinds : combined_opkinds)
+    for (const int opkinds : test::make_opkinds_all_combined())
     {
         EXPECT_GT(opkinds, 0);
         EXPECT_FALSE(test::is_positive_pow2(opkinds));
@@ -208,11 +165,12 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_expected_bits)
         expected_tflag,
         expected_traw
     };
+    const auto actual_vec = test::make_opkinds_all_combined();
     const std::set<int> expected_set {
         expected_vec.begin(), expected_vec.end()
     };
     const std::set<int> actual_set {
-        combined_opkinds.begin(), combined_opkinds.end()
+        actual_vec.begin(), actual_vec.end()
     };
 
     // test
@@ -228,16 +186,16 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_expected_bits)
     EXPECT_EQ(patomic_opkinds_TFLAG, expected_tflag);
     EXPECT_EQ(patomic_opkinds_TRAW, expected_traw);
     // can't check set sizes in case two opcats have the same value
-    EXPECT_EQ(expected_vec.size(), combined_opkinds.size());
+    EXPECT_EQ(expected_vec.size(), actual_vec.size());
 }
 
 /// @brief All "opkinds" opkinds consist only of known "opkind" opkind bits.
 TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
 {
     // setup
-    for (unsigned int opkinds : combined_opkinds)
+    for (unsigned int opkinds : test::make_opkinds_all_combined())
     {
-        for (const unsigned int opkind : solo_opkinds)
+        for (const unsigned int opkind : test::make_opkinds_all_solo())
         {
             opkinds &= ~opkind;
         }
@@ -246,6 +204,11 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
         EXPECT_EQ(0, opkinds);
     }
 }
+
+/// @brief Invalid opkind bits remain set in the return value of leaf feature
+///        check.
+TYPED_TEST(BtTypesFeatureCheckLeafT, check_invalid_opkinds_unmodified)
+{}
 
 /// @brief Calling check_leaf with all LDST function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_LDST.
