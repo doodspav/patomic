@@ -26,6 +26,12 @@ create_bt(
 )
 
 create_bt(
+    NAME BtApiOptions
+    SOURCE
+        options.cpp
+)
+
+create_bt(
     NAME BtApiTransaction
     SOURCE
         transaction.cpp

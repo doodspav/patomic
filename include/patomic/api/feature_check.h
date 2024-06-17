@@ -16,6 +16,10 @@ extern "C" {
  * @brief
  *   Enum constants representing operation categories, corresponding to groups
  *   of operations found in ops structs.
+ *
+ * @note
+ *   Each "opcat" label has a single bit set (except for NONE which has no bits
+ *   set), and each "opcats" label has more than one bit set.
  */
 typedef enum {
 
@@ -93,6 +97,10 @@ typedef enum {
  *   There is no differentiation between fetch and void (non-fetch) op kinds.
  *   Instead, the differentiation is made by whether the op kind is used with
  *   a fetch or void op category.
+ *
+ * @note
+ *   Each "opkind" label has a single bit set (except for NONE which has no
+ *   bits set), and each "opkinds" label has more than one bit set.
  */
 typedef enum {
 

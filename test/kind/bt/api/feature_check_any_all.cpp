@@ -97,7 +97,8 @@ TYPED_TEST_SUITE(
 );
 
 
-/// @brief All "opcat" opcats have exactly zero or one bits set.
+/// @brief All "opcat" opcats have exactly one bit set, except for
+///        patomic_opcat_NONE which has zero bits set.
 TEST_F(BtApiFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
 {
     // test

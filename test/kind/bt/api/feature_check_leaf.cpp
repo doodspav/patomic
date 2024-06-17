@@ -102,7 +102,8 @@ TYPED_TEST_SUITE(
 );
 
 
-/// @brief All "opkind" opkinds have exactly zero or one bits set.
+/// @brief All "opkind" opkinds have exactly one bit set, except for
+///        patomic_opkind_NONE which has zero bits set.
 TEST_F(BtApiFeatureCheckLeaf, all_opkind_have_zero_or_one_bits_set)
 {
     // test

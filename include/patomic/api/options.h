@@ -30,6 +30,10 @@ extern "C" {
  * @note
  *   Options are merely hints to an implementation; they may be completely
  *   ignored.
+ *
+ * @note
+ *   Each "option" label has a single bit set (except for NONE which has no
+ *   bits set), and each "options" label has more than one bit set.
  */
 typedef enum {
 
