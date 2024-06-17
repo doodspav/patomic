@@ -509,3 +509,45 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_all_special_bits_match_expected)
         EXPECT_EQ(expected_result, actual_result);
     }
 }
+
+/// @brief Calling check_any with all combinations of TFLAG function pointers
+///        set in patomic_ops_transaction_t unsets the correct bits.
+TEST_F(BtTypesFeatureCheckAnyAll, check_any_flag_bits_match_expected)
+{
+    // setup
+    patomic_ops_transaction_t ops {};
+    for (const auto& flag : test::make_ops_flag_combinations_transaction())
+    {
+        ops.flag_ops = flag.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = flag.any ? patomic_opcat_TFLAG : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_any(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_all with all combinations of TFLAG function pointers
+///        set in patomic_ops_transaction_t unsets the correct bits.
+TEST_F(BtTypesFeatureCheckAnyAll, check_all_flag_bits_match_expected)
+{
+    // setup
+    patomic_ops_transaction_t ops {};
+    for (const auto& flag : test::make_ops_flag_combinations_transaction())
+    {
+        ops.flag_ops = flag.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = flag.all ? patomic_opcat_TFLAG : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_all(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
