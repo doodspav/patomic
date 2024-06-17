@@ -259,7 +259,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_invalid_opcats_unmodified)
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 {
     // setup
-    for (auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
+    for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
     {
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = ldst.any ? patomic_opcat_LDST : 0;
@@ -278,7 +278,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
 {
     // setup
-    for (auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
+    for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
     {
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = ldst.all ? patomic_opcat_LDST : 0;
@@ -298,7 +298,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
-    for (auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
+    for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
     {
         ops.xchg_ops = xchg.ops;
         constexpr unsigned int input_opcats = ~0;
@@ -319,7 +319,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
-    for (auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
+    for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
     {
         ops.xchg_ops = xchg.ops;
         constexpr unsigned int input_opcats = ~0;
@@ -340,7 +340,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
-    for (auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
+    for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
     {
         ops.bitwise_ops = bitwise.ops;
         constexpr unsigned int input_opcats = ~0;
@@ -361,11 +361,57 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
-    for (auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
+    for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
     {
         ops.bitwise_ops = bitwise.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = bitwise.all ? patomic_opcat_BIT : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_all(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_any with all combinations of BIN(_V/F) function
+///        pointers set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
+    {
+        ops.binary_ops = binary.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats =
+            (binary.any_void ? patomic_opcat_BIN_V : 0) |
+            (binary.any_fetch ? patomic_opcat_BIN_F : 0);
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_any(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_all with all combinations of BIN(_V/F) function
+///        pointers set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
+    {
+        ops.binary_ops = binary.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats =
+            (binary.all_void ? patomic_opcat_BIN_V : 0) |
+            (binary.all_fetch ? patomic_opcat_BIN_F : 0);
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~set_opcats;
 
