@@ -19,12 +19,12 @@
 
 
 /// @brief Test fixture.
-class BtTypesFeatureCheckLeaf : public testing::Test
+class BtApiFeatureCheckLeaf : public testing::Test
 {};
 
 /// @brief Templated test fixture.
 template <class T>
-class BtTypesFeatureCheckLeafT : public testing::Test
+class BtApiFeatureCheckLeafT : public testing::Test
 {
 public:
     static constexpr test::ops_domain domain = T::value;
@@ -33,14 +33,14 @@ public:
 
 /// @brief Templated test fixture for death tests.
 template <class T>
-class BtTypesFeatureCheckLeafT_DeathTest : public testing::Test
+class BtApiFeatureCheckLeafT_DeathTest : public testing::Test
 {
 public:
     static constexpr test::ops_domain domain = T::value;
     using OpsTypes = test::ops_types<domain>;
 };
 
-using BtTypesFeatureCheckLeafT_Types = ::testing::Types<
+using BtApiFeatureCheckLeafT_Types = ::testing::Types<
     std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>,
     std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>,
     std::integral_constant<test::ops_domain, test::ops_domain::TRANSACTION>
@@ -90,20 +90,20 @@ public:
 }  // namespace
 
 TYPED_TEST_SUITE(
-    BtTypesFeatureCheckLeafT,
-    BtTypesFeatureCheckLeafT_Types,
+    BtApiFeatureCheckLeafT,
+    BtApiFeatureCheckLeafT_Types,
     TTestHelper
 );
 
 TYPED_TEST_SUITE(
-    BtTypesFeatureCheckLeafT_DeathTest,
-    BtTypesFeatureCheckLeafT_Types,
+    BtApiFeatureCheckLeafT_DeathTest,
+    BtApiFeatureCheckLeafT_Types,
     TTestHelper
 );
 
 
 /// @brief All "opkind" opkinds have exactly zero or one bits set.
-TEST_F(BtTypesFeatureCheckLeaf, all_opkind_have_zero_or_one_bits_set)
+TEST_F(BtApiFeatureCheckLeaf, all_opkind_have_zero_or_one_bits_set)
 {
     // test
     for (const patomic_opkind_t opkind : test::make_opkinds_all_solo())
@@ -120,7 +120,7 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkind_have_zero_or_one_bits_set)
 }
 
 /// @brief All "opkinds" opkinds have multiple bits set.
-TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_multiple_bits_set)
+TEST_F(BtApiFeatureCheckLeaf, all_opkinds_have_multiple_bits_set)
 {
     // test
     for (const int opkinds : test::make_opkinds_all_combined())
@@ -131,7 +131,7 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_multiple_bits_set)
 }
 
 /// @brief All "opkinds" opkinds have expected combination of bits.
-TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_expected_bits)
+TEST_F(BtApiFeatureCheckLeaf, all_opkinds_have_expected_bits)
 {
     // setup
     // values
@@ -206,7 +206,7 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_have_expected_bits)
 }
 
 /// @brief All "opkinds" opkinds consist only of known "opkind" opkind bits.
-TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
+TEST_F(BtApiFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
 {
     // setup
     for (unsigned int opkinds : test::make_opkinds_all_combined())
@@ -223,7 +223,7 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
 
 /// @brief Calling check_leaf with invalid opkind bits for any valid opcat does
 ///        not unset the invalid opkind bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -252,7 +252,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
 
 /// @brief Calling check_leaf with a valid opkind with an opcat which does not
 ///        apply to the domain does not unset any opkind bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bits)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bits)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -281,7 +281,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_
 
 /// @brief Calling check_leaf with all LDST function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_LDST.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_ldst_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_ldst_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -300,7 +300,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_ldst_bits_match_expected)
 
 /// @brief Calling check_leaf with all combinations of LDST function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ldst_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_ldst_bits_match_expected)
 {
     // setup
     for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
@@ -318,7 +318,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ldst_bits_match_expected)
 
 /// @brief Calling check_leaf with all XCHG function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_XCHG.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -336,7 +336,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
 
 /// @brief Calling check_leaf with all combinations of XCHG function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -356,7 +356,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
 
 /// @brief Calling check_leaf with all BIT function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_BIT.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -374,7 +374,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected
 
 /// @brief Calling check_leaf with all combinations of BIT function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -394,7 +394,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
 
 /// @brief Calling check_leaf with all BIN(_V/F) function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_BIN.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -415,7 +415,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
 
 /// @brief Calling check_leaf with all combinations of BIN(_V/F) function
 ///        pointers set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -439,7 +439,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
 
 /// @brief Calling check_leaf with all ARI(_V/F) function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_ARI.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -460,7 +460,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expec
 
 /// @brief Calling check_leaf with all combinations of ARI(_V/F) function
 ///        pointers set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_arithmetic_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_arithmetic_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -485,7 +485,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_arithmetic_bits_match_expected)
 /// @brief Calling check_leaf with all TSPEC function pointers set in
 ///        patomic_ops_transaction_t unsets exactly the bits in
 ///        patomic_opkinds_TSPEC.
-TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_special_bits_match_expected)
+TEST_F(BtApiFeatureCheckLeaf, check_leaf_full_special_bits_match_expected)
 {
     // setup
     constexpr auto domain = test::ops_domain::TRANSACTION;
@@ -504,7 +504,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_special_bits_match_expected)
 
 /// @brief Calling check_leaf with all combinations of TSPEC function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckLeaf, check_leaf_special_bits_match_expected)
+TEST_F(BtApiFeatureCheckLeaf, check_leaf_special_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -525,7 +525,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_special_bits_match_expected)
 /// @brief Calling check_leaf with all TFLAG function pointers set in
 ///        patomic_ops_transaction_t unsets exactly the bits in
 ///        patomic_opkinds_TFLAG.
-TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_flag_bits_match_expected)
+TEST_F(BtApiFeatureCheckLeaf, check_leaf_full_flag_bits_match_expected)
 {
     // setup
     constexpr auto domain = test::ops_domain::TRANSACTION;
@@ -544,7 +544,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_flag_bits_match_expected)
 
 /// @brief Calling check_leaf with all combinations of TFLAG function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckLeaf, check_leaf_flag_bits_match_expected)
+TEST_F(BtApiFeatureCheckLeaf, check_leaf_flag_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -565,7 +565,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_flag_bits_match_expected)
 /// @brief Calling check_leaf with all TRAW function pointers set in
 ///        patomic_ops_transaction_t unsets exactly the bits in
 ///        patomic_opkinds_TRAW.
-TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_raw_bits_match_expected)
+TEST_F(BtApiFeatureCheckLeaf, check_leaf_full_raw_bits_match_expected)
 {
     // setup
     constexpr auto domain = test::ops_domain::TRANSACTION;
@@ -584,7 +584,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_raw_bits_match_expected)
 
 /// @brief Calling check_leaf with all combinations of TRAW function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
+TEST_F(BtApiFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -604,7 +604,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
 
 /// @brief Calling check_leaf with an opcat value which has no bits set is
 ///        fatally asserted.
-TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_opcat)
+TYPED_TEST(BtApiFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_opcat)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -621,7 +621,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_op
 
 /// @brief Calling check_leaf with an opcat value which has more than one bit
 ///        set is fatally asserted.
-TYPED_TEST(BtTypesFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_multi_bit_opcat)
+TYPED_TEST(BtApiFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_multi_bit_opcat)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();

@@ -6,12 +6,12 @@
 
 
 /// @brief Test fixture.
-class BtTypesTransaction : public testing::Test
+class BtApiTransaction : public testing::Test
 {};
 
 
 /// @brief Reason returned is 0 if status is not patomic_TABORT_EXPLICIT.
-TEST_F(BtTypesTransaction, reason_is_zero_if_not_explicit_abort)
+TEST_F(BtApiTransaction, reason_is_zero_if_not_explicit_abort)
 {
     // create other statuses
     // new status kinds may be added, but they are guaranteed to fit in 8 bits
@@ -37,7 +37,7 @@ TEST_F(BtTypesTransaction, reason_is_zero_if_not_explicit_abort)
 }
 
 /// @brief Reason is returned if status is patomic_TABORT_EXPLICIT.
-TEST_F(BtTypesTransaction, reason_returned_if_explicit_abort)
+TEST_F(BtApiTransaction, reason_returned_if_explicit_abort)
 {
     // create reasons
     const std::vector<unsigned long> reasons {
@@ -58,7 +58,7 @@ TEST_F(BtTypesTransaction, reason_returned_if_explicit_abort)
 }
 
 /// @brief Check that only first 8 bits of reason are provided.
-TEST_F(BtTypesTransaction, reason_only_saves_first_8_bits)
+TEST_F(BtApiTransaction, reason_only_saves_first_8_bits)
 {
     // create status with extended reason (more than 8 bits)
     constexpr unsigned long extended_reason = 0xfffUL;

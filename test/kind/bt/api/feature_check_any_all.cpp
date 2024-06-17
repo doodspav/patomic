@@ -14,19 +14,19 @@
 
 
 /// @brief Test fixture.
-class BtTypesFeatureCheckAnyAll : public testing::Test
+class BtApiFeatureCheckAnyAll : public testing::Test
 {};
 
 /// @brief Templated test fixture.
 template <class T>
-class BtTypesFeatureCheckAnyAllT : public testing::Test
+class BtApiFeatureCheckAnyAllT : public testing::Test
 {
 public:
     static constexpr test::ops_domain domain = T::value;
     using OpsTypes = test::ops_types<domain>;
 };
 
-using BtTypesFeatureCheckAnyAllT_Types = ::testing::Types<
+using BtApiFeatureCheckAnyAllT_Types = ::testing::Types<
     std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>,
     std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>,
     std::integral_constant<test::ops_domain, test::ops_domain::TRANSACTION>
@@ -91,14 +91,14 @@ public:
 }  // namespace
 
 TYPED_TEST_SUITE(
-    BtTypesFeatureCheckAnyAllT,
-    BtTypesFeatureCheckAnyAllT_Types,
+    BtApiFeatureCheckAnyAllT,
+    BtApiFeatureCheckAnyAllT_Types,
     TTestHelper
 );
 
 
 /// @brief All "opcat" opcats have exactly zero or one bits set.
-TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
+TEST_F(BtApiFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
 {
     // test
     for (const patomic_opcat_t opcat : test::make_opcats_all_solo())
@@ -115,7 +115,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
 }
 
 /// @brief All "opcat" values are unique.
-TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_are_unique)
+TEST_F(BtApiFeatureCheckAnyAll, all_opcat_are_unique)
 {
     // setup
     const auto solo_opcats = test::make_opcats_all_solo();
@@ -128,7 +128,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_are_unique)
 }
 
 /// @brief All "opcats" opcats have multiple bits set.
-TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_multiple_bits_set)
+TEST_F(BtApiFeatureCheckAnyAll, all_opcats_have_multiple_bits_set)
 {
     // test
     for (const int opcats : test::make_opcats_all_combined())
@@ -139,7 +139,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_multiple_bits_set)
 }
 
 /// @brief All "opcats" opcats have expected combination of bits.
-TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
+TEST_F(BtApiFeatureCheckAnyAll, all_opcats_have_expected_bits)
 {
     // setup
     // values
@@ -187,7 +187,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
 }
 
 /// @brief Each "opcats" opcats consist only of known "opcat" opcat bits.
-TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_only_contain_known_opcat_bits)
+TEST_F(BtApiFeatureCheckAnyAll, all_opcats_only_contain_known_opcat_bits)
 {
     // setup
     for (unsigned int opcats : test::make_opcats_all_combined())
@@ -204,7 +204,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_only_contain_known_opcat_bits)
 
 /// @brief The values of patomic_opcats_IMPLICIT and patomic_opcats_EXPLICIT
 ///        are the same.
-TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_eq_explicit)
+TEST_F(BtApiFeatureCheckAnyAll, opcats_implicit_eq_explicit)
 {
     // test
     EXPECT_EQ(patomic_opcats_IMPLICIT, patomic_opcats_EXPLICIT);
@@ -212,7 +212,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_eq_explicit)
 
 /// @brief The bits set in patomic_opcats_IMPLICIT and patomic_opcats_EXPLICIT
 ///        are all set in patomic_opcats_TRANSACTION.
-TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction)
+TEST_F(BtApiFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction)
 {
     // setup
     constexpr auto masked_implicit =
@@ -227,7 +227,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction
 
 /// @brief Calling check_any with invalid opcat bits does not unset the invalid
 ///        bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ignores_invalid_bits)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_ignores_invalid_bits)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -243,7 +243,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ignores_invalid_bits)
 
 /// @brief Calling check_all with invalid opcat bits does not unset the invalid
 ///        bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ignores_invalid_bits)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_ignores_invalid_bits)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -259,7 +259,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ignores_invalid_bits)
 
 /// @brief Calling check_any with all pointers set in patomic_ops*_t unsets
 ///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -276,7 +276,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
 
 /// @brief Calling check_all with all pointers set in patomic_ops*_t unsets
 ///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_full_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_full_bits_match_expected)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -293,7 +293,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_full_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of LDST function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 {
     // setup
     for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
@@ -312,7 +312,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of LDST function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
 {
     // setup
     for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
@@ -331,7 +331,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of XCHG function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -352,7 +352,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of XCHG function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -373,7 +373,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of BIT function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -394,7 +394,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of BIT function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -415,7 +415,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of BIN(_V/F) function
 ///        pointers set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -438,7 +438,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of BIN(_V/F) function
 ///        pointers set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -461,7 +461,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of ARI(_V/F) function
 ///        pointers set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -484,7 +484,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of ARI(_V/F) function
 ///        pointers set in patomic_ops*_t unsets the correct bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_arithmetic_bits_match_expected)
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_arithmetic_bits_match_expected)
 {
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
@@ -507,7 +507,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_arithmetic_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of TSPEC function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll, check_any_special_bits_match_expected)
+TEST_F(BtApiFeatureCheckAnyAll, check_any_special_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -528,7 +528,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_any_special_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of TSPEC function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll, check_all_special_bits_match_expected)
+TEST_F(BtApiFeatureCheckAnyAll, check_all_special_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -549,7 +549,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_all_special_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of TFLAG function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll, check_any_flag_bits_match_expected)
+TEST_F(BtApiFeatureCheckAnyAll, check_any_flag_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -570,7 +570,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_any_flag_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of TFLAG function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll, check_all_flag_bits_match_expected)
+TEST_F(BtApiFeatureCheckAnyAll, check_all_flag_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -591,7 +591,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_all_flag_bits_match_expected)
 
 /// @brief Calling check_any with all combinations of TRAW function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll, check_any_raw_bits_match_expected)
+TEST_F(BtApiFeatureCheckAnyAll, check_any_raw_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};
@@ -612,7 +612,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_any_raw_bits_match_expected)
 
 /// @brief Calling check_all with all combinations of TRAW function pointers
 ///        set in patomic_ops_transaction_t unsets the correct bits.
-TEST_F(BtTypesFeatureCheckAnyAll, check_all_raw_bits_match_expected)
+TEST_F(BtApiFeatureCheckAnyAll, check_all_raw_bits_match_expected)
 {
     // setup
     patomic_ops_transaction_t ops {};

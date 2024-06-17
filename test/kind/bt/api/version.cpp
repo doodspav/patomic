@@ -7,7 +7,7 @@
 
 
 /// @brief Test fixture.
-class BtTypesVersion : public testing::Test
+class BtApiVersion : public testing::Test
 {
 public:
     const std::regex semver_regex{
@@ -18,7 +18,7 @@ public:
 
 /// @brief Return value of patomic_version_string() compares equal to
 ///        PATOMIC_VERSION_STRING.
-TEST_F(BtTypesVersion, version_string_fn_cmp_eq_macro)
+TEST_F(BtApiVersion, version_string_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_STRING;
@@ -30,7 +30,7 @@ TEST_F(BtTypesVersion, version_string_fn_cmp_eq_macro)
 
 /// @brief Return value of patomic_version_major() compares equal to
 ///        PATOMIC_VERSION_MAJOR.
-TEST_F(BtTypesVersion, version_major_fn_cmp_eq_macro)
+TEST_F(BtApiVersion, version_major_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_MAJOR;
@@ -42,7 +42,7 @@ TEST_F(BtTypesVersion, version_major_fn_cmp_eq_macro)
 
 /// @brief Return value of patomic_version_minor() compares equal to
 ///        PATOMIC_VERSION_MINOR.
-TEST_F(BtTypesVersion, version_minor_fn_cmp_eq_macro)
+TEST_F(BtApiVersion, version_minor_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_MINOR;
@@ -54,7 +54,7 @@ TEST_F(BtTypesVersion, version_minor_fn_cmp_eq_macro)
 
 /// @brief Return value of patomic_version_patch() compares equal to
 ///        PATOMIC_VERSION_PATCH.
-TEST_F(BtTypesVersion, version_patch_fn_cmp_eq_macro)
+TEST_F(BtApiVersion, version_patch_fn_cmp_eq_macro)
 {
     // setup
     constexpr auto macro = PATOMIC_VERSION_PATCH;
@@ -65,7 +65,7 @@ TEST_F(BtTypesVersion, version_patch_fn_cmp_eq_macro)
 }
 
 /// @brief PATOMIC_VERSION_STRING matches SemVer regex.
-TEST_F(BtTypesVersion, version_string_matches_semver_regex)
+TEST_F(BtApiVersion, version_string_matches_semver_regex)
 {
     // test
     EXPECT_TRUE(std::regex_match(PATOMIC_VERSION_STRING, semver_regex));
@@ -73,7 +73,7 @@ TEST_F(BtTypesVersion, version_string_matches_semver_regex)
 
 /// @brief PATOMIC_VERSION_STRING major component compares equal to
 ///        PATOMIC_VERSION_MAJOR.
-TEST_F(BtTypesVersion, version_string_major_component_matches_version_major)
+TEST_F(BtApiVersion, version_string_major_component_matches_version_major)
 {
     // get major component as int
     std::cmatch sub_matches;
@@ -87,7 +87,7 @@ TEST_F(BtTypesVersion, version_string_major_component_matches_version_major)
 
 /// @brief PATOMIC_VERSION_STRING minor component compares equal to
 ///        PATOMIC_VERSION_MINOR.
-TEST_F(BtTypesVersion, version_string_minor_component_matches_version_minor)
+TEST_F(BtApiVersion, version_string_minor_component_matches_version_minor)
 {
     // get major component as int
     std::cmatch sub_matches;
@@ -101,7 +101,7 @@ TEST_F(BtTypesVersion, version_string_minor_component_matches_version_minor)
 
 /// @brief PATOMIC_VERSION_STRING major component compares equal to
 ///        PATOMIC_VERSION_MAJOR.
-TEST_F(BtTypesVersion, version_string_patch_component_matches_version_patch)
+TEST_F(BtApiVersion, version_string_patch_component_matches_version_patch)
 {
     // get major component as int
     std::cmatch sub_matches;
@@ -115,7 +115,7 @@ TEST_F(BtTypesVersion, version_string_patch_component_matches_version_patch)
 
 /// @brief Library is not compatible with major versions that do not compare
 ///        equal to PATOMIC_VERSION_MAJOR.
-TEST_F(BtTypesVersion, version_not_compatible_major_ne)
+TEST_F(BtApiVersion, version_not_compatible_major_ne)
 {
     // setup
     constexpr int major = PATOMIC_VERSION_MAJOR;
@@ -131,7 +131,7 @@ TEST_F(BtTypesVersion, version_not_compatible_major_ne)
 /// @brief Library is not compatible with minor versions that compare greater
 ///        than PATOMIC_VERSION_MINOR when the major version compares equal
 ///        to PATOMIC_VERSION_MAJOR.
-TEST_F(BtTypesVersion, version_not_compatible_major_eq_minor_gt)
+TEST_F(BtApiVersion, version_not_compatible_major_eq_minor_gt)
 {
     // setup
     constexpr int major = PATOMIC_VERSION_MAJOR;
@@ -146,7 +146,7 @@ TEST_F(BtTypesVersion, version_not_compatible_major_eq_minor_gt)
 ///        than PATOMIC_VERSION_PATCH when the major and minor versions compare
 ///        equal to PATOMIC_VERSION_MAJOR and PATOMIC_VERSION_MINOR
 ///        respectively.
-TEST_F(BtTypesVersion, version_not_compatible_major_eq_minor_eq_patch_gt)
+TEST_F(BtApiVersion, version_not_compatible_major_eq_minor_eq_patch_gt)
 {
     // setup
     constexpr int major = PATOMIC_VERSION_MAJOR;
@@ -161,7 +161,7 @@ TEST_F(BtTypesVersion, version_not_compatible_major_eq_minor_eq_patch_gt)
 /// @brief Library is compatible with minor versions that compare less than
 ///        PATOMIC_VERSION_MINOR when the major version compares equal to
 ///        PATOMIC_VERSION_MAJOR and the patch version has any value.
-TEST_F(BtTypesVersion, version_compatible_major_eq_minor_lt_patch_any)
+TEST_F(BtApiVersion, version_compatible_major_eq_minor_lt_patch_any)
 {
     // setup
     constexpr int patch = PATOMIC_VERSION_PATCH;
@@ -180,7 +180,7 @@ TEST_F(BtTypesVersion, version_compatible_major_eq_minor_lt_patch_any)
 ///        PATOMIC_VERSION_MINOR when the major version compares equal to
 ///        PATOMIC_VERSION_MAJOR and the patch version compares less than or
 ///        equal to PATOMIC_VERSION_PATCH.
-TEST_F(BtTypesVersion, version_compatible_major_eq_minor_eq_patch_le)
+TEST_F(BtApiVersion, version_compatible_major_eq_minor_eq_patch_le)
 {
     // setup
     constexpr int patch = PATOMIC_VERSION_PATCH;

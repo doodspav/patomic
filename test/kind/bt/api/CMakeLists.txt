@@ -1,7 +1,7 @@
 # create tests
-create_bt(NAME BtTypesAlign SOURCE align.cpp)
-create_bt(NAME BtTypesFeatureCheck SOURCE feature_check_any_all.cpp feature_check_leaf.cpp)
-create_bt(NAME BtTypesIds SOURCE ids.cpp)
-create_bt(NAME BtTypesMemoryOrder SOURCE memory_order.cpp)
-create_bt(NAME BtTypesTransaction SOURCE transaction.cpp)
-create_bt(NAME BtTypesVersion SOURCE version.cpp)
+create_bt(NAME BtApiAlign        SOURCE align.cpp)
+create_bt(NAME BtApiFeatureCheck SOURCE feature_check_any_all.cpp feature_check_leaf.cpp)
+create_bt(NAME BtApiIds          SOURCE ids.cpp)
+create_bt(NAME BtApiMemoryOrder  SOURCE memory_order.cpp)
+create_bt(NAME BtApiTransaction  SOURCE transaction.cpp)
+create_bt(NAME BtApiVersion      SOURCE version.cpp)
