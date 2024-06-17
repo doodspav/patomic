@@ -238,6 +238,12 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
     // test
     for (const patomic_opcat_t opcat : test::make_opcats_all_solo())
     {
+        if (opcat == 0)
+        {
+            continue;
+        }
+
+        ASSERT_TRUE(test::is_positive_pow2(static_cast<unsigned int>(opcat)));
         const std::bitset<bit_width> actual_result =
             TTestHelper::check_leaf(ops, opcat, invalid_opkind);
         EXPECT_EQ(expected_result, actual_result);
