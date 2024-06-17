@@ -225,9 +225,40 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction
     EXPECT_EQ(masked_explicit, patomic_opcats_EXPLICIT);
 }
 
+/// @brief Calling check_any with invalid opcat bits does not unset the invalid
+///        bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_invalid_bits_unmodified)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr unsigned int invalid_opcats = ~TestFixture::OpsTypes::full_opcat;
+    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+    const std::bitset<bit_width> expected_result = invalid_opcats;
+
+    // test
+    const std::bitset<bit_width> actual_result =
+        TTestHelper::check_any(ops, invalid_opcats);
+    EXPECT_EQ(expected_result, actual_result);
+}
+
+/// @brief Calling check_all with invalid opcat bits does not unset the invalid
+///        bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_invalid_bits_unmodified)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr unsigned int invalid_opcats = ~TestFixture::OpsTypes::full_opcat;
+    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+    const std::bitset<bit_width> expected_result = invalid_opcats;
+
+    // test
+    const std::bitset<bit_width> actual_result =
+        TTestHelper::check_all(ops, invalid_opcats);
+    EXPECT_EQ(expected_result, actual_result);
+}
+
 /// @brief Calling check_any with all pointers set in patomic_ops*_t unsets
-///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}, and
-///        invalid bits remain set.
+///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
 {
     // setup
@@ -244,8 +275,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
 }
 
 /// @brief Calling check_all with all pointers set in patomic_ops*_t unsets
-///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}, and
-///        invalid bits remain set.
+///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_full_bits_match_expected)
 {
     // setup
