@@ -1,5 +1,5 @@
-#ifndef PATOMIC_OPS_IMPLICIT_H
-#define PATOMIC_OPS_IMPLICIT_H
+#ifndef PATOMIC_API_OPS_IMPLICIT_H
+#define PATOMIC_API_OPS_IMPLICIT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -489,4 +489,4 @@ typedef struct {
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_OPS_IMPLICIT_H */
+#endif  /* PATOMIC_API_OPS_IMPLICIT_H */

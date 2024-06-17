@@ -1,7 +1,7 @@
-#ifndef PATOMIC_MEMORY_ORDER_H
-#define PATOMIC_MEMORY_ORDER_H
+#ifndef PATOMIC_API_MEMORY_ORDER_H
+#define PATOMIC_API_MEMORY_ORDER_H
 
-#include <patomic/types/export.h>
+#include <patomic/api/export.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -185,4 +185,4 @@ patomic_cmpxchg_fail_order(int succ);
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_MEMORY_ORDER_H */
+#endif  /* PATOMIC_API_MEMORY_ORDER_H */

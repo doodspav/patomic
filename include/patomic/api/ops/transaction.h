@@ -1,5 +1,5 @@
-#ifndef PATOMIC_OPS_TRANSACTION_H
-#define PATOMIC_OPS_TRANSACTION_H
+#ifndef PATOMIC_API_OPS_TRANSACTION_H
+#define PATOMIC_API_OPS_TRANSACTION_H
 
 #include "../transaction.h"
 
@@ -1095,4 +1095,4 @@ typedef struct {
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_OPS_TRANSACTION_H */
+#endif  /* PATOMIC_API_OPS_TRANSACTION_H */

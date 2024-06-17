@@ -1,9 +1,9 @@
-#ifndef PATOMIC_FEATURE_CHECK_H
-#define PATOMIC_FEATURE_CHECK_H
+#ifndef PATOMIC_API_FEATURE_CHECK_H
+#define PATOMIC_API_FEATURE_CHECK_H
 
 #include "ops.h"
 
-#include <patomic/types/export.h>
+#include <patomic/api/export.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -536,4 +536,4 @@ patomic_feature_check_leaf_transaction(
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_FEATURE_CHECK_H */
+#endif  /* PATOMIC_API_FEATURE_CHECK_H */

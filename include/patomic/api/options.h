@@ -1,5 +1,5 @@
-#ifndef PATOMIC_OPTIONS_H
-#define PATOMIC_OPTIONS_H
+#ifndef PATOMIC_API_OPTIONS_H
+#define PATOMIC_API_OPTIONS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,4 +43,4 @@ typedef enum {
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_OPTIONS_H */
+#endif  /* PATOMIC_API_OPTIONS_H */

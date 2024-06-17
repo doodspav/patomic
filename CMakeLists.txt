@@ -49,13 +49,14 @@ endif()
 include(GenerateExportHeader)
 generate_export_header(${target_name}
     BASE_NAME patomic
-    EXPORT_FILE_NAME include/patomic/types/export.h
+    INCLUDE_GUARD_NAME PATOMIC_GENERATED_API_EXPORT_H
+    EXPORT_FILE_NAME include/patomic/api/export.h
 )
 
 # generate header file with version macros and functions
 configure_file(
     cmake/in/version.h.in
-    include/patomic/types/version.h
+    include/patomic/api/version.h
     @ONLY
 )
 
@@ -69,8 +70,8 @@ configure_file(
 # add generated headers to target
 target_sources(${target_name} PRIVATE
     # include (generated)
-    "${PROJECT_BINARY_DIR}/include/patomic/types/export.h"
-    "${PROJECT_BINARY_DIR}/include/patomic/types/version.h"
+    "${PROJECT_BINARY_DIR}/include/patomic/api/export.h"
+    "${PROJECT_BINARY_DIR}/include/patomic/api/version.h"
     # src/include (generated)
     "${PROJECT_BINARY_DIR}/src/include/patomic/_patomic_config.h"
 )

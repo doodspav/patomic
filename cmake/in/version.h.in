@@ -1,7 +1,7 @@
-#ifndef PATOMIC_GENERATED_VERSION_H
-#define PATOMIC_GENERATED_VERSION_H
+#ifndef PATOMIC_GENERATED_API_VERSION_H
+#define PATOMIC_GENERATED_API_VERSION_H
 
-#include <patomic/types/export.h>
+#include <patomic/api/export.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,4 +149,4 @@ patomic_version_compatible_with(int major, int minor, int patch);
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_GENERATED_VERSION_H */
+#endif  /* PATOMIC_GENERATED_API_VERSION_H */

@@ -1,7 +1,7 @@
-#ifndef PATOMIC_ALIGN_H
-#define PATOMIC_ALIGN_H
+#ifndef PATOMIC_API_ALIGN_H
+#define PATOMIC_API_ALIGN_H
 
-#include <patomic/types/export.h>
+#include <patomic/api/export.h>
 
 #include <stddef.h>
 
@@ -178,4 +178,4 @@ patomic_align_meets_minimum(
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_ALIGN_H */
+#endif  /* PATOMIC_API_ALIGN_H */

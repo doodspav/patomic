@@ -1,9 +1,9 @@
-#ifndef PATOMIC_TRANSACTION_H
-#define PATOMIC_TRANSACTION_H
+#ifndef PATOMIC_API_TRANSACTION_H
+#define PATOMIC_API_TRANSACTION_H
 
 #include "align.h"
 
-#include <patomic/types/export.h>
+#include <patomic/api/export.h>
 
 #include <stddef.h>
 
@@ -379,4 +379,4 @@ typedef struct {
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_TRANSACTION_H */
+#endif  /* PATOMIC_API_TRANSACTION_H */

@@ -1,7 +1,7 @@
-#ifndef PATOMIC_IDS_H
-#define PATOMIC_IDS_H
+#ifndef PATOMIC_API_IDS_H
+#define PATOMIC_API_IDS_H
 
-#include <patomic/types/export.h>
+#include <patomic/api/export.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -143,4 +143,4 @@ patomic_get_kind(
 }  /* extern "C" */
 #endif
 
-#endif  /* PATOMIC_IDS_H */
+#endif  /* PATOMIC_API_IDS_H */

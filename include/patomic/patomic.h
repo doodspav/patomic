@@ -1,16 +1,16 @@
 #ifndef PATOMIC_PATOMIC_H
 #define PATOMIC_PATOMIC_H
 
-#include "types/align.h"
-#include "types/feature_check.h"
-#include "types/ids.h"
-#include "types/memory_order.h"
-#include "types/ops.h"
-#include "types/options.h"
-#include "types/transaction.h"
+#include "api/align.h"
+#include "api/feature_check.h"
+#include "api/ids.h"
+#include "api/memory_order.h"
+#include "api/ops.h"
+#include "api/options.h"
+#include "api/transaction.h"
 
-#include <patomic/types/export.h>
-#include <patomic/types/version.h>
+#include <patomic/api/export.h>
+#include <patomic/api/version.h>
 
 #include <stddef.h>
 
