@@ -53,6 +53,9 @@ using BtTypesFeatureCheckAnyAllT_Types = ::testing::Types<
     std::integral_constant<test::ops_domain, test::ops_domain::TRANSACTION>
 >;
 
+namespace
+{
+
 /// @brief Helper type for templated test fixture.
 class TTestHelper
 {
@@ -118,6 +121,8 @@ public:
         return patomic_feature_check_all_transaction(&ops, opcats);
     }
 };
+
+}  // namespace
 
 TYPED_TEST_SUITE(
     BtTypesFeatureCheckAnyAllT,
