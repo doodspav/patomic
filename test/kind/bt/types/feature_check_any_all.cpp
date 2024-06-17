@@ -41,7 +41,11 @@ public:
 /// @brief Templated test fixture.
 template <class T>
 class BtTypesFeatureCheckAnyAllT : public testing::Test
-{};
+{
+public:
+    static constexpr test::ops_domain domain = T::value;
+    using OpsTypes = test::ops_types<domain>;
+};
 
 using BtTypesFeatureCheckAnyAllT_Types = ::testing::Types<
     std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>,
@@ -255,8 +259,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, check_invalid_opcats_unmodified)
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 {
     // setup
-    constexpr test::ops_domain domain = TypeParam::value;
-    for (auto& ldst : test::make_ops_ldst_combinations<domain>())
+    for (auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
     {
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = ldst.any ? patomic_opcat_LDST : 0;
@@ -275,8 +278,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
 {
     // setup
-    constexpr test::ops_domain domain = TypeParam::value;
-    for (auto& ldst : test::make_ops_ldst_combinations<domain>())
+    for (auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
     {
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = ldst.all ? patomic_opcat_LDST : 0;
@@ -286,6 +288,48 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
         // test
         const std::bitset<bit_width> actual_result =
             TTestHelper::check_all(ldst.ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_any with all combinations of XCHG function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
+    {
+        ops.xchg_ops = xchg.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = xchg.any ? patomic_opcat_XCHG : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_any(ops, input_opcats);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_all with all combinations of XCHG function pointers
+///        set in patomic_ops*_t unsets the correct bits.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
+{
+    // setup
+    typename TestFixture::OpsTypes::base_t ops {};
+    for (auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
+    {
+        ops.xchg_ops = xchg.ops;
+        constexpr unsigned int input_opcats = ~0;
+        const unsigned int set_opcats = xchg.all ? patomic_opcat_XCHG : 0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~set_opcats;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
 }
