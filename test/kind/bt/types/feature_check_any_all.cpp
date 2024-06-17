@@ -227,7 +227,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction
 
 /// @brief Calling check_any with invalid opcat bits does not unset the invalid
 ///        bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_invalid_bits_unmodified)
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ignores_invalid_bits)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
@@ -243,7 +243,7 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_invalid_bits_unmodified)
 
 /// @brief Calling check_all with invalid opcat bits does not unset the invalid
 ///        bits.
-TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_invalid_bits_unmodified)
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_ignores_invalid_bits)
 {
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
