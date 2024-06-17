@@ -15,30 +15,7 @@
 
 /// @brief Test fixture.
 class BtTypesFeatureCheckAnyAll : public testing::Test
-{
-public:
-    const std::vector<patomic_opcat_t> solo_opcats {
-        patomic_opcat_NONE,
-        patomic_opcat_LDST,
-        patomic_opcat_XCHG,
-        patomic_opcat_BIT,
-        patomic_opcat_BIN_V,
-        patomic_opcat_BIN_F,
-        patomic_opcat_ARI_V,
-        patomic_opcat_ARI_F,
-        patomic_opcat_TSPEC,
-        patomic_opcat_TFLAG,
-        patomic_opcat_TRAW
-    };
-
-    const std::vector<patomic_opcat_t> combined_opcats {
-        patomic_opcats_BIN,
-        patomic_opcats_ARI,
-        patomic_opcats_IMPLICIT,
-        patomic_opcats_EXPLICIT,
-        patomic_opcats_TRANSACTION
-    };
-};
+{};
 
 /// @brief Templated test fixture.
 template <class T>
@@ -124,7 +101,7 @@ TYPED_TEST_SUITE(
 TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
 {
     // test
-    for (const patomic_opcat_t opcat : solo_opcats)
+    for (const patomic_opcat_t opcat : test::make_opcats_all_solo())
     {
         if (opcat == patomic_opcat_NONE)
         {
@@ -141,6 +118,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_have_zero_or_one_bits_set)
 TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_are_unique)
 {
     // setup
+    const auto solo_opcats = test::make_opcats_all_solo();
     const std::set<patomic_opcat_t> solo_opcats_set {
         solo_opcats.begin(), solo_opcats.end()
     };
@@ -153,7 +131,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcat_are_unique)
 TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_multiple_bits_set)
 {
     // test
-    for (const int opcats : combined_opcats)
+    for (const int opcats : test::make_opcats_all_combined())
     {
         EXPECT_GT(opcats, 0);
         EXPECT_FALSE(test::is_positive_pow2(opcats));
@@ -190,6 +168,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
     const std::set<int> expected_set {
         expected_vec.begin(), expected_vec.end()
     };
+    const auto combined_opcats = test::make_opcats_all_combined();
     const std::set<int> actual_set {
         combined_opcats.begin(), combined_opcats.end()
     };
@@ -211,9 +190,9 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
 TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_only_contain_known_opcat_bits)
 {
     // setup
-    for (unsigned int opcats : combined_opcats)
+    for (unsigned int opcats : test::make_opcats_all_combined())
     {
-        for (const unsigned int opcat : solo_opcats)
+        for (const unsigned int opcat : test::make_opcats_all_solo())
         {
             opcats &= ~opcat;
         }
@@ -246,13 +225,9 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction
     EXPECT_EQ(masked_explicit, patomic_opcats_EXPLICIT);
 }
 
-/// @brief Invalid opcat bits remain set in the return value of any/all feature
-///        check.
-TEST_F(BtTypesFeatureCheckAnyAll, check_invalid_opcats_unmodified)
-{}
-
 /// @brief Calling check_any with all pointers set in patomic_ops*_t unsets
-///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
+///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}, and
+///        invalid bits remain set.
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
 {
     // setup
@@ -269,7 +244,8 @@ TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
 }
 
 /// @brief Calling check_all with all pointers set in patomic_ops*_t unsets
-///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
+///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}, and
+///        invalid bits remain set.
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_full_bits_match_expected)
 {
     // setup
