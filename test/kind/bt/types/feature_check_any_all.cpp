@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <bitset>
 #include <string>
 #include <type_traits>
@@ -62,27 +63,14 @@ class TTestHelper
 public:
     template <class T>
     static std::string
-    GetName(int);
-
-    template <>
-    std::string
-    GetName<std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>>(int)
+    GetName(int)
     {
-        return "implicit";
-    }
-
-    template <>
-    std::string
-    GetName<std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>>(int)
-    {
-        return "explicit";
-    }
-
-    template <>
-    std::string
-    GetName<std::integral_constant<test::ops_domain, test::ops_domain::TRANSACTION>>(int)
-    {
-        return "transaction";
+        auto name = test::to_string(T::value);
+        std::transform(name.begin(), name.end(), name.begin(),
+                       [](unsigned char c) noexcept -> char {
+            return static_cast<char>(std::tolower(c));
+        });
+        return name;
     }
 
     static unsigned int
