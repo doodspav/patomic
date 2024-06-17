@@ -470,6 +470,26 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_special_bits_match_expected)
     EXPECT_EQ(expected_result, actual_result);
 }
 
+/// @brief Calling check_leaf with all combinations of TSPEC function pointers
+///        set in patomic_ops_transaction_t unsets the correct bits.
+TEST_F(BtTypesFeatureCheckLeaf, check_leaf_special_bits_match_expected)
+{
+    // setup
+    patomic_ops_transaction_t ops {};
+    for (const auto& special : test::make_ops_special_combinations_transaction())
+    {
+        ops.special_ops = special.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~special.opkinds;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, patomic_opcat_TSPEC, input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
 /// @brief Calling check_leaf with all TFLAG function pointers set in
 ///        patomic_ops_transaction_t unsets exactly the bits in
 ///        patomic_opkinds_TFLAG.
@@ -488,6 +508,26 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_flag_bits_match_expected)
     const std::bitset<bit_width> actual_result =
         TTestHelper::check_leaf(ops, patomic_opcat_TFLAG, input_opkinds);
     EXPECT_EQ(expected_result, actual_result);
+}
+
+/// @brief Calling check_leaf with all combinations of TFLAG function pointers
+///        set in patomic_ops_transaction_t unsets the correct bits.
+TEST_F(BtTypesFeatureCheckLeaf, check_leaf_flag_bits_match_expected)
+{
+    // setup
+    patomic_ops_transaction_t ops {};
+    for (const auto& flag : test::make_ops_flag_combinations_transaction())
+    {
+        ops.flag_ops = flag.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~flag.opkinds;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, patomic_opcat_TFLAG, input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
 }
 
 /// @brief Calling check_leaf with all TRAW function pointers set in
@@ -510,5 +550,24 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_raw_bits_match_expected)
     EXPECT_EQ(expected_result, actual_result);
 }
 
+/// @brief Calling check_leaf with all combinations of TRAW function pointers
+///        set in patomic_ops_transaction_t unsets the correct bits.
+TEST_F(BtTypesFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
+{
+    // setup
+    patomic_ops_transaction_t ops {};
+    for (const auto& raw : test::make_ops_raw_combinations_transaction())
+    {
+        ops.raw_ops = raw.ops;
+        constexpr unsigned int input_opkinds = ~0;
+        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+        const std::bitset<bit_width> expected_result = ~raw.opkinds;
+
+        // test
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, patomic_opcat_TRAW, input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
 
 // TODO: death
