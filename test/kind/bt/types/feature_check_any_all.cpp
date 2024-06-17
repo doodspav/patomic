@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <bitset>
+#include <set>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -179,14 +180,17 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
         patomic_opcat_TFLAG |
         patomic_opcat_TRAW;
     // sets of values
-    const std::set<int> expected_set = {
+    const std::vector<int> expected_vec {
         expected_bin,
         expected_ari,
         expected_implicit,
         expected_explicit,
         expected_transaction
     };
-    const std::set<int> actual_set = {
+    const std::set<int> expected_set {
+        expected_vec.begin(), expected_vec.end()
+    };
+    const std::set<int> actual_set {
         combined_opcats.begin(), combined_opcats.end()
     };
 
@@ -200,7 +204,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_have_expected_bits)
     EXPECT_EQ(patomic_opcats_EXPLICIT, expected_explicit);
     EXPECT_EQ(patomic_opcats_TRANSACTION, expected_transaction);
     // can't check set sizes in case two opcats have the same value
-    EXPECT_EQ(5, combined_opcats.size());
+    EXPECT_EQ(expected_vec.size(), combined_opcats.size());
 }
 
 /// @brief Each "opcats" opcats consist only of known "opcat" opcat bits.
@@ -209,7 +213,7 @@ TEST_F(BtTypesFeatureCheckAnyAll, all_opcats_only_contain_known_opcat_bits)
     // setup
     for (unsigned int opcats : combined_opcats)
     {
-        for (unsigned int opcat : solo_opcats)
+        for (const unsigned int opcat : solo_opcats)
         {
             opcats &= ~opcat;
         }
