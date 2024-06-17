@@ -6,4 +6,5 @@ target_sources(${target_name} PRIVATE
     ids.c
     memory_order.c
     transaction.c
+    version.c
 )
