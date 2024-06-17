@@ -36,7 +36,7 @@ struct ops_types;
 template <>
 struct ops_types<ops_domain::IMPLICIT>
 {
-    static constexpr patomic_opcat_t full_opcat = patomic_opcats_IMPLICIT;
+    static constexpr unsigned int full_opcat = patomic_opcats_IMPLICIT;
 
     using base_t = patomic_ops_t;
     using xchg_t = patomic_ops_xchg_t;
@@ -48,7 +48,7 @@ struct ops_types<ops_domain::IMPLICIT>
 template <>
 struct ops_types<ops_domain::EXPLICIT>
 {
-    static constexpr patomic_opcat_t full_opcat = patomic_opcats_EXPLICIT;
+    static constexpr unsigned int full_opcat = patomic_opcats_EXPLICIT;
 
     using base_t = patomic_ops_explicit_t;
     using xchg_t = patomic_ops_explicit_xchg_t;
@@ -60,7 +60,7 @@ struct ops_types<ops_domain::EXPLICIT>
 template <>
 struct ops_types<ops_domain::TRANSACTION>
 {
-    static constexpr patomic_opcat_t full_opcat = patomic_opcats_TRANSACTION;
+    static constexpr unsigned int full_opcat = patomic_opcats_TRANSACTION;
 
     using base_t = patomic_ops_transaction_t;
     using xchg_t = patomic_ops_transaction_xchg_t;
