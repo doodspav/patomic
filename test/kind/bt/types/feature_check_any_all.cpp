@@ -254,6 +254,40 @@ TEST_F(BtTypesFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction
 TEST_F(BtTypesFeatureCheckAnyAll, check_invalid_opcats_unmodified)
 {}
 
+/// @brief Calling check_any with all pointers set in patomic_ops*_t unsets
+///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr unsigned int input_opcats = ~0;
+    const unsigned set_opcats = TestFixture::OpsTypes::full_opcat;
+    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+    const std::bitset<bit_width> expected_result = ~set_opcats;
+
+    // test
+    const std::bitset<bit_width> actual_result =
+        TTestHelper::check_any(ops, input_opcats);
+    EXPECT_EQ(expected_result, actual_result);
+}
+
+/// @brief Calling check_all with all pointers set in patomic_ops*_t unsets
+///        exactly the bits in patomic_{IMPLICIT, EXPLICIT, TRANSACTION}.
+TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_all_full_bits_match_expected)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr unsigned int input_opcats = ~0;
+    const unsigned set_opcats = TestFixture::OpsTypes::full_opcat;
+    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+    const std::bitset<bit_width> expected_result = ~set_opcats;
+
+    // test
+    const std::bitset<bit_width> actual_result =
+        TTestHelper::check_all(ops, input_opcats);
+    EXPECT_EQ(expected_result, actual_result);
+}
+
 /// @brief Calling check_any with all combinations of LDST function pointers
 ///        set in patomic_ops*_t unsets the correct bits.
 TYPED_TEST(BtTypesFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)

@@ -1,6 +1,7 @@
 #ifndef PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
 #define PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
 
+#include <patomic/types/feature_check.h>
 #include <patomic/types/ops.h>
 
 #include <vector>
@@ -28,6 +29,8 @@ struct ops_types;
 template <>
 struct ops_types<ops_domain::IMPLICIT>
 {
+    static constexpr patomic_opcat_t full_opcat = patomic_opcats_IMPLICIT;
+
     using base_t = patomic_ops_t;
     using xchg_t = patomic_ops_xchg_t;
     using bitwise_t = patomic_ops_bitwise_t;
@@ -38,6 +41,8 @@ struct ops_types<ops_domain::IMPLICIT>
 template <>
 struct ops_types<ops_domain::EXPLICIT>
 {
+    static constexpr patomic_opcat_t full_opcat = patomic_opcats_EXPLICIT;
+
     using base_t = patomic_ops_explicit_t;
     using xchg_t = patomic_ops_explicit_xchg_t;
     using bitwise_t = patomic_ops_explicit_bitwise_t;
@@ -48,6 +53,8 @@ struct ops_types<ops_domain::EXPLICIT>
 template <>
 struct ops_types<ops_domain::TRANSACTION>
 {
+    static constexpr patomic_opcat_t full_opcat = patomic_opcats_TRANSACTION;
+
     using base_t = patomic_ops_transaction_t;
     using xchg_t = patomic_ops_transaction_xchg_t;
     using bitwise_t = patomic_ops_transaction_bitwise_t;
