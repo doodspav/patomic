@@ -1,4 +1,4 @@
-#include <patomic/types/feature_check.h>
+#include <patomic/api/feature_check.h>
 
 #include <test/common/math.hpp>
 #include <test/common/make_ops.hpp>

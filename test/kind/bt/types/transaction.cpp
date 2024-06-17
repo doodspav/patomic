@@ -1,4 +1,4 @@
-#include <patomic/types/transaction.h>
+#include <patomic/api/transaction.h>
 
 #include <gtest/gtest.h>
 

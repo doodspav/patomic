@@ -1,4 +1,4 @@
-#include <patomic/types/align.h>
+#include <patomic/api/align.h>
 
 #include <test/common/align.hpp>
 #include <test/common/math.hpp>

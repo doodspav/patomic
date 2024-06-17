@@ -1,8 +1,8 @@
 #ifndef PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
 #define PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
 
-#include <patomic/types/feature_check.h>
-#include <patomic/types/ops.h>
+#include <patomic/api/feature_check.h>
+#include <patomic/api/ops.h>
 
 #include <string>
 #include <vector>

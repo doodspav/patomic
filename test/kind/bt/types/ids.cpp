@@ -1,4 +1,4 @@
-#include <patomic/types/ids.h>
+#include <patomic/api/ids.h>
 
 #include <test/common/math.hpp>
 
