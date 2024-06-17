@@ -224,12 +224,54 @@ TEST_F(BtTypesFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
 /// @brief Calling check_leaf with invalid opkind bits for any valid opcat does
 ///        not unset the invalid opkind bits.
 TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
-{}
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    unsigned int invalid_opkind = ~0u;
+    for (const unsigned int valid_opkind : test::make_opkinds_all_solo())
+    {
+        invalid_opkind &= ~valid_opkind;
+    }
+    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+    const std::bitset<bit_width> expected_result = invalid_opkind;
 
-/// @brief Calling check_leaf with a valid opkind that does not apply to the
-///        domain does not unset any opkind bits.
+    // test
+    for (const patomic_opcat_t opcat : test::make_opcats_all_solo())
+    {
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, opcat, invalid_opkind);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
+
+/// @brief Calling check_leaf with a valid opkind with an opcat which does not
+///        apply to the domain does not unset any opkind bits.
 TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bits)
-{}
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    const auto opcat_vec = test::make_opcats_all_solo();
+    const std::set<patomic_opcat_t> opcat_set {
+        opcat_vec.begin(), opcat_vec.end()
+    };
+    unsigned int opcat = 1;
+    while (opcat != 0 && opcat_set.count(static_cast<patomic_opcat_t>(opcat)) != 0)
+    {
+        opcat <<= 1;
+    }
+    constexpr unsigned int input_opkinds = ~0u;
+    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
+    const std::bitset<bit_width> expected_result = input_opkinds;
+    
+    // test
+    if (opcat != 0)
+    {
+        ASSERT_TRUE(test::is_positive_pow2(opcat));
+        const std::bitset<bit_width> actual_result =
+            TTestHelper::check_leaf(ops, static_cast<patomic_opcat_t>(opcat), input_opkinds);
+        EXPECT_EQ(expected_result, actual_result);
+    }
+}
 
 /// @brief Calling check_leaf with all LDST function pointers set in
 ///        patomic_ops*_t unsets exactly the bits in patomic_opkinds_LDST.
@@ -239,7 +281,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_ldst_bits_match_expected)
     typename TestFixture::OpsTypes::base_t ops {};
     ops.fp_load = test::make_ops_all_nonnull<TestFixture::domain>().fp_load;
     ops.fp_store = test::make_ops_all_nonnull<TestFixture::domain>().fp_store;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_LDST;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -257,7 +299,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_ldst_bits_match_expected)
     // setup
     for (const auto& ldst : test::make_ops_ldst_combinations<TestFixture::domain>())
     {
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~ldst.opkinds;
 
@@ -275,7 +317,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
     ops.xchg_ops = test::make_ops_all_nonnull<TestFixture::domain>().xchg_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_XCHG;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -295,7 +337,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
     for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
     {
         ops.xchg_ops = xchg.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~xchg.opkinds;
 
@@ -313,7 +355,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
     ops.bitwise_ops = test::make_ops_all_nonnull<TestFixture::domain>().bitwise_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_BIT;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -333,7 +375,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
     for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
     {
         ops.bitwise_ops = bitwise.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~bitwise.opkinds;
 
@@ -351,7 +393,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
     ops.binary_ops = test::make_ops_all_nonnull<TestFixture::domain>().binary_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_BIN;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -374,7 +416,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
     for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
     {
         ops.binary_ops = binary.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result_void = ~binary.opkinds_void;
         const std::bitset<bit_width> expected_result_fetch = ~binary.opkinds_fetch;
@@ -396,7 +438,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expec
     // setup
     typename TestFixture::OpsTypes::base_t ops {};
     ops.arithmetic_ops = test::make_ops_all_nonnull<TestFixture::domain>().arithmetic_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_ARI;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -419,7 +461,7 @@ TYPED_TEST(BtTypesFeatureCheckLeafT, check_leaf_arithmetic_bits_match_expected)
     for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
     {
         ops.arithmetic_ops = arithmetic.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result_void = ~arithmetic.opkinds_void;
         const std::bitset<bit_width> expected_result_fetch = ~arithmetic.opkinds_fetch;
@@ -443,7 +485,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_special_bits_match_expected)
     constexpr auto domain = test::ops_domain::TRANSACTION;
     patomic_ops_transaction_t ops {};
     ops.special_ops = test::make_ops_all_nonnull<domain>().special_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_TSPEC;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -463,7 +505,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_special_bits_match_expected)
     for (const auto& special : test::make_ops_special_combinations_transaction())
     {
         ops.special_ops = special.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~special.opkinds;
 
@@ -483,7 +525,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_flag_bits_match_expected)
     constexpr auto domain = test::ops_domain::TRANSACTION;
     patomic_ops_transaction_t ops {};
     ops.flag_ops = test::make_ops_all_nonnull<domain>().flag_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_TFLAG;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -503,7 +545,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_flag_bits_match_expected)
     for (const auto& flag : test::make_ops_flag_combinations_transaction())
     {
         ops.flag_ops = flag.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~flag.opkinds;
 
@@ -523,7 +565,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_full_raw_bits_match_expected)
     constexpr auto domain = test::ops_domain::TRANSACTION;
     patomic_ops_transaction_t ops {};
     ops.raw_ops = test::make_ops_all_nonnull<domain>().raw_ops;
-    constexpr unsigned int input_opkinds = ~0;
+    constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_TRAW;
     constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
     const std::bitset<bit_width> expected_result = ~set_opkinds;
@@ -543,7 +585,7 @@ TEST_F(BtTypesFeatureCheckLeaf, check_leaf_raw_bits_match_expected)
     for (const auto& raw : test::make_ops_raw_combinations_transaction())
     {
         ops.raw_ops = raw.ops;
-        constexpr unsigned int input_opkinds = ~0;
+        constexpr unsigned int input_opkinds = ~0u;
         constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
         const std::bitset<bit_width> expected_result = ~raw.opkinds;
 
