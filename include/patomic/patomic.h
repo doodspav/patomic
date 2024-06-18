@@ -2,6 +2,7 @@
 #define PATOMIC_PATOMIC_H
 
 #include "api/align.h"
+#include "api/combine.h"
 #include "api/feature_check.h"
 #include "api/ids.h"
 #include "api/memory_order.h"
@@ -26,7 +27,7 @@ extern "C" {
  *   Struct containing all information and functionality required to perform
  *   atomic operations with implicit memory order.
  */
-typedef struct {
+typedef struct __patomic_t_ {
 
     /** @brief Atomic operations with implicit memory order. */
     patomic_ops_t ops;
@@ -44,7 +45,7 @@ typedef struct {
  *   Struct containing all information and functionality required to perform
  *   atomic operations with explicit memory order.
  */
-typedef struct {
+typedef struct __patomic_explicit_t_ {
 
     /** @brief Atomic operations with explicit memory order. */
     patomic_ops_explicit_t ops;
@@ -78,70 +79,6 @@ typedef struct {
     patomic_transaction_safe_string_t string;
 
 } patomic_transaction_t;
-
-
-/**
- * @addtogroup patomic
- *
- * @brief
- *   Combines two atomic structs with implicit memory order operations. The
- *   first struct always takes priority, and only missing members are copied
- *   over from the second struct.
- *
- * @details
- *   Initially, the .ops member may be modified. If it is modified, the .align
- *   member may also be modified to meet the requirements for all the operations
- *   now present.
- *
- * @note
- *   It is advisable to sort structs by the .align member when combining more
- *   than two structs, in order to end up with the least restrictive values for
- *   the .align member.
- *
- * @param priority
- *   Struct which takes priority if both structs support an operation, and into
- *   which unsupported operations are added from the other struct.
- *
- * @param other
- *   Struct to combine into priority struct.
- */
-PATOMIC_EXPORT void
-patomic_combine(
-    patomic_t *priority,
-    const patomic_t *other
-);
-
-
-/**
- * @addtogroup patomic
- *
- * @brief
- *   Combines two atomic structs with explicit memory order operations. The
- *   first struct always takes priority, and only missing members are copied
- *   over from the second struct.
- *
- * @details
- *   Initially, the .ops member may be modified. If it is modified, the .align
- *   member may also be modified to meet the requirements for all the operations
- *   now present.
- *
- * @note
- *   It is advisable to sort structs by the .align member when combining more
- *   than two structs, in order to end up with the least restrictive values for
- *   the .align member.
- *
- * @param priority
- *   Struct which takes priority if both structs support an operation, and into
- *   which unsupported operations are added from the other struct.
- *
- * @param other
- *   Struct to combine into priority struct.
- */
-PATOMIC_EXPORT void
-patomic_combine_explicit(
-    patomic_explicit_t *priority,
-    const patomic_explicit_t *other
-);
 
 
 /**
