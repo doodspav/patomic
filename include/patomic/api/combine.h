@@ -1,6 +1,10 @@
 #ifndef PATOMIC_API_COMBINE_H
 #define PATOMIC_API_COMBINE_H
 
+#include "align.h"
+#include "ops/implicit.h"
+#include "ops/explicit.h"
+
 #include <patomic/api/export.h>
 
 #ifdef __cplusplus
@@ -15,7 +19,15 @@ extern "C" {
  *   Struct containing all information and functionality required to perform
  *   atomic operations with implicit memory order.
  */
-typedef struct __patomic_t_ patomic_t;
+typedef struct {
+
+    /** @brief Atomic operations with implicit memory order. */
+    patomic_ops_t ops;
+
+    /** @brief Alignment requirements for atomic operations. */
+    patomic_align_t align;
+
+} patomic_t;
 
 
 /**
@@ -25,7 +37,15 @@ typedef struct __patomic_t_ patomic_t;
  *   Struct containing all information and functionality required to perform
  *   atomic operations with explicit memory order.
  */
-typedef struct __patomic_explicit_t_ patomic_explicit_t;
+typedef struct {
+
+    /** @brief Atomic operations with explicit memory order. */
+    patomic_ops_explicit_t ops;
+
+    /** @brief Alignment requirements for atomic operations. */
+    patomic_align_t align;
+
+} patomic_explicit_t;
 
 
 /**

@@ -24,42 +24,6 @@ extern "C" {
  * @addtogroup patomic
  *
  * @brief
- *   Struct containing all information and functionality required to perform
- *   atomic operations with implicit memory order.
- */
-typedef struct __patomic_t_ {
-
-    /** @brief Atomic operations with implicit memory order. */
-    patomic_ops_t ops;
-
-    /** @brief Alignment requirements for atomic operations. */
-    patomic_align_t align;
-
-} patomic_t;
-
-
-/**
- * @addtogroup patomic
- *
- * @brief
- *   Struct containing all information and functionality required to perform
- *   atomic operations with explicit memory order.
- */
-typedef struct __patomic_explicit_t_ {
-
-    /** @brief Atomic operations with explicit memory order. */
-    patomic_ops_explicit_t ops;
-
-    /** @brief Alignment requirements for atomic operations. */
-    patomic_align_t align;
-
-} patomic_explicit_t;
-
-
-/**
- * @addtogroup patomic
- *
- * @brief
  *   Struct containing al information and functionality required to perform
  *   atomic operations implemented using a sequentially consistent transaction.
  */
