@@ -236,7 +236,7 @@ patomic_create_explicit(
  * @note
  *   Implementations are not combined because it is too complicated to do
  *   properly, and because it is not expected that any platform will have more
- *   than one set of assembly instructions for performing lock-free
+ *   than one set of APIs using hardware support for performing lock-free
  *   transactional operations.
  *
  * @param opts

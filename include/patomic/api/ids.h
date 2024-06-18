@@ -131,7 +131,7 @@ patomic_get_ids(
  * @warning
  *   The id MUST NOT have more than a single bit set. This means that you cannot
  *   pass patomic_id_ALL. This will always be asserted, even if NDEBUG is
- *   defined.
+ *   defined. It is allowed for the id to have zero bits set.
  */
 PATOMIC_EXPORT unsigned int
 patomic_get_kind(
