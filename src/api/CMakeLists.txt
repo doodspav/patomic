@@ -1,6 +1,7 @@
 # add directory files to target
 target_sources(${target_name} PRIVATE
     align.c
+    combine.c
     feature_check_any_all.c
     feature_check_leaf.c
     ids.c
