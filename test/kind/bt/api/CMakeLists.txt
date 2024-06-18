@@ -7,6 +7,12 @@ create_bt(
 )
 
 create_bt(
+    NAME BtApiCombine
+    SOURCE
+        combine.cpp
+)
+
+create_bt(
     NAME BtApiFeatureCheck
     SOURCE
         feature_check_any_all.cpp
