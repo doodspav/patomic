@@ -5,6 +5,7 @@ add_subdirectory(ops)
 target_sources(${target_name} PRIVATE
     align.h
     combine.h
+    core.h
     feature_check.h
     ids.h
     memory_order.h

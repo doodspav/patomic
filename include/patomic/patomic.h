@@ -3,6 +3,7 @@
 
 #include "api/align.h"
 #include "api/combine.h"
+#include "api/core.h"
 #include "api/feature_check.h"
 #include "api/ids.h"
 #include "api/memory_order.h"
@@ -18,31 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-/**
- * @addtogroup patomic
- *
- * @brief
- *   Struct containing al information and functionality required to perform
- *   atomic operations implemented using a sequentially consistent transaction.
- */
-typedef struct {
-
-    /** @brief Atomic operations implemented using a sequentially consistent
-     *         transaction, and non-atomic transaction specific operations. */
-    patomic_ops_transaction_t ops;
-
-    /** @brief Alignment requirements for atomic operations. */
-    patomic_align_t align;
-
-    /** @brief Recommended time and space bounds for atomic operations. */
-    patomic_transaction_recommended_t recommended;
-
-    /** @brief Transaction safe versions of core <string.h> functions. */
-    patomic_transaction_safe_string_t string;
-
-} patomic_transaction_t;
 
 
 /**
