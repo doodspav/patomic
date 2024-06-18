@@ -4,7 +4,7 @@
 
 #define CREATE_SETTER_LAMBDA(name, opkind)                                       \
     const auto set_##name = [](T& ops, unsigned int& opkinds) noexcept -> void { \
-        ops.fp_##name = test::convertible_to_any<void(*)(void)> {                \
+        ops.fp_##name = test::convertible_to_any<void(*)()> {                    \
             only_for_address                                                     \
         };                                                                       \
         opkinds |= patomic_opkind_##opkind;                                      \
@@ -49,12 +49,12 @@ static_assert(&only_for_address != nullptr, "address must be non-null");
 
 template <class T>
 constexpr T
-make_ops_all_nonnull_except_transaction_specific() noexcept
+make_ops_all_nonnull_except_transaction_specific(void(*nonnull_value)()) noexcept
 {
     // setup
     T ops {};
-    constexpr test::convertible_to_any<void(*)(void)> non_null {
-        only_for_address
+    const test::convertible_to_any<void(*)(void)> non_null {
+        nonnull_value
     };
 
     // initialize all members to be non-null
@@ -429,31 +429,30 @@ make_opkinds_all_combined()
 
 template <>
 patomic_ops_t
-make_ops_all_nonnull<ops_domain::IMPLICIT>()
+make_ops_all_nonnull<ops_domain::IMPLICIT>(void(*nonnull_value)()) noexcept
 {
     using ops_t = patomic_ops_t;
-    return ::make_ops_all_nonnull_except_transaction_specific<ops_t>();
+    return ::make_ops_all_nonnull_except_transaction_specific<ops_t>(nonnull_value);
 }
 
 
 template <>
 patomic_ops_explicit_t
-make_ops_all_nonnull<ops_domain::EXPLICIT>()
+make_ops_all_nonnull<ops_domain::EXPLICIT>(void(*nonnull_value)()) noexcept
 {
     using ops_t = patomic_ops_explicit_t;
-    return ::make_ops_all_nonnull_except_transaction_specific<ops_t>();
+    return ::make_ops_all_nonnull_except_transaction_specific<ops_t>(nonnull_value);
 }
 
 
 template <>
 patomic_ops_transaction_t
-make_ops_all_nonnull<ops_domain::TRANSACTION>()
+make_ops_all_nonnull<ops_domain::TRANSACTION>(void(*nonnull_value)()) noexcept
 {
-    // setup
     using ops_t = patomic_ops_transaction_t;
-    ops_t ops = ::make_ops_all_nonnull_except_transaction_specific<ops_t>();
-    constexpr test::convertible_to_any<void(*)(void)> non_null {
-        only_for_address
+    ops_t ops = ::make_ops_all_nonnull_except_transaction_specific<ops_t>(nonnull_value);
+    const test::convertible_to_any<void(*)()> non_null {
+        nonnull_value
     };
 
     // initialize all transaction specific members to be non-null
@@ -474,6 +473,33 @@ make_ops_all_nonnull<ops_domain::TRANSACTION>()
 
     // return fully nonnull ops
     return ops;
+}
+
+
+template <>
+patomic_ops_t
+make_ops_all_nonnull<ops_domain::IMPLICIT>() noexcept
+{
+    constexpr auto nonnull_value = &only_for_address;
+    return make_ops_all_nonnull<ops_domain::IMPLICIT>(nonnull_value);
+}
+
+
+template <>
+patomic_ops_explicit_t
+make_ops_all_nonnull<ops_domain::EXPLICIT>() noexcept
+{
+    constexpr auto nonnull_value = &only_for_address;
+    return make_ops_all_nonnull<ops_domain::EXPLICIT>(nonnull_value);
+}
+
+
+template <>
+patomic_ops_transaction_t
+make_ops_all_nonnull<ops_domain::TRANSACTION>() noexcept
+{
+    constexpr auto nonnull_value = &only_for_address;
+    return make_ops_all_nonnull<ops_domain::TRANSACTION>(nonnull_value);
 }
 
 

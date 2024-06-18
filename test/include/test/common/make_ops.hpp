@@ -131,11 +131,19 @@ make_opkinds_all_combined();
 
 
 /// @brief
+///   Create a patomic_ops*_t object where all members are set to a provided
+///   value.
+template <ops_domain D>
+typename ops_types<D>::base_t
+make_ops_all_nonnull(void(*nonnull_value)()) noexcept;
+
+
+/// @brief
 ///   Create a patomic_ops*_t object where all members are set to a non-null
 ///   value.
 template <ops_domain D>
 typename ops_types<D>::base_t
-make_ops_all_nonnull();
+make_ops_all_nonnull() noexcept;
 
 
 /// @brief
