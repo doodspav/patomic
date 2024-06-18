@@ -1,14 +1,14 @@
 #include <patomic/api/combine.h>
 
 
-#define PATOMIC_COPY_IF_NULL(i, core, other_core, member) \
-    do {                                                  \
-        if (core->member == NULL)                         \
-        {                                                 \
-            core->member = other_core->member;            \
-            i += (core->member != NULL);                  \
-        }                                                 \
-    }                                                     \
+#define PATOMIC_COPY_IF_NULL(i, core, other_core, member)       \
+    do {                                                        \
+        if (core->member == NULL && other_core->member != NULL) \
+        {                                                       \
+            core->member = other_core->member;                  \
+            ++i;                                                \
+        }                                                       \
+    }                                                           \
     while (0)
 
 
