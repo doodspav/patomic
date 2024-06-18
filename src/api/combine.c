@@ -1,17 +1,6 @@
 #include <patomic/api/combine.h>
 
 
-#define PATOMIC_COPY_IF_NULL(i, core, other_core, member)       \
-    do {                                                        \
-        if (core->member == NULL && other_core->member != NULL) \
-        {                                                       \
-            core->member = other_core->member;                  \
-            ++i;                                                \
-        }                                                       \
-    }                                                           \
-    while (0)
-
-
 #define PATOMIC_SET_MAX(ops, other_ops, member) \
     do {                                        \
         if (ops->member < other_ops->member)    \
@@ -38,6 +27,17 @@
         PATOMIC_SET_MAX(core, other_core, align.minimum);        \
         PATOMIC_SET_MIN_NZ(core, other_core, align.size_within); \
     }                                                            \
+    while (0)
+
+
+#define PATOMIC_COPY_IF_NULL(i, core, other_core, member)       \
+    do {                                                        \
+        if (core->member == NULL && other_core->member != NULL) \
+        {                                                       \
+            core->member = other_core->member;                  \
+            ++i;                                                \
+        }                                                       \
+    }                                                           \
     while (0)
 
 
