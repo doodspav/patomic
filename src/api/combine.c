@@ -11,13 +11,16 @@
     while (0)
 
 
-#define PATOMIC_SET_MIN_NZ(ops, other_ops, member)                     \
-    do {                                                               \
-        if (ops->member > other_ops->member && other_ops->member != 0) \
-        {                                                              \
-            ops->member = other_ops->member;                           \
-        }                                                              \
-    }                                                                  \
+#define PATOMIC_SET_MIN_NZ(ops, other_ops, member)                   \
+    do {                                                             \
+        if (other_ops->member != 0)                                  \
+        {                                                            \
+            if (ops->member == 0 || ops->member > other_ops->member) \
+            {                                                        \
+                ops->member = other_ops->member;                     \
+            }                                                        \
+        }                                                            \
+    }                                                                \
     while (0)
 
 
