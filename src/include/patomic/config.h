@@ -333,7 +333,7 @@
      * @addtogroup config.safe
      *
      * @brief
-     *   '__builtin_unreachable()' is available as a function.
+     *   '__builtin_unreachable(void)' is available as a function.
      *
      * @note
      *   Usually requires: GNU compatible(-ish) compiler.

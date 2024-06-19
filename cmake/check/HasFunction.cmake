@@ -4,7 +4,7 @@
 # | Variable                         | Check                                                                                                    |
 # |==================================|==========================================================================================================|
 # | COMPILER_HAS_MS_ASSUME           | '__assume(int)' is available as a function                                                               |
-# | COMPILER_HAS_BUILTIN_UNREACHABLE | '__builtin_unreachable()' is available as a function                                                     |
+# | COMPILER_HAS_BUILTIN_UNREACHABLE | '__builtin_unreachable(void)' is available as a function                                                 |
 # | COMPILER_HAS_WCHAR_FWIDE         | '<wchar.h>' header is available and makes 'fwide(FILE*, int)' available as a function                    |
 # | COMPILER_HAS_WCHAR_FWPRINTF      | '<wchar.h>' header is available and makes 'fwprintf(FILE*, const wchar_t*, ...)' available as a function |
 # -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ check_c_source_compiles_or_zero(
         COMPILER_HAS_MS_ASSUME
 )
 
-# '__builtin_unreachable()' is available as a function
+# '__builtin_unreachable(void)' is available as a function
 check_c_source_compiles_or_zero(
     SOURCE
         "int main(int argc, char **argv) {              \n\
