@@ -10,28 +10,55 @@
     }
 
 
-#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name, ops_holder_type)                \
-    template <>                                                                              \
-    std::vector<ops_holder_type<patomic_ops##type_name##t>>                                  \
-    make_ops_##fn_name##_combinations<ops_domain::IMPLICIT>()                                \
-    {                                                                                        \
-        return ::make_ops_##fn_name##_combinations<patomic_ops##type_name##t>();             \
-    }                                                                                        \
-                                                                                             \
-    template <>                                                                              \
-    std::vector<ops_holder_type<patomic_ops_explicit##type_name##t>>                         \
-    make_ops_##fn_name##_combinations<ops_domain::EXPLICIT>()                                \
-    {                                                                                        \
-        return ::make_ops_##fn_name##_combinations<patomic_ops_explicit##type_name##t>();    \
-    }                                                                                        \
-                                                                                             \
-    template <>                                                                              \
-    std::vector<ops_holder_type<patomic_ops_transaction##type_name##t>>                      \
-    make_ops_##fn_name##_combinations<ops_domain::TRANSACTION>()                             \
-    {                                                                                        \
-        return ::make_ops_##fn_name##_combinations<patomic_ops_transaction##type_name##t>(); \
-    }                                                                                        \
-                                                                                             \
+#define DEFINE_MAKE_OPS_COMBINATIONS_IET(fn_name, type_name, ops_holder_type)          \
+    template <>                                                                        \
+    std::vector<ops_holder_type<patomic_ops##type_name##t>>                            \
+    make_ops_##fn_name##_combinations<ops_domain::IMPLICIT>()                          \
+    {                                                                                  \
+        using T = patomic_ops##type_name##t;                                           \
+        return ::make_ops_##fn_name##_combinations<T>(&::only_for_address);            \
+    }                                                                                  \
+                                                                                       \
+    template <>                                                                        \
+    std::vector<ops_holder_type<patomic_ops##type_name##t>>                            \
+    make_ops_##fn_name##_combinations<ops_domain::IMPLICIT>(void(*nonnull_value)())    \
+    {                                                                                  \
+        using T = patomic_ops##type_name##t;                                           \
+        return ::make_ops_##fn_name##_combinations<T>(nonnull_value);                  \
+    }                                                                                  \
+                                                                                       \
+    template <>                                                                        \
+    std::vector<ops_holder_type<patomic_ops_explicit##type_name##t>>                   \
+    make_ops_##fn_name##_combinations<ops_domain::EXPLICIT>()                          \
+    {                                                                                  \
+        using T = patomic_ops_explicit##type_name##t;                                  \
+        return ::make_ops_##fn_name##_combinations<T>(&::only_for_address);            \
+    }                                                                                  \
+                                                                                       \
+    template <>                                                                        \
+    std::vector<ops_holder_type<patomic_ops_explicit##type_name##t>>                   \
+    make_ops_##fn_name##_combinations<ops_domain::EXPLICIT>(void(*nonnull_value)())    \
+    {                                                                                  \
+        using T = patomic_ops_explicit##type_name##t;                                  \
+        return ::make_ops_##fn_name##_combinations<T>(nonnull_value);                  \
+    }                                                                                  \
+                                                                                       \
+    template <>                                                                        \
+    std::vector<ops_holder_type<patomic_ops_transaction##type_name##t>>                \
+    make_ops_##fn_name##_combinations<ops_domain::TRANSACTION>()                       \
+    {                                                                                  \
+        using T = patomic_ops_transaction##type_name##t;                               \
+        return ::make_ops_##fn_name##_combinations<T>(&::only_for_address);            \
+    }                                                                                  \
+                                                                                       \
+    template <>                                                                        \
+    std::vector<ops_holder_type<patomic_ops_transaction##type_name##t>>                \
+    make_ops_##fn_name##_combinations<ops_domain::TRANSACTION>(void(*nonnull_value)()) \
+    {                                                                                  \
+        using T = patomic_ops_transaction##type_name##t;                               \
+        return ::make_ops_##fn_name##_combinations<T>(nonnull_value);                  \
+    }                                                                                  \
+                                                                                       \
     static_assert(!!true, "require semicolon")
 
 
@@ -213,7 +240,7 @@ make_ops_combinations(const std::vector<setters_vf<T>>& setters, void(*nonnull_v
 
 template <class T>
 std::vector<test::ops_any_all<T>>
-make_ops_ldst_combinations()
+make_ops_ldst_combinations(void(*nonnull_value)())
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(store, STORE);
@@ -224,13 +251,13 @@ make_ops_ldst_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
 }
 
 
 template <class T>
 std::vector<test::ops_any_all<T>>
-make_ops_xchg_combinations()
+make_ops_xchg_combinations(void(*nonnull_value)())
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(exchange, EXCHANGE);
@@ -243,13 +270,13 @@ make_ops_xchg_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
 }
 
 
 template <class T>
 std::vector<test::ops_any_all<T>>
-make_ops_bitwise_combinations()
+make_ops_bitwise_combinations(void(*nonnull_value)())
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(test, TEST);
@@ -264,13 +291,13 @@ make_ops_bitwise_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
 }
 
 
 template <class T>
 std::vector<test::ops_any_all_vf<T>>
-make_ops_binary_combinations()
+make_ops_binary_combinations(void(*nonnull_value)())
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(or, OR);
@@ -289,13 +316,13 @@ make_ops_binary_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
 }
 
 
 template <class T>
 std::vector<test::ops_any_all_vf<T>>
-make_ops_arithmetic_combinations()
+make_ops_arithmetic_combinations(void(*nonnull_value)())
 {
     // lambda helpers
     CREATE_SETTER_LAMBDA(add, ADD);
@@ -317,7 +344,7 @@ make_ops_arithmetic_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
 }
 
 
@@ -521,7 +548,7 @@ DEFINE_MAKE_OPS_COMBINATIONS_IET(arithmetic, _arithmetic_, ops_any_all_vf);
 
 
 std::vector<ops_any_all<patomic_ops_transaction_special_t>>
-make_ops_special_combinations_transaction()
+make_ops_special_combinations_transaction(void(*nonnull_value)())
 {
     // lambda helpers
     using T = patomic_ops_transaction_special_t;
@@ -537,12 +564,20 @@ make_ops_special_combinations_transaction()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
+}
+
+
+std::vector<ops_any_all<patomic_ops_transaction_special_t>>
+make_ops_special_combinations_transaction()
+{
+    // defer to overload
+    return make_ops_special_combinations_transaction(&::only_for_address);
 }
 
 
 std::vector<ops_any_all<patomic_ops_transaction_flag_t>>
-make_ops_flag_combinations_transaction()
+make_ops_flag_combinations_transaction(void(*nonnull_value)())
 {
     // lambda helpers
     using T = patomic_ops_transaction_flag_t;
@@ -556,12 +591,20 @@ make_ops_flag_combinations_transaction()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
+}
+
+
+std::vector<ops_any_all<patomic_ops_transaction_flag_t>>
+make_ops_flag_combinations_transaction()
+{
+    // defer to overload
+    return make_ops_flag_combinations_transaction(&::only_for_address);
 }
 
 
 std::vector<ops_any_all<patomic_ops_transaction_raw_t>>
-make_ops_raw_combinations_transaction()
+make_ops_raw_combinations_transaction(void(*nonnull_value)())
 {
     // lambda helpers
     using T = patomic_ops_transaction_raw_t;
@@ -577,7 +620,15 @@ make_ops_raw_combinations_transaction()
     };
 
     // create all combinations
-    return make_ops_combinations(setters, &only_for_address);
+    return make_ops_combinations(setters, nonnull_value);
+}
+
+
+std::vector<ops_any_all<patomic_ops_transaction_raw_t>>
+make_ops_raw_combinations_transaction()
+{
+    // defer to overload
+    return make_ops_raw_combinations_transaction(&::only_for_address);
 }
 
 

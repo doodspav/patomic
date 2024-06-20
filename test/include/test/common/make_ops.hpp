@@ -148,11 +148,27 @@ make_ops_all_nonnull() noexcept;
 
 /// @brief
 ///   Create a set of patomic_ops*_t objects with all combinations of fp_store
+///   and fp_load members set to a provided value. All other members are null.
+template <ops_domain D>
+std::vector<ops_any_all<typename ops_types<D>::base_t>>
+make_ops_ldst_combinations(void(*nonnull_value)());
+
+
+/// @brief
+///   Create a set of patomic_ops*_t objects with all combinations of fp_store
 ///   and fp_load members set to null and non-null values. All other members
 ///   are null.
 template <ops_domain D>
 std::vector<ops_any_all<typename ops_types<D>::base_t>>
 make_ops_ldst_combinations();
+
+
+/// @brief
+///   Create a set of patomic_ops*_xchg_t objects with all combinations of
+///   members set to a provided value. All other members are null.
+template <ops_domain D>
+std::vector<ops_any_all<typename ops_types<D>::xchg_t>>
+make_ops_xchg_combinations(void(*nonnull_value)());
 
 
 /// @brief
@@ -165,10 +181,27 @@ make_ops_xchg_combinations();
 
 /// @brief
 ///   Create a set of patomic_ops*_bitwise_t objects with all combinations of
+///   members set to a provided value. All other members are null.
+template <ops_domain D>
+std::vector<ops_any_all<typename ops_types<D>::bitwise_t>>
+make_ops_bitwise_combinations(void(*nonnull_value)());
+
+
+/// @brief
+///   Create a set of patomic_ops*_bitwise_t objects with all combinations of
 ///   members set to null and non-null values.
 template <ops_domain D>
 std::vector<ops_any_all<typename ops_types<D>::bitwise_t>>
 make_ops_bitwise_combinations();
+
+
+/// @brief
+///   Create a set of patomic_ops*_binary_t objects with all combinations of
+///   void and fetch members set to a provided value. All other members are
+///   null.
+template <ops_domain D>
+std::vector<ops_any_all_vf<typename ops_types<D>::binary_t>>
+make_ops_binary_combinations(void(*nonnull_value)());
 
 
 /// @brief
@@ -181,10 +214,27 @@ make_ops_binary_combinations();
 
 /// @brief
 ///   Create a set of patomic_ops*_arithmetic_t objects with all combinations of
+///   void and fetch members set to a provided value. All other members are
+///   null.
+template <ops_domain D>
+std::vector<ops_any_all_vf<typename ops_types<D>::arithmetic_t>>
+make_ops_arithmetic_combinations(void(*nonnull_value)());
+
+
+/// @brief
+///   Create a set of patomic_ops*_arithmetic_t objects with all combinations of
 ///   void and fetch members set to null and non-null values.
 template <ops_domain D>
 std::vector<ops_any_all_vf<typename ops_types<D>::arithmetic_t>>
 make_ops_arithmetic_combinations();
+
+
+/// @brief
+///   Create a set of patomic_ops_transaction_special_t objects with all
+///   combinations of members set to a provided value. All other members are
+///   null.
+std::vector<ops_any_all<patomic_ops_transaction_special_t>>
+make_ops_special_combinations_transaction(void(*nonnull_value)());
 
 
 /// @brief
@@ -196,9 +246,25 @@ make_ops_special_combinations_transaction();
 
 /// @brief
 ///   Create a set of patomic_ops_transaction_flag_t objects with all
+///   combinations of members set to a provided value. All other members are
+///   null.
+std::vector<ops_any_all<patomic_ops_transaction_flag_t>>
+make_ops_flag_combinations_transaction(void(*nonnull_value)());
+
+
+/// @brief
+///   Create a set of patomic_ops_transaction_flag_t objects with all
 ///   combinations of members set to null and non-null values.
 std::vector<ops_any_all<patomic_ops_transaction_flag_t>>
 make_ops_flag_combinations_transaction();
+
+
+/// @brief
+///   Create a set of patomic_ops_transaction_raw_t objects with all
+///   combinations of members set to a provided value. All other members are
+///   null.
+std::vector<ops_any_all<patomic_ops_transaction_raw_t>>
+make_ops_raw_combinations_transaction(void(*nonnull_value)());
 
 
 /// @brief
