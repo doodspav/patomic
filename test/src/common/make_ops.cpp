@@ -2,12 +2,11 @@
 #include <test/common/utility.hpp>
 
 
-#define CREATE_SETTER_LAMBDA(name, opkind)                                       \
-    const auto set_##name = [](T& ops, unsigned int& opkinds) noexcept -> void { \
-        ops.fp_##name = test::convertible_to_any<void(*)()> {                    \
-            only_for_address                                                     \
-        };                                                                       \
-        opkinds |= patomic_opkind_##opkind;                                      \
+#define CREATE_SETTER_LAMBDA(name, opkind)                                     \
+    const auto set_##name = [](T& ops, unsigned int& opkinds,                  \
+                               void(*nonnull_value)()) noexcept -> void {      \
+        ops.fp_##name = test::convertible_to_any<void(*)()> { nonnull_value }; \
+        opkinds |= patomic_opkind_##opkind;                                    \
     }
 
 
@@ -100,7 +99,8 @@ make_ops_all_nonnull_except_transaction_specific(void(*nonnull_value)()) noexcep
 
 template <class T>
 std::vector<test::ops_any_all<T>>
-make_ops_combinations(const std::vector<void(*)(T&, unsigned int&)>& setters)
+make_ops_combinations(const std::vector<void(*)(T&, unsigned int&, void(*)())>& setters,
+                      void(*nonnull_value)())
 {
     // setup
     std::vector<test::ops_any_all<T>> combinations;
@@ -118,7 +118,7 @@ make_ops_combinations(const std::vector<void(*)(T&, unsigned int&)>& setters)
         {
             if (i & (1u << j))
             {
-                setters[j](combinations[i].ops, combinations[i].opkinds);
+                setters[j](combinations[i].ops, combinations[i].opkinds, nonnull_value);
                 combinations[i].any = true;
             }
             else
@@ -139,26 +139,26 @@ class setters_vf
 public:
     setters_vf() noexcept = default;
 
-    setters_vf& v(void(*set_v)(T&, unsigned int&)) noexcept
+    setters_vf& v(void(*set_v)(T&, unsigned int&, void(*)())) noexcept
     {
         this->set_void = set_v;
         return *this;
     }
 
-    setters_vf& f(void(*set_f)(T&, unsigned int&)) noexcept
+    setters_vf& f(void(*set_f)(T&, unsigned int&, void(*)())) noexcept
     {
         this->set_fetch = set_f;
         return *this;
     }
 
-    void (*set_void)(T&, unsigned int&) = nullptr;
-    void (*set_fetch)(T&, unsigned int&) = nullptr;
+    void (*set_void)(T&, unsigned int&, void(*)()) = nullptr;
+    void (*set_fetch)(T&, unsigned int&, void(*)()) = nullptr;
 };
 
 
 template <class T>
 std::vector<test::ops_any_all_vf<T>>
-make_ops_combinations(const std::vector<setters_vf<T>>& setters)
+make_ops_combinations(const std::vector<setters_vf<T>>& setters, void(*nonnull_value)())
 {
     // setup
     const auto sqrt_size = (1u << setters.size());
@@ -182,7 +182,8 @@ make_ops_combinations(const std::vector<setters_vf<T>>& setters)
                 // conditionally set void operations
                 if (i_void & (1u << j))
                 {
-                    setters[j].set_void(combinations[i].ops, combinations[i].opkinds_void);
+                    setters[j].set_void(
+                        combinations[i].ops, combinations[i].opkinds_void, nonnull_value);
                     combinations[i].any_void = true;
                 }
                 else
@@ -193,7 +194,8 @@ make_ops_combinations(const std::vector<setters_vf<T>>& setters)
                 // conditionally set fetch operations
                 if (i_fetch & (1u << j))
                 {
-                    setters[j].set_fetch(combinations[i].ops, combinations[i].opkinds_fetch);
+                    setters[j].set_fetch(
+                        combinations[i].ops, combinations[i].opkinds_fetch, nonnull_value);
                     combinations[i].any_fetch = true;
                 }
                 else
@@ -216,13 +218,13 @@ make_ops_ldst_combinations()
     // lambda helpers
     CREATE_SETTER_LAMBDA(store, STORE);
     CREATE_SETTER_LAMBDA(load, LOAD);
-    const std::vector<void(*)(T&, unsigned int&)> setters {
+    const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_store,
         set_load
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -234,14 +236,14 @@ make_ops_xchg_combinations()
     CREATE_SETTER_LAMBDA(exchange, EXCHANGE);
     CREATE_SETTER_LAMBDA(cmpxchg_weak, CMPXCHG_WEAK);
     CREATE_SETTER_LAMBDA(cmpxchg_strong, CMPXCHG_STRONG);
-    const std::vector<void(*)(T&, unsigned int&)> setters {
+    const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_exchange,
         set_cmpxchg_weak,
         set_cmpxchg_strong
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -254,7 +256,7 @@ make_ops_bitwise_combinations()
     CREATE_SETTER_LAMBDA(test_compl, TEST_COMPL);
     CREATE_SETTER_LAMBDA(test_set, TEST_SET);
     CREATE_SETTER_LAMBDA(test_reset, TEST_RESET);
-    const std::vector<void(*)(T&, unsigned int&)> setters {
+    const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_test,
         set_test_compl,
         set_test_set,
@@ -262,7 +264,7 @@ make_ops_bitwise_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -287,7 +289,7 @@ make_ops_binary_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -315,7 +317,7 @@ make_ops_arithmetic_combinations()
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -527,7 +529,7 @@ make_ops_special_combinations_transaction()
     CREATE_SETTER_LAMBDA(multi_cmpxchg, MULTI_CMPXCHG);
     CREATE_SETTER_LAMBDA(generic, GENERIC);
     CREATE_SETTER_LAMBDA(generic_wfb, GENERIC_WFB);
-    const std::vector<void(*)(T&, unsigned int&)> setters {
+    const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_double_cmpxchg,
         set_multi_cmpxchg,
         set_generic,
@@ -535,7 +537,7 @@ make_ops_special_combinations_transaction()
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -547,14 +549,14 @@ make_ops_flag_combinations_transaction()
     CREATE_SETTER_LAMBDA(test, TEST);
     CREATE_SETTER_LAMBDA(test_set, TEST_SET);
     CREATE_SETTER_LAMBDA(clear, CLEAR);
-    const std::vector<void(*)(T&, unsigned int&)> setters {
+    const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_test,
         set_test_set,
         set_clear
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
@@ -567,7 +569,7 @@ make_ops_raw_combinations_transaction()
     CREATE_SETTER_LAMBDA(tabort, TABORT);
     CREATE_SETTER_LAMBDA(tcommit, TCOMMIT);
     CREATE_SETTER_LAMBDA(ttest, TTEST);
-    const std::vector<void(*)(T&, unsigned int&)> setters {
+    const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_tbegin,
         set_tabort,
         set_tcommit,
@@ -575,7 +577,7 @@ make_ops_raw_combinations_transaction()
     };
 
     // create all combinations
-    return make_ops_combinations(setters);
+    return make_ops_combinations(setters, &only_for_address);
 }
 
 
