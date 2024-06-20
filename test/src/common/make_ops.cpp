@@ -1,12 +1,21 @@
 #include <test/common/make_ops.hpp>
 #include <test/common/utility.hpp>
 
+#include <array>
+#include <cstdlib>
+
 
 #define CREATE_SETTER_LAMBDA(name, opkind)                                     \
     const auto set_##name = [](T& ops, unsigned int& opkinds,                  \
                                void(*nonnull_value)()) noexcept -> void {      \
         ops.fp_##name = test::convertible_to_any<void(*)()> { nonnull_value }; \
         opkinds |= patomic_opkind_##opkind;                                    \
+    }
+
+
+#define CREATE_GETTER_LAMBDA(name)                                   \
+    const auto get_##name = [](const T& ops) noexcept -> void(*)() { \
+        return reinterpret_cast<void(*)()>(ops.fp_##name);           \
     }
 
 
@@ -59,6 +68,35 @@
         return ::make_ops_##fn_name##_combinations<T>(nonnull_value);                  \
     }                                                                                  \
                                                                                        \
+    static_assert(!!true, "require semicolon")
+
+
+#define DEFINE_MAKE_OPS_ARRAY_IET(fn_name, type_name, op_count) \
+    template <>                                                 \
+    std::array<void(*)(), op_count>                             \
+    make_ops_##fn_name##_array<ops_domain::IMPLICIT>(           \
+        const patomic_ops##type_name##t& ops) noexcept          \
+    {                                                           \
+        return ::make_ops_##fn_name##_array(ops);               \
+                                                                \
+    }                                                           \
+                                                                \
+    template <>                                                 \
+    std::array<void(*)(), op_count>                             \
+    make_ops_##fn_name##_array<ops_domain::EXPLICIT>(           \
+        const patomic_ops##type_name##t& ops) noexcept          \
+    {                                                           \
+        return ::make_ops_##fn_name##_array(ops);               \
+    }                                                           \
+                                                                \
+    template <>                                                 \
+    std::array<void(*)(), op_count>                             \
+    make_ops_##fn_name##_array<ops_domain::TRANSACTION>(        \
+        const patomic_ops##type_name##t& ops) noexcept          \
+    {                                                           \
+        return ::make_ops_##fn_name##_array(ops);               \
+    }                                                           \
+                                                                \
     static_assert(!!true, "require semicolon")
 
 
@@ -125,6 +163,29 @@ make_ops_all_nonnull_except_transaction_specific(void(*nonnull_value)()) noexcep
 
 
 template <class T>
+class setters_vf
+{
+public:
+    setters_vf() noexcept = default;
+
+    setters_vf& v(void(*set_v)(T&, unsigned int&, void(*)())) noexcept
+    {
+        this->set_void = set_v;
+        return *this;
+    }
+
+    setters_vf& f(void(*set_f)(T&, unsigned int&, void(*)())) noexcept
+    {
+        this->set_fetch = set_f;
+        return *this;
+    }
+
+    void (*set_void)(T&, unsigned int&, void(*)()) = nullptr;
+    void (*set_fetch)(T&, unsigned int&, void(*)()) = nullptr;
+};
+
+
+template <class T>
 std::vector<test::ops_any_all<T>>
 make_ops_combinations(const std::vector<void(*)(T&, unsigned int&, void(*)())>& setters,
                       void(*nonnull_value)())
@@ -158,29 +219,6 @@ make_ops_combinations(const std::vector<void(*)(T&, unsigned int&, void(*)())>& 
     // return
     return combinations;
 }
-
-
-template <class T>
-class setters_vf
-{
-public:
-    setters_vf() noexcept = default;
-
-    setters_vf& v(void(*set_v)(T&, unsigned int&, void(*)())) noexcept
-    {
-        this->set_void = set_v;
-        return *this;
-    }
-
-    setters_vf& f(void(*set_f)(T&, unsigned int&, void(*)())) noexcept
-    {
-        this->set_fetch = set_f;
-        return *this;
-    }
-
-    void (*set_void)(T&, unsigned int&, void(*)()) = nullptr;
-    void (*set_fetch)(T&, unsigned int&, void(*)()) = nullptr;
-};
 
 
 template <class T>
@@ -345,6 +383,140 @@ make_ops_arithmetic_combinations(void(*nonnull_value)())
 
     // create all combinations
     return make_ops_combinations(setters, nonnull_value);
+}
+
+
+template <class T, std::size_t N>
+std::array<void(*)(), N>
+make_ops_array(const T& ops,
+               const std::array<void(*)(const T&), N>& getters) noexcept
+{
+    // go through all combinations
+    std::array<void(*)(), N> arr {};
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        arr[i] = getters[i](ops);
+    }
+    return arr;
+}
+
+
+template <class T>
+std::array<void(*)(), 2>
+make_ops_ldst_array(const T& ldst_ops) noexcept
+{
+    // lambda helpers
+    CREATE_GETTER_LAMBDA(store);
+    CREATE_GETTER_LAMBDA(load);
+    const std::array<void(*)(), 2> getters {
+        get_store,
+        get_load
+    };
+
+    // create array
+    return make_ops_array(ldst_ops, getters);
+}
+
+
+template <class T>
+std::array<void(*)(), 3>
+make_ops_xchg_array(const T& xchg_ops) noexcept
+{
+    // lambda helpers
+    CREATE_GETTER_LAMBDA(exchange);
+    CREATE_GETTER_LAMBDA(cmpxchg_weak);
+    CREATE_GETTER_LAMBDA(cmpxchg_strong);
+    const std::array<void(*)(), 3> getters {
+        get_exchange,
+        get_cmpxchg_weak,
+        get_cmpxchg_strong
+    };
+
+    // create array
+    return make_ops_array(xchg_ops, getters);
+}
+
+
+template <class T>
+std::array<void(*)(), 4>
+make_ops_bitwise_array(const T& bitwise_ops) noexcept
+{
+    // lambda helpers
+    CREATE_GETTER_LAMBDA(test);
+    CREATE_GETTER_LAMBDA(test_compl);
+    CREATE_GETTER_LAMBDA(test_set);
+    CREATE_GETTER_LAMBDA(test_reset);
+    const std::array<void(*)(), 4> getters {
+        get_test,
+        get_test_compl,
+        get_test_set,
+        get_test_reset
+    };
+
+    // create array
+    return make_ops_array(bitwise_ops, getters);
+}
+
+
+template <class T>
+std::array<void(*)(), 8>
+make_ops_binary_array(const T& binary_ops) noexcept
+{
+    // lambda helpers
+    CREATE_GETTER_LAMBDA(or);
+    CREATE_GETTER_LAMBDA(xor);
+    CREATE_GETTER_LAMBDA(and);
+    CREATE_GETTER_LAMBDA(not);
+    CREATE_GETTER_LAMBDA(fetch_or);
+    CREATE_GETTER_LAMBDA(fetch_xor);
+    CREATE_GETTER_LAMBDA(fetch_and);
+    CREATE_GETTER_LAMBDA(fetch_not);
+    const std::array<void(*)(), 8> getters {
+        get_or,
+        get_xor,
+        get_and,
+        get_not,
+        get_fetch_or,
+        get_fetch_xor,
+        get_fetch_and,
+        get_fetch_not
+    };
+
+    // create array
+    return make_ops_array(binary_ops, getters);
+}
+
+
+template <class T>
+std::array<void(*)(), 10>
+make_ops_arithmetic_array(const T& arithmetic_ops) noexcept
+{
+    // lambda helpers
+    CREATE_GETTER_LAMBDA(add);
+    CREATE_GETTER_LAMBDA(sub);
+    CREATE_GETTER_LAMBDA(inc);
+    CREATE_GETTER_LAMBDA(dec);
+    CREATE_GETTER_LAMBDA(neg);
+    CREATE_GETTER_LAMBDA(fetch_add);
+    CREATE_GETTER_LAMBDA(fetch_sub);
+    CREATE_GETTER_LAMBDA(fetch_inc);
+    CREATE_GETTER_LAMBDA(fetch_dec);
+    CREATE_GETTER_LAMBDA(fetch_neg);
+    const std::array<void(*)(), 10> getters {
+        get_add,
+        get_sub,
+        get_inc,
+        get_dec,
+        get_neg,
+        get_fetch_add,
+        get_fetch_sub,
+        get_fetch_inc,
+        get_fetch_dec,
+        get_fetch_neg
+    };
+
+    // create array
+    return make_ops_array(arithmetic_ops, getters);
 }
 
 
