@@ -819,4 +819,68 @@ DEFINE_MAKE_OPS_ARRAY_IET(binary, _binary_, 8);
 DEFINE_MAKE_OPS_ARRAY_IET(arithmetic, _arithmetic_, 10);
 
 
+std::array<void(*)(), 4>
+make_ops_special_array_transaction(
+    const patomic_ops_transaction_special_t& special) noexcept
+{
+    // lambda helpers
+    using T = patomic_ops_transaction_special_t;
+    CREATE_GETTER_LAMBDA(double_cmpxchg);
+    CREATE_GETTER_LAMBDA(multi_cmpxchg);
+    CREATE_GETTER_LAMBDA(generic);
+    CREATE_GETTER_LAMBDA(generic_wfb);
+    const std::array<void(*(*)(const T&))(), 4> getters {
+        get_double_cmpxchg,
+        get_multi_cmpxchg,
+        get_generic,
+        get_generic_wfb
+    };
+
+    // create array
+    return make_ops_array(special, getters);
+}
+
+
+std::array<void(*)(), 3>
+make_ops_flag_array_transaction(
+    const patomic_ops_transaction_flag_t& flag) noexcept
+{
+    // lambda helpers
+    using T = patomic_ops_transaction_flag_t;
+    CREATE_GETTER_LAMBDA(test);
+    CREATE_GETTER_LAMBDA(test_set);
+    CREATE_GETTER_LAMBDA(clear);
+    const std::array<void(*(*)(const T&))(), 3> getters {
+        get_test,
+        get_test_set,
+        get_clear
+    };
+
+    // create array
+    return make_ops_array(flag, getters);
+}
+
+
+std::array<void(*)(), 4>
+make_ops_raw_array_transaction(
+    const patomic_ops_transaction_raw_t& raw) noexcept
+{
+    // lambda helpers
+    using T = patomic_ops_transaction_raw_t;
+    CREATE_GETTER_LAMBDA(tbegin);
+    CREATE_GETTER_LAMBDA(tabort);
+    CREATE_GETTER_LAMBDA(tcommit);
+    CREATE_GETTER_LAMBDA(ttest);
+    const std::array<void(*(*)(const T&))(), 4> getters {
+        get_tbegin,
+        get_tabort,
+        get_tcommit,
+        get_ttest
+    };
+
+    // create array
+    return make_ops_array(raw, getters);
+}
+
+
 }  // namespace test

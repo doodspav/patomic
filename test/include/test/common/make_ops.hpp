@@ -286,6 +286,13 @@ make_ops_special_combinations_transaction();
 
 
 /// @brief
+///   Create an array of members in a patomic_ops_transaction_special_t object,
+///   with the types cast to void(*)().
+std::array<void(*)(), 4>
+make_ops_special_array_transaction(const patomic_ops_transaction_special_t& special) noexcept;
+
+
+/// @brief
 ///   Create a set of patomic_ops_transaction_flag_t objects with all
 ///   combinations of members set to a provided value. All other members are
 ///   null.
@@ -301,6 +308,13 @@ make_ops_flag_combinations_transaction();
 
 
 /// @brief
+///   Create an array of members in a patomic_ops_transaction_flag_t object,
+///   with the types cast to void(*)().
+std::array<void(*)(), 3>
+make_ops_flag_array_transaction(const patomic_ops_transaction_flag_t& flag) noexcept;
+
+
+/// @brief
 ///   Create a set of patomic_ops_transaction_raw_t objects with all
 ///   combinations of members set to a provided value. All other members are
 ///   null.
@@ -313,6 +327,13 @@ make_ops_raw_combinations_transaction(void(*nonnull_value)());
 ///   combinations of members set to null and non-null values.
 std::vector<ops_any_all<patomic_ops_transaction_raw_t>>
 make_ops_raw_combinations_transaction();
+
+
+/// @brief
+///   Create an array of members in a patomic_ops_transaction_raw_t object,
+///   with the types cast to void(*)().
+std::array<void(*)(), 4>
+make_ops_raw_array_transaction(const patomic_ops_transaction_raw_t& raw) noexcept;
 
 
 }  // namespace test
