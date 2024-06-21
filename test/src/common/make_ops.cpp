@@ -71,32 +71,32 @@
     static_assert(!!true, "require semicolon")
 
 
-#define DEFINE_MAKE_OPS_ARRAY_IET(fn_name, type_name, op_count) \
-    template <>                                                 \
-    std::array<void(*)(), op_count>                             \
-    make_ops_##fn_name##_array<ops_domain::IMPLICIT>(           \
-        const patomic_ops##type_name##t& ops) noexcept          \
-    {                                                           \
-        return ::make_ops_##fn_name##_array(ops);               \
-                                                                \
-    }                                                           \
-                                                                \
-    template <>                                                 \
-    std::array<void(*)(), op_count>                             \
-    make_ops_##fn_name##_array<ops_domain::EXPLICIT>(           \
-        const patomic_ops##type_name##t& ops) noexcept          \
-    {                                                           \
-        return ::make_ops_##fn_name##_array(ops);               \
-    }                                                           \
-                                                                \
-    template <>                                                 \
-    std::array<void(*)(), op_count>                             \
-    make_ops_##fn_name##_array<ops_domain::TRANSACTION>(        \
-        const patomic_ops##type_name##t& ops) noexcept          \
-    {                                                           \
-        return ::make_ops_##fn_name##_array(ops);               \
-    }                                                           \
-                                                                \
+#define DEFINE_MAKE_OPS_ARRAY_IET(fn_name, type_name, op_count)    \
+    template <>                                                    \
+    std::array<void(*)(), op_count>                                \
+    make_ops_##fn_name##_array<ops_domain::IMPLICIT>(              \
+        const patomic_ops##type_name##t& ops) noexcept             \
+    {                                                              \
+        return ::make_ops_##fn_name##_array(ops);                  \
+                                                                   \
+    }                                                              \
+                                                                   \
+    template <>                                                    \
+    std::array<void(*)(), op_count>                                \
+    make_ops_##fn_name##_array<ops_domain::EXPLICIT>(              \
+        const patomic_ops_explicit##type_name##t& ops) noexcept    \
+    {                                                              \
+        return ::make_ops_##fn_name##_array(ops);                  \
+    }                                                              \
+                                                                   \
+    template <>                                                    \
+    std::array<void(*)(), op_count>                                \
+    make_ops_##fn_name##_array<ops_domain::TRANSACTION>(           \
+        const patomic_ops_transaction##type_name##t& ops) noexcept \
+    {                                                              \
+        return ::make_ops_##fn_name##_array(ops);                  \
+    }                                                              \
+                                                                   \
     static_assert(!!true, "require semicolon")
 
 
@@ -389,7 +389,7 @@ make_ops_arithmetic_combinations(void(*nonnull_value)())
 template <class T, std::size_t N>
 std::array<void(*)(), N>
 make_ops_array(const T& ops,
-               const std::array<void(*)(const T&), N>& getters) noexcept
+               const std::array<void(*(*)(const T&))(), N>& getters) noexcept
 {
     // go through all combinations
     std::array<void(*)(), N> arr {};
@@ -408,7 +408,7 @@ make_ops_ldst_array(const T& ldst_ops) noexcept
     // lambda helpers
     CREATE_GETTER_LAMBDA(store);
     CREATE_GETTER_LAMBDA(load);
-    const std::array<void(*)(), 2> getters {
+    const std::array<void(*(*)(const T&))(), 2> getters {
         get_store,
         get_load
     };
@@ -426,7 +426,7 @@ make_ops_xchg_array(const T& xchg_ops) noexcept
     CREATE_GETTER_LAMBDA(exchange);
     CREATE_GETTER_LAMBDA(cmpxchg_weak);
     CREATE_GETTER_LAMBDA(cmpxchg_strong);
-    const std::array<void(*)(), 3> getters {
+    const std::array<void(*(*)(const T&))(), 3> getters {
         get_exchange,
         get_cmpxchg_weak,
         get_cmpxchg_strong
@@ -446,7 +446,7 @@ make_ops_bitwise_array(const T& bitwise_ops) noexcept
     CREATE_GETTER_LAMBDA(test_compl);
     CREATE_GETTER_LAMBDA(test_set);
     CREATE_GETTER_LAMBDA(test_reset);
-    const std::array<void(*)(), 4> getters {
+    const std::array<void(*(*)(const T&))(), 4> getters {
         get_test,
         get_test_compl,
         get_test_set,
@@ -471,7 +471,7 @@ make_ops_binary_array(const T& binary_ops) noexcept
     CREATE_GETTER_LAMBDA(fetch_xor);
     CREATE_GETTER_LAMBDA(fetch_and);
     CREATE_GETTER_LAMBDA(fetch_not);
-    const std::array<void(*)(), 8> getters {
+    const std::array<void(*(*)(const T&))(), 8> getters {
         get_or,
         get_xor,
         get_and,
@@ -502,7 +502,7 @@ make_ops_arithmetic_array(const T& arithmetic_ops) noexcept
     CREATE_GETTER_LAMBDA(fetch_inc);
     CREATE_GETTER_LAMBDA(fetch_dec);
     CREATE_GETTER_LAMBDA(fetch_neg);
-    const std::array<void(*)(), 10> getters {
+    const std::array<void(*(*)(const T&))(), 10> getters {
         get_add,
         get_sub,
         get_inc,
@@ -802,6 +802,21 @@ make_ops_raw_combinations_transaction()
     // defer to overload
     return make_ops_raw_combinations_transaction(&::only_for_address);
 }
+
+
+DEFINE_MAKE_OPS_ARRAY_IET(ldst, _, 2);
+
+
+DEFINE_MAKE_OPS_ARRAY_IET(xchg, _xchg_, 3);
+
+
+DEFINE_MAKE_OPS_ARRAY_IET(bitwise, _bitwise_, 4);
+
+
+DEFINE_MAKE_OPS_ARRAY_IET(binary, _binary_, 8);
+
+
+DEFINE_MAKE_OPS_ARRAY_IET(arithmetic, _arithmetic_, 10);
 
 
 }  // namespace test

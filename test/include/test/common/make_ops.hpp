@@ -4,6 +4,7 @@
 #include <patomic/api/feature_check.h>
 #include <patomic/api/ops.h>
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -164,6 +165,14 @@ make_ops_ldst_combinations();
 
 
 /// @brief
+///   Create an array of fp_store and fp_load members in a patomic_ops*_t
+///   object, with the types cast to void(*)().
+template <ops_domain D>
+std::array<void(*)(), 2>
+make_ops_ldst_array(const typename ops_types<D>::base_t& ldst) noexcept;
+
+
+/// @brief
 ///   Create a set of patomic_ops*_xchg_t objects with all combinations of
 ///   members set to a provided value. All other members are null.
 template <ops_domain D>
@@ -180,6 +189,14 @@ make_ops_xchg_combinations();
 
 
 /// @brief
+///   Create an array of members in a patomic_ops*_xchg_t object, with the
+///   types cast to void(*)().
+template <ops_domain D>
+std::array<void(*)(), 3>
+make_ops_xchg_array(const typename ops_types<D>::xchg_t& xchg) noexcept;
+
+
+/// @brief
 ///   Create a set of patomic_ops*_bitwise_t objects with all combinations of
 ///   members set to a provided value. All other members are null.
 template <ops_domain D>
@@ -193,6 +210,14 @@ make_ops_bitwise_combinations(void(*nonnull_value)());
 template <ops_domain D>
 std::vector<ops_any_all<typename ops_types<D>::bitwise_t>>
 make_ops_bitwise_combinations();
+
+
+/// @brief
+///   Create an array of members in a patomic_ops*_bitwise_t object, with the
+///   types cast to void(*)().
+template <ops_domain D>
+std::array<void(*)(), 4>
+make_ops_bitwise_array(const typename ops_types<D>::bitwise_t& bitwise) noexcept;
 
 
 /// @brief
@@ -213,6 +238,14 @@ make_ops_binary_combinations();
 
 
 /// @brief
+///   Create an array of members in a patomic_ops*_binary_t object, with the
+///   types cast to void(*)().
+template <ops_domain D>
+std::array<void(*)(), 8>
+make_ops_binary_array(const typename ops_types<D>::binary_t& binary) noexcept;
+
+
+/// @brief
 ///   Create a set of patomic_ops*_arithmetic_t objects with all combinations of
 ///   void and fetch members set to a provided value. All other members are
 ///   null.
@@ -227,6 +260,14 @@ make_ops_arithmetic_combinations(void(*nonnull_value)());
 template <ops_domain D>
 std::vector<ops_any_all_vf<typename ops_types<D>::arithmetic_t>>
 make_ops_arithmetic_combinations();
+
+
+/// @brief
+///   Create an array of members in a patomic_ops*_arithmetic_t object, with the
+///   types cast to void(*)().
+template <ops_domain D>
+std::array<void(*)(), 10>
+make_ops_arithmetic_array(const typename ops_types<D>::arithmetic_t& arithmetic) noexcept;
 
 
 /// @brief
