@@ -285,7 +285,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bi
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_ldst_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     ops.fp_load = test::make_ops_all_nonnull<TestFixture::domain>().fp_load;
     ops.fp_store = test::make_ops_all_nonnull<TestFixture::domain>().fp_store;
     constexpr unsigned int input_opkinds = ~0u;
@@ -322,7 +322,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_ldst_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     ops.xchg_ops = test::make_ops_all_nonnull<TestFixture::domain>().xchg_ops;
     constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_XCHG;
@@ -340,7 +340,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_xchg_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
     {
         ops.xchg_ops = xchg.ops;
@@ -360,7 +360,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_xchg_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     ops.bitwise_ops = test::make_ops_all_nonnull<TestFixture::domain>().bitwise_ops;
     constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_BIT;
@@ -378,7 +378,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_bitwise_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
     {
         ops.bitwise_ops = bitwise.ops;
@@ -398,7 +398,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_bitwise_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     ops.binary_ops = test::make_ops_all_nonnull<TestFixture::domain>().binary_ops;
     constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_BIN;
@@ -419,7 +419,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_binary_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
     {
         ops.binary_ops = binary.ops;
@@ -443,7 +443,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_binary_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     ops.arithmetic_ops = test::make_ops_all_nonnull<TestFixture::domain>().arithmetic_ops;
     constexpr unsigned int input_opkinds = ~0u;
     const unsigned int set_opkinds = patomic_opkinds_ARI;
@@ -464,7 +464,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_full_arithmetic_bits_match_expecte
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_arithmetic_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
     {
         ops.arithmetic_ops = arithmetic.ops;

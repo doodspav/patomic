@@ -1,6 +1,7 @@
 #ifndef PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
 #define PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
 
+#include <patomic/api/core.h>
 #include <patomic/api/feature_check.h>
 #include <patomic/api/ops.h>
 
@@ -39,7 +40,8 @@ struct ops_types<ops_domain::IMPLICIT>
 {
     static constexpr unsigned int full_opcat = patomic_opcats_IMPLICIT;
 
-    using base_t = patomic_ops_t;
+    using base_t = patomic_t;
+    using ldst_t = patomic_ops_t;
     using xchg_t = patomic_ops_xchg_t;
     using bitwise_t = patomic_ops_bitwise_t;
     using binary_t = patomic_ops_binary_t;
@@ -51,7 +53,8 @@ struct ops_types<ops_domain::EXPLICIT>
 {
     static constexpr unsigned int full_opcat = patomic_opcats_EXPLICIT;
 
-    using base_t = patomic_ops_explicit_t;
+    using base_t = patomic_explicit_t;
+    using ldst_t = patomic_ops_explicit_t;
     using xchg_t = patomic_ops_explicit_xchg_t;
     using bitwise_t = patomic_ops_explicit_bitwise_t;
     using binary_t = patomic_ops_explicit_binary_t;
@@ -63,7 +66,8 @@ struct ops_types<ops_domain::TRANSACTION>
 {
     static constexpr unsigned int full_opcat = patomic_opcats_TRANSACTION;
 
-    using base_t = patomic_ops_transaction_t;
+    using base_t = patomic_transaction_t;
+    using ldst_t = patomic_ops_transaction_t;
     using xchg_t = patomic_ops_transaction_xchg_t;
     using bitwise_t = patomic_ops_transaction_bitwise_t;
     using binary_t = patomic_ops_transaction_binary_t;
@@ -135,7 +139,7 @@ make_opkinds_all_combined();
 ///   Create a patomic_ops*_t object where all members are set to a provided
 ///   value.
 template <ops_domain D>
-typename ops_types<D>::base_t
+typename ops_types<D>::ldst_t
 make_ops_all_nonnull(void(*nonnull_value)()) noexcept;
 
 
@@ -143,7 +147,7 @@ make_ops_all_nonnull(void(*nonnull_value)()) noexcept;
 ///   Create a patomic_ops*_t object where all members are set to a non-null
 ///   value.
 template <ops_domain D>
-typename ops_types<D>::base_t
+typename ops_types<D>::ldst_t
 make_ops_all_nonnull() noexcept;
 
 
@@ -151,7 +155,7 @@ make_ops_all_nonnull() noexcept;
 ///   Create a set of patomic_ops*_t objects with all combinations of fp_store
 ///   and fp_load members set to a provided value. All other members are null.
 template <ops_domain D>
-std::vector<ops_any_all<typename ops_types<D>::base_t>>
+std::vector<ops_any_all<typename ops_types<D>::ldst_t>>
 make_ops_ldst_combinations(void(*nonnull_value)());
 
 
@@ -160,7 +164,7 @@ make_ops_ldst_combinations(void(*nonnull_value)());
 ///   and fp_load members set to null and non-null values. All other members
 ///   are null.
 template <ops_domain D>
-std::vector<ops_any_all<typename ops_types<D>::base_t>>
+std::vector<ops_any_all<typename ops_types<D>::ldst_t>>
 make_ops_ldst_combinations();
 
 
@@ -169,7 +173,7 @@ make_ops_ldst_combinations();
 ///   object, with the types cast to void(*)().
 template <ops_domain D>
 std::array<void(*)(), 2>
-make_ops_ldst_array(const typename ops_types<D>::base_t& ldst) noexcept;
+make_ops_ldst_array(const typename ops_types<D>::ldst_t& ldst) noexcept;
 
 
 /// @brief

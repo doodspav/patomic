@@ -335,7 +335,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
     {
         ops.xchg_ops = xchg.ops;
@@ -356,7 +356,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& xchg : test::make_ops_xchg_combinations<TestFixture::domain>())
     {
         ops.xchg_ops = xchg.ops;
@@ -377,7 +377,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
     {
         ops.bitwise_ops = bitwise.ops;
@@ -398,7 +398,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& bitwise : test::make_ops_bitwise_combinations<TestFixture::domain>())
     {
         ops.bitwise_ops = bitwise.ops;
@@ -419,7 +419,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
     {
         ops.binary_ops = binary.ops;
@@ -442,7 +442,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& binary : test::make_ops_binary_combinations<TestFixture::domain>())
     {
         ops.binary_ops = binary.ops;
@@ -465,7 +465,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
     {
         ops.arithmetic_ops = arithmetic.ops;
@@ -488,7 +488,7 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_arithmetic_bits_match_expected)
 {
     // setup
-    typename TestFixture::OpsTypes::base_t ops {};
+    typename TestFixture::OpsTypes::ldst_t ops {};
     for (const auto& arithmetic : test::make_ops_arithmetic_combinations<TestFixture::domain>())
     {
         ops.arithmetic_ops = arithmetic.ops;
