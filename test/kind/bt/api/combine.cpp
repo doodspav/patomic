@@ -1,5 +1,6 @@
 #include <patomic/api/combine.h>
 
+#include <test/common/compare.hpp>
 #include <test/common/make_ops.hpp>
 
 #include <gtest/gtest.h>
@@ -8,10 +9,6 @@
 #include <string>
 #include <type_traits>
 
-
-/// @brief Test fixture.
-class BtApiCombine : public testing::Test
-{};
 
 /// @brief Templated test fixture.
 template <class T>
@@ -74,16 +71,90 @@ TYPED_TEST_SUITE(
 );
 
 
-/// @brief Calling combine with two operands where both have all ops compare
-///        equal and the copied-from alignment is weaker does not modify the
-///        alignment.
-TEST_F(BtApiCombine, combine_equal_ops_does_not_optimize_align)
-{}
+/// @brief Calling combine with two operands where both have all ops non-null
+///        and compare equal and the copied-from alignment is weaker does not
+///        modify the alignment.
+TYPED_TEST(BtApiCombineT, combine_equal_nonnull_ops_does_not_optimize_align)
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+    constexpr patomic_align_t weak_align { 1, 1, 0 };
+    constexpr patomic_align_t strong_align { 64, 64, 64 };
+    BaseT copied_to { test::make_ops_all_nonnull<D>(), strong_align };
+    const BaseT copied_from { test::make_ops_all_nonnull<D>(), weak_align };
+
+    // test
+    // check alignment is weaker on copied-from
+    EXPECT_LT(copied_from.align.recommended, copied_to.align.recommended);
+    EXPECT_LT(copied_from.align.minimum, copied_to.align.minimum);
+    EXPECT_EQ(0, copied_from.align.size_within);
+    EXPECT_NE(0, copied_to.align.size_within);
+    // check ops compare equal and are non-null (if one op is, they all should be)
+    EXPECT_EQ(copied_from.ops.fp_store, copied_to.ops.fp_store);
+    EXPECT_NE(nullptr, copied_from.ops.fp_store);
+    // check that alignment doesn't change
+    EXPECT_EQ(copied_to.align, strong_align);
+    TTestHelper::combine(copied_to, copied_from);
+    EXPECT_EQ(copied_to.align, strong_align);
+}
+
+/// @brief Calling combine with two operands where both have all ops null and
+///        the copied-from alignment is weaker does not modify the alignment.
+TYPED_TEST(BtApiCombineT, combine_equal_null_ops_does_not_optimize_align)
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+    constexpr patomic_align_t weak_align { 1, 1, 0 };
+    constexpr patomic_align_t strong_align { 64, 64, 64 };
+    BaseT copied_to { test::make_ops_all_nonnull<D>(nullptr), strong_align };
+    const BaseT copied_from { test::make_ops_all_nonnull<D>(nullptr), weak_align };
+
+    // test
+    // check alignment is weaker on copied-from
+    EXPECT_LT(copied_from.align.recommended, copied_to.align.recommended);
+    EXPECT_LT(copied_from.align.minimum, copied_to.align.minimum);
+    EXPECT_EQ(0, copied_from.align.size_within);
+    EXPECT_NE(0, copied_to.align.size_within);
+    // check ops compare equal and are null (if one op is, they all should be)
+    EXPECT_EQ(copied_from.ops.fp_store, copied_to.ops.fp_store);
+    EXPECT_EQ(nullptr, copied_from.ops.fp_store);
+    // check that alignment doesn't change
+    EXPECT_EQ(copied_to.align, strong_align);
+    TTestHelper::combine(copied_to, copied_from);
+    EXPECT_EQ(copied_to.align, strong_align);
+}
 
 /// @brief The size_within member is considered less strict when its value is
 ///        zero than when its value is non-zero for all ops.
-TEST_F(BtApiCombine, combine_size_within_zero_less_strict_than_non_zero)
-{}
+TYPED_TEST(BtApiCombineT, combine_size_within_zero_less_strict_than_non_zero)
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+    BaseT copied_to {
+        test::make_ops_all_nonnull<D>(nullptr),
+        patomic_align_t { 1, 1, 0 }
+    };
+    const BaseT copied_from {
+        test::make_ops_all_nonnull<D>(),
+        patomic_align_t { 1, 1, 1 }
+    };
+
+    // test
+    // check alignment is equal but only copied-to has zero size_within
+    EXPECT_EQ(copied_from.align.recommended, copied_to.align.recommended);
+    EXPECT_EQ(copied_from.align.minimum, copied_to.align.minimum);
+    EXPECT_NE(0, copied_from.align.size_within);
+    EXPECT_EQ(0, copied_to.align.size_within);
+    // check ops are null for copied-to, and non-null for copied-from
+    EXPECT_EQ(nullptr, copied_to.ops.fp_store);
+    EXPECT_NE(nullptr, copied_from.ops.fp_store);
+    // check that size_within is updated to be non-zero
+    TTestHelper::combine(copied_to, copied_from);
+    EXPECT_NE(0, copied_to.align.size_within);
+}
 
 /// @brief Calling combine with all combinations of LDST ops set in both
 ///        operands, with all combinations of alignment (stronger, equal,
