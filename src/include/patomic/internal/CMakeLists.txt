@@ -1,4 +1,4 @@
 # add directory files to target
 target_sources(${target_name} PRIVATE
-    combine_internal.h
+    combine.h
 )

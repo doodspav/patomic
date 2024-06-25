@@ -1,5 +1,5 @@
 #include <patomic/api/combine.h>
-#include <patomic/helper/combine_internal.h>
+#include <patomic/internal/combine.h>
 
 
 #define PATOMIC_SET_MAX(ops, other_ops, member) \

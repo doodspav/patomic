@@ -1,11 +1,11 @@
-#ifndef PATOMIC_HELPER_COMBINE_INTERNAL_H
-#define PATOMIC_HELPER_COMBINE_INTERNAL_H
+#ifndef PATOMIC_INTERNAL_COMBINE_H
+#define PATOMIC_INTERNAL_COMBINE_H
 
 #include <patomic/api/core.h>
 
 
 /**
- * @addtogroup helper
+ * @addtogroup internal
  *
  * @brief
  *   Internal implementation of patomic_combine which is not exported.
@@ -22,7 +22,7 @@ patomic_internal_combine(
 
 
 /**
- * @addtogroup helper
+ * @addtogroup internal
  *
  * @brief
  *   Internal implementation of patomic_combine_explicit which is not exported.
@@ -38,4 +38,4 @@ patomic_internal_combine_explicit(
 );
 
 
-#endif  /* PATOMIC_HELPER_COMBINE_INTERNAL_H */
+#endif  /* PATOMIC_INTERNAL_COMBINE_H */
