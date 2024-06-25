@@ -31,7 +31,7 @@
  *   The interface is identical to C90's qsort.
  */
 void
-patomic_sort(
+patomic_array_sort(
     void *ptr,
     size_t count,
     size_t size,
