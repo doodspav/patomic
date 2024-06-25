@@ -20,6 +20,15 @@ public:
     using OpsTypes = test::ops_types<domain>;
 };
 
+/// @brief Templated test fixture for "slow" tests.
+template <class T>
+class BtApiCombineT_SlowTest : public testing::Test
+{
+public:
+    static constexpr test::ops_domain domain = T::value;
+    using OpsTypes = test::ops_types<domain>;
+};
+
 using BtApiCombineT_Types = ::testing::Types<
     std::integral_constant<test::ops_domain, test::ops_domain::IMPLICIT>,
     std::integral_constant<test::ops_domain, test::ops_domain::EXPLICIT>
@@ -99,6 +108,12 @@ constexpr std::array<patomic_align_t, 3> aligns {
 
 TYPED_TEST_SUITE(
     BtApiCombineT,
+    BtApiCombineT_Types,
+    TTestHelper
+);
+
+TYPED_TEST_SUITE(
+    BtApiCombineT_SlowTest,
     BtApiCombineT_Types,
     TTestHelper
 );
@@ -381,7 +396,7 @@ TYPED_TEST(BtApiCombineT, combine_all_bitwise_combinations_correct_result)
 ///        operands, with all combinations of alignment (stronger, equal,
 ///        weaker), copies over the correct ops and adjusts the alignment
 ///        correctly. Non-null ops compare unequal.
-TYPED_TEST(BtApiCombineT, combine_all_binary_combinations_correct_result)
+TYPED_TEST(BtApiCombineT_SlowTest, combine_all_binary_combinations_correct_result)
 {
     // setup
     constexpr test::ops_domain D = TestFixture::domain;
@@ -447,7 +462,7 @@ TYPED_TEST(BtApiCombineT, combine_all_binary_combinations_correct_result)
 ///        operands, with all combinations of alignment (stronger, equal,
 ///        weaker), copies over the correct ops and adjusts the alignment
 ///        correctly. Non-null ops compare unequal.
-TYPED_TEST(BtApiCombineT, combine_all_arithmetic_combinations_correct_result)
+TYPED_TEST(BtApiCombineT_SlowTest, combine_all_arithmetic_combinations_correct_result)
 {
     // setup
     constexpr test::ops_domain D = TestFixture::domain;
