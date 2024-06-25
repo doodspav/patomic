@@ -1,4 +1,5 @@
 #include <patomic/api/combine.h>
+#include <patomic/helper/combine_internal.h>
 
 
 #define PATOMIC_SET_MAX(ops, other_ops, member) \
@@ -91,9 +92,38 @@
 
 
 void
+patomic_internal_combine(
+    patomic_t *const priority,
+    const patomic_t *const other
+)
+{
+    /* count how many ops were copied over */
+    int copy_count = 0;
+    PATOMIC_COMBINE_OPS(copy_count, priority, other);
+
+    /* only combine alignment if at least one op was copied over */
+    if (copy_count > 0)
+    {
+        PATOMIC_COMBINE_ALIGN(priority, other);
+    }
+}
+
+
+void
 patomic_combine(
     patomic_t *const priority,
     const patomic_t *const other
+)
+{
+    /* defer to internal implementation */
+    patomic_internal_combine(priority, other);
+}
+
+
+void
+patomic_internal_combine_explicit(
+    patomic_explicit_t *const priority,
+    const patomic_explicit_t *const other
 )
 {
     /* count how many ops were copied over */
@@ -114,13 +144,6 @@ patomic_combine_explicit(
     const patomic_explicit_t *const other
 )
 {
-    /* count how many ops were copied over */
-    int copy_count = 0;
-    PATOMIC_COMBINE_OPS(copy_count, priority, other);
-
-    /* only combine alignment if at least one op was copied over */
-    if (copy_count > 0)
-    {
-        PATOMIC_COMBINE_ALIGN(priority, other);
-    }
+    /* defer to internal implementation */
+    patomic_internal_combine_explicit(priority, other);
 }
