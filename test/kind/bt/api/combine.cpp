@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <array>
 #include <string>
 #include <type_traits>
 
@@ -61,6 +62,28 @@ void fn_a() noexcept {}
 
 /// @brief Used to obtain a distinct non-null function pointer.
 void fn_b() noexcept {}
+
+/// @brief Combine align "from" into "to".
+patomic_align_t
+combine_align(const patomic_align_t& to, const patomic_align_t& from) noexcept
+{
+    patomic_align_t ret;
+    ret.recommended = std::max(to.recommended, from.recommended);
+    ret.minimum = std::max(to.minimum, from.minimum);
+    if (to.size_within == 0)
+    {
+        ret.size_within = from.size_within;
+    }
+    else if (from.size_within == 0)
+    {
+        ret.size_within = to.size_within;
+    }
+    else
+    {
+        ret.size_within = std::min(to.size_within, from.size_within);
+    }
+    return ret;
+}
 
 }  // namespace
 
@@ -161,7 +184,64 @@ TYPED_TEST(BtApiCombineT, combine_size_within_zero_less_strict_than_non_zero)
 ///        weaker), copies over the correct ops and adjusts the alignment
 ///        correctly. Non-null ops compare unequal.
 TYPED_TEST(BtApiCombineT, combine_all_ldst_combinations_correct_result)
-{}
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+    // alignments
+    constexpr patomic_align_t strong_align { 64, 64, 16 };
+    constexpr patomic_align_t normal_align { 32, 32, 32 };
+    constexpr patomic_align_t weak_align { 16, 16, 64 };
+    constexpr std::array<patomic_align_t, 3> aligns {
+        weak_align,
+        normal_align,
+        strong_align
+    };
+
+
+    for (const auto& ldst_from : test::make_ops_ldst_combinations<D>(&fn_a))
+    {
+    for (const auto& ldst_to : test::make_ops_ldst_combinations<D>(&fn_b))
+    {
+    for (const auto align_from : aligns)
+    {
+        // patomic*_t objects
+        BaseT combined { ldst_to.ops, normal_align };
+        const BaseT copied_to = combined;
+        const BaseT copied_from { ldst_from.ops, align_from };
+        // arrays of relevant ops
+        const auto arr_to = test::make_ops_ldst_array<D>(copied_to.ops);
+        const auto arr_from = test::make_ops_ldst_array<D>(copied_from.ops);
+
+        // do combine
+        TTestHelper::combine(combined, copied_from);
+        const auto arr_combined = test::make_ops_ldst_array<D>(combined.ops);
+
+        // go through result
+        bool any_ops_copied = false;
+        for (std::size_t i = 0; i < arr_to.size(); ++i)
+        {
+            // test
+            if (arr_to[i] == nullptr && arr_from[i] != nullptr)
+            {
+                EXPECT_EQ(arr_combined[i], arr_from[i]);
+                any_ops_copied = true;
+            }
+        }
+
+        // check alignment is copied correctly
+        if (any_ops_copied)
+        {
+            const auto combined_align =
+                combine_align(copied_to.align, copied_from.align);
+            EXPECT_EQ(combined.align, combined_align);
+        }
+        else
+        {
+            EXPECT_EQ(combined.align, copied_to.align);
+        }
+    }}}
+}
 
 /// @brief Calling combine with all combinations of XCHG ops set in both
 ///        operands, with all combinations of alignment (stronger, equal,
