@@ -70,8 +70,8 @@ patomic_align_meets_minimum(
 }
 
 
-static int
-compare_align(
+int
+patomic_internal_compare_align(
     const patomic_align_t lhs,
     const patomic_align_t rhs
 )
@@ -117,34 +117,4 @@ compare_align(
     {
         return 1;
     }
-}
-
-
-int
-patomic_internal_compare_implicit_align(
-    const patomic_t *const lhs,
-    const patomic_t *const rhs
-)
-{
-    return compare_align(lhs->align, rhs->align);
-}
-
-
-int
-patomic_internal_compare_explicit_align(
-    const patomic_explicit_t *const lhs,
-    const patomic_explicit_t *const rhs
-)
-{
-    return compare_align(lhs->align, rhs->align);
-}
-
-
-int
-patomic_internal_compare_transaction_align(
-    const patomic_transaction_t *const lhs,
-    const patomic_transaction_t *const rhs
-)
-{
-    return compare_align(lhs->align, rhs->align);
 }
