@@ -224,8 +224,14 @@ TYPED_TEST(BtApiCombineT, combine_all_ldst_combinations_correct_result)
             // test
             if (arr_to[i] == nullptr && arr_from[i] != nullptr)
             {
+                // if "to" is null, then we took "from"'s value
                 EXPECT_EQ(arr_combined[i], arr_from[i]);
                 any_ops_copied = true;
+            }
+            else
+            {
+                // if "to" is not null, then it didn't change
+                EXPECT_EQ(arr_combined[i], arr_to[i]);
             }
         }
 
