@@ -1,4 +1,5 @@
 #include <patomic/api/align.h>
+#include <patomic/internal/align.h>
 
 #include <patomic/stdlib/math.h>
 #include <patomic/stdlib/stdint.h>
@@ -66,4 +67,58 @@ patomic_align_meets_minimum(
 
     /* addr ptr is not aligned to minimum alignment */
     return 0;
+}
+
+
+int
+patomic_internal_compare_align(
+    const void *const lhs_void,
+    const void *const rhs_void
+)
+{
+    /* convert to non-void types */
+    const patomic_align_t lhs = *(const patomic_align_t *const) lhs_void;
+    const patomic_align_t rhs = *(const patomic_align_t *const) rhs_void;
+
+    /* recommended takes priority over minimum */
+    if (lhs.recommended < rhs.recommended)
+    {
+        return -1;
+    }
+    else if (lhs.recommended > rhs.recommended)
+    {
+        return 1;
+    }
+
+    /* minimum takes priority over size_within */
+    if (lhs.minimum < rhs.minimum)
+    {
+        return -1;
+    }
+    else if (lhs.minimum > rhs.minimum)
+    {
+        return 1;
+    }
+
+    /* prioritize zero size_within, and then largest size_within */
+    if (lhs.size_within == rhs.size_within)
+    {
+        return 0;
+    }
+    else if (lhs.size_within == 0)
+    {
+        return -1;
+    }
+    else if (rhs.size_within == 0)
+    {
+        return 1;
+    }
+    else if (lhs.size_within > rhs.size_within)
+    {
+        return -1;
+    }
+    else /* if (lhs.size_within < rhs.size_within) */
+    {
+        return 1;
+    }
 }
