@@ -316,7 +316,66 @@ TYPED_TEST(BtApiCombineT, combine_all_xchg_combinations_correct_result)
 ///        weaker), copies over the correct ops and adjusts the alignment
 ///        correctly. Non-null ops compare unequal.
 TYPED_TEST(BtApiCombineT, combine_all_bitwise_combinations_correct_result)
-{}
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using OpsT = typename TestFixture::OpsTypes::ldst_t;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+
+    for (const auto& bitwise_from : test::make_ops_bitwise_combinations<D>(&fn_a))
+    {
+    for (const auto& bitwise_to : test::make_ops_bitwise_combinations<D>(&fn_b))
+    {
+    for (const auto align_from : aligns)
+    {
+        // patomic_ops*_t objects
+        OpsT ops_to {};
+        ops_to.bitwise_ops = bitwise_to.ops;
+        OpsT ops_from {};
+        ops_from.bitwise_ops = bitwise_from.ops;
+        // patomic*_t objects
+        BaseT combined { ops_to, normal_align };
+        const BaseT copied_to = combined;
+        const BaseT copied_from { ops_from, align_from };
+        // arrays of relevant ops
+        const auto arr_to = test::make_ops_bitwise_array<D>(copied_to.ops.bitwise_ops);
+        const auto arr_from = test::make_ops_bitwise_array<D>(copied_from.ops.bitwise_ops);
+
+        // do combine
+        TTestHelper::combine(combined, copied_from);
+        const auto arr_combined = test::make_ops_bitwise_array<D>(combined.ops.bitwise_ops);
+
+        // go through result
+        bool any_ops_copied = false;
+        for (std::size_t i = 0; i < arr_to.size(); ++i)
+        {
+            // test
+            if (arr_to[i] == nullptr && arr_from[i] != nullptr)
+            {
+                // if "to" is null, then we took "from"'s value
+                EXPECT_EQ(arr_combined[i], arr_from[i]);
+                any_ops_copied = true;
+            }
+            else
+            {
+                // if "to" is not null, then it didn't change
+                EXPECT_EQ(arr_combined[i], arr_to[i]);
+            }
+        }
+
+        // check alignment is copied correctly
+        if (any_ops_copied)
+        {
+            const auto combined_align =
+                combine_align(copied_to.align, copied_from.align);
+            EXPECT_EQ(combined.align, combined_align);
+        }
+        else
+        {
+            EXPECT_EQ(combined.align, copied_to.align);
+        }
+    }}}
+}
 
 /// @brief Calling combine with all combinations of BIN ops set in both
 ///        operands, with all combinations of alignment (stronger, equal,
