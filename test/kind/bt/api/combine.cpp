@@ -85,6 +85,16 @@ combine_align(const patomic_align_t& to, const patomic_align_t& from) noexcept
     return ret;
 }
 
+// helper constants
+constexpr patomic_align_t strong_align { 64, 64, 16 };
+constexpr patomic_align_t normal_align { 32, 32, 32 };
+constexpr patomic_align_t weak_align { 16, 16, 64 };
+constexpr std::array<patomic_align_t, 3> aligns {
+    weak_align,
+    normal_align,
+    strong_align
+};
+
 }  // namespace
 
 TYPED_TEST_SUITE(
@@ -102,8 +112,6 @@ TYPED_TEST(BtApiCombineT, combine_equal_nonnull_ops_does_not_optimize_align)
     // setup
     constexpr test::ops_domain D = TestFixture::domain;
     using BaseT = typename TestFixture::OpsTypes::base_t;
-    constexpr patomic_align_t weak_align { 1, 1, 0 };
-    constexpr patomic_align_t strong_align { 64, 64, 64 };
     BaseT copied_to { test::make_ops_all_nonnull<D>(), strong_align };
     const BaseT copied_from { test::make_ops_all_nonnull<D>(), weak_align };
 
@@ -111,8 +119,8 @@ TYPED_TEST(BtApiCombineT, combine_equal_nonnull_ops_does_not_optimize_align)
     // check alignment is weaker on copied-from
     EXPECT_LT(copied_from.align.recommended, copied_to.align.recommended);
     EXPECT_LT(copied_from.align.minimum, copied_to.align.minimum);
-    EXPECT_EQ(0, copied_from.align.size_within);
-    EXPECT_NE(0, copied_to.align.size_within);
+    EXPECT_GT(copied_from.align.size_within, copied_to.align.size_within);
+    EXPECT_GT(copied_to.align.size_within, 0);
     // check ops compare equal and are non-null (if one op is, they all should be)
     EXPECT_EQ(copied_from.ops.fp_store, copied_to.ops.fp_store);
     EXPECT_NE(nullptr, copied_from.ops.fp_store);
@@ -129,8 +137,6 @@ TYPED_TEST(BtApiCombineT, combine_equal_null_ops_does_not_optimize_align)
     // setup
     constexpr test::ops_domain D = TestFixture::domain;
     using BaseT = typename TestFixture::OpsTypes::base_t;
-    constexpr patomic_align_t weak_align { 1, 1, 0 };
-    constexpr patomic_align_t strong_align { 64, 64, 64 };
     BaseT copied_to { test::make_ops_all_nonnull<D>(nullptr), strong_align };
     const BaseT copied_from { test::make_ops_all_nonnull<D>(nullptr), weak_align };
 
@@ -138,8 +144,8 @@ TYPED_TEST(BtApiCombineT, combine_equal_null_ops_does_not_optimize_align)
     // check alignment is weaker on copied-from
     EXPECT_LT(copied_from.align.recommended, copied_to.align.recommended);
     EXPECT_LT(copied_from.align.minimum, copied_to.align.minimum);
-    EXPECT_EQ(0, copied_from.align.size_within);
-    EXPECT_NE(0, copied_to.align.size_within);
+    EXPECT_GT(copied_from.align.size_within, copied_to.align.size_within);
+    EXPECT_GT(copied_to.align.size_within, 0);
     // check ops compare equal and are null (if one op is, they all should be)
     EXPECT_EQ(copied_from.ops.fp_store, copied_to.ops.fp_store);
     EXPECT_EQ(nullptr, copied_from.ops.fp_store);
@@ -188,16 +194,6 @@ TYPED_TEST(BtApiCombineT, combine_all_ldst_combinations_correct_result)
     // setup
     constexpr test::ops_domain D = TestFixture::domain;
     using BaseT = typename TestFixture::OpsTypes::base_t;
-    // alignments
-    constexpr patomic_align_t strong_align { 64, 64, 16 };
-    constexpr patomic_align_t normal_align { 32, 32, 32 };
-    constexpr patomic_align_t weak_align { 16, 16, 64 };
-    constexpr std::array<patomic_align_t, 3> aligns {
-        weak_align,
-        normal_align,
-        strong_align
-    };
-
 
     for (const auto& ldst_from : test::make_ops_ldst_combinations<D>(&fn_a))
     {
@@ -254,7 +250,13 @@ TYPED_TEST(BtApiCombineT, combine_all_ldst_combinations_correct_result)
 ///        weaker), copies over the correct ops and adjusts the alignment
 ///        correctly. Non-null ops compare unequal.
 TYPED_TEST(BtApiCombineT, combine_all_xchg_combinations_correct_result)
-{}
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+    // alignments
+
+}
 
 /// @brief Calling combine with all combinations of BIT ops set in both
 ///        operands, with all combinations of alignment (stronger, equal,
@@ -276,76 +278,3 @@ TYPED_TEST(BtApiCombineT, combine_all_binary_combinations_correct_result)
 ///        correctly. Non-null ops compare unequal.
 TYPED_TEST(BtApiCombineT, combine_all_arithmetic_combinations_correct_result)
 {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/// @brief Calling combine with all combinations of LDST function pointers set
-///        in priority and other copies over the correct operations.
-TYPED_TEST(BtApiCombineT, hii)
-{
-    // setup
-    constexpr auto D = TestFixture::domain;
-    typename TestFixture::OpsTypes::base_t combined {};
-    typename TestFixture::OpsTypes::base_t other {};
-    for (const auto& priority_ldst : test::make_ops_ldst_combinations<D>(&fn_a))
-    {
-    for (const auto& other_ldst : test::make_ops_ldst_combinations<D>(&fn_b))
-    {
-        combined.ops = priority_ldst.ops;
-        other.ops = other_ldst.ops;
-        TTestHelper::combine(combined, other);
-        auto priority_fps = test::make_ops_ldst_array<D>(priority_ldst.ops);
-        auto other_fps = test::make_ops_ldst_array<D>(other_ldst.ops);
-        auto combined_fps = test::make_ops_ldst_array<D>(combined.ops);
-
-        // test
-        ASSERT_EQ(combined_fps.size(), priority_fps.size());
-        ASSERT_EQ(combined_fps.size(), other_fps.size());
-        for (std::size_t i = 0; i < combined_fps.size(); ++i)
-        {
-            if (priority_fps[i] != nullptr)
-            {
-                EXPECT_EQ(combined_fps[i], priority_fps[i]);
-            }
-            else
-            {
-                EXPECT_EQ(combined_fps[i], other_fps[i]);
-            }
-        }
-    }}
-}
-
-/// @brief Calling combine with no operations being copied over does not affect
-///        the alignment requirements.
-TYPED_TEST(BtApiCombineT, hii2)
-{
-    // setup
-    constexpr auto D = TestFixture::domain;
-    // only combined has non-null ops, so nothing copied over from other
-    typename TestFixture::OpsTypes::base_t combined {};
-    typename TestFixture::OpsTypes::base_t other {};
-    const typename TestFixture::OpsTypes::ldst_t nonnull = test::make_ops_all_nonnull<D>();
-    combined.ops.fp_store = nonnull.fp_store;
-    combined.ops.fp_load = nonnull.fp_load;
-    // other has stricter alignment requirements than combined
-    combined.align = patomic_align_t { 1, 1, 64 };
-    other.align = patomic_align_t { 8, 8, 32 };
-    // combine should do nothing
-    TTestHelper::combine(combined, other);
-
-    // testy
-    EXPECT_EQ(combined.align.recommended, 1);
-    EXPECT_EQ(combined.align.minimum, 1);
-    EXPECT_EQ(combined.align.size_within, 64);
-}
