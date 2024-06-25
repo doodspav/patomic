@@ -2,5 +2,6 @@
 target_sources(${target_name} PRIVATE
     assert.h
     math.h
+    sort.h
     stdint.h
 )
