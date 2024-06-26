@@ -2,6 +2,7 @@
 
 #include <patomic/internal/align.h>
 #include <patomic/internal/combine.h>
+#include <patomic/internal/feature_check.h>
 
 #include <patomic/stdlib/sort.h>
 
@@ -9,7 +10,7 @@
 
 
 static int
-compare_implicit_align(
+compare_implicit(
     const void *const lhs_void,
     const void *const rhs_void
 )
@@ -24,7 +25,7 @@ compare_implicit_align(
 
 
 static int
-compare_explicit_align(
+compare_explicit(
     const void *const lhs_void,
     const void *const rhs_void
 )
@@ -40,14 +41,15 @@ compare_explicit_align(
 
 patomic_t
 patomic_create(
-    size_t byte_width,
-    patomic_memory_order_t order,
-    unsigned int opts,
-    unsigned int kinds,
-    unsigned long ids
+    const size_t byte_width,
+    const patomic_memory_order_t order,
+    const unsigned int opts,
+    const unsigned int kinds,
+    const unsigned long ids
 )
 {
     /* declare variables */
+    const unsigned int opcats = ~0u;
     patomic_t ret;
     patomic_t objs[PATOMIC_IMPL_REGISTER_SIZE];
     patomic_t *begin = objs;
@@ -60,20 +62,21 @@ patomic_create(
         if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
              ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
-            *end++ = patomic_impl_register[i].fp_create(
-                byte_width,
-                order,
-                opts
-            );
+            /* only add to array if some operation is supported */
+            *end = patomic_impl_register[i].fp_create(byte_width, order, opts);
+            if (opcats != patomic_internal_feature_check_any(&end->ops, opcats))
+            {
+                ++end;
+            }
         }
     }
 
     /* sort implementations by alignment */
     patomic_array_sort(
         begin,
-        i,
+        (size_t) (end - begin),
         sizeof(patomic_t),
-        &compare_implicit_align
+        &compare_implicit
     );
 
     /* combine implementations */
@@ -89,13 +92,14 @@ patomic_create(
 
 patomic_explicit_t
 patomic_create_explicit(
-    size_t byte_width,
-    unsigned int opts,
-    unsigned int kinds,
-    unsigned long ids
+    const size_t byte_width,
+    const unsigned int opts,
+    const unsigned int kinds,
+    const unsigned long ids
 )
 {
     /* declare variables */
+    const unsigned int opcats = ~0u;
     patomic_explicit_t ret;
     patomic_explicit_t objs[PATOMIC_IMPL_REGISTER_SIZE];
     patomic_explicit_t *begin = objs;
@@ -108,19 +112,21 @@ patomic_create_explicit(
         if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
              ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
-            *end++ = patomic_impl_register[i].fp_create_explicit(
-                byte_width,
-                opts
-            );
+            /* only add to array if some operation is supported */
+            *end = patomic_impl_register[i].fp_create_explicit(byte_width, opts);
+            if (opcats != patomic_internal_feature_check_any_explicit(&end->ops, opcats))
+            {
+                ++end;
+            }
         }
     }
 
     /* sort implementations by alignment */
     patomic_array_sort(
         begin,
-        i,
+        (size_t) (end - begin),
         sizeof(patomic_explicit_t),
-        &compare_explicit_align
+        &compare_explicit
     );
 
     /* combine implementations */
@@ -130,5 +136,17 @@ patomic_create_explicit(
         patomic_internal_combine_explicit(&ret, begin);
     }
 
+    return ret;
+}
+
+
+patomic_transaction_t
+patomic_create_transaction(
+    const unsigned int opts,
+    const unsigned int kinds,
+    const unsigned long ids
+)
+{
+    patomic_transaction_t ret { 0 };
     return ret;
 }
