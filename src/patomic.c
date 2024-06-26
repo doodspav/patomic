@@ -147,6 +147,43 @@ patomic_create_transaction(
     const unsigned long ids
 )
 {
-    patomic_transaction_t ret { 0 };
-    return ret;
+    /* declare variables */
+    const unsigned int opcats = ~0u;
+    patomic_kind_t last_kind = patomic_kind_UNKN;
+    patomic_transaction_t ret;
+    patomic_transaction_t objs[PATOMIC_IMPL_REGISTER_SIZE];
+    patomic_transaction_t *begin = objs;
+    patomic_transaction_t *end   = objs;
+    size_t i;
+
+    /* fill array with implementations */
+    for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
+    {
+        if( ((unsigned long) patomic_impl_register[i].id & ids) &&
+            ((unsigned int)  patomic_impl_register[i].kind & kinds))
+        {
+            /* only add to array if some operation is supported */
+            ret = patomic_impl_register[i].fp_create_transaction(opts);
+            if(opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
+            {
+                /* ignore previous implementations if current one has a better kind */
+                if (patomic_impl_register[i].kind > last_kind)
+                {
+                    end = objs;
+                }
+                last_kind = patomic_impl_register[i].kind;
+                *end++ = ret;
+            }
+        }
+    }
+
+    /* get first implementation available */
+    if (begin != end)
+    {
+        return objs[0];
+    }
+    else
+    {
+        return patomic_impl_create_transaction_null(opts);
+    }
 }
