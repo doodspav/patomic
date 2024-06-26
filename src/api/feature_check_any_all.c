@@ -1,4 +1,5 @@
 #include <patomic/api/feature_check.h>
+#include <patomic/internal/feature_check.h>
 
 
 #define PATOMIC_UNSET_OPCAT_LDST(ops, cats, and_or) \
@@ -205,8 +206,45 @@ patomic_feature_check_all_transaction(
 
 
 unsigned int
+patomic_internal_feature_check_any(
+    const patomic_ops_t *const ops,
+    unsigned int opcats
+)
+{
+    /* short circuit if possible */
+    if (opcats == 0)
+    {
+        return opcats;
+    }
+
+    /* unset bits for opcats where all ops are present */
+    PATOMIC_UNSET_OPCAT_LDST(ops, opcats, ||);
+    PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, ||);
+    PATOMIC_UNSET_OPCAT_BIT(ops, opcats, ||);
+    PATOMIC_UNSET_OPCAT_BIN_V(ops, opcats, ||);
+    PATOMIC_UNSET_OPCAT_BIN_F(ops, opcats, ||);
+    PATOMIC_UNSET_OPCAT_ARI_V(ops, opcats, ||);
+    PATOMIC_UNSET_OPCAT_ARI_F(ops, opcats, ||);
+
+    /* return updated opcats */
+    return opcats;
+}
+
+
+unsigned int
 patomic_feature_check_any(
     const patomic_ops_t *const ops,
+    const unsigned int opcats
+)
+{
+    /* defer to internal implementation */
+    return patomic_internal_feature_check_any(ops, opcats);
+}
+
+
+unsigned int
+patomic_internal_feature_check_any_explicit(
+    const patomic_ops_explicit_t *const ops,
     unsigned int opcats
 )
 {
@@ -233,31 +271,16 @@ patomic_feature_check_any(
 unsigned int
 patomic_feature_check_any_explicit(
     const patomic_ops_explicit_t *const ops,
-    unsigned int opcats
+    const unsigned int opcats
 )
 {
-    /* short circuit if possible */
-    if (opcats == 0)
-    {
-        return opcats;
-    }
-
-    /* unset bits for opcats where all ops are present */
-    PATOMIC_UNSET_OPCAT_LDST(ops, opcats, ||);
-    PATOMIC_UNSET_OPCAT_XCHG(ops, opcats, ||);
-    PATOMIC_UNSET_OPCAT_BIT(ops, opcats, ||);
-    PATOMIC_UNSET_OPCAT_BIN_V(ops, opcats, ||);
-    PATOMIC_UNSET_OPCAT_BIN_F(ops, opcats, ||);
-    PATOMIC_UNSET_OPCAT_ARI_V(ops, opcats, ||);
-    PATOMIC_UNSET_OPCAT_ARI_F(ops, opcats, ||);
-
-    /* return updated opcats */
-    return opcats;
+    /* defer to internal implementation */
+    return patomic_internal_feature_check_any_explicit(ops, opcats);
 }
 
 
 unsigned int
-patomic_feature_check_any_transaction(
+patomic_internal_feature_check_any_transaction(
     const patomic_ops_transaction_t *const ops,
     unsigned int opcats
 )
@@ -283,4 +306,15 @@ patomic_feature_check_any_transaction(
 
     /* return updated opcats */
     return opcats;
+}
+
+
+unsigned int
+patomic_feature_check_any_transaction(
+    const patomic_ops_transaction_t *const ops,
+    const unsigned int opcats
+)
+{
+    /* defer to internal implementation */
+    return patomic_internal_feature_check_any_transaction(ops, opcats);
 }
