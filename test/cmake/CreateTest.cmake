@@ -349,9 +349,10 @@ function(create_ut)
         UT      ${ARG_NAME}
         SOURCE  ${ARG_SOURCE}
         INCLUDE
-            "$<BUILD_INTERFACE:${PATOMIC_BINARY_DIR}/include>"
             "$<BUILD_INTERFACE:${PATOMIC_SOURCE_DIR}/include>"
+            "$<BUILD_INTERFACE:${PATOMIC_BINARY_DIR}/include>"
             "$<BUILD_INTERFACE:${PATOMIC_SOURCE_DIR}/src/include>"
+            "$<BUILD_INTERFACE:${PATOMIC_BINARY_DIR}/src/include>"
             ${ARG_INCLUDE}
     )
 
