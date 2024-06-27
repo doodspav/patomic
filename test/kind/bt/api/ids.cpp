@@ -1,5 +1,6 @@
 #include <patomic/api/ids.h>
 
+#include <test/common/killed_by.hpp>
 #include <test/common/math.hpp>
 
 #include <gmock/gmock.h>
@@ -9,11 +10,6 @@
 #include <map>
 #include <set>
 #include <vector>
-
-
-#ifdef _MSC_VER
-    #define KilledBySignal(_sig) ExitedWithCode(3)
-#endif
 
 
 /// @brief Test fixture.
@@ -290,7 +286,7 @@ TEST_F(BtApiIds_DeathTest, get_kinds_asserts_on_multiple_ids)
     EXPECT_FALSE(test::is_positive_pow2(multiple_bits_set));
     EXPECT_EXIT(
         patomic_get_kind(multiple_bits_set),
-        testing::KilledBySignal(SIGABRT),
+        test::KilledByAbort(),
         ".*"
     );
 }

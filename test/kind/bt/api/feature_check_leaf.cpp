@@ -1,5 +1,6 @@
 #include <patomic/api/feature_check.h>
 
+#include <test/common/killed_by.hpp>
 #include <test/common/make_ops.hpp>
 #include <test/common/math.hpp>
 
@@ -11,11 +12,6 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-
-
-#ifdef _MSC_VER
-    #define KilledBySignal(_sig) ExitedWithCode(3)
-#endif
 
 
 /// @brief Test fixture.
@@ -615,7 +611,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_zero_bit_opca
     EXPECT_EQ(0, zero_bit_opcat);
     EXPECT_EXIT(
         TTestHelper::check_leaf(ops, zero_bit_opcat, 0u),
-        testing::KilledBySignal(SIGABRT),
+        test::KilledByAbort(),
         ".*"
     );
 }
@@ -644,7 +640,7 @@ TYPED_TEST(BtApiFeatureCheckLeafT_DeathTest, check_leaf_asserts_on_multi_bit_opc
         EXPECT_EXIT(
             TTestHelper::check_leaf(
                 ops, static_cast<patomic_opcat_t>(multi_opcat), 0u),
-            testing::KilledBySignal(SIGABRT),
+            test::KilledByAbort(),
             ".*"
         );
     }
