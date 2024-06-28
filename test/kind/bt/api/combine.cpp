@@ -171,8 +171,9 @@ TYPED_TEST(BtApiCombineT, combine_equal_null_ops_does_not_optimize_align)
 }
 
 /// @brief The size_within member is considered less strict when its value is
-///        zero than when its value is non-zero for all ops.
-TYPED_TEST(BtApiCombineT, combine_size_within_zero_less_strict_than_non_zero)
+///        zero (copied-to) than when its value is non-zero (copied-from) for
+///        all ops.
+TYPED_TEST(BtApiCombineT, combine_size_within_to_zero_less_strict_than_from_non_zero)
 {
     // setup
     constexpr test::ops_domain D = TestFixture::domain;
@@ -192,6 +193,37 @@ TYPED_TEST(BtApiCombineT, combine_size_within_zero_less_strict_than_non_zero)
     EXPECT_EQ(copied_from.align.minimum, copied_to.align.minimum);
     EXPECT_NE(0, copied_from.align.size_within);
     EXPECT_EQ(0, copied_to.align.size_within);
+    // check ops are null for copied-to, and non-null for copied-from
+    EXPECT_EQ(nullptr, copied_to.ops.fp_store);
+    EXPECT_NE(nullptr, copied_from.ops.fp_store);
+    // check that size_within is updated to be non-zero
+    TTestHelper::combine(copied_to, copied_from);
+    EXPECT_NE(0, copied_to.align.size_within);
+}
+
+/// @brief The size_within member is considered less strict when its value is
+///        zero (copied-from) than when its value is non-zero (copied-to) for
+///        all ops.
+TYPED_TEST(BtApiCombineT, combine_size_within_from_zero_less_strict_than_to_non_zero)
+{
+    // setup
+    constexpr test::ops_domain D = TestFixture::domain;
+    using BaseT = typename TestFixture::OpsTypes::base_t;
+    BaseT copied_to {
+        test::make_ops_all_nonnull<D>(nullptr),
+        patomic_align_t { 1, 1, 1 }
+    };
+    const BaseT copied_from {
+        test::make_ops_all_nonnull<D>(),
+        patomic_align_t { 1, 1, 0 }
+    };
+
+    // test
+    // check alignment is equal but only copied-from has zero size_within
+    EXPECT_EQ(copied_from.align.recommended, copied_to.align.recommended);
+    EXPECT_EQ(copied_from.align.minimum, copied_to.align.minimum);
+    EXPECT_EQ(0, copied_from.align.size_within);
+    EXPECT_NE(0, copied_to.align.size_within);
     // check ops are null for copied-to, and non-null for copied-from
     EXPECT_EQ(nullptr, copied_to.ops.fp_store);
     EXPECT_NE(nullptr, copied_from.ops.fp_store);
