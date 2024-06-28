@@ -1,6 +1,6 @@
 #include <patomic/api/feature_check.h>
 
-#include <test/common/killed_by.hpp>
+#include <test/common/death.hpp>
 #include <test/common/make_ops.hpp>
 #include <test/common/math.hpp>
 

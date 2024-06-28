@@ -1,6 +1,6 @@
 #include <patomic/api/ids.h>
 
-#include <test/common/killed_by.hpp>
+#include <test/common/death.hpp>
 #include <test/common/math.hpp>
 
 #include <gmock/gmock.h>
