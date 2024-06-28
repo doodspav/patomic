@@ -68,9 +68,9 @@
  * @return
  *   A non-negative value 'x % y' of unsigned integer type.
  */
-#define patomic_unsigned_mod(x, y)     \
-    (patomic_unsigned_is_pow2(y)     ? \
-     patomic_unsigned_mod_pow2(x, y) : \
+#define patomic_unsigned_mod(x, y)         \
+    (patomic_unsigned_is_pow2_or_zero(y) ? \
+     patomic_unsigned_mod_pow2(x, y)     : \
      ((x) % (y + 0u)))
 
 

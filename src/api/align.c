@@ -4,6 +4,8 @@
 #include <patomic/stdlib/math.h>
 #include <patomic/stdlib/stdint.h>
 
+#include <patomic/stdlib/assert.h>
+
 
 size_t
 patomic_cache_line_size(void)
