@@ -4,6 +4,7 @@
 
 
 #include <patomic/stdlib/assert.h>
+#include <patomic/stdlib/terminate.h>
 
 #include <patomic/macros/ignore_unused.h>
 #include <patomic/macros/unreachable.h>
@@ -84,7 +85,7 @@ __patomic_assert_fail(
     PATOMIC_IGNORE_UNUSED(_);
 
     /* failed assertions should not return */
-    abort();
+    patomic_terminate();
 
     /* if unreachable is vcz ((void) 0), we may get a compiler warning for
      * unreachable code */
