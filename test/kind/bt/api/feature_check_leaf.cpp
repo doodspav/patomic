@@ -218,6 +218,18 @@ TEST_F(BtApiFeatureCheckLeaf, all_opkinds_only_contain_known_opkind_bits)
     }
 }
 
+/// @brief Calling check_leaf with a non-zero opcat and zero opkind bits
+///        returns zero.
+TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_zero_opkind_bits_returns_zero)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+    constexpr auto non_zero_opcat = patomic_opcat_LDST;
+
+    // test
+    EXPECT_EQ(0u, TTestHelper::check_leaf(ops, non_zero_opcat, 0u));
+}
+
 /// @brief Calling check_leaf with invalid opkind bits for any valid opcat does
 ///        not unset the invalid opkind bits.
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
