@@ -4,4 +4,5 @@ target_sources(${target_name} PRIVATE
     math.h
     sort.h
     stdint.h
+    terminate.h
 )
