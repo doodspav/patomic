@@ -226,6 +226,26 @@ TEST_F(BtApiFeatureCheckAnyAll, opcats_implicit_explicit_subset_of_transaction)
     EXPECT_EQ(masked_explicit, patomic_opcats_EXPLICIT);
 }
 
+/// @brief Calling check_any with zero opcat bits returns zero.
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_zero_bits_returns_zero)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+
+    // test
+    EXPECT_EQ(0u, TTestHelper::check_any(ops, 0u));
+}
+
+/// @brief Calling check_all with zero opcat bits returns zero.
+TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_zero_bits_returns_zero)
+{
+    // setup
+    const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
+
+    // test
+    EXPECT_EQ(0u, TTestHelper::check_all(ops, 0u));
+}
+
 /// @brief Calling check_any with invalid opcat bits does not unset the invalid
 ///        bits.
 TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_ignores_invalid_bits)
