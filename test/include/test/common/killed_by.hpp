@@ -12,6 +12,9 @@ namespace test
 /// @brief
 ///   Produces a predicate that checks if an int exit code is what would be
 ///   expected from a process killed by SIGABRT (or OS equivalent).
+///
+/// @note
+///   Predicate is callable with the signature bool()(int).
 inline auto
 KilledByAbort() noexcept
 {
