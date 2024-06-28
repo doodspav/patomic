@@ -314,10 +314,11 @@ TEST_F(BtApiAlign, meets_minimum_succeeds_zero_size_buffer_any_size_within)
     // pointer is aligned to at least minimum
     EXPECT_GE(test::runtime_alignof(ptr), align.minimum);
     // check succeeds for successive values of size_within with a zero sized buffer
-    for (int i = 0; i < 10; ++i)
+    // should check zero and non-zero values for size_within
+    for (int i = 0; i < 20; ++i)
     {
-        ++align.size_within;
         EXPECT_TRUE(patomic_align_meets_minimum(ptr, align, 0));
+        ++align.size_within;
     }
 }
 
