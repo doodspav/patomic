@@ -128,7 +128,7 @@ patomic_feature_check_leaf(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcats_EXPLICIT: (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            PATOMIC_UNREACHABLE();
+            PATOMIC_UNREACHABLE();  /* GCOVR_EXCL_LINE */
 #if PATOMIC_UNREACHABLE_IS_VCZ
             break;
 #endif
@@ -181,7 +181,7 @@ patomic_feature_check_leaf_explicit(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcats_EXPLICIT: (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            PATOMIC_UNREACHABLE();
+            PATOMIC_UNREACHABLE();  /* GCOV_EXCL_LINE */
 #if PATOMIC_UNREACHABLE_IS_VCZ
             break;
 #endif
@@ -234,7 +234,7 @@ patomic_feature_check_leaf_transaction(
         case patomic_opcats_IMPLICIT:
         /* case patomic_opcats_EXPLICIT: (==IMPLICIT) */
         case patomic_opcats_TRANSACTION:
-            PATOMIC_UNREACHABLE();
+            PATOMIC_UNREACHABLE();  /* LCOV_EXCL_LINE */
 #if PATOMIC_UNREACHABLE_IS_VCZ
             break;
 #endif
