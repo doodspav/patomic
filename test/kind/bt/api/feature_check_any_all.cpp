@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <bitset>
+#include <climits>
 #include <set>
 #include <string>
 #include <type_traits>
