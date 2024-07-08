@@ -7,7 +7,7 @@
 
 #include <algorithm>
 #include <bitset>
-#include <climits>
+#include <limits>
 #include <set>
 #include <string>
 #include <type_traits>
@@ -36,6 +36,9 @@ using BtApiFeatureCheckAnyAllT_Types = ::testing::Types<
 namespace
 {
 
+/// @brief Helper constant.
+constexpr auto UINT_BIT_WIDTH = std::numeric_limits<unsigned int>::digits;
+    
 /// @brief Helper type for templated test fixture.
 class TTestHelper
 {
@@ -254,11 +257,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_ignores_invalid_bits)
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
     constexpr unsigned int invalid_opcats = ~TestFixture::OpsTypes::full_opcat;
-    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-    const std::bitset<bit_width> expected_result = invalid_opcats;
+    const std::bitset<UINT_BIT_WIDTH> expected_result = invalid_opcats;
 
     // test
-    const std::bitset<bit_width> actual_result =
+    const std::bitset<UINT_BIT_WIDTH> actual_result =
         TTestHelper::check_any(ops, invalid_opcats);
     EXPECT_EQ(expected_result, actual_result);
 }
@@ -270,11 +272,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_ignores_invalid_bits)
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
     constexpr unsigned int invalid_opcats = ~TestFixture::OpsTypes::full_opcat;
-    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-    const std::bitset<bit_width> expected_result = invalid_opcats;
+    const std::bitset<UINT_BIT_WIDTH> expected_result = invalid_opcats;
 
     // test
-    const std::bitset<bit_width> actual_result =
+    const std::bitset<UINT_BIT_WIDTH> actual_result =
         TTestHelper::check_all(ops, invalid_opcats);
     EXPECT_EQ(expected_result, actual_result);
 }
@@ -287,11 +288,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_full_bits_match_excepted)
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
     constexpr unsigned int input_opcats = ~0;
     const unsigned set_opcats = TestFixture::OpsTypes::full_opcat;
-    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-    const std::bitset<bit_width> expected_result = ~set_opcats;
+    const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
     // test
-    const std::bitset<bit_width> actual_result =
+    const std::bitset<UINT_BIT_WIDTH> actual_result =
         TTestHelper::check_any(ops, input_opcats);
     EXPECT_EQ(expected_result, actual_result);
 }
@@ -304,11 +304,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_full_bits_match_expected)
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
     constexpr unsigned int input_opcats = ~0;
     const unsigned set_opcats = TestFixture::OpsTypes::full_opcat;
-    constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-    const std::bitset<bit_width> expected_result = ~set_opcats;
+    const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
     // test
-    const std::bitset<bit_width> actual_result =
+    const std::bitset<UINT_BIT_WIDTH> actual_result =
         TTestHelper::check_all(ops, input_opcats);
     EXPECT_EQ(expected_result, actual_result);
 }
@@ -322,11 +321,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_ldst_bits_match_expected)
     {
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = ldst.any ? patomic_opcat_LDST : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ldst.ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -341,11 +339,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_ldst_bits_match_expected)
     {
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = ldst.all ? patomic_opcat_LDST : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ldst.ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -362,11 +359,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_xchg_bits_match_expected)
         ops.xchg_ops = xchg.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = xchg.any ? patomic_opcat_XCHG : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -383,11 +379,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_xchg_bits_match_expected)
         ops.xchg_ops = xchg.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = xchg.all ? patomic_opcat_XCHG : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -404,11 +399,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_bitwise_bits_match_expected)
         ops.bitwise_ops = bitwise.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = bitwise.any ? patomic_opcat_BIT : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -425,11 +419,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_bitwise_bits_match_expected)
         ops.bitwise_ops = bitwise.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = bitwise.all ? patomic_opcat_BIT : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -448,11 +441,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_binary_bits_match_expected)
         const unsigned int set_opcats =
             (binary.any_void ? patomic_opcat_BIN_V : 0) |
             (binary.any_fetch ? patomic_opcat_BIN_F : 0);
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -471,11 +463,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_binary_bits_match_expected)
         const unsigned int set_opcats =
             (binary.all_void ? patomic_opcat_BIN_V : 0) |
             (binary.all_fetch ? patomic_opcat_BIN_F : 0);
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -494,11 +485,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_any_arithmetic_bits_match_expected)
         const unsigned int set_opcats =
             (arithmetic.any_void ? patomic_opcat_ARI_V : 0) |
             (arithmetic.any_fetch ? patomic_opcat_ARI_F : 0);
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -517,11 +507,10 @@ TYPED_TEST(BtApiFeatureCheckAnyAllT, check_all_arithmetic_bits_match_expected)
         const unsigned int set_opcats =
             (arithmetic.all_void ? patomic_opcat_ARI_V : 0) |
             (arithmetic.all_fetch ? patomic_opcat_ARI_F : 0);
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -538,11 +527,10 @@ TEST_F(BtApiFeatureCheckAnyAll, check_any_special_bits_match_expected)
         ops.special_ops = special.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = special.any ? patomic_opcat_TSPEC : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -559,11 +547,10 @@ TEST_F(BtApiFeatureCheckAnyAll, check_all_special_bits_match_expected)
         ops.special_ops = special.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = special.all ? patomic_opcat_TSPEC : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -580,11 +567,10 @@ TEST_F(BtApiFeatureCheckAnyAll, check_any_flag_bits_match_expected)
         ops.flag_ops = flag.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = flag.any ? patomic_opcat_TFLAG : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -601,11 +587,10 @@ TEST_F(BtApiFeatureCheckAnyAll, check_all_flag_bits_match_expected)
         ops.flag_ops = flag.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = flag.all ? patomic_opcat_TFLAG : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -622,11 +607,10 @@ TEST_F(BtApiFeatureCheckAnyAll, check_any_raw_bits_match_expected)
         ops.raw_ops = raw.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = raw.any ? patomic_opcat_TRAW : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_any(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
@@ -643,11 +627,10 @@ TEST_F(BtApiFeatureCheckAnyAll, check_all_raw_bits_match_expected)
         ops.raw_ops = raw.ops;
         constexpr unsigned int input_opcats = ~0;
         const unsigned int set_opcats = raw.all ? patomic_opcat_TRAW : 0;
-        constexpr auto bit_width = sizeof(unsigned int) * CHAR_BIT;
-        const std::bitset<bit_width> expected_result = ~set_opcats;
+        const std::bitset<UINT_BIT_WIDTH> expected_result = ~set_opcats;
 
         // test
-        const std::bitset<bit_width> actual_result =
+        const std::bitset<UINT_BIT_WIDTH> actual_result =
             TTestHelper::check_all(ops, input_opcats);
         EXPECT_EQ(expected_result, actual_result);
     }
