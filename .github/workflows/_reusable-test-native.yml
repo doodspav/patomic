@@ -206,7 +206,7 @@ jobs:
           fi
           
           # debug: print everything
-          apt install tree
+          sudo apt install tree
           echo "tree ."
           tree .
           echo "tree test/working"
