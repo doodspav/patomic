@@ -179,13 +179,13 @@ TEST_F(BtApiIds, get_ids_gives_correct_ids_for_all_kind_combinations)
 {
     // calculate all kind combinations
     std::vector<int> all_kind_combos;
-    all_kind_combos.resize(1u << kinds.size());
+    all_kind_combos.resize(1ull << kinds.size());
     for (std::size_t i = 0; i < all_kind_combos.size(); ++i)
     {
         int kind_combo = 0;
         for (std::size_t j = 0; j < kinds.size(); ++j)
         {
-            if (i & (1u << j))
+            if (i & (1ull << j))
             {
                 kind_combo |= kinds[j];
             }

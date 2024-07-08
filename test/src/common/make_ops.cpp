@@ -192,7 +192,7 @@ make_ops_combinations(const std::vector<void(*)(T&, unsigned int&, void(*)())>& 
 {
     // setup
     std::vector<test::ops_any_all<T>> combinations;
-    combinations.resize(1u << setters.size());
+    combinations.resize(1ull << setters.size());
 
     // go through all combinations
     for (std::size_t i = 0; i < combinations.size(); ++i)
@@ -204,7 +204,7 @@ make_ops_combinations(const std::vector<void(*)(T&, unsigned int&, void(*)())>& 
         // set necessary members and update values
         for (std::size_t j = 0; j < setters.size(); ++j)
         {
-            if (i & (1u << j))
+            if (i & (1ull << j))
             {
                 setters[j](combinations[i].ops, combinations[i].opkinds, nonnull_value);
                 combinations[i].any = true;
@@ -245,7 +245,7 @@ make_ops_combinations(const std::vector<setters_vf<T>>& setters, void(*nonnull_v
             for (std::size_t j = 0; j < setters.size(); ++j)
             {
                 // conditionally set void operations
-                if (i_void & (1u << j))
+                if (i_void & (1ull << j))
                 {
                     setters[j].set_void(
                         combinations[i].ops, combinations[i].opkinds_void, nonnull_value);
@@ -257,7 +257,7 @@ make_ops_combinations(const std::vector<setters_vf<T>>& setters, void(*nonnull_v
                 }
 
                 // conditionally set fetch operations
-                if (i_fetch & (1u << j))
+                if (i_fetch & (1ull << j))
                 {
                     setters[j].set_fetch(
                         combinations[i].ops, combinations[i].opkinds_fetch, nonnull_value);

@@ -19,7 +19,7 @@ inline auto
 KilledByAbort() noexcept
 {
 #if defined(GTEST_OS_WINDOWS) || defined (GTEST_OS_FUCHSIA)
-    return testing:ExitedWithCode(3);
+    return testing::ExitedWithCode(3);
 #else
     return testing::KilledBySignal(SIGABRT);
 #endif
