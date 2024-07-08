@@ -164,15 +164,12 @@ jobs:
         if: env.SKIP_JOB != 'true'
         continue-on-error: true
         env:
-          LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
+          CTEST_SELECT: ${{ matrix.kind == 'coverage' && '--tests-regex "^(Ut|BtApi)"' || '--label-regex "^(.*)$"' }}
         run: |
           cd ${{ env.ROOT_PATH }}
           
           cd patomic/build
-          sudo apt install tree  # debug
-          tree .
-          ctest --show-only=json-v1
-          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
+          ctest ${{ env.CTEST_SELECT }} --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
 
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
