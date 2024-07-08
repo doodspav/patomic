@@ -171,6 +171,7 @@ jobs:
           cd patomic/build
           sudo apt install tree  # debug
           tree .
+          ctest --show-only=json-v1
           ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
 
       - name: Prepare Test Results
