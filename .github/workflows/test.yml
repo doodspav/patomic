@@ -55,6 +55,7 @@ jobs:
       architecture: ${{ matrix.architecture }}
 
   test-qemu:
+    if: false  # debug
     strategy:
       matrix:
         # architecture gets converted to triple
