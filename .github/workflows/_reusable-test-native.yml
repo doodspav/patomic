@@ -210,7 +210,11 @@ jobs:
           find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=patomic.profdata
           
           # debug: print everything
-          ls -a
+          apt install tree
+          echo "tree ."
+          tree .
+          echo "tree test/working"
+          tree test/working
           
           # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
