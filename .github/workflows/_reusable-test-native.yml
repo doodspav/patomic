@@ -169,6 +169,8 @@ jobs:
           cd ${{ env.ROOT_PATH }}
           
           cd patomic/build
+          sudo apt install tree  # debug
+          tree .
           ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
 
       - name: Prepare Test Results
@@ -204,13 +206,6 @@ jobs:
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
           fi
-          
-          # debug: print everything
-          sudo apt install tree
-          echo "tree ."
-          tree .
-          echo "tree test/working"
-          tree test/working
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
