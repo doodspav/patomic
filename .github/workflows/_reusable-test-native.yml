@@ -204,10 +204,6 @@ jobs:
           else  # [[ "${{ inputs.os }}" == "ubuntu" ]]; then
             sudo apt install llvm
           fi
-
-          # merge coverage output from all tests
-          # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=patomic.profdata
           
           # debug: print everything
           apt install tree
@@ -215,6 +211,10 @@ jobs:
           tree .
           echo "tree test/working"
           tree test/working
+
+          # merge coverage output from all tests
+          # use find because bash on GitHub Actions currently does not support '**'
+          find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=patomic.profdata
           
           # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
