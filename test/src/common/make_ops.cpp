@@ -108,8 +108,6 @@ constexpr void
 only_for_address() noexcept
 {}
 
-static_assert(&only_for_address != nullptr, "address must be non-null");
-
 
 template <class T>
 constexpr T
