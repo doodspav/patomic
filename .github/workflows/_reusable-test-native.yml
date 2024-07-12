@@ -211,7 +211,7 @@ jobs:
           
           # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
-          ${prefix}llvm-cov export -format=lcov -instr-profile=patomic.profdata -object="${lib_files[0]}" >> patomic.lcov
+          ${prefix}llvm-cov export -format=lcov -instr-profile=patomic.profdata -object="${lib_files[@]}" >> patomic.lcov
           cp patomic.lcov ../../upload/cov/${{ env.UNIQUE_NAME }}/patomic.lcov
           
           # we need original source mapping to make use of lcov tracefile
