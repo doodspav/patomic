@@ -8,16 +8,7 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  check-mingw-version:
-    runs-on: windows-latest
-
-    steps:
-      - name: Check MinGW Version
-        run: |
-          g++ -v
-
   test-native:
-    if: false  # remove me
     strategy:
       matrix:
         # verbose labels make things easier to read in GitHub Actions
@@ -64,7 +55,6 @@ jobs:
       architecture: ${{ matrix.architecture }}
 
   test-qemu:
-    if: false  # remove me
     strategy:
       matrix:
         # architecture gets converted to triple
@@ -143,7 +133,6 @@ jobs:
       skip_llvm: ${{ matrix.skip_llvm == true }}
 
   publish-results:
-    if: false  # remove me
     runs-on: ubuntu-latest
     needs:
       - test-native
@@ -172,7 +161,6 @@ jobs:
           files: test-results/**/*.xml
 
   publish-coverage:
-    if: false  # remove me
     runs-on: ubuntu-latest
     needs:
       - test-native

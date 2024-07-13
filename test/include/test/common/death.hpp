@@ -22,7 +22,8 @@ using KilledBySignalType = testing::KilledBySignal;
 
 /// @brief
 ///   Produces a predicate that checks if an int exit code is what would be
-///   expected from a process killed by SIGABRT (or OS equivalent).
+///   expected from a process killed by abort() (which may ask the runtime to
+///   kill it in a variety of ways).
 ///
 /// @note
 ///   Predicate is callable with the signature bool()(int).
