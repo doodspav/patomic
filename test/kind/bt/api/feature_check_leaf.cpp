@@ -269,11 +269,11 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bi
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
     const auto opcat_vec = test::make_opcats_all_solo();
-    const std::set<patomic_opcat_t> opcat_set {
+    const std::set<unsigned int> opcat_set {
         opcat_vec.begin(), opcat_vec.end()
     };
     unsigned int opcat = 1;
-    while (opcat != 0 && opcat_set.count(static_cast<patomic_opcat_t>(opcat)) != 0)
+    while (opcat != 0 && opcat_set.count(opcat) != 0)
     {
         opcat <<= 1;
     }
