@@ -8,7 +8,7 @@ namespace test
 {
 
 
-testing::ExitedWithCode
+KilledByAbortPredicateType
 KilledByAbort()
 {
 #if PATOMIC_GTEST_HAS_KILLED_BY_SIGNAL

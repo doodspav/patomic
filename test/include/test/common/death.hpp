@@ -13,10 +13,10 @@ namespace test
 ///   passes an exit code.
 #if defined(GTEST_OS_WINDOWS) || defined(GTEST_OS_FUCHSIA)
 #define PATOMIC_GTEST_HAS_KILLED_BY_SIGNAL 0
-using KilledBySignalType = testing::ExitedWithCode;
+using KilledByAbortPredicateType = testing::ExitedWithCode;
 #else
 #define PATOMIC_GTEST_HAS_KILLED_BY_SIGNAL 1
-using KilledBySignalType = testing::KilledBySignal;
+using KilledByAbortPredicateType = testing::KilledBySignal;
 #endif
 
 
@@ -27,7 +27,7 @@ using KilledBySignalType = testing::KilledBySignal;
 ///
 /// @note
 ///   Predicate is callable with the signature bool()(int).
-KilledBySignalType
+KilledByAbortPredicateType
 KilledByAbort();
 
 
