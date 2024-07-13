@@ -139,8 +139,15 @@ jobs:
       - test-qemu
 
     steps:
+      - name: Merge Test Result Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: test-results
+          pattern: test-results-*
+          delete-merged: true
+
       - name: Download Test Result Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: test-results
           path: test-results/
@@ -169,8 +176,15 @@ jobs:
           sudo apt install binutils  # for c++filt
           sudo apt install lcov
 
+      - name: Merge Test Coverage Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: test-coverage-internal
+          pattern: test-results-*
+          delete-merged: true
+
       - name: Download Test Coverage Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: test-coverage-internal
           path: test-coverage-internal/
@@ -244,7 +258,7 @@ jobs:
           genhtml --output-directory "./test-coverage/universal" --title "patomic-universal" --show-details --num-spaces 4 --legend --demangle-cpp --precision 2 ./test-coverage-internal/universal/patomic.lcov
 
       - name: Upload Coverage HTML Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-coverage
           path: test-coverage/
