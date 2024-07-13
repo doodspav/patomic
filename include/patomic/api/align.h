@@ -76,30 +76,12 @@ typedef struct {
  *   target platform.
  *
  * @warning
- *   Changing this value is an ABI break, requiring a major version bump.
- *
- * @note
- *   The value is always a power of 2.
- */
-#undef PATOMIC_MAX_CACHE_LINE_SIZE
-#define PATOMIC_MAX_CACHE_LINE_SIZE ((size_t) 128)
-
-
-/**
- * @addtogroup align
- *
- * @brief
- *   Represents the compile-time upper bound of the cache line size for the
- *   target platform.
- *
- * @warning
  *   Changing this value is NOT an ABI break, with no major version bump needed.
  *   The benefit is that the value can be updated frequently to more closely
  *   match the true value on a wider range of platforms as they become known.
  *
  * @note
- *   The value is always a power of 2, and will not be larger than its stable
- *   counterpart.
+ *   The value is always a power of 2.
  */
 #undef PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE
 #define PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE ((size_t) 128)
@@ -113,8 +95,8 @@ typedef struct {
  *   platform; may provide a more accurate value than the corresponding macros.
  *
  * @note
- *   The value will not return a value larger than either macro equivalent but
- *   may return a smaller value.
+ *   The value will not return a value larger than its unstable macro
+ *   equivalent but may return a smaller value.
  *
  * @note
  *   The value returned is always a power of 2.

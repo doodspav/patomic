@@ -20,8 +20,8 @@ extern "C" {
  *   the transaction to abort.
  *
  * @details
- *   Any modification  to any memory in a cache line that is being used in a
- *   transaction will cause it to abort.
+ *   Any modification by another thread to any memory in a cache line that is
+ *   being used in a transaction will cause the transaction to abort.
  */
 typedef volatile unsigned char patomic_transaction_flag_t;
 
@@ -34,33 +34,8 @@ typedef volatile unsigned char patomic_transaction_flag_t;
  *   sharing (which may cause a live transaction to unexpectedly abort).
  *
  * @warning
- *   The value of PATOMIC_MAX_CACHE_LINE_SIZE may change on major version bumps
- *   which may cause an ABI break with this type.
- *
- * @note
- *   You are not required to align/pad your transaction flag.                   \n
- *   If you align/pad your transaction flag, you are not required to use this
- *   helper type. E.g. in C11 you may use _Alignas or create your own flag
- *   holder type.
- */
-typedef struct {
-    unsigned char _padding_head[PATOMIC_MAX_CACHE_LINE_SIZE - 1];
-    patomic_transaction_flag_t flag;
-    unsigned char _padding_tail[PATOMIC_MAX_CACHE_LINE_SIZE];
-} patomic_transaction_padded_flag_holder_t;
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Ensures that the transaction flag has its own cache line to avoid false
- *   sharing (which may cause a live transaction to unexpectedly abort).
- *
- * @warning
- *   The value of PATOMIC_MAX_CACHE_LINE_SIZE may change without notice, causing
- *   an ABI break with this type. If this is undesirable, use the stable
- *   variant of this type.
+ *   The value of PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE may change without
+ *   notice, causing an ABI break with this type.
  *
  * @note
  *   You are not required to align/pad your transaction flag.                   \n
