@@ -29,16 +29,6 @@ class BtApiAlign_Experimental : public testing::Test
 {};
 
 
-/// @brief PATOMIC_MAX_CACHE_LINE_SIZE is a positive power of 2.
-TEST_F(BtApiAlign, max_cache_line_size_macro_is_pow2)
-{
-    // setup
-    constexpr auto macro_stable = PATOMIC_MAX_CACHE_LINE_SIZE;
-
-    // test
-    EXPECT_TRUE(test::is_positive_pow2(macro_stable));
-}
-
 /// @brief PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE is a positive power of 2.
 TEST_F(BtApiAlign, max_cache_line_size_macro_abi_unstable_is_pow2)
 {
@@ -47,18 +37,6 @@ TEST_F(BtApiAlign, max_cache_line_size_macro_abi_unstable_is_pow2)
 
     // test
     EXPECT_TRUE(test::is_positive_pow2(macro_unstable));
-}
-
-/// @brief PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE compares less than or equal
-///        to PATOMIC_MAX_CACHE_LINE_SIZE.
-TEST_F(BtApiAlign, max_cache_line_size_macro_cmp_ge_unstable)
-{
-    // setup
-    constexpr auto macro_stable = PATOMIC_MAX_CACHE_LINE_SIZE;
-    constexpr auto macro_unstable = PATOMIC_MAX_CACHE_LINE_SIZE_ABI_UNSTABLE;
-
-    // test
-    EXPECT_LE(macro_unstable, macro_stable);
 }
 
 
@@ -71,18 +49,6 @@ TEST_F(BtApiAlign, max_cache_line_size_fn_is_pow2)
 
     // test
     EXPECT_TRUE(test::is_positive_pow2(fnval));
-}
-
-/// @brief Return value of patomic_max_cache_line_size() compares less than or
-///        equal to PATOMIC_MAX_CACHE_LINE_SIZE.
-TEST_F(BtApiAlign, max_cache_line_size_fn_cmp_le_macro)
-{
-    // setup
-    constexpr auto macro_stable = PATOMIC_MAX_CACHE_LINE_SIZE;
-    const auto fnval = patomic_cache_line_size();
-
-    // test
-    EXPECT_LE(fnval, macro_stable);
 }
 
 /// @brief Return value of patomic_max_cache_line_size() compares less than or
