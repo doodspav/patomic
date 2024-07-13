@@ -18,7 +18,7 @@ namespace test
 inline auto
 KilledByAbort() noexcept
 {
-#if defined(GTEST_OS_WINDOWS) || defined (GTEST_OS_FUCHSIA)
+#if defined(_MSC_VER)
     return testing::ExitedWithCode(3);
 #else
     return testing::KilledBySignal(SIGABRT);
