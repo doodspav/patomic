@@ -266,6 +266,13 @@ TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_ignores_invalid_opkind_bits)
 ///        apply to the domain does not unset any opkind bits.
 TYPED_TEST(BtApiFeatureCheckLeafT, check_leaf_unused_opcat_ignores_all_opkind_bits)
 {
+    // skip this test when running with ubsan because it invokes UB
+    // we cast a value to patomic_opcat_t which has no corresponding label
+#if PATOMIC_HAS_UBSAN
+    GTEST_SKIP() << "Cannot run this test case under ubsan because "
+                    "it invokes UB as part of the test setup";
+#endif
+
     // setup
     const auto ops = test::make_ops_all_nonnull<TestFixture::domain>();
     const auto opcat_vec = test::make_opcats_all_solo();
