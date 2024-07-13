@@ -3,9 +3,9 @@
 #include <test/common/death.hpp>
 #include <test/common/math.hpp>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>
@@ -226,14 +226,10 @@ TEST_F(BtApiIds, get_ids_gives_correct_ids_for_all_kind_combinations)
 ///        NULL implementation id is returned.
 TEST_F(BtApiIds, get_ids_ignores_invalid_kinds)
 {
-    // mock helpers
-    using testing::Contains;
-    using testing::Not;
-
     // setup
     ASSERT_FALSE(kinds.empty());
     const auto invalid_kind = kinds.back() << 1;
-    EXPECT_THAT(kinds, Not(Contains(invalid_kind)));
+    EXPECT_EQ(kinds.end(), std::find(kinds.begin(), kinds.end(), invalid_kind));
     const auto stdc_kind = impls_id_to_kind.at(patomic_id_STDC);
 
     // test
