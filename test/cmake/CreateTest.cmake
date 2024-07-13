@@ -189,6 +189,16 @@ function(_create_test)
         WORKING_DIRECTORY "${test_working_dir}"
     )
 
+    # when compiling with LLVM, use unique name for each test's coverage file
+    # otherwise they will all have the same name and overwrite each other
+    # since the variable is prefixed with LLVM, no harm in always setting it
+    foreach(test IN LISTS added_tests)
+        string(MAKE_C_IDENTIFIER "${test}" safe_test_name)
+        set_tests_properties("${test}" PROPERTIES
+            ENVIRONMENT "LLVM_PROFILE_FILE=${safe_test_name}.profraw"
+        )
+    endforeach()
+
     # add label to tests so ctest can run them by kind
     foreach(test IN LISTS added_tests)
         set_property(
