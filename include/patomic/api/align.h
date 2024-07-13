@@ -92,7 +92,7 @@ typedef struct {
  *
  * @brief
  *   Returns the runtime upper bound of the cache line size for the target
- *   platform; may provide a more accurate value than the corresponding macros.
+ *   platform; may provide a more accurate value than the corresponding macro.
  *
  * @note
  *   The value will not return a value larger than its unstable macro

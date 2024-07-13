@@ -180,7 +180,7 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: test-coverage-internal
-          pattern: test-results-*
+          pattern: test-coverage-internal-*
           delete-merged: true
 
       - name: Download Test Coverage Artifacts
