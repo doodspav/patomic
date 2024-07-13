@@ -148,7 +148,7 @@ jobs:
       - name: Restore Cached Sysroot (with GoogleTest)
         if: env.SKIP_JOB != 'true'
         id: cache-sysroot
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.ROOT_PATH }}/sysroot
           key: sysroot-${{ env.UNIQUE_ID }}

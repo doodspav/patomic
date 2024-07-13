@@ -117,7 +117,7 @@ jobs:
       - name: Restore Cached GoogleTest
         if: env.SKIP_JOB != 'true'
         id: cache-googletest
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.ROOT_PATH }}/googletest/build/install
           key: googletest-${{ env.UNIQUE_ID }}
