@@ -183,7 +183,7 @@ jobs:
         if: env.SKIP_JOB != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ env.UNIQUE_NAME }}
+          name: test-results-${{ env.UNIQUE_ID }}
           path: ${{ env.ROOT_PATH }}/upload/test/
 
       - name: Generate Lcov Tracefile and Root Path File (clang)
@@ -247,5 +247,5 @@ jobs:
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
         uses: actions/upload-artifact@v4
         with:
-          name: test-coverage-internal-${{ env.UNIQUE_NAME }}
+          name: test-coverage-internal-${{ env.UNIQUE_ID }}
           path: ${{ env.ROOT_PATH }}/upload/cov/
