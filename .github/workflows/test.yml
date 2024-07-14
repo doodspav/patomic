@@ -236,7 +236,9 @@ jobs:
           find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             mv "${dir}/patomic.lcov" "${dir}/patomic.lcov.old"
             root_path=$(cat "${dir}/patomic.rootpath")
-            lcov --output-file "${dir}/patomic.lcov" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/src/*"
+            lcov --output-file "${dir}/patomic.lcov.include" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/include/*"
+            lcov --output-file "${dir}/patomic.lcov.src" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/src/*"
+            lcov --output-file "${dir}/patomic.lcov --add-tracefile "${dir}/patomic.lcov.include" --add-tracefile "${dir}/patomic.lcov.src"
           done
           
           # generate html files for each separate compilation
