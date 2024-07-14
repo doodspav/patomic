@@ -1,6 +1,6 @@
 extern "C" {
 #include <patomic/internal/align.h>
-};
+}
 
 #include <gtest/gtest.h>
 
