@@ -238,7 +238,7 @@ jobs:
             root_path=$(cat "${dir}/patomic.rootpath")
             lcov --output-file "${dir}/patomic.lcov.include" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/include/*"
             lcov --output-file "${dir}/patomic.lcov.src" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/src/*"
-            lcov --output-file "${dir}/patomic.lcov --add-tracefile "${dir}/patomic.lcov.include" --add-tracefile "${dir}/patomic.lcov.src"
+            lcov --output-file "${dir}/patomic.lcov" --add-tracefile "${dir}/patomic.lcov.include" --add-tracefile "${dir}/patomic.lcov.src"
           done
           
           # generate html files for each separate compilation
