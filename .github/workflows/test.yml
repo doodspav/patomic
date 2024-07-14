@@ -233,13 +233,13 @@ jobs:
           mkdir test-coverage
           
           # keep only coverage data relating to patomic source files
+          # the include tracefile may be empty with clang, hence ignoring the errors
           find ./test-coverage-internal -mindepth 1 -maxdepth 1 -type d -not -path '*/.*' -print0 | while IFS= read -r -d '' dir; do
             mv "${dir}/patomic.lcov" "${dir}/patomic.lcov.old"
             root_path=$(cat "${dir}/patomic.rootpath")
-            lcov --output-file "${dir}/patomic.lcov.include" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/include/*"
+            lcov --output-file "${dir}/patomic.lcov.include" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/include/*" --ignore-errors empty,unused
             lcov --output-file "${dir}/patomic.lcov.src" --extract "${dir}/patomic.lcov.old" "${root_path}/patomic/src/*"
-            # ignore errors because on clang's lcov file generates error about no valid records found in include tracefile
-            lcov --output-file "${dir}/patomic.lcov" --ignore-errors gcov --add-tracefile "${dir}/patomic.lcov.include" --add-tracefile "${dir}/patomic.lcov.src"
+            lcov --output-file "${dir}/patomic.lcov" --add-tracefile "${dir}/patomic.lcov.include" --add-tracefile "${dir}/patomic.lcov.src" --ignore-errors empty
           done
           
           # generate html files for each separate compilation
