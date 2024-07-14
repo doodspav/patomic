@@ -111,7 +111,7 @@ jobs:
         ${{ (
           ( matrix.compiler == 'clang' && inputs.skip_llvm ) ||
           ( matrix.compiler == 'gcc' && inputs.skip_gcc )    ||
-          ( 'hppa-shared-coverage' == inputs.architecture '-' + '-' matrix.build_shared '-' + '-' matrix.kind ) 
+          ( 'hppa' == inputs.architecture && 'shared' == matrix.build_shared && 'coverage' == matrix.kind )
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}
