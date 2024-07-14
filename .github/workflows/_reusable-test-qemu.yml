@@ -103,16 +103,15 @@ jobs:
       # these have to be in env context because they depend on matrix context
       UNIQUE_ID: ${{ matrix.kind }}-${{ inputs.triple }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}-${{ inputs.gcc_version }}-${{ inputs.llvm_version }}
       UNIQUE_NAME: ${{ inputs.architecture }}-ubuntu-${{ matrix.compiler }}-${{ matrix.build_shared }}
-      UNIQUE_NAME_AND_KIND: ${{ env.UNIQUE_NAME }}-${{ matrix.kind }}
       CMAKE_PRESET: ${{ matrix.preset }}-${{ matrix.kind }}
       CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # apparently not possible to skip job using matrix context, so this is the next best thing
-      # hppa tests segfault when built
+      # fixme: hppa-shared-coverage tests segfault (GHI #25)
       SKIP_JOB: >-
         ${{ (
           ( matrix.compiler == 'clang' && inputs.skip_llvm ) ||
           ( matrix.compiler == 'gcc' && inputs.skip_gcc )    ||
-          ( env.UNIQUE_NAME_AND_KIND == 'hppa-ubuntu-gcc-shared-coverage' )
+          ( 'hppa-shared-coverage' == inputs.architecture '-' + '-' matrix.build_shared '-' + '-' matrix.kind ) 
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}
