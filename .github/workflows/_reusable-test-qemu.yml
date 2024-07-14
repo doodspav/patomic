@@ -237,7 +237,7 @@ jobs:
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*.profraw" -print0 | xargs -0 llvm-profdata merge -output=patomic.profdata
+          find test/kind -type f -name "*.profraw" -print0 | xargs -0 llvm-profdata merge -output=patomic.profdata
           
           # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
