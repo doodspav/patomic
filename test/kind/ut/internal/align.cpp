@@ -6,13 +6,13 @@ extern "C" {
 
 
 /// @brief Test fixture.
-class UtApiAlign : public testing::Test
+class UtInternalAlign : public testing::Test
 {};
 
 
 /// @brief Comparing patomic_align_t prioritizes recommend over all other
-///        members.
-TEST_F(UtApiAlign, compare_align_recommended_ne)
+///        members. Larger recommended is stricter (and compares greater).
+TEST_F(UtInternalAlign, compare_align_recommended_ne)
 {
     // setup
     // larger recommended is stricter
@@ -30,8 +30,9 @@ TEST_F(UtApiAlign, compare_align_recommended_ne)
 }
 
 /// @brief Comparing patomic_align_t prioritizes minimum over all other members
-///        if recommend compares equal.
-TEST_F(UtApiAlign, compare_align_minimum_ne_recommended_eq)
+///        if recommend compares equal. Larger minimum is stricter (and
+///        compares greater).
+TEST_F(UtInternalAlign, compare_align_minimum_ne_recommended_eq)
 {
     // setup
     // larger recommended is stricter
@@ -49,8 +50,9 @@ TEST_F(UtApiAlign, compare_align_minimum_ne_recommended_eq)
 }
 
 /// @brief Comparing patomic_align_t prioritizes size_within after all other
-///        members.
-TEST_F(UtApiAlign, compare_align_size_within_any_minimum_eq_recommended_eq)
+///        members. Larger size_within is less strict (and compares lesser),
+///        except for 0 which is the least strict.
+TEST_F(UtInternalAlign, compare_align_size_within_any_minimum_eq_recommended_eq)
 {
     // setup
     // smaller size_within is stricter (except zero which is least strict)
