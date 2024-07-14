@@ -12,6 +12,10 @@
  *
  * @details
  *   Priority is given to "recommended", then "minimum", then "size_within".
+ *
+ * @return
+ *   Returns -1 if lhs is a looser requirement than rhs, 1 if lhs is a stricter
+ *   requirement than rhs, otherwise 0.
  */
 int
 patomic_internal_compare_align(
