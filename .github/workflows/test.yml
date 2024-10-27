@@ -166,8 +166,8 @@ jobs:
       - test-native
       - test-qemu
     env:
-      HI_LIMIT: 100
-      MED_LIMIT: 90
+      HI_LIMIT: 50
+      MED_LIMIT: 50
 
     steps:
       - name: Install Dependencies
