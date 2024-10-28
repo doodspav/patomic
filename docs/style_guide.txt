@@ -1,0 +1,8 @@
+- one line between header guard, includes, and extern C thing
+- two lines between major parts of the file
+- end of header guard shall have a comment of the format /* PATOMIC_NAME_H */
+- how to add more compiler checks?
+
+
+
+- document naming for tests, including DeathTest and SlowTest suffixes

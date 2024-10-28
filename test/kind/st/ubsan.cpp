@@ -5,11 +5,13 @@
 #include <limits>
 
 
-class StUbsan : public testing::Test
+/// @brief Test fixture.
+class StCheckUbsan : public testing::Test
 {};
 
 
-TEST_F(StUbsan, ShiftExponentTooLarge)
+/// @brief Check that ubsan catches shifting by more than the bit width.
+TEST_F(StCheckUbsan, ShiftExponentTooLarge)
 {
 #if PATOMIC_HAS_UBSAN
     EXPECT_FATAL_FAILURE({
@@ -22,7 +24,8 @@ TEST_F(StUbsan, ShiftExponentTooLarge)
 #endif
 }
 
-TEST_F(StUbsan, SignedIntegerOverflow)
+/// @brief Check that ubsan catches signed integer overflow.
+TEST_F(StCheckUbsan, SignedIntegerOverflow)
 {
 #if PATOMIC_HAS_UBSAN
     EXPECT_FATAL_FAILURE({
@@ -36,7 +39,8 @@ TEST_F(StUbsan, SignedIntegerOverflow)
 #endif
 }
 
-TEST_F(StUbsan, FloatCastOverflow)
+/// @brief Check that ubsan catches overflow from casting float to integer.
+TEST_F(StCheckUbsan, FloatCastOverflow)
 {
 #if PATOMIC_HAS_UBSAN && defined(__clang__)
     EXPECT_FATAL_FAILURE({

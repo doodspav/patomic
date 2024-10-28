@@ -117,7 +117,7 @@ jobs:
       - name: Restore Cached GoogleTest
         if: env.SKIP_JOB != 'true'
         id: cache-googletest
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.ROOT_PATH }}/googletest/build/install
           key: googletest-${{ env.UNIQUE_ID }}
@@ -164,12 +164,12 @@ jobs:
         if: env.SKIP_JOB != 'true'
         continue-on-error: true
         env:
-          LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
+          CTEST_SELECT: ${{ matrix.kind == 'coverage' && '--tests-regex "^(Ut|BtApi)"' || '--label-regex "^(.*)$"' }}
         run: |
           cd ${{ env.ROOT_PATH }}
           
           cd patomic/build
-          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
+          ctest ${{ env.CTEST_SELECT }} --verbose --output-junit Testing/Temporary/results.xml --build-config ${{ env.CMAKE_BUILD_TYPE }} .
 
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
@@ -181,9 +181,9 @@ jobs:
 
       - name: Upload Test Results
         if: env.SKIP_JOB != 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-${{ env.UNIQUE_ID }}
           path: ${{ env.ROOT_PATH }}/upload/test/
 
       - name: Generate Lcov Tracefile and Root Path File (clang)
@@ -207,7 +207,7 @@ jobs:
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=patomic.profdata
+          find test/kind -type f -name "*.profraw" -print0 | xargs -0 ${prefix}llvm-profdata merge -output=patomic.profdata
           
           # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
@@ -245,7 +245,7 @@ jobs:
 
       - name: Upload Internal Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: test-coverage-internal
+          name: test-coverage-internal-${{ env.UNIQUE_ID }}
           path: ${{ env.ROOT_PATH }}/upload/cov/

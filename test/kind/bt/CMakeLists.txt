@@ -1,10 +1,7 @@
-include(../../cmake/CreateTest.cmake)
-
-
 # ---- Setup Tests ----
 
-add_custom_target(patomic-test-bt)
-add_dependencies(patomic-test patomic-test-bt)
+add_custom_target(${test_target_name}-bt)
+add_dependencies(${test_target_name} ${test_target_name}-bt)
 
-create_bt(NAME example_add SOURCE example_add.cpp)
-create_bt(NAME example_sub SOURCE example_sub.cpp)
+# add all subdirectories
+add_subdirectory(api)

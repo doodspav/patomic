@@ -1,15 +1,18 @@
-# fine with CML file here because include isn't installed for tests
-
 # create interface target that is automatically linked to all tests
-# this is solely so that IDEs understand that these are source files
-# include directories are set in test creation
-add_library(
-    patomic-test-include INTERFACE
-    # .
+add_library(${test_target_name}-include INTERFACE)
+
+# add include directory paths
+target_include_directories(${test_target_name}-include INTERFACE
+    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${PATOMIC_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${PATOMIC_BINARY_DIR}/include>"
+    "$<BUILD_INTERFACE:${GTEST_INCLUDE_DIRS}>"
 )
 
 # require C++14 as minimum
-target_compile_features(
-    patomic-test-include INTERFACE
+target_compile_features(${test_target_name}-include INTERFACE
     cxx_std_14
 )
+
+# add all subdirectories
+add_subdirectory(test)

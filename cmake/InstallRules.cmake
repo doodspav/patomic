@@ -7,6 +7,8 @@ install(
     "${PROJECT_BINARY_DIR}/include/"  # generated header files
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT ${package_name}-development
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN "CMake*" EXCLUDE
 )
 
 # copy target build output artifacts to OS dependent locations
@@ -35,7 +37,7 @@ configure_file(
 # copy config file for find_package to find
 install(
     FILES "${PROJECT_BINARY_DIR}/cmake/${package_name}-config.cmake"
-    DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
+    DESTINATION "${CMAKE_INSTALL_CMAKEDIR}"
     COMPONENT ${package_name}-development
 )
 
@@ -48,7 +50,7 @@ write_basic_package_version_file(
 # copy version file for find_package to find for version check
 install(
     FILES "${PROJECT_BINARY_DIR}/${package_name}-config-version.cmake"
-    DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
+    DESTINATION "${CMAKE_INSTALL_CMAKEDIR}"
     COMPONENT ${package_name}-development
 )
 
@@ -56,7 +58,7 @@ install(
 install(
     EXPORT ${package_name}-targets
     NAMESPACE patomic::
-    DESTINATION "${PATOMIC_INSTALL_CMAKEDIR}"
+    DESTINATION "${CMAKE_INSTALL_CMAKEDIR}"
     COMPONENT ${package_name}-development
 )
 

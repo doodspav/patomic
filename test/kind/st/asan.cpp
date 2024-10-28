@@ -2,10 +2,12 @@
 #include <gtest/gtest-spi.h>
 
 
+/// @brief Test fixture.
 class StAsan : public testing::Test
 {};
 
 
+/// @brief Check that asan catches use-after-free.
 TEST_F(StAsan, UseAfterFree)
 {
 #if PATOMIC_HAS_ASAN
@@ -19,6 +21,7 @@ TEST_F(StAsan, UseAfterFree)
 #endif
 }
 
+/// @brief Check that asan catches a heap allocated buffer overflow.
 TEST_F(StAsan, HeapBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
@@ -33,6 +36,7 @@ TEST_F(StAsan, HeapBufferOverflow)
 #endif
 }
 
+/// @brief Check that asan catches a stack allocated buffer overflow.
 TEST_F(StAsan, StackBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN
@@ -51,6 +55,7 @@ TEST_F(StAsan, StackBufferOverflow)
 #endif
 }
 
+/// @brief Check that asan catches a statically allocated buffer overflow.
 TEST_F(StAsan, GlobalBufferOverflow)
 {
 #if PATOMIC_HAS_ASAN

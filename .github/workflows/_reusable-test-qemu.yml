@@ -106,10 +106,12 @@ jobs:
       CMAKE_PRESET: ${{ matrix.preset }}-${{ matrix.kind }}
       CMAKE_BUILD_TYPE: ${{ ( matrix.kind == 'ansi' || matrix.kind == 'warning' ) && 'Release' || 'Debug' }}
       # apparently not possible to skip job using matrix context, so this is the next best thing
+      # fixme: hppa-shared-coverage tests segfault (GHI #25)
       SKIP_JOB: >-
         ${{ (
           ( matrix.compiler == 'clang' && inputs.skip_llvm ) ||
-          ( matrix.compiler == 'gcc' && inputs.skip_gcc )
+          ( matrix.compiler == 'gcc' && inputs.skip_gcc )    ||
+          ( 'hppa' == inputs.architecture && 'shared' == matrix.build_shared && 'coverage' == matrix.kind )
         ) }}
       # necessary because publish-coverage job expects everything to have the same root path
       ROOT_PATH: /Users/${{ matrix.kind }}
@@ -148,7 +150,7 @@ jobs:
       - name: Restore Cached Sysroot (with GoogleTest)
         if: env.SKIP_JOB != 'true'
         id: cache-sysroot
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.ROOT_PATH }}/sysroot
           key: sysroot-${{ env.UNIQUE_ID }}
@@ -201,12 +203,12 @@ jobs:
         if: env.SKIP_JOB != 'true'
         continue-on-error: true
         env:
-          LABEL_REGEX: ${{ matrix.kind == 'coverage' && '^(ut)$' || '^(.*)$' }}
+          CTEST_SELECT: ${{ matrix.kind == 'coverage' && '--tests-regex "^(Ut|BtApi)"' || '--label-regex "^(.*)$"' }}
         run: |
           cd ${{ env.ROOT_PATH }}
           
           cd patomic/build
-          ctest --label-regex "${{ env.LABEL_REGEX }}" --verbose --output-junit Testing/Temporary/results.xml .
+          ctest ${{ env.CTEST_SELECT }} --verbose --output-junit Testing/Temporary/results.xml .
 
       - name: Prepare Test Results
         if: env.SKIP_JOB != 'true'
@@ -218,9 +220,9 @@ jobs:
 
       - name: Upload Test Results
         if: env.SKIP_JOB != 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-${{ env.UNIQUE_ID }}
           path: ${{ env.ROOT_PATH }}/upload/test/
 
       - name: Generate Lcov Tracefile and Root Path File (clang)
@@ -237,7 +239,7 @@ jobs:
 
           # merge coverage output from all tests
           # use find because bash on GitHub Actions currently does not support '**'
-          find test/working -type f -name "*.profraw" -print0 | xargs -0 llvm-profdata merge -output=patomic.profdata
+          find test/kind -type f -name "*.profraw" -print0 | xargs -0 llvm-profdata merge -output=patomic.profdata
           
           # convert profdata to lcov tracefile, and copy to upload
           lib_files=(libpatomic.*)  # matches shared/static lib files and symlinks
@@ -270,7 +272,7 @@ jobs:
 
       - name: Upload Internal Coverage Results
         if: env.SKIP_JOB != 'true' && matrix.kind == 'coverage'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: test-coverage-internal
+          name: test-coverage-internal-${{ env.UNIQUE_ID }}
           path: ${{ env.ROOT_PATH }}/upload/cov/

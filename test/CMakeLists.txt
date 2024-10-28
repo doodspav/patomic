@@ -9,26 +9,36 @@ project(
     LANGUAGES CXX
 )
 
+include(cmake/ProjectIsTopLevel.cmake)
 include(cmake/OptionVariables.cmake)
+include(cmake/CreateTest.cmake)
 
 
 # ---- Dependencies ----
-
-include(cmake/ProjectIsTopLevel.cmake)
 
 # need to enable testing ourselves if we're the root project
 if(PROJECT_IS_TOP_LEVEL)
     enable_testing()
 endif()
 
-# patomic is not a required dependency
-if(NOT TARGET patomic::patomic)
-    find_package(patomic QUIET)
-endif()
-
 # get GTest
 find_package(GTest REQUIRED)
 include(GoogleTest)
+
+# check patomic target is available
+if(NOT TARGET patomic::patomic)
+    message(FATAL_ERROR "Target patomic::patomic required to build tests, not available.")
+endif()
+
+# check patomic dir variables are set
+if(NOT PATOMIC_BINARY_DIR)
+    message(FATAL_ERROR "Variable PATOMIC_BINARY_DIR required to build tests, not set.")
+elseif(NOT PATOMIC_SOURCE_DIR)
+    message(FATAL_ERROR "Variable PATOMIC_SOURCE_DIR required to build tests, not set.")
+endif()
+
+
+# ---- Fix GoogleTest ----
 
 # sometimes this variable is not correctly set by GTest's find_package
 if(NOT GTEST_INCLUDE_DIRS)
@@ -53,9 +63,8 @@ find_library(libatomic NAMES atomic atomic.so.1 libatomic.so.1)
 # necessary for using GTest on platforms without atomic operations where
 # libatomic is not automatically linked (e.g. clang-15 for arm-linux-gnueabi)
 if(libatomic)
-    set_property(
-        TARGET GTest::gtest
-        APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${libatomic}"
+    target_link_libraries(GTest::gtest
+        INTERFACE "${libatomic}"
     )
 endif()
 
@@ -63,7 +72,8 @@ endif()
 # ---- Declare Tests ----
 
 # base target that indirectly depends on all tests
-add_custom_target(patomic-test)
+set(test_target_name "patomic-test")
+add_custom_target(${test_target_name})
 
 # always add include and src; used by and linked to all test targets
 # must be added first to create targets that we use when creating test targets
@@ -72,10 +82,3 @@ add_subdirectory(src)
 
 # add directory with all test kinds
 add_subdirectory(kind)
-
-
-# ---- Support Packaging Library ----
-
-if(PROJECT_IS_TOP_LEVEL AND NOT CMAKE_SKIP_INSTALL_RULES)
-    include(CPack)
-endif()

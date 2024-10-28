@@ -4,18 +4,17 @@
 
 # ---- Options Summary ----
 
-# -------------------------------------------------------------------------------------------------------------------
-# | Option                       | Availability  | Default                                                          |
-# |==============================|===============|==================================================================|
-# | BUILD_SHARED_LIBS            | Top-Level     | OFF                                                              |
-# | BUILD_TESTING                | Top-Level     | OFF                                                              |
-# | CMAKE_INSTALL_INCLUDEDIR     | Top-Level     | include/${package_name}-${PROJECT_VERSION}                       |
-# |------------------------------|---------------|------------------------------------------------------------------|
-# | PATOMIC_BUILD_SHARED         | Always        | ${BUILD_SHARED_LIBS}                                             |
-# | PATOMIC_BUILD_TESTING        | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}                     |
-# | PATOMIC_INCLUDES_WITH_SYSTEM | Not Top-Level | ON                                                               |
-# | PATOMIC_INSTALL_CMAKEDIR     | Always        | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION} |
-# -------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------
+# | Option                    | Availability  | Default                                                          |
+# |===========================|===============|==================================================================|
+# | BUILD_SHARED_LIBS         | Top-Level     | OFF                                                              |
+# | BUILD_TESTING             | Top-Level     | OFF                                                              |
+# | CMAKE_INSTALL_CMAKEDIR    | Top-Level     | ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION} |
+# | CMAKE_INSTALL_INCLUDEDIR  | Top-Level     | include/${package_name}-${PROJECT_VERSION}                       |
+# |---------------------------|---------------|------------------------------------------------------------------|
+# | PATOMIC_BUILD_SHARED_LIBS | Always        | ${BUILD_SHARED_LIBS}                                             |
+# | PATOMIC_BUILD_TESTING     | Always        | ${BUILD_TESTING} AND ${PROJECT_IS_TOP_LEVEL}                     |
+# ----------------------------------------------------------------------------------------------------------------
 
 
 # ---- Build Shared ----
@@ -26,35 +25,16 @@ if(PROJECT_IS_TOP_LEVEL)
     option(BUILD_SHARED_LIBS "Build shared libs" OFF)
 endif()
 option(
-    PATOMIC_BUILD_SHARED
-    "Override BUILD_SHARED_LIBS for ${package_name} library"
+    PATOMIC_BUILD_SHARED_LIBS
+    "Override BUILD_SHARED_LIBS for ${package_name} package"
     ${BUILD_SHARED_LIBS}
 )
-mark_as_advanced(PATOMIC_BUILD_SHARED)
 set(build_type STATIC)
-if(PATOMIC_BUILD_SHARED)
+if(PATOMIC_BUILD_SHARED_LIBS)
     set(build_type SHARED)
 endif()
-
-
-# ---- Warning Guard ----
-
-# target_include_directories with SYSTEM modifier will request the compiler to
-# omit warnings from the provided paths, if the compiler supports that.
-# This is to provide a user experience similar to find_package when
-# add_subdirectory or FetchContent is used to consume this project.
-set(warning_guard "")
-if(NOT PROJECT_IS_TOP_LEVEL)
-    option(
-        PATOMIC_INCLUDES_WITH_SYSTEM
-        "Use SYSTEM modifier for ${package_name}'s includes, disabling warnings"
-        ON
-    )
-    mark_as_advanced(PATOMIC_INCLUDES_WITH_SYSTEM)
-    if(PATOMIC_INCLUDES_WITH_SYSTEM)
-        set(warning_guard SYSTEM)
-    endif()
-endif()
+# don't mark BUILD_SHARED_LIBS as advanced
+mark_as_advanced(PATOMIC_BUILD_SHARED_LIBS)
 
 
 # ---- Enable Testing ----
@@ -71,10 +51,11 @@ if(PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
 endif()
 option(
     PATOMIC_BUILD_TESTING
-    "Override BUILD_TESTING for ${package_name} library"
+    "Override BUILD_TESTING for ${package_name} package"
     ${build_testing}
 )
-set(build_testing )
+unset(build_testing)
+# don't mark BUILD_TESTING as advanced
 mark_as_advanced(PATOMIC_BUILD_TESTING)
 
 
@@ -82,7 +63,7 @@ mark_as_advanced(PATOMIC_BUILD_TESTING)
 
 # Adds an extra directory to the include path by default, so that when you link
 # against the target, you get `<prefix>/include/<package>-X` added to your
-# include paths rather than `<prefix/include`.
+# include paths rather than `<prefix>/include`.
 # This doesn't affect include paths used by consumers of this project, but helps
 # prevent consumers having access to other projects in the same include
 # directory (e.g. /usr/include).
@@ -93,10 +74,13 @@ mark_as_advanced(PATOMIC_BUILD_TESTING)
 if(PROJECT_IS_TOP_LEVEL)
     set(
         CMAKE_INSTALL_INCLUDEDIR "include/${package_name}-${PROJECT_VERSION}"
-        CACHE STRING ""
+        CACHE STRING "CMake top level include location relative to the install prefix"
     )
+    # set it back to PATH type for GUI assistance
+    set_property(CACHE CMAKE_INSTALL_INCLUDEDIR PROPERTY TYPE PATH)
     # marked as advanced in GNUInstallDirs version, so we follow their lead
     mark_as_advanced(CMAKE_INSTALL_INCLUDEDIR)
+    # CMAKE_INSTALL_FULL_INCLUDEDIR will be generated by GNUInstallDirs below
 endif()
 
 
@@ -113,16 +97,35 @@ include(GNUInstallDirs)
 # and uses the full version to aid in debugging.
 # This doesn't affect include paths used by consumers of this project.
 # The variable type is STRING rather than PATH, because otherwise passing
-# -DPATOMIC_INSTALL_CMAKEDIR=lib/cmake on the command line would expand to an
+# -DCMAKE_INSTALL_CMAKEDIR=lib/cmake on the command line would expand to an
 # absolute path with the base being the current CMake directory, leading to
 # unexpected errors.
 #
-# Note: this will yield the lowest compatible version on platforms that sort
-# their directories' contents unless you set CMAKE_FIND_PACKAGE_SORT_DIRECTION
-# to DEC before calling find_package.
-set(
-    PATOMIC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION}"
-    CACHE STRING "CMake ${package_name} package's config location relative to the install prefix"
-)
-# depends on CMAKE_INSTALL_LIBDIR which is marked as advanced in GNUInstallDirs
-mark_as_advanced(PATOMIC_INSTALL_CMAKEDIR)
+# Note: in order to get the latest compatible version by default, you should
+# set CMAKE_FIND_PACKAGE_SORT_ORDER to NATURAL before calling find_package.
+if(PROJECT_IS_TOP_LEVEL)
+    set(
+        CMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}-${PROJECT_VERSION}"
+        CACHE STRING "(unofficial) CMake top level config location relative to the install prefix"
+    )
+    # set it back to PATH type for GUI assistance
+    set_property(CACHE CMAKE_INSTALL_CMAKEDIR PROPERTY TYPE PATH)
+    # depends on CMAKE_INSTALL_LIBRDIR which is marked as advanced in GNUInstallDirs
+    mark_as_advanced(CMAKE_INSTALL_CMAKEDIR)
+    # generate absolute path version
+    set(dir "LIBDIR")  # use LIBDIR since that forms the root of CMAKEDIR
+    set(dir_param )
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
+        set(dir_param "${dir}")
+    endif()
+    GNUInstallDirs_get_absolute_install_dir(
+        CMAKE_INSTALL_FULL_CMAKEDIR
+        CMAKE_INSTALL_CMAKEDIR
+        ${dir_param}
+    )
+    unset(dir_param)
+    unset(dir)
+elseif(NOT CMAKE_INSTALL_CMAKEDIR AND NOT CMAKE_SKIP_INSTALL_RULES)
+    # required because this is unofficial and has no default set by GNUInstallDirs
+    message(FATAL_ERROR "Cache variable CMAKE_INSTALL_CMAKEDIR was not defined; must be set manually")
+endif()
