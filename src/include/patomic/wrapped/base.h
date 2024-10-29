@@ -87,7 +87,8 @@
  * @addtogroup wrapped
  *
  * @brief
- *   Acts as a transparent wrapper around memcpy.
+ *   Acts as a transparent wrapper around memcpy where the return value is
+ *   discarded.
  *
  * @note
  *   Necessary because some compiler options may cause an error if the return
