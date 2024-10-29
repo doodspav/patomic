@@ -26,9 +26,9 @@
 static void
 patomic_assert_fxprint(
     FILE *stream,
-    const char *expr,
-    const char *file,
-    const char *func,
+    const char *const expr,
+    const char *const file,
+    const char *const func,
     const unsigned int line
 )
 {
@@ -66,9 +66,9 @@ patomic_assert_fxprint(
 
 void
 __patomic_assert_fail(
-    const char *expr,
-    const char *file,
-    const char *func,
+    const char *const expr,
+    const char *const file,
+    const char *const func,
     const unsigned int line
 )
 {

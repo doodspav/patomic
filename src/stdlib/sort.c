@@ -3,10 +3,10 @@
 
 void
 patomic_array_sort(
-    void *ptr,
-    size_t count,
-    size_t size,
-    int (*comp)(const void*, const void*)
+    void *const ptr,
+    const size_t count,
+    const size_t size,
+    int (*const comp)(const void*, const void*)
 )
 {
     qsort(ptr, count, size, comp);

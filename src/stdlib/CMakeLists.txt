@@ -3,4 +3,5 @@ target_sources(${target_name} PRIVATE
     abort.c
     assert.c
     sort.c
+    stdalign.c
 )
