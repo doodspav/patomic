@@ -4,5 +4,6 @@ target_sources(${target_name} PRIVATE
     ignore_unused.h
     noreturn.h
     restrict.h
+    static_assert.h
     unreachable.h
 )
