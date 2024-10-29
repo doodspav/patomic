@@ -96,6 +96,6 @@
  */
 #define PATOMIC_WRAPPED_DO_MEMCPY(dest, src, count) \
     PATOMIC_IGNORE_UNUSED(patomic_memcpy(dest, src, count))
-
+///
 
 #endif  /* PATOMIC_WRAPPED_BASE_H */
