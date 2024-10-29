@@ -24,7 +24,7 @@ patomic_is_aligned(
     const size_t alignment
 )
 {
-    /* check that our address is exactly divisible by the alignment */
+    /* check that our address is a multiple of the alignment */
     patomic_intptr_unsigned_t address = (patomic_intptr_unsigned_t) ptr;
     address &= (alignment - 1u);
     return address == 0;
