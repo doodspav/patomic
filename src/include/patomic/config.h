@@ -43,6 +43,48 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'restrict' is available as a keyword.
+     *
+     * @note
+     *   Usually required: C99.
+     */
+    #define PATOMIC_HAS_RESTRICT 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__restrict' is available as a keyword.
+     *
+     * @note
+     *   Usually required: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_RESTRICT 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__restrict__' is available as a keyword.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_RESTRICT 0
+#endif
+
+
 #ifndef PATOMIC_HAS_STDINT_H
     /**
      * @addtogroup config.safe
