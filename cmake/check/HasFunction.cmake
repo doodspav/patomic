@@ -7,6 +7,14 @@
 # | COMPILER_HAS_BUILTIN_UNREACHABLE | '__builtin_unreachable(void)' is available as a function                                                 |
 # | COMPILER_HAS_WCHAR_FWIDE         | '<wchar.h>' header is available and makes 'fwide(FILE*, int)' available as a function                    |
 # | COMPILER_HAS_WCHAR_FWPRINTF      | '<wchar.h>' header is available and makes 'fwprintf(FILE*, const wchar_t*, ...)' available as a function |
+# | COMPILER_HAS_C23_ALIGNOF         | 'alignof(T)' is available as a function                                                                  |
+# | COMPILER_HAS_C23_ALIGNOF_EXTN    | '__extension__ alignof(T)' is available as a function                                                    |
+# | COMPILER_HAS_C11_ALIGNOF         | '_Alignof(T)' is available as a function                                                                 |
+# | COMPILER_HAS_C11_ALIGNOF_EXTN    | '__extension__ _Alignof(T)' is available as a function                                                   |
+# | COMPILER_HAS_MS_ALIGNOF          | '__alignof(T)' is available as a function                                                                |
+# | COMPILER_HAS_MS_ALIGNOF_EXTN     | '__extension__ __alignof(T)' is available as a function                                                  |
+# | COMPILER_HAS_GNU_ALIGNOF         | '__alignof__(T)' is available as a function                                                              |
+# | COMPILER_HAS_GNU_ALIGNOF_EXTN    | '__extension__ __alignof__(T)' is available as a function                                                |
 # -----------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -54,4 +62,88 @@ check_c_source_compiles_or_zero(
         COMPILER_HAS_WCHAR_FWPRINTF
     WILL_FAIL_IF_ANY_NOT
         ${COMPILER_HAS_WCHAR_H}
+)
+
+# 'alignof(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) alignof(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_C23_ALIGNOF
+)
+
+# '__extension__ alignof(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) __extension__ alignof(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_C23_ALIGNOF_EXTN
+    WILL_SUCCEED_IF_ALL
+        ${COMPILER_HAS_C23_ALIGNOF}
+        ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
+)
+
+# '_Alignof(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) _Alignof(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_C11_ALIGNOF
+)
+
+# '__extension__ _Alignof(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) __extension__ _Alignof(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_C11_ALIGNOF_EXTN
+    WILL_SUCCEED_IF_ALL
+        ${COMPILER_HAS_C11_ALIGNOF}
+        ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
+)
+
+# '__alignof(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) __alignof(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_MS_ALIGNOF
+)
+
+# '__extension__ __alignof(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) __extension__ __alignof(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_MS_ALIGNOF_EXTN
+    WILL_SUCCEED_IF_ALL
+        ${COMPILER_HAS_MS_ALIGNOF}
+        ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
+)
+
+# '__alignof__(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) __alignof__(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_GNU_ALIGNOF
+)
+
+# '__extension__ __alignof__(T)' is available as a function
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { return (int) __extension__ __alignof__(int); }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_GNU_ALIGNOF_EXTN
+    WILL_SUCCEED_IF_ALL
+        ${COMPILER_HAS_GNU_ALIGNOF}
+        ${COMPILER_HAS_EXTN}
+    WILL_FAIL_IF_ANY_NOT
+        ${COMPILER_HAS_EXTN}
 )
