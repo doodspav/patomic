@@ -2,6 +2,7 @@
 add_subdirectory(internal)
 add_subdirectory(macros)
 add_subdirectory(stdlib)
+add_subdirectory(wrapped)
 
 # add directory files to target
 target_sources(${target_name} PRIVATE
