@@ -43,7 +43,7 @@ patomic_t
 patomic_create(
     const size_t byte_width,
     const patomic_memory_order_t order,
-    const unsigned int opts,
+    const unsigned int options,
     const unsigned int kinds,
     const unsigned long ids
 )
@@ -63,7 +63,7 @@ patomic_create(
              ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
             /* only add to array if some operation is supported */
-            *end = patomic_impl_register[i].fp_create(byte_width, order, opts);
+            *end = patomic_impl_register[i].fp_create(byte_width, order, options);
             if (opcats != patomic_internal_feature_check_any(&end->ops, opcats))
             {
                 ++end;
@@ -80,7 +80,7 @@ patomic_create(
     );
 
     /* combine implementations */
-    ret = patomic_impl_create_null(byte_width, order, opts);
+    ret = patomic_impl_create_null(byte_width, order, options);
     for (; begin != end; ++begin)
     {
         patomic_internal_combine(&ret, begin);
@@ -93,7 +93,7 @@ patomic_create(
 patomic_explicit_t
 patomic_create_explicit(
     const size_t byte_width,
-    const unsigned int opts,
+    const unsigned int options,
     const unsigned int kinds,
     const unsigned long ids
 )
@@ -113,7 +113,7 @@ patomic_create_explicit(
              ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
             /* only add to array if some operation is supported */
-            *end = patomic_impl_register[i].fp_create_explicit(byte_width, opts);
+            *end = patomic_impl_register[i].fp_create_explicit(byte_width, options);
             if (opcats != patomic_internal_feature_check_any_explicit(&end->ops, opcats))
             {
                 ++end;
@@ -130,7 +130,7 @@ patomic_create_explicit(
     );
 
     /* combine implementations */
-    ret = patomic_impl_create_explicit_null(byte_width, opts);
+    ret = patomic_impl_create_explicit_null(byte_width, options);
     for (; begin != end; ++begin)
     {
         patomic_internal_combine_explicit(&ret, begin);
@@ -142,7 +142,7 @@ patomic_create_explicit(
 
 patomic_transaction_t
 patomic_create_transaction(
-    const unsigned int opts,
+    const unsigned int options,
     const unsigned int kinds,
     const unsigned long ids
 )
@@ -163,7 +163,7 @@ patomic_create_transaction(
             ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
             /* only add to array if some operation is supported */
-            ret = patomic_impl_register[i].fp_create_transaction(opts);
+            ret = patomic_impl_register[i].fp_create_transaction(options);
             if(opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
             {
                 /* ignore previous implementations if current one has a better kind */
@@ -184,6 +184,6 @@ patomic_create_transaction(
     }
     else
     {
-        return patomic_impl_create_transaction_null(opts);
+        return patomic_impl_create_transaction_null(options);
     }
 }

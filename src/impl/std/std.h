@@ -21,7 +21,7 @@
  * @param order
  *   The minimum memory order to perform the operation with.
  *
- * @param opts
+ * @param options
  *   Value is currently unused.
  *
  * @return
@@ -31,7 +31,7 @@ patomic_t
 patomic_impl_create_std(
     size_t byte_width,
     patomic_memory_order_t order,
-    unsigned int opts
+    unsigned int options
 );
 
 
@@ -49,7 +49,7 @@ patomic_impl_create_std(
  * @param byte_width
  *   The width of an object to operate on.
  *
- * @param opts
+ * @param options
  *   Value is currently unused.
  *
  * @return
@@ -58,7 +58,7 @@ patomic_impl_create_std(
 patomic_explicit_t
 patomic_impl_create_explicit_std(
     size_t byte_width,
-    unsigned int opts
+    unsigned int options
 );
 
 
@@ -69,7 +69,7 @@ patomic_impl_create_explicit_std(
  *   No operations are supported here, since C11 does not provide transactional
  *   operations.
  *
- * @param opts
+ * @param options
  *   Value is ignored.
  *
  * @return
@@ -78,7 +78,7 @@ patomic_impl_create_explicit_std(
  */
 patomic_transaction_t
 patomic_impl_create_transaction_std(
-    unsigned int opts
+    unsigned int options
 );
 
 

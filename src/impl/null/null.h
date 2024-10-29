@@ -16,7 +16,7 @@
  * @param order
  *   Value is ignored.
  *
- * @param opts
+ * @param options
  *   Value is ignored.
  *
  * @return
@@ -27,7 +27,7 @@ patomic_t
 patomic_impl_create_null(
     size_t byte_width,
     patomic_memory_order_t order,
-    unsigned int opts
+    unsigned int options
 );
 
 
@@ -40,7 +40,7 @@ patomic_impl_create_null(
  * @param byte_width
  *   Value is ignored.
  *
- * @param opts
+ * @param options
  *   Value is ignored.
  *
  * @return
@@ -50,7 +50,7 @@ patomic_impl_create_null(
 patomic_explicit_t
 patomic_impl_create_explicit_null(
     size_t byte_width,
-    unsigned int opts
+    unsigned int options
 );
 
 
@@ -60,7 +60,7 @@ patomic_impl_create_explicit_null(
  * @brief
  *   No operations are supported.
  *
- * @param opts
+ * @param options
  *   Value is ignored.
  *
  * @return
@@ -69,7 +69,7 @@ patomic_impl_create_explicit_null(
  */
 patomic_transaction_t
 patomic_impl_create_transaction_null(
-    unsigned int opts
+    unsigned int options
 );
 
 
