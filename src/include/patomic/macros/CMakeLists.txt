@@ -3,5 +3,6 @@ target_sources(${target_name} PRIVATE
     func_name.h
     ignore_unused.h
     noreturn.h
+    restrict.h
     unreachable.h
 )
