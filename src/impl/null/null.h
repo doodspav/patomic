@@ -3,8 +3,6 @@
 
 #include <patomic/patomic.h>
 
-#include <stddef.h>
-
 
 /**
  * @addtogroup impl.null
