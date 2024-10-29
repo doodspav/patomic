@@ -47,7 +47,7 @@ patomic_alignment_from_size(
  */
 int
 patomic_is_aligned(
-    const void *ptr,
+    const volatile void *ptr,
     size_t alignment
 );
 
