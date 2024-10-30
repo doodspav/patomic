@@ -11,6 +11,6 @@
  *   never be at the start).
  */
 #define PATOMIC_STATIC_ASSERT(msg, expr) \
-    typedef char patomic_static_assert##msg[(expr) ? 1 : -1]
+    typedef char patomic_static_assert_##msg[(expr) ? 1 : -1]
 
 #endif  /* PATOMIC_STATIC_ASSERT */

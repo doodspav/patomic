@@ -82,7 +82,7 @@
                                                                               \
         /* declarations */                                                    \
         type des;                                                             \
-        type scratch                                                          \
+        type scratch;                                                         \
         int temp;                                                             \
                                                                               \
         /* assertions */                                                      \
@@ -167,7 +167,7 @@
 )                                                                            \
     static void                                                              \
     fn_name(                                                                 \
-        volatile void *const obj                                             \
+        const volatile void *const obj                                       \
  vis_p(_,const int order)                                                    \
         ,void *const ret                                                     \
     )                                                                        \
@@ -899,7 +899,7 @@
         /* declarations */                                              \
         type arg;                                                       \
         type scratch;                                                   \
-        int temp                                                        \
+        int temp;                                                       \
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
