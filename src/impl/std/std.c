@@ -8,6 +8,9 @@
 #if PATOMIC_HAS_ATOMIC && PATOMIC_HAS_STDATOMIC_H && PATOMIC_HAS_IR_TWOS_COMPL
 
 
+#include <patomic/stdlib/assert.h>
+#include <patomic/stdlib/stdint.h>
+
 #include <patomic/wrapped/direct.h>
 
 #include <stdatomic.h>
@@ -394,26 +397,216 @@
         return pao;                                                       \
     }
 
-#define PATOMIC_DEFINE_OPS_CREATE_ALL(type, name)                     \
-    PATOMIC_DEFINE_OPS_CREATE_RSC(                                    \
-        type, name##_relaxed, HIDE_P, SHOW, memory_order_relaxed, ops \
-    )                                                                 \
-    /* consume is not supported, we just use acquire */               \
-    PATOMIC_DEFINE_OPS_CREATE_CA(                                     \
-        type, name##_acquire, HIDE_P, SHOW, memory_order_acquire, ops \
-    )                                                                 \
-    PATOMIC_DEFINE_OPS_CREATE_R(                                      \
-        type, name##_release, HIDE_P, SHOW, memory_order_release, ops \
-    )                                                                 \
-    PATOMIC_DEFINE_OPS_CREATE_AR(                                     \
-        type, name##_acq_rel, HIDE_P, SHOW, memory_order_acq_rel, ops \
-    )                                                                 \
-    PATOMIC_DEFINE_OPS_CREATE_RSC(                                    \
-        type, name##_seq_cst, HIDE_P, SHOW, memory_order_seq_cst, ops \
-    )                                                                 \
-    PATOMIC_DEFINE_OPS_CREATE_RSC(                                    \
-        type, name##_explicit, SHOW_P, HIDE, order, ops_explicit      \
+#define PATOMIC_DEFINE_OPS_CREATE_ALL(type, name)                \
+    PATOMIC_DEFINE_OPS_CREATE_RSC(                               \
+        type, name##_relaxed, HIDE_P, SHOW, patomic_RELAXED, ops \
+    )                                                            \
+    /* consume is not supported, we just use acquire */          \
+    PATOMIC_DEFINE_OPS_CREATE_CA(                                \
+        type, name##_acquire, HIDE_P, SHOW, patomic_ACQUIRE, ops \
+    )                                                            \
+    PATOMIC_DEFINE_OPS_CREATE_R(                                 \
+        type, name##_release, HIDE_P, SHOW, patomic_RELEASE, ops \
+    )                                                            \
+    PATOMIC_DEFINE_OPS_CREATE_AR(                                \
+        type, name##_acq_rel, HIDE_P, SHOW, patomic_ACQ_REL, ops \
+    )                                                            \
+    PATOMIC_DEFINE_OPS_CREATE_RSC(                               \
+        type, name##_seq_cst, HIDE_P, SHOW, patomic_SEQ_CST, ops \
+    )                                                            \
+    PATOMIC_DEFINE_OPS_CREATE_RSC(                               \
+        type, name##_explicit, SHOW_P, HIDE, order, ops_explicit \
     )
+
+
+#if ATOMIC_CHAR_LOCK_FREE
+    PATOMIC_DEFINE_OPS_CREATE_ALL(unsigned char, char)
+#endif
+
+#if ATOMIC_SHORT_LOCK_FREE
+    PATOMIC_DEFINE_OPS_CREATE_ALL(unsigned short, short)
+#endif
+
+#if ATOMIC_INT_LOCK_FREE
+    PATOMIC_DEFINE_OPS_CREATE_ALL(unsigned int, int)
+#endif
+
+#if ATOMIC_LONG_LOCK_FREE
+    PATOMIC_DEFINE_OPS_CREATE_ALL(unsigned long, long)
+#endif
+
+#undef HAS_LLONG_IMPL
+#if ATOMIC_LLONG_LOCK_FREE && PATOMIC_STDINT_HAS_LLONG
+    #define HAS_LLONG_IMPL 1
+    PATOMIC_DEFINE_OPS_CREATE_ALL(patomic_llong_unsigned_t, llong)
+#else
+    #define HAS_LLONG_IMPL 0
+#endif
+
+
+#define PATOMIC_SET_RET(type, name, byte_width, order, ops)             \
+        ((byte_width == sizeof(type)) &&                                \
+         (byte_width == sizeof(_Atomic(type))))                         \
+    {                                                                   \
+        _Atomic(type) obj;                                              \
+        if (atomic_is_lock_free(&obj))                                  \
+        {                                                               \
+            switch (order)                                              \
+            {                                                           \
+                case patomic_RELAXED:                                   \
+                    ops = patomic_ops_create_##name##_relaxed();        \
+                    break;                                              \
+                case patomic_CONSUME:                                   \
+                case patomic_ACQUIRE:                                   \
+                    ops = patomic_ops_create_##name##_acquire();        \
+                    break;                                              \
+                case patomic_RELEASE:                                   \
+                    ops = patomic_ops_create_##name##_release();        \
+                    break;                                              \
+                case patomic_ACQ_REL:                                   \
+                    ops = patomic_ops_create_##name##_acq_rel();        \
+                    break;                                              \
+                case patomic_SEQ_CST:                                   \
+                    ops = patomic_ops_create_##name##_seq_cst();        \
+                    break;                                              \
+                default:                                                \
+                    patomic_assert_always("invalid memory order" && 0); \
+            }                                                           \
+        }                                                               \
+        PATOMIC_IGNORE_UNUSED(obj);                                     \
+    }
+
+#define PATOMIC_SET_RET_EXPLICIT(type, name, byte_width, ops) \
+        ((byte_width == sizeof(type)) &&                      \
+         (byte_width == sizeof(_Atomic(type))))               \
+    {                                                         \
+        _Atomic(type) obj;                                    \
+        if (atomic_is_lock_free(&obj))                        \
+        {                                                     \
+            ops = patomic_ops_create_##name##_explicit();     \
+        }                                                     \
+        PATOMIC_IGNORE_UNUSED(obj);                           \
+    }
+
+#define PATOMIC_SET_ALIGN(type, byte_width, member)   \
+        ((byte_width == sizeof(type)) &&              \
+         (byte_width == sizeof(_Atomic(type))))       \
+    {                                                 \
+        member = patomic_alignof_type(_Atomic(type)); \
+    }
+
+
+static patomic_ops_t
+patomic_create_ops(
+    const size_t byte_width,
+    const patomic_memory_order_t order
+)
+{
+    /* setup */
+    patomic_ops_t ops = {0};
+    patomic_assert_always(patomic_is_valid_order((int) order));
+
+    /* set members */
+    if PATOMIC_SET_RET(unsigned char, char, byte_width, order, ops)
+    else if PATOMIC_SET_RET(unsigned short, short, byte_width, order, ops)
+    else if PATOMIC_SET_RET(unsigned int, int, byte_width, order, ops)
+    else if PATOMIC_SET_RET(unsigned long, long, byte_width, order, ops)
+#if HAS_LLONG_IMPL
+    else if PATOMIC_SET_RET(patomic_llong_unsigned_t, llong, byte_width, order, ops)
+#endif
+
+    /* return */
+    return ops;
+}
+
+static patomic_ops_explicit_t
+patomic_create_ops_explicit(
+    const size_t byte_width
+)
+{
+    /* setup */
+    patomic_ops_explicit_t ops = {0};
+
+    /* set members */
+    if PATOMIC_SET_RET_EXPLICIT(unsigned char, char, byte_width, ops)
+    else if PATOMIC_SET_RET_EXPLICIT(unsigned short, short, byte_width, ops)
+    else if PATOMIC_SET_RET_EXPLICIT(unsigned int, int, byte_width, ops)
+    else if PATOMIC_SET_RET_EXPLICIT(unsigned long, long, byte_width, ops)
+#if HAS_LLONG_IMPL
+    else if PATOMIC_SET_RET_EXPLICIT(patomic_llong_unsigned_t, llong, byte_width, ops)
+#endif
+
+    /* return */
+    return ops;
+}
+
+static patomic_align_t
+patomic_create_align(
+    const size_t byte_width
+)
+{
+    /* setup */
+    patomic_align_t align = {0};
+
+    /* set recommended */
+    if PATOMIC_SET_ALIGN(unsigned char, byte_width, align.recommended)
+    else if PATOMIC_SET_ALIGN(unsigned short, byte_width, align.recommended)
+    else if PATOMIC_SET_ALIGN(unsigned int, byte_width, align.recommended)
+    else if PATOMIC_SET_ALIGN(unsigned long, byte_width, align.recommended)
+#if HAS_LLONG_IMPL
+    else if PATOMIC_SET_ALIGN(patomic_llong_unsigned_t, byte_width, align.recommended)
+#endif
+    else
+    {
+        /* minimum valid alignment */
+        align.recommended = 1;
+    }
+
+    /* set remaining members */
+    align.minimum = align.recommended;
+    align.size_within = 0;
+
+    /* return */
+    return align;
+}
+
+
+patomic_t
+patomic_impl_create_std(
+    const size_t byte_width,
+    const patomic_memory_order_t order,
+    const unsigned int options
+)
+{
+    /* setup */
+    patomic_t impl;
+    PATOMIC_IGNORE_UNUSED(options);
+
+    /* set members */
+    impl.ops = patomic_create_ops(byte_width, order);
+    impl.align = patomic_create_align(byte_width);
+
+    /* return */
+    return impl;
+}
+
+patomic_explicit_t
+patomic_impl_create_explicit_std(
+    const size_t byte_width,
+    const unsigned int options
+)
+{
+    /* setup */
+    patomic_explicit_t impl;
+    PATOMIC_IGNORE_UNUSED(options);
+
+    /* set members */
+    impl.ops = patomic_create_ops_explicit(byte_width);
+    impl.align = patomic_create_align(byte_width);
+
+    /* return */
+    return impl;
+}
 
 
 #else  /* PATOMIC_HAS_ATOMIC && PATOMIC_HAS_STDATOMIC_H && PATOMIC_HAS_IR_TWOS_COMPL */
