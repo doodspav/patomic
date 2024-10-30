@@ -46,7 +46,7 @@
  * @param do_atomic_store_explicit
  *   A macro, M, callable as 'M(obj, des, order)' where:
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'des' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     store memory order
@@ -139,7 +139,7 @@
  * @param do_atomic_load_explicit
  *   A macro, M, callable as 'M(obj, order, res)' where:
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'const volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'const volatile atomic_type *'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     load memory order
  *   - 'res' will be the name of a local identifier, with the type 'type'
@@ -230,7 +230,7 @@
  * @param do_atomic_exchange_explicit
  *   A macro, M, callable as 'M(obj, des, order, res)' where:
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'des' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     memory order
@@ -335,7 +335,7 @@
  * @param do_atomic_cmpxchg_explicit
  *   A macro, M, callable as 'M(obj, exp, des, succ, fail, ok)' where
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'exp' will be the name of a local identifier, with the type 'type'
  *   - 'des' will be the name of a local identifier, with the type 'type'
  *   - 'succ' will be an expression of type 'int' whose value is a valid
@@ -451,7 +451,7 @@
  * @param do_atomic_bit_test_explicit
  *   A macro, M, callable as 'M(obj, offset, order, res)' where:
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'const volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'const volatile atomic_type *'
  *   - 'offset' will be an expression of type 'int' whose value is non-negative
  *     and less than 'sizeof(type) * CHAR_BIT'
  *   - 'order' will be an expression of type 'int' whose value is a valid
@@ -547,7 +547,7 @@
  * @param do_atomic_bit_test_modify_explicit
  *   A macro, M, callable as 'M(obj, offset, order, res)' where:
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'offset' will be an expression of type 'int' whose value is non-negative
  *     and less than 'sizeof(type) * CHAR_BIT'
  *   - 'order' will be an expression of type 'int' whose value is a valid
@@ -641,17 +641,17 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_fetch_explicit
- *   A macro, M, callable as 'M(obj, arg, order, res) where:
+ *   A macro, M, callable as 'M(obj, arg, order, res)' where:
  *   - the result of the expression is unused
- *   - 'obj' will be an expression of the type 'volatile atomic_type *'
+ *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'arg' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     memory order
  *   - 'res' will be the name of a local identifier, with the type 'type'
  *
  *   The expected behaviour of calling the macro M as above is:
- *   - the value of the object pointed to by 'obj' is read and modified in
- *     a single atomic operation
+ *   - the value of the object pointed to by 'obj' is read and modified in a
+ *     single atomic operation
  *   - 'res' is set to the original value read from the object pointed to by
  *     'obj'
  *   - the atomic operation uses a memory ordering at least as strong as
@@ -671,7 +671,7 @@
     fn_name(                                                            \
         volatile void *const obj                                        \
         ,const void *const argument                                     \
- vis_p(_,int order)                                                     \
+ vis_p(_,const int order)                                               \
         ,void *const ret                                                \
     )                                                                   \
     {                                                                   \
@@ -710,7 +710,98 @@
     }
 
 
-
+/**
+ * @addtogroup wrapped.direct
+ * 
+ * @brief
+ *   Defines a function which implements a noarg atomic fetch operation using
+ *   noarg fetch as the underlying atomic operation.
+ * 
+ * @details
+ *   The defined function's signature will match either 
+ *   patomic_opsig_fetch_noarg_t or patomic_opsig_explicit_fetch_noarg_t
+ *   (depending on the value of 'vis_p').
+ *
+ * @param atomic_type
+ *   The type of the object on which the atomic operation is to be performed.
+ *   Must not be a VLA or an array of unknown size.
+ *
+ * @param type
+ *   The non-atomic counterpart of 'atomic_type'. This must have the same size
+ *   as 'atomic_type' and must not have a stricter alignment.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param vis_p
+ *   Either the macro 'SHOW_P' if the function should be defined as taking a
+ *   memory order parameter (a.k.a. explicit), or the macro 'HIDE_P' if it
+ *   should not (a.k.a. implicit).
+ *
+ * @param order
+ *   The literal token 'order' if 'vis_p' is 'SHOW_P', otherwise the desired
+ *   memory order to be used implicitly by the atomic operation.
+ * 
+ * @param do_atomic_fetch_noarg_explicit
+ *   A macro, M, callable as 'M(obj, order, res)' where:
+ *   - the result of the expression is unused
+ *   - 'obj' will be an expression of type 'volatile atomic_type *'
+ *   - 'order' will be an expression of type 'int' whose value is a valid
+ *     memory order
+ *   - 'res' will be the name of a local identifier, with the type 'type'
+ *
+ *   The expected behaviour of calling the macro M as above is:
+ *   - the value of the object pointed to by 'obj' is read and modified in a
+ *     single atomic operation
+ *   - 'res' is set to the original value read from the object pointed to by
+ *     'obj'
+ *   - the atomic operation uses a memory ordering at least as strong as
+ *     'order'
+ *
+ *   The following local variables will also be available to be used by the
+ *   macro M:
+ *   - 'temp' has type 'int'
+ *   - 'scratch' has type 'type'
+ *   - their value is unspecified and they may be uninitialized
+ */
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(                    \
+    atomic_type, type, fn_name, vis_p, order,                            \
+    do_atomic_fetch_noarg_explicit                                       \
+)                                                                        \
+    static void                                                          \
+    fn_name(                                                             \
+        volatile void *const obj                                         \
+ vis_p(_,const int order)                                                \
+        ,void *const ret                                                 \
+    )                                                                    \
+    {                                                                    \
+        /* static assertions */                                          \
+        PATOMIC_STATIC_ASSERT(                                           \
+            sizeof_type_eq_atype, sizeof(type) == sizeof(atomic_type));  \
+                                                                         \
+        /* declarations */                                               \
+        type res;                                                        \
+        type scratch;                                                    \
+        int temp;                                                        \
+                                                                         \
+        /* assertions */                                                 \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                          \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                          \
+        PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atomic_type);             \
+        PATOMIC_WRAPPED_DOO_ASSERT(PATOMIC_IS_VALID_ORDER((int) order)); \
+                                                                         \
+        /* operation */                                                  \
+        do_atomic_fetch_noarg_explicit(                                  \
+            (volatile atomic_type *) obj,                                \
+            (int) order,                                                 \
+            res                                                          \
+        );                                                               \
+                                                                         \
+        /* cleanup */                                                    \
+        PATOMIC_WRAPPED_DO_MEMCPY(ret, &res, sizeof(type));              \
+        PATOMIC_IGNORE_UNUSED(scratch);                                  \
+        PATOMIC_IGNORE_UNUSED(temp);                                     \
+    }
 
 
 #endif  /* PATOMIC_WRAPPED_DIRECT_H */
