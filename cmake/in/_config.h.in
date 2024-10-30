@@ -58,6 +58,19 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_STDATOMIC_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdatomic.h> header is available.
+     *
+     * @note
+     *   Usually required: C11.
+     */
+    #define PATOMIC_HAS_STDATOMIC_H @COMPILER_HAS_STDATOMIC_H@
+#endif
+
 
 #ifndef PATOMIC_HAS_STDINT_H
     /**
