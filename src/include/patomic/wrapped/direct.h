@@ -44,13 +44,14 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_store_explicit
- *   A macro, M, callable as 'M(type, obj, des, order)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'des' will be the name of a local identifier, with the type 'type'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     store memory order
+ *   A macro, M, callable as 'M(type, obj, des, order);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'volatile atomic_type *'
+ *   - 'des'   : the name of an identifier designating an object of type 'type'
+ *   - 'order' : an expression of type 'int' whose value is a valid store
+ *               memory order
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of 'des' is read and atomically stored into the object pointed
@@ -127,13 +128,14 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_load_explicit
- *   A macro, M, callable as 'M(type, obj, order, res)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'const volatile atomic_type *'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     load memory order
- *   - 'res' will be the name of a local identifier, with the type 'type'
+ *   A macro, M, callable as 'M(type, obj, order, res);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'const volatile atomic_type *'
+ *   - 'order' : an expression of type 'int' whose value is a valid load memory
+ *               order
+ *   - 'res'   : the name of an identifier designating an object of type 'type'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of the object pointed to by 'obj' is atomically read
@@ -210,14 +212,14 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_exchange_explicit
- *   A macro, M, callable as 'M(type, obj, des, order, res)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'des' will be the name of a local identifier, with the type 'type'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     memory order
- *   - 'res' will be the name of a local identifier, with the type 'type'
+ *   A macro, M, callable as 'M(type, obj, des, order, res);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'volatile atomic_type *'
+ *   - 'des'   : the name of an identifier designating an object of type 'type'
+ *   - 'order' : an expression of type 'int' whose value is a valid memory order
+ *   - 'res'   : the name of an identifier designating an object of type 'type'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of 'des' is read and, in a single atomic operation is stored
@@ -307,17 +309,18 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_cmpxchg_explicit
- *   A macro, M, callable as 'M(type, obj, exp, des, succ, fail, ok)' where
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'exp' will be the name of a local identifier, with the type 'type'
- *   - 'des' will be the name of a local identifier, with the type 'type'
- *   - 'succ' will be an expression of type 'int' whose value is a valid
- *     memory order
- *   - 'fail' will be an expression of type 'int' whose value is a valid
- *     load memory order not stronger than 'succ'
- *   - 'ok' will be the name of a local identifier, with the type 'int'
+ *   A macro, M, callable as 'M(type, obj, exp, des, succ, fail, ok);' in block
+ *   scope.
+ *
+ *   The arguments provided are:
+ *   - 'type' : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'  : an expression of type 'volatile atomic_type *'
+ *   - 'exp'  : the name of an identifier designating an object of type 'type'
+ *   - 'des'  : the name of an identifier designating an object of type 'type'
+ *   - 'succ' : an expression of type 'int' whose value is a valid memory order
+ *   - 'fail' : an expression of type 'int' whose value is a valid load memory
+ *              order not stronger than 'succ'
+ *   - 'ok'   : the name of an identifier designating an object of type 'int'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the values of 'exp' and 'des' are read
@@ -414,15 +417,16 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_bit_test_explicit
- *   A macro, M, callable as 'M(type, obj, offset, order, res)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'const volatile atomic_type *'
- *   - 'offset' will be an expression of type 'int' whose value is non-negative
- *     and less than 'sizeof(type) * CHAR_BIT'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     load memory order
- *   - 'res' will be the name of a local identifier, with the type 'int'
+ *   A macro, M, callable as 'M(type, obj, offset, order, res);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'   : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'    : an expression of type 'const volatile atomic_type *'
+ *   - 'offset' : an expression of type 'int' whose value is non-negative and
+ *                less than 'sizeof(type) * CHAR_BIT'
+ *   - 'order'  : an expression of type 'int' whose value is a valid load
+ *                memory order
+ *   - 'res'    : the name of an identifier designating an object of type 'int'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of the object pointed to by 'obj' is atomically read
@@ -502,15 +506,16 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_bit_test_modify_explicit
- *   A macro, M, callable as 'M(type, obj, offset, order, res)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'offset' will be an expression of type 'int' whose value is non-negative
- *     and less than 'sizeof(type) * CHAR_BIT'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     memory order
- *   - 'res' will be the name of a local identifier, with the type 'int'
+ *   A macro, M, callable as 'M(type, obj, offset, order, res);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'   : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'    : an expression of type 'volatile atomic_type *'
+ *   - 'offset' : an expression of type 'int' whose value is non-negative and
+ *                less than 'sizeof(type) * CHAR_BIT'
+ *   - 'order'  : an expression of type 'int' whose value is a valid memory
+ *                order
+ *   - 'res'    : the name of an identifier designating an object of type 'int'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the bit at offset 'offset' in the object pointed to by 'obj' is modified
@@ -590,14 +595,14 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_fetch_explicit
- *   A macro, M, callable as 'M(type, obj, arg, order, res)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'arg' will be the name of a local identifier, with the type 'type'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     memory order
- *   - 'res' will be the name of a local identifier, with the type 'type'
+ *   A macro, M, callable as 'M(type, obj, arg, order, res);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'volatile atomic_type *'
+ *   - 'arg'   : the name of an identifier designating an object of type 'type'
+ *   - 'order' : an expression of type 'int' whose value is a valid memory order
+ *   - 'res'   : the name of an identifier designating an object of type 'type'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of the object pointed to by 'obj' is read and modified in a
@@ -684,13 +689,13 @@
  *   memory order to be used implicitly by the atomic operation.
  * 
  * @param do_atomic_fetch_noarg_explicit
- *   A macro, M, callable as 'M(type, obj, order, res)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     memory order
- *   - 'res' will be the name of a local identifier, with the type 'type'
+ *   A macro, M, callable as 'M(type, obj, order, res);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'volatile atomic_type *'
+ *   - 'order' : an expression of type 'int' whose value is a valid memory order
+ *   - 'res'   : the name of an identifier designating an object of type 'type'
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of the object pointed to by 'obj' is read and modified in a
@@ -769,13 +774,13 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_void_explicit
- *   A macro, M, callable as 'M(type, obj, arg, order)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'arg' will be the name of a local identifier, with the type 'type'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     memory order
+ *   A macro, M, callable as 'M(type, obj, arg, order);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'volatile atomic_type *'
+ *   - 'arg'   : the name of an identifier designating an object of type 'type'
+ *   - 'order' : an expression of type 'int' whose value is a valid memory order
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of the object pointed to by 'obj' is read and modified in a
@@ -853,12 +858,12 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_void_noarg_explicit
- *   A macro, M, callable as 'M(type, obj, order)' where:
- *   - the result of the expression is unused
- *   - 'type' is forwarded directly
- *   - 'obj' will be an expression of type 'volatile atomic_type *'
- *   - 'order' will be an expression of type 'int' whose value is a valid
- *     memory order
+ *   A macro, M, callable as 'M(type, obj, order);' in block scope.
+ *
+ *   The arguments provided are:
+ *   - 'type'  : forwarded directly from the 'type' argument in this macro
+ *   - 'obj'   : an expression of type 'volatile atomic_type *'
+ *   - 'order' : an expression of type 'int' whose value is a valid memory order
  *
  *   The expected behaviour of calling the macro M as above is:
  *   - the value of the object pointed to by 'obj' is read and modified in a
