@@ -44,8 +44,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_store_explicit
- *   A macro, M, callable as 'M(obj, des, order)' where:
+ *   A macro, M, callable as 'M(type, obj, des, order)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'des' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
@@ -95,6 +96,7 @@
                                                                               \
         /* operation */                                                       \
         do_atomic_store_explicit(                                             \
+            type,                                                             \
             (volatile atomic_type *) obj,                                     \
             des,                                                              \
             (int) order                                                       \
@@ -138,8 +140,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_load_explicit
- *   A macro, M, callable as 'M(obj, order, res)' where:
+ *   A macro, M, callable as 'M(type, obj, order, res)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'const volatile atomic_type *'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     load memory order
@@ -186,6 +189,7 @@
                                                                              \
         /* operation */                                                      \
         do_atomic_load_explicit(                                             \
+            type,                                                            \
             (const volatile atomic_type *) obj,                              \
             (int) order,                                                     \
             res                                                              \
@@ -230,8 +234,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_exchange_explicit
- *   A macro, M, callable as 'M(obj, des, order, res)' where:
+ *   A macro, M, callable as 'M(type, obj, des, order, res)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'des' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
@@ -287,6 +292,7 @@
                                                                         \
         /* operation */                                                 \
         do_atomic_exchange_explicit(                                    \
+            type,                                                       \
             (volatile atomic_type *) obj,                               \
             des,                                                        \
             (int) order,                                                \
@@ -336,8 +342,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_cmpxchg_explicit
- *   A macro, M, callable as 'M(obj, exp, des, succ, fail, ok)' where
+ *   A macro, M, callable as 'M(type, obj, exp, des, succ, fail, ok)' where
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'exp' will be the name of a local identifier, with the type 'type'
  *   - 'des' will be the name of a local identifier, with the type 'type'
@@ -407,6 +414,7 @@
                                                                             \
         /* operation */                                                     \
         do_atomic_cmpxchg_explicit(                                         \
+            type,                                                           \
             (volatile atomic_type *) obj,                                   \
             exp, des,                                                       \
             succ, fail,                                                     \
@@ -453,8 +461,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_bit_test_explicit
- *   A macro, M, callable as 'M(obj, offset, order, res)' where:
+ *   A macro, M, callable as 'M(type, obj, offset, order, res)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'const volatile atomic_type *'
  *   - 'offset' will be an expression of type 'int' whose value is non-negative
  *     and less than 'sizeof(type) * CHAR_BIT'
@@ -504,6 +513,7 @@
                                                                                 \
         /* operation */                                                         \
         do_atomic_bit_test_explicit(                                            \
+            type,                                                               \
             (const volatile atomic_type *) obj,                                 \
             offset,                                                             \
             (int) order,                                                        \
@@ -550,8 +560,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_bit_test_modify_explicit
- *   A macro, M, callable as 'M(obj, offset, order, res)' where:
+ *   A macro, M, callable as 'M(type, obj, offset, order, res)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'offset' will be an expression of type 'int' whose value is non-negative
  *     and less than 'sizeof(type) * CHAR_BIT'
@@ -602,6 +613,7 @@
                                                                                 \
         /* operation */                                                         \
         do_atomic_bit_test_modify_explicit(                                     \
+            type,                                                               \
             (volatile atomic_type *) obj,                                       \
             offset,                                                             \
             (int) order,                                                        \
@@ -647,8 +659,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_fetch_explicit
- *   A macro, M, callable as 'M(obj, arg, order, res)' where:
+ *   A macro, M, callable as 'M(type, obj, arg, order, res)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'arg' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
@@ -704,6 +717,7 @@
                                                                         \
         /* operation */                                                 \
         do_atomic_fetch_explicit(                                       \
+            type,                                                       \
             (volatile atomic_type *) obj,                               \
             arg,                                                        \
             (int) order,                                                \
@@ -750,8 +764,9 @@
  *   memory order to be used implicitly by the atomic operation.
  * 
  * @param do_atomic_fetch_noarg_explicit
- *   A macro, M, callable as 'M(obj, order, res)' where:
+ *   A macro, M, callable as 'M(type, obj, order, res)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     memory order
@@ -800,6 +815,7 @@
                                                                         \
         /* operation */                                                 \
         do_atomic_fetch_noarg_explicit(                                 \
+            type,                                                       \
             (volatile atomic_type *) obj,                               \
             (int) order,                                                \
             res                                                         \
@@ -844,8 +860,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_void_explicit
- *   A macro, M, callable as 'M(obj, arg, order)' where:
+ *   A macro, M, callable as 'M(type, obj, arg, order)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'arg' will be the name of a local identifier, with the type 'type'
  *   - 'order' will be an expression of type 'int' whose value is a valid
@@ -895,6 +912,7 @@
                                                                         \
         /* operation */                                                 \
         do_atomic_void_explicit(                                        \
+            type,                                                       \
             (volatile atomic_type *) obj,                               \
             arg,                                                        \
             (int) order                                                 \
@@ -939,8 +957,9 @@
  *   memory order to be used implicitly by the atomic operation.
  *
  * @param do_atomic_void_noarg_explicit
- *   A macro, M, callable as 'M(obj, order)' where:
+ *   A macro, M, callable as 'M(type, obj, order)' where:
  *   - the result of the expression is unused
+ *   - 'type' is forwarded directly
  *   - 'obj' will be an expression of type 'volatile atomic_type *'
  *   - 'order' will be an expression of type 'int' whose value is a valid
  *     memory order
@@ -983,6 +1002,7 @@
                                                                            \
         /* operation */                                                    \
         do_atomic_void_noarg_explicit(                                     \
+            type,                                                          \
             (volatile atomic_type *) obj,                                  \
             (int) order                                                    \
         );                                                                 \
