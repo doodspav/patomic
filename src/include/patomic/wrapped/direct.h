@@ -57,13 +57,6 @@
  *     to by 'obj'
  *   - the atomic operation uses a store memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(                               \
     atomic_type, type, fn_name, vis_p, order,                                 \
@@ -82,8 +75,6 @@
                                                                               \
         /* declarations */                                                    \
         type des;                                                             \
-        type scratch;                                                         \
-        int temp;                                                             \
                                                                               \
         /* assertions */                                                      \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                               \
@@ -91,7 +82,7 @@
         PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atomic_type);                  \
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_STORE_ORDER((int) order)); \
                                                                               \
-        /* setup */                                                           \
+        /* inputs */                                                          \
         PATOMIC_WRAPPED_DO_MEMCPY(&des, desired, sizeof(type));               \
                                                                               \
         /* operation */                                                       \
@@ -101,10 +92,6 @@
             des,                                                              \
             (int) order                                                       \
         );                                                                    \
-                                                                              \
-        /* cleanup */                                                         \
-        PATOMIC_IGNORE_UNUSED(scratch);                                       \
-        PATOMIC_IGNORE_UNUSED(temp);                                          \
     }
 
 
@@ -153,13 +140,6 @@
  *   - 'res' is set to the value which was read
  *   - the atomic operation uses a load memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                               \
     atomic_type, type, fn_name, vis_p, order,                                \
@@ -178,8 +158,6 @@
                                                                              \
         /* declarations */                                                   \
         type res;                                                            \
-        type scratch;                                                        \
-        int temp;                                                            \
                                                                              \
         /* assertions */                                                     \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                              \
@@ -195,10 +173,8 @@
             res                                                              \
         );                                                                   \
                                                                              \
-        /* cleanup */                                                        \
+        /* outputs */                                                        \
         PATOMIC_WRAPPED_DO_MEMCPY(ret, &res, sizeof(type));                  \
-        PATOMIC_IGNORE_UNUSED(scratch);                                      \
-        PATOMIC_IGNORE_UNUSED(temp);                                         \
     }
 
 
@@ -250,13 +226,6 @@
  *   - the value read from 'obj' is stored into 'res'
  *   - the atomic operation uses a memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(                      \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -277,8 +246,6 @@
         /* declarations */                                              \
         type des;                                                       \
         type res;                                                       \
-        type scratch;                                                   \
-        int temp;                                                       \
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
@@ -287,7 +254,7 @@
         PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atomic_type);            \
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_ORDER((int) order)); \
                                                                         \
-        /* setup */                                                     \
+        /* inputs */                                                    \
         PATOMIC_WRAPPED_DO_MEMCPY(&des, desired, sizeof(type));         \
                                                                         \
         /* operation */                                                 \
@@ -299,10 +266,8 @@
             res                                                         \
         );                                                              \
                                                                         \
-        /* cleanup */                                                   \
+        /* outputs */                                                   \
         PATOMIC_WRAPPED_DO_MEMCPY(ret, &res, sizeof(type));             \
-        PATOMIC_IGNORE_UNUSED(scratch);                                 \
-        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 
@@ -365,13 +330,6 @@
  *   - the atomic operation uses a memory ordering at least as strong as 'succ'
  *     for a successful exchange, and a load memory ordering at least as strong
  *     as 'fail' for a failed exchange
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(                           \
     atomic_type, type, fn_name, vis_p, inv, order,                          \
@@ -393,9 +351,7 @@
         /* declarations */                                                  \
         type exp;                                                           \
         type des;                                                           \
-        type scratch;                                                       \
         int ok = 0;                                                         \
-        int temp;                                                           \
     inv(int succ = (int) order;)                                            \
     inv(int fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);)                       \
                                                                             \
@@ -407,8 +363,7 @@
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_ORDER(succ));            \
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_FAIL_ORDER(succ, fail)); \
                                                                             \
-                                                                            \
-        /* setup */                                                         \
+        /* inputs */                                                        \
         PATOMIC_WRAPPED_DO_MEMCPY(&des, desired, sizeof(type));             \
         PATOMIC_WRAPPED_DO_MEMCPY(&exp, expected, sizeof(type));            \
                                                                             \
@@ -421,10 +376,8 @@
             ok                                                              \
         );                                                                  \
                                                                             \
-        /* cleanup */                                                       \
+        /* outputs */                                                       \
         PATOMIC_WRAPPED_DO_MEMCPY(expected, &exp, sizeof(type));            \
-        PATOMIC_IGNORE_UNUSED(scratch);                                     \
-        PATOMIC_IGNORE_UNUSED(temp);                                        \
         return ok != 0;                                                     \
     }
 
@@ -476,13 +429,6 @@
  *   - 'res' is set to the bit at offset 'offset' of the value which was read
  *   - the atomic operation uses a load memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(                              \
     atomic_type, type, fn_name, vis_p, order,                                   \
@@ -500,8 +446,6 @@
             sizeof_type_eq_atype, sizeof(type) == sizeof(atomic_type));         \
                                                                                 \
         /* declarations */                                                      \
-        type scratch;                                                           \
-        int temp;                                                               \
         int res;                                                                \
                                                                                 \
         /* assertions */                                                        \
@@ -520,9 +464,7 @@
             res                                                                 \
         );                                                                      \
                                                                                 \
-        /* cleanup */                                                           \
-        PATOMIC_IGNORE_UNUSED(scratch);                                         \
-        PATOMIC_IGNORE_UNUSED(temp);                                            \
+        /* outputs */                                                           \
         return res != 0;                                                        \
     }
 
@@ -576,13 +518,6 @@
  *   - the atomic operation uses a store memory ordering at least as strong as
  *     'order' if the operation does not require reading the old value,
  *     otherwise it uses a memory ordering at least as strong as 'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(                       \
     atomic_type, type, fn_name, vis_p, order,                                   \
@@ -600,8 +535,6 @@
             sizeof_type_eq_atype, sizeof(type) == sizeof(atomic_type));         \
                                                                                 \
         /* declarations */                                                      \
-        type scratch;                                                           \
-        int temp;                                                               \
         int res;                                                                \
                                                                                 \
         /* assertions */                                                        \
@@ -620,9 +553,7 @@
             res                                                                 \
         );                                                                      \
                                                                                 \
-        /* cleanup */                                                           \
-        PATOMIC_IGNORE_UNUSED(scratch);                                         \
-        PATOMIC_IGNORE_UNUSED(temp);                                            \
+        /* outputs */                                                           \
         return res != 0;                                                        \
     }
 
@@ -675,13 +606,6 @@
  *     'obj'
  *   - the atomic operation uses a memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(                         \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -702,8 +626,6 @@
         /* declarations */                                              \
         type arg;                                                       \
         type res;                                                       \
-        type scratch;                                                   \
-        int temp;                                                       \
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
@@ -712,7 +634,7 @@
         PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atomic_type);            \
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_ORDER((int) order)); \
                                                                         \
-        /* setup */                                                     \
+        /* inputs */                                                    \
         PATOMIC_WRAPPED_DO_MEMCPY(&arg, argument, sizeof(type));        \
                                                                         \
         /* operation */                                                 \
@@ -724,10 +646,8 @@
             res                                                         \
         );                                                              \
                                                                         \
-        /* cleanup */                                                   \
+        /* outputs */                                                   \
         PATOMIC_WRAPPED_DO_MEMCPY(ret, &res, sizeof(type));             \
-        PATOMIC_IGNORE_UNUSED(scratch);                                 \
-        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 
@@ -779,13 +699,6 @@
  *     'obj'
  *   - the atomic operation uses a memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(                   \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -804,8 +717,6 @@
                                                                         \
         /* declarations */                                              \
         type res;                                                       \
-        type scratch;                                                   \
-        int temp;                                                       \
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
@@ -821,10 +732,8 @@
             res                                                         \
         );                                                              \
                                                                         \
-        /* cleanup */                                                   \
+        /* outputs */                                                   \
         PATOMIC_WRAPPED_DO_MEMCPY(ret, &res, sizeof(type));             \
-        PATOMIC_IGNORE_UNUSED(scratch);                                 \
-        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 
@@ -873,13 +782,6 @@
  *     single atomic operation
  *   - the atomic operation uses a memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(                          \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -898,8 +800,6 @@
                                                                         \
         /* declarations */                                              \
         type arg;                                                       \
-        type scratch;                                                   \
-        int temp;                                                       \
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
@@ -907,7 +807,7 @@
         PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atomic_type);            \
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_ORDER((int) order)); \
                                                                         \
-        /* setup */                                                     \
+        /* inputs */                                                    \
         PATOMIC_WRAPPED_DO_MEMCPY(&arg, argument, sizeof(type));        \
                                                                         \
         /* operation */                                                 \
@@ -917,10 +817,6 @@
             arg,                                                        \
             (int) order                                                 \
         );                                                              \
-                                                                        \
-        /* cleanup */                                                   \
-        PATOMIC_IGNORE_UNUSED(scratch);                                 \
-        PATOMIC_IGNORE_UNUSED(temp);                                    \
     }
 
 
@@ -969,13 +865,6 @@
  *     single atomic operation
  *   - the atomic operation uses a memory ordering at least as strong as
  *     'order'
- *
- *   The following local variables will also be available to be used by the
- *   macro M:
- *   - 'temp' has type 'int'
- *   - 'scratch' has type 'type'
- *   - their value is unspecified and they may be uninitialized
- *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(                       \
     atomic_type, type, fn_name, vis_p, order,                              \
@@ -991,10 +880,6 @@
         PATOMIC_STATIC_ASSERT(                                             \
             sizeof_type_eq_atype, sizeof(type) == sizeof(atomic_type));    \
                                                                            \
-        /* declarations */                                                 \
-        type scratch;                                                      \
-        int temp;                                                          \
-                                                                           \
         /* assertions */                                                   \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                            \
         PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, atomic_type);               \
@@ -1006,10 +891,6 @@
             (volatile atomic_type *) obj,                                  \
             (int) order                                                    \
         );                                                                 \
-                                                                           \
-        /* cleanup */                                                      \
-        PATOMIC_IGNORE_UNUSED(scratch);                                    \
-        PATOMIC_IGNORE_UNUSED(temp);                                       \
     }
 
 

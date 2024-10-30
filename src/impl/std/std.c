@@ -95,9 +95,12 @@
  * - bit_test_reset (no)
  */
 #define do_bit_test_explicit(type, obj, offset, order, res) \
-    scratch = (type) ((type) 1 << (type) offset);           \
-    scratch &= atomic_load_explicit(obj, order);            \
-    res = (scratch != (type) 0)
+    do {                                                    \
+        type scratch = (type) ((type) 1 << (type) offset);  \
+        scratch &= atomic_load_explicit(obj, order);        \
+        res = (scratch != (type) 0);                        \
+    }                                                       \
+    while (0)
 
 #define PATOMIC_DEFINE_BIT_TEST_OP(type, name, vis_p, order) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(               \
