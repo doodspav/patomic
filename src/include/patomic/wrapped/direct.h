@@ -250,7 +250,7 @@
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
  */
-#define PATOMIC_WRAPPED_DEFINE_OP_EXCHANGE(                             \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(                      \
     atomic_type, type, fn_name, vis_p, order,                           \
     do_atomic_exchange_explicit                                         \
 )                                                                       \
@@ -362,7 +362,7 @@
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
  */
-#define PATOMIC_WRAPPED_DEFINE_OP_CMPXCHG(                                  \
+#define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(                           \
     atomic_type, type, fn_name, vis_p, inv, order,                          \
     do_atomic_cmpxchg_explicit                                              \
 )                                                                           \
