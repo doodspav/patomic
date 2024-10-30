@@ -19,7 +19,7 @@
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
  *   Hides a token from the compiler.
@@ -28,7 +28,7 @@
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
  *   Hides two comma-separated tokens from the compiler.
@@ -36,11 +36,11 @@
  * @note
  *   Can be used for conditionally hiding a function parameter.
  */
-#define HIDE_P(tokenA, tokenB)
+#define HIDE_P(token_a, token_b)
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
  *   Makes a token visible to the compiler.
@@ -49,7 +49,7 @@
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
  *   Makes the second of two comma-separated tokens visible to the compiler,
@@ -58,11 +58,11 @@
  * @note
  *   Can be used for conditionally making a function parameter visible.
  */
-#define SHOW_P(tokenA, tokenB) ,tokenB
+#define SHOW_P(token_a, token_b) ,token_b
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
  *   Asserts that an expression evaluates to a non-zero value.
@@ -72,19 +72,19 @@
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
- *   Asserts that an object meets a types alignment requirements.
+ *   Asserts that a pointed-to object meets a type's alignment requirements.
  */
-#define PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj, type)        \
-    patomic_assert_unreachable(                             \
-        patomic_is_aligned(obj, patomic_alignof_type(type)) \
+#define PATOMIC_WRAPPED_DO_ASSERT_ALIGNED(obj_ptr, type)        \
+    patomic_assert_unreachable(                                 \
+        patomic_is_aligned(obj_ptr, patomic_alignof_type(type)) \
     )
 
 
 /**
- * @addtogroup wrapped
+ * @addtogroup wrapped.base
  *
  * @brief
  *   Acts as a transparent wrapper around memcpy where the return value is
