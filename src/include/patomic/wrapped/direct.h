@@ -62,6 +62,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(                               \
     atomic_type, type, fn_name, vis_p, order,                                 \
@@ -155,6 +156,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(                               \
     atomic_type, type, fn_name, vis_p, order,                                \
@@ -249,6 +251,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(                      \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -361,6 +364,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(                           \
     atomic_type, type, fn_name, vis_p, inv, order,                          \
@@ -469,6 +473,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(                              \
     atomic_type, type, fn_name, vis_p, order,                                   \
@@ -566,6 +571,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(                       \
     atomic_type, type, fn_name, vis_p, order,                                   \
@@ -662,6 +668,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(                         \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -763,6 +770,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(                   \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -854,6 +862,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(                          \
     atomic_type, type, fn_name, vis_p, order,                           \
@@ -947,6 +956,7 @@
  *   - 'temp' has type 'int'
  *   - 'scratch' has type 'type'
  *   - their value is unspecified and they may be uninitialized
+ *   - these are provided to support C90's lack of declarations after code
  */
 #define PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(                       \
     atomic_type, type, fn_name, vis_p, order,                              \
