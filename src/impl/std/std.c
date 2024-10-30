@@ -507,13 +507,16 @@ patomic_create_ops(
     patomic_assert_always(patomic_is_valid_order((int) order));
 
     /* set members */
-    if PATOMIC_SET_RET(unsigned char, char, byte_width, order, ops)
-    else if PATOMIC_SET_RET(unsigned short, short, byte_width, order, ops)
-    else if PATOMIC_SET_RET(unsigned int, int, byte_width, order, ops)
-    else if PATOMIC_SET_RET(unsigned long, long, byte_width, order, ops)
+    /* go from largest to smallest in case some platform has two types with the
+     * same width but one has a larger range */
 #if HAS_LLONG_IMPL
-    else if PATOMIC_SET_RET(patomic_llong_unsigned_t, llong, byte_width, order, ops)
+    if PATOMIC_SET_RET(patomic_llong_unsigned_t, llong, byte_width, order, ops)
+    else
 #endif
+    if PATOMIC_SET_RET(unsigned long, long, byte_width, order, ops)
+    else if PATOMIC_SET_RET(unsigned int, int, byte_width, order, ops)
+    else if PATOMIC_SET_RET(unsigned short, short, byte_width, order, ops)
+    else if PATOMIC_SET_RET(unsigned char, char, byte_width, order, ops)
 
     /* return */
     return ops;
@@ -528,13 +531,16 @@ patomic_create_ops_explicit(
     patomic_ops_explicit_t ops = {0};
 
     /* set members */
-    if PATOMIC_SET_RET_EXPLICIT(unsigned char, char, byte_width, ops)
-    else if PATOMIC_SET_RET_EXPLICIT(unsigned short, short, byte_width, ops)
-    else if PATOMIC_SET_RET_EXPLICIT(unsigned int, int, byte_width, ops)
-    else if PATOMIC_SET_RET_EXPLICIT(unsigned long, long, byte_width, ops)
+    /* go from largest to smallest in case some platform has two types with the
+     * same width but one has a larger range */
 #if HAS_LLONG_IMPL
-    else if PATOMIC_SET_RET_EXPLICIT(patomic_llong_unsigned_t, llong, byte_width, ops)
+    if PATOMIC_SET_RET_EXPLICIT(patomic_llong_unsigned_t, llong, byte_width, ops)
+    else
 #endif
+    if PATOMIC_SET_RET_EXPLICIT(unsigned long, long, byte_width, ops)
+    else if PATOMIC_SET_RET_EXPLICIT(unsigned int, int, byte_width, ops)
+    else if PATOMIC_SET_RET_EXPLICIT(unsigned short, short, byte_width, ops)
+    else if PATOMIC_SET_RET_EXPLICIT(unsigned char, char, byte_width, ops)
 
     /* return */
     return ops;
@@ -549,13 +555,16 @@ patomic_create_align(
     patomic_align_t align = {0};
 
     /* set recommended */
-    if PATOMIC_SET_ALIGN(unsigned char, byte_width, align.recommended)
-    else if PATOMIC_SET_ALIGN(unsigned short, byte_width, align.recommended)
-    else if PATOMIC_SET_ALIGN(unsigned int, byte_width, align.recommended)
-    else if PATOMIC_SET_ALIGN(unsigned long, byte_width, align.recommended)
+    /* go from largest to smallest in case some platform has two types with the
+     * same width but one has a larger range */
 #if HAS_LLONG_IMPL
-    else if PATOMIC_SET_ALIGN(patomic_llong_unsigned_t, byte_width, align.recommended)
+    if PATOMIC_SET_ALIGN(patomic_llong_unsigned_t, byte_width, align.recommended)
+    else
 #endif
+    if PATOMIC_SET_ALIGN(unsigned long, byte_width, align.recommended)
+    else if PATOMIC_SET_ALIGN(unsigned int, byte_width, align.recommended)
+    else if PATOMIC_SET_ALIGN(unsigned short, byte_width, align.recommended)
+    else if PATOMIC_SET_ALIGN(unsigned char, byte_width, align.recommended)
     else
     {
         /* minimum valid alignment */
