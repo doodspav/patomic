@@ -58,6 +58,20 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_ATOMIC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Atomic' is available as a keyword.
+     *
+     * @note
+     *   Usually required: C11.
+     */
+    #define PATOMIC_HAS_ATOMIC @COMPILER_HAS_ATOMIC@
+#endif
+
+
 #ifndef PATOMIC_HAS_STDATOMIC_H
     /**
      * @addtogroup config.safe

@@ -7,6 +7,7 @@
 # | COMPILER_HAS_RESTRICT     | 'restrict' is available as a keyword      |
 # | COMPILER_HAS_MS_RESTRICT  | '__restrict' is available as a keyword    |
 # | COMPILER_HAS_GNU_RESTRICT | '__restrict__' is available as a keyword  |
+# | COMPILER_HAS_ATOMIC       | '_Atomic' is available as a keyword       |
 # -------------------------------------------------------------------------
 
 
@@ -43,4 +44,12 @@ check_c_source_compiles_or_zero(
          int main(void) { int x = 0; return get(&x); }"
     OUTPUT_VARIABLE
         COMPILER_HAS_GNU_RESTRICT
+)
+
+# '_Atomic' is available as a keyword
+check_c_source_compiles_or_zero(
+    SOURCE
+        "int main(void) { _Atomic(int) x = 0; return x; }"
+    OUTPUT_VARIABLE
+        COMPILER_HAS_ATOMIC
 )
