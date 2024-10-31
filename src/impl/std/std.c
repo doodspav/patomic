@@ -91,9 +91,9 @@
 /*
  * BITWISE:
  * - bit_test       (direct)
- * - bit_test_compl (no)
- * - bit_test_set   (no)
- * - bit_test_reset (no)
+ * - bit_test_compl (cmpxchg)
+ * - bit_test_set   (cmpxchg)
+ * - bit_test_reset (cmpxchg)
  */
 #define do_bit_test_explicit(type, obj, offset, order, res) \
     do {                                                    \
@@ -197,7 +197,7 @@
  * - (fetch_)or  (direct)
  * - (fetch_)xor (direct)
  * - (fetch_)and (direct)
- * - (fetch_)not (no)
+ * - (fetch_)not (cmpxchg)
  */
 #define do_void_or_explicit(type, obj, arg, order) \
     PATOMIC_IGNORE_UNUSED(atomic_fetch_or_explicit(obj, arg, order))
@@ -212,6 +212,9 @@
     res = atomic_fetch_xor_explicit(obj, arg, order)
 #define do_fetch_and_explicit(type, obj, arg, order, res) \
     res = atomic_fetch_and_explicit(obj, arg, order)
+
+#define do_make_desired_not(type, exp, des) \
+    des = (type) ~exp
 
 #define PATOMIC_DEFINE_BINARY_OPS_CREATE(type, name, vis_p, order, ops) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(                              \
@@ -232,6 +235,12 @@
         vis_p, order,                                                   \
         do_void_and_explicit                                            \
     )                                                                   \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(                       \
+        _Atomic(type), type,                                            \
+        patomic_opimpl_void_not_##name,                                 \
+        vis_p, order,                                                   \
+        do_cmpxchg_weak, do_make_desired_not                            \
+    )                                                                   \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(                             \
         _Atomic(type), type,                                            \
         patomic_opimpl_fetch_or_##name,                                 \
@@ -250,6 +259,12 @@
         vis_p, order,                                                   \
         do_fetch_and_explicit                                           \
     )                                                                   \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(                      \
+        _Atomic(type), type,                                            \
+        patomic_opimpl_fetch_not_##name,                                \
+        vis_p, order,                                                   \
+        do_cmpxchg_weak, do_make_desired_not                            \
+    )                                                                   \
     static patomic_##ops##_binary_t                                     \
     patomic_ops_binary_create_##name(void)                              \
     {                                                                   \
@@ -257,11 +272,11 @@
         pao.fp_or  = patomic_opimpl_void_or_##name;                     \
         pao.fp_xor = patomic_opimpl_void_xor_##name;                    \
         pao.fp_and = patomic_opimpl_void_and_##name;                    \
-        pao.fp_not = NULL;                                              \
+        pao.fp_not = patomic_opimpl_void_not_##name;                    \
         pao.fp_fetch_or  = patomic_opimpl_fetch_or_##name;              \
         pao.fp_fetch_xor = patomic_opimpl_fetch_xor_##name;             \
         pao.fp_fetch_and = patomic_opimpl_fetch_and_##name;             \
-        pao.fp_fetch_not = NULL;                                        \
+        pao.fp_fetch_not = patomic_opimpl_fetch_not_##name;             \
         return pao;                                                     \
     }
 
