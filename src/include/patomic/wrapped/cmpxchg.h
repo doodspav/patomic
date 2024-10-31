@@ -461,7 +461,7 @@
 )                                                                               \
     static int                                                                  \
     fn_name(                                                                    \
-        volatil void *const obj,                                                \
+        volatile void *const obj                                                \
         ,const int offset                                                       \
  vis_p(_,const int order)                                                       \
     )                                                                           \
@@ -490,8 +490,8 @@
             /* get the expected bit */                                          \
             do_get_bit(                                                         \
                 type,                                                           \
-                exp, offset                                                     \
-                old_bit                                                         \
+                exp, offset,                                                    \
+                exp_bit                                                         \
             );                                                                  \
                                                                                 \
             /* make the desired value from the expected value */                \
@@ -513,7 +513,7 @@
         while (!ok);                                                            \
                                                                                 \
         /* outputs */                                                           \
-        return ok != 0;                                                         \
+        return exp_bit;                                                         \
     }
 
 

@@ -11,6 +11,7 @@
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/stdint.h>
 
+#include <patomic/wrapped/cmpxchg.h>
 #include <patomic/wrapped/direct.h>
 
 #include <stdatomic.h>
@@ -96,10 +97,38 @@
  */
 #define do_bit_test_explicit(type, obj, offset, order, res) \
     do {                                                    \
-        type scratch = (type) ((type) 1 << (type) offset);  \
-        scratch &= atomic_load_explicit(obj, order);        \
-        res = (scratch != (type) 0);                        \
+        type mask = (type) ((type) 1 << offset);            \
+        mask &= atomic_load_explicit(obj, order);           \
+        res = (mask != (type) 0);                           \
     }                                                       \
+    while (0)
+
+#define do_get_bit(type, exp, offset, bit)             \
+    do {                                               \
+        const type mask = (type) ((type) 1 << offset); \
+        bit = (exp & mask) != 0;                       \
+    }                                                  \
+    while (0)
+
+#define do_make_desired_compl(type, exp, offset, des)  \
+    do {                                               \
+        const type mask = (type) ((type) 1 << offset); \
+        des = (type) (exp ^ mask);                     \
+    }                                                  \
+    while (0)
+
+#define do_make_desired_set(type, exp, offset, des)    \
+    do {                                               \
+        const type mask = (type) ((type) 1 << offset); \
+        des = (type) (exp | mask);                     \
+    }                                                  \
+    while (0)
+
+#define do_make_desired_reset(type, exp, offset, des)  \
+    do {                                               \
+        const type mask = (type) ((type) 1 << offset); \
+        des = (type) (exp & (type) ~mask);             \
+    }                                                  \
     while (0)
 
 #define PATOMIC_DEFINE_BIT_TEST_OP(type, name, vis_p, order) \
@@ -111,9 +140,27 @@
     )
 
 #define PATOMIC_DEFINE_BIT_TEST_MODIFY_OPS(type, name, vis_p, order) \
-    static const void * patomic_opimpl_bit_test_compl_##name = NULL; \
-    static const void * patomic_opimpl_bit_test_set_##name   = NULL; \
-    static const void * patomic_opimpl_bit_test_reset_##name = NULL;
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(               \
+        _Atomic(type), type,                                         \
+        patomic_opimpl_bit_test_compl_##name,                        \
+        vis_p, order,                                                \
+        do_cmpxchg_weak,                                             \
+        do_get_bit, do_make_desired_compl                            \
+    )                                                                \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(               \
+        _Atomic(type), type,                                         \
+        patomic_opimpl_bit_test_set_##name,                          \
+        vis_p, order,                                                \
+        do_cmpxchg_weak,                                             \
+        do_get_bit, do_make_desired_set                              \
+    )                                                                \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(               \
+        _Atomic(type), type,                                         \
+        patomic_opimpl_bit_test_reset_##name,                        \
+        vis_p, order,                                                \
+        do_cmpxchg_weak,                                             \
+        do_get_bit, do_make_desired_reset                            \
+    )
 
 /* create ops which support all memory orders */
 #define PATOMIC_DEFINE_BITWISE_OPS_CREATE_NO_LOAD(type, name, vis_p, order, ops) \
