@@ -94,7 +94,7 @@
       "name": "_patomic-ci-flags-warning-clang",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories -Wno-reserved-identifier -Wno-documentation-unknown-command",
+        "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories -Wno-reserved-identifier -Wno-documentation-unknown-command -Wno-unused-local-typedef",
         "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wno-c++17-attribute-extensions"
       }
     },
@@ -102,7 +102,7 @@
       "name": "_patomic-ci-flags-warning-gcc",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function",
+        "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function -Wno-unused-local-typedef",
         "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic"
       }
     },
@@ -110,7 +110,7 @@
       "name": "_patomic-ci-flags-warning-msvc",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668",
+        "CMAKE_C_FLAGS_INIT": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668 /wd4146",
         "CMAKE_CXX_FLAGS_INIT": "/permissive- /volatile:iso /W4 /WX"
       }
     },
