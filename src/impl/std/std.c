@@ -287,7 +287,7 @@
  * - (fetch_)sub (direct)
  * - (fetch_)inc (direct)
  * - (fetch_)dec (direct)
- * - (fetch_)neg (no)
+ * - (fetch_)neg (cmpxchg)
  */
 #define do_void_add_explicit(type, obj, arg, order) \
     PATOMIC_IGNORE_UNUSED(atomic_fetch_add_explicit(obj, arg, order))
@@ -306,6 +306,9 @@
     res = atomic_fetch_add_explicit(obj, (type) 1, order)
 #define do_fetch_dec_explicit(type, obj, order, res) \
     res = atomic_fetch_sub_explicit(obj, (type) 1, order)
+
+#define do_make_desired_neg(type, exp, des) \
+    des = (type) -exp
 
 #define PATOMIC_DEFINE_ARITHMETIC_OPS_CREATE(type, name, vis_p, order, ops) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(                                  \
@@ -332,6 +335,12 @@
         vis_p, order,                                                       \
         do_void_dec_explicit                                                \
     )                                                                       \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(                           \
+        _Atomic(type), type,                                                \
+        patomic_opimpl_void_neg_##name,                                     \
+        vis_p, order,                                                       \
+        do_cmpxchg_weak, do_make_desired_neg                                \
+    )                                                                       \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(                                 \
         _Atomic(type), type,                                                \
         patomic_opimpl_fetch_add_##name,                                    \
@@ -356,6 +365,12 @@
         vis_p, order,                                                       \
         do_fetch_dec_explicit                                               \
     )                                                                       \
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(                          \
+        _Atomic(type), type,                                                \
+        patomic_opimpl_fetch_neg_##name,                                    \
+        vis_p, order,                                                       \
+        do_cmpxchg_weak, do_make_desired_neg                                \
+    )                                                                       \
     static patomic_##ops##_arithmetic_t                                     \
     patomic_ops_arithmetic_create_##name(void)                              \
     {                                                                       \
@@ -364,12 +379,12 @@
         pao.fp_sub = patomic_opimpl_void_sub_##name;                        \
         pao.fp_inc = patomic_opimpl_void_inc_##name;                        \
         pao.fp_dec = patomic_opimpl_void_dec_##name;                        \
-        pao.fp_neg = NULL;                                                  \
+        pao.fp_neg = patomic_opimpl_void_neg_##name;                        \
         pao.fp_fetch_add = patomic_opimpl_fetch_add_##name;                 \
         pao.fp_fetch_sub = patomic_opimpl_fetch_sub_##name;                 \
         pao.fp_fetch_inc = patomic_opimpl_fetch_inc_##name;                 \
         pao.fp_fetch_dec = patomic_opimpl_fetch_dec_##name;                 \
-        pao.fp_fetch_neg = NULL;                                            \
+        pao.fp_fetch_neg = patomic_opimpl_fetch_neg_##name;                 \
         return pao;                                                         \
     }
 
