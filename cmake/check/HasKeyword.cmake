@@ -51,14 +51,14 @@ check_c_source_compiles_or_zero(
     SOURCE
         "#include <stdatomic.h> \n\
          int main(void) { \n\
-             const _Atomic(unsigned char)  a1 = {0}; \n\
-             const _Atomic(unsigned short) a2 = {0}; \n\
-             const _Atomic(unsigned int)   a3 = {0}; \n\
-             const _Atomic(unsigned long)  a4 = {0}; \n\
-             const volatile *const _Atomic(unsigned char)  p1 = &a1; \n\
-             const volatile *const _Atomic(unsigned short) p1 = &a1; \n\
-             const volatile *const _Atomic(unsigned int)   p1 = &a1; \n\
-             const volatile *const _Atomic(unsigned long)  p1 = &a1; \n\
+             static const _Atomic(unsigned char)  a1; \n\
+             static const _Atomic(unsigned short) a2; \n\
+             static const _Atomic(unsigned int)   a3; \n\
+             static const _Atomic(unsigned long)  a4; \n\
+             const volatile _Atomic(unsigned char)  *const p1 = &a1; \n\
+             const volatile _Atomic(unsigned short) *const p2 = &a2; \n\
+             const volatile _Atomic(unsigned int)   *const p3 = &a3; \n\
+             const volatile _Atomic(unsigned long)  *const p4 = &a4; \n\
              unsigned long sum = 0; \n\
              sum += (unsigned long) atomic_load(p1); \n\
              sum += (unsigned long) atomic_load(p2); \n\
