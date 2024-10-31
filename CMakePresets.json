@@ -56,7 +56,7 @@
       "name": "_patomic-ci-flags-ansi-gnu",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment",
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment -Wno-unused-local-typedef",
         "CMAKE_C_STANDARD": "90"
       }
     },
