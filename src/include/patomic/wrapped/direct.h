@@ -353,9 +353,9 @@
         /* declarations */                                                  \
         type exp;                                                           \
         type des;                                                           \
-        int ok = 0;                                                         \
-    inv(int succ = (int) order;)                                            \
-    inv(int fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);)                       \
+        int ok;                                                             \
+    inv(const int succ = (int) order;)                                      \
+    inv(const int fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);)                 \
                                                                             \
         /* assertions */                                                    \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \

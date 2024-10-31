@@ -86,9 +86,9 @@
         /* declarations */                                                    \
         type exp = {0};                                                       \
         type des;                                                             \
-        int succ;                                                             \
-        int fail;                                                             \
-        int ok = 0;                                                           \
+        int ok;                                                               \
+        const int succ = (int) order;                                         \
+        const int fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);                    \
                                                                               \
         /* assertions */                                                      \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                               \
@@ -97,8 +97,6 @@
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_STORE_ORDER((int) order)); \
                                                                               \
         /* inputs */                                                          \
-        succ = (int) order;                                                   \
-        fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);                              \
         PATOMIC_WRAPPED_DO_MEMCPY(&des, desired, sizeof(type));               \
                                                                               \
         /* operation */                                                       \
@@ -190,9 +188,9 @@
         /* declarations */                                              \
         type exp = {0};                                                 \
         type des;                                                       \
-        int succ;                                                       \
-        int fail;                                                       \
-        int ok = 0;                                                     \
+        int ok;                                                         \
+        const int succ = (int) order;                                   \
+        const int fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);              \
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
@@ -202,8 +200,6 @@
         PATOMIC_WRAPPED_DO_ASSERT(PATOMIC_IS_VALID_ORDER((int) order)); \
                                                                         \
         /* inputs */                                                    \
-        succ = (int) order;                                             \
-        fail = PATOMIC_CMPXCHG_FAIL_ORDER(succ);                        \
         PATOMIC_WRAPPED_DO_MEMCPY(&des, desired, sizeof(type));         \
                                                                         \
         /* operation */                                                 \
@@ -319,10 +315,10 @@
         type exp;                                                           \
         type des;                                                           \
         type old;                                                           \
-        int cmp = 0;                                                        \
-        int ok = 0;                                                         \
-    inv(int succ = (int) order;)                                            \
-    inv(int fail = PATOMIC_CMPXCHG_FAIL_ORDER((int) order);)                \
+        int eq;                                                             \
+        int ok;                                                             \
+    inv(const int succ = (int) order;)                                      \
+    inv(const int fail = PATOMIC_CMPXCHG_FAIL_ORDER((int) order);)          \
                                                                             \
         /* assertions */                                                    \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
@@ -335,10 +331,12 @@
         /* inputs */                                                        \
         PATOMIC_WRAPPED_DO_MEMCPY(&exp, expected, sizeof(type));            \
         PATOMIC_WRAPPED_DO_MEMCPY(&des, desired, sizeof(type));             \
-        PATOMIC_WRAPPED_DO_MEMCPY(&old, &exp, sizeof(type));                \
                                                                             \
         /* operation */                                                     \
         do {                                                                \
+            /* save expected value for comparison */                        \
+            PATOMIC_WRAPPED_DO_MEMCPY(&old, &exp, sizeof(type));            \
+                                                                            \
             /* cmpxchg_weak */                                              \
             do_atomic_cmpxchg_weak_explicit(                                \
                 type                                                        \
@@ -352,20 +350,13 @@
             do_cmp_eq(                                                      \
                 type,                                                       \
                 exp, old,                                                   \
-                cmp                                                         \
+                eq                                                          \
             );                                                              \
                                                                             \
-            /* was modified */                                              \
-            if (!cmp)                                                       \
+            /* was modified: non-spurious failure */                        \
+            if (!eq)                                                        \
             {                                                               \
                 break;                                                      \
-            }                                                               \
-                                                                            \
-            /* spurious failure */                                          \
-            /* save loaded value for future comparison */                   \
-            else                                                            \
-            {                                                               \
-                PATOMIC_WRAPPED_DO_MEMCPY(&old, &exp, sizeof(type));        \
             }                                                               \
         }                                                                   \
         while (!ok);                                                        \
