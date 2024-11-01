@@ -130,10 +130,6 @@ patomic_create_explicit(
  *   The implementation with the most efficient kind that supports at least a
  *   single operation. If no such implementations exist, the NULL implementation
  *   is returned.
- *
- * @note
- *   The alignment requirements returned by this function will always be valid
- *   even if no operations are supported.
  */
 PATOMIC_EXPORT patomic_transaction_t
 patomic_create_transaction(

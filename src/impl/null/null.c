@@ -60,10 +60,6 @@ patomic_impl_create_transaction_null(
     /* ignore parameters */
     PATOMIC_IGNORE_UNUSED(options);
 
-    /* set a valid minimal alignment */
-    impl.align.recommended = 1;
-    impl.align.minimum = 1;
-
     /* return */
     return impl;
 }
