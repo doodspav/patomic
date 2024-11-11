@@ -524,9 +524,9 @@
 #endif
 
 
-#define PATOMIC_SET_RET(type, name, byte_width, order, ops)             \
-        ((byte_width == sizeof(type)) &&                                \
-         (byte_width == sizeof(_Atomic(type))))                         \
+#define PATOMIC_RET_OPS(type, name, byte_width, order, ops)             \
+    if ((byte_width == sizeof(type)) &&                                 \
+        (byte_width == sizeof(_Atomic(type))))                          \
     {                                                                   \
         _Atomic(type) obj;                                              \
         if (atomic_is_lock_free(&obj))                                  \
@@ -552,27 +552,37 @@
                 default:                                                \
                     patomic_assert_always("invalid memory order" && 0); \
             }                                                           \
+            return ops;                                                 \
         }                                                               \
         PATOMIC_IGNORE_UNUSED(obj);                                     \
     }
 
-#define PATOMIC_SET_RET_EXPLICIT(type, name, byte_width, ops) \
-        ((byte_width == sizeof(type)) &&                      \
-         (byte_width == sizeof(_Atomic(type))))               \
+#define PATOMIC_RET_OPS_EXPLICIT(type, name, byte_width, ops) \
+    if ((byte_width == sizeof(type)) &&                       \
+        (byte_width == sizeof(_Atomic(type))))                \
     {                                                         \
         _Atomic(type) obj;                                    \
         if (atomic_is_lock_free(&obj))                        \
         {                                                     \
             ops = patomic_ops_create_##name##_explicit();     \
+            return ops;                                       \
         }                                                     \
         PATOMIC_IGNORE_UNUSED(obj);                           \
     }
 
-#define PATOMIC_SET_ALIGN(type, byte_width, member)   \
-        ((byte_width == sizeof(type)) &&              \
-         (byte_width == sizeof(_Atomic(type))))       \
-    {                                                 \
-        member = patomic_alignof_type(_Atomic(type)); \
+#define PATOMIC_RET_ALIGN(type, byte_width)                          \
+    if ((byte_width == sizeof(type)) &&                              \
+        (byte_width == sizeof(_Atomic(type))))                       \
+    {                                                                \
+        _Atomic(type) obj;                                           \
+        if (atomic_is_lock_free(&obj))                               \
+        {                                                            \
+            align.recommended = patomic_alignof_type(_Atomic(type)); \
+            align.minimum = align.recommended;                       \
+            align.size_within = 0;                                   \
+            return align;                                            \
+        }                                                            \
+        PATOMIC_IGNORE_UNUSED(obj);                                  \
     }
 
 
@@ -590,15 +600,22 @@ patomic_create_ops(
     /* go from largest to smallest in case some platform has two types with the
      * same width but one has a larger range */
 #if HAS_LLONG_IMPL
-    if PATOMIC_SET_RET(patomic_llong_unsigned_t, llong, byte_width, order, ops)
-    else
+    PATOMIC_RET_OPS(patomic_llong_unsigned_t, llong, byte_width, order, ops)
 #endif
-    if PATOMIC_SET_RET(unsigned long, long, byte_width, order, ops)
-    else if PATOMIC_SET_RET(unsigned int, int, byte_width, order, ops)
-    else if PATOMIC_SET_RET(unsigned short, short, byte_width, order, ops)
-    else if PATOMIC_SET_RET(unsigned char, char, byte_width, order, ops)
+#if ATOMIC_LONG_LOCK_FREE
+    PATOMIC_RET_OPS(unsigned long, long, byte_width, order, ops)
+#endif
+#if ATOMIC_INT_LOCK_FREE
+    PATOMIC_RET_OPS(unsigned int, int, byte_width, order, ops)
+#endif
+#if ATOMIC_SHORT_LOCK_FREE
+    PATOMIC_RET_OPS(unsigned short, short, byte_width, order, ops)
+#endif
+#if ATOMIC_CHAR_LOCK_FREE
+    PATOMIC_RET_OPS(unsigned char, char, byte_width, order, ops)
+#endif
 
-    /* return */
+    /* fallback, width not supported */
     return ops;
 }
 
@@ -614,15 +631,22 @@ patomic_create_ops_explicit(
     /* go from largest to smallest in case some platform has two types with the
      * same width but one has a larger range */
 #if HAS_LLONG_IMPL
-    if PATOMIC_SET_RET_EXPLICIT(patomic_llong_unsigned_t, llong, byte_width, ops)
-    else
+    PATOMIC_RET_OPS_EXPLICIT(patomic_llong_unsigned_t, llong, byte_width, ops)
 #endif
-    if PATOMIC_SET_RET_EXPLICIT(unsigned long, long, byte_width, ops)
-    else if PATOMIC_SET_RET_EXPLICIT(unsigned int, int, byte_width, ops)
-    else if PATOMIC_SET_RET_EXPLICIT(unsigned short, short, byte_width, ops)
-    else if PATOMIC_SET_RET_EXPLICIT(unsigned char, char, byte_width, ops)
+#if ATOMIC_LONG_LOCK_FREE
+    PATOMIC_RET_OPS_EXPLICIT(unsigned long, long, byte_width, ops)
+#endif
+#if ATOMIC_INT_LOCK_FREE
+    PATOMIC_RET_OPS_EXPLICIT(unsigned int, int, byte_width, ops)
+#endif
+#if ATOMIC_SHORT_LOCK_FREE
+    PATOMIC_RET_OPS_EXPLICIT(unsigned short, short, byte_width, ops)
+#endif
+#if ATOMIC_CHAR_LOCK_FREE
+    PATOMIC_RET_OPS_EXPLICIT(unsigned char, char, byte_width, ops)
+#endif
 
-    /* return */
+    /* fallback, width not supported */
     return ops;
 }
 
@@ -638,24 +662,25 @@ patomic_create_align(
     /* go from largest to smallest in case some platform has two types with the
      * same width but one has a larger range */
 #if HAS_LLONG_IMPL
-    if PATOMIC_SET_ALIGN(patomic_llong_unsigned_t, byte_width, align.recommended)
-    else
+    PATOMIC_RET_ALIGN(patomic_llong_unsigned_t, byte_width)
 #endif
-    if PATOMIC_SET_ALIGN(unsigned long, byte_width, align.recommended)
-    else if PATOMIC_SET_ALIGN(unsigned int, byte_width, align.recommended)
-    else if PATOMIC_SET_ALIGN(unsigned short, byte_width, align.recommended)
-    else if PATOMIC_SET_ALIGN(unsigned char, byte_width, align.recommended)
-    else
-    {
-        /* minimum valid alignment */
-        align.recommended = 1;
-    }
+#if ATOMIC_LONG_LOCK_FREE
+    PATOMIC_RET_ALIGN(unsigned long, byte_width)
+#endif
+#if ATOMIC_INT_LOCK_FREE
+    PATOMIC_RET_ALIGN(unsigned int, byte_width)
+#endif
+#if ATOMIC_SHORT_LOCK_FREE
+    PATOMIC_RET_ALIGN(unsigned short, byte_width)
+#endif
+#if ATOMIC_CHAR_LOCK_FREE
+    PATOMIC_RET_ALIGN(unsigned char, byte_width)
+#endif
 
-    /* set remaining members */
+    /* fallback, width not supported */
+    align.recommended = 1;
     align.minimum = align.recommended;
     align.size_within = 0;
-
-    /* return */
     return align;
 }
 
