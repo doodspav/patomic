@@ -596,7 +596,7 @@ patomic_create_ops(
     patomic_ops_t ops = {0};
     patomic_assert_always(patomic_is_valid_order((int) order));
 
-    /* set members */
+    /* set and return implicit atomic ops */
     /* go from largest to smallest in case some platform has two types with the
      * same width but one has a larger range */
 #if HAS_LLONG_IMPL
@@ -627,7 +627,7 @@ patomic_create_ops_explicit(
     /* setup */
     patomic_ops_explicit_t ops = {0};
 
-    /* set members */
+    /* set and return explicit atomic ops */
     /* go from largest to smallest in case some platform has two types with the
      * same width but one has a larger range */
 #if HAS_LLONG_IMPL
@@ -658,7 +658,7 @@ patomic_create_align(
     /* setup */
     patomic_align_t align = {0};
 
-    /* set recommended */
+    /* set and return atomic alignments */
     /* go from largest to smallest in case some platform has two types with the
      * same width but one has a larger range */
 #if HAS_LLONG_IMPL
