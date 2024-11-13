@@ -172,14 +172,20 @@ generic_integer::dec() noexcept
 void
 generic_integer::neg() noexcept
 {
+    // invert all bits and increment result
+    inv();
+    inc();
+}
+
+
+void
+generic_integer::inv() noexcept
+{
     // invert all bits
     for (std::size_t i = 0; i < width(); ++i)
     {
         data()[i] = static_cast<unsigned char>(~(data()[i]));
     }
-
-    // increment result
-    inc();
 }
 
 

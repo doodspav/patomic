@@ -82,11 +82,15 @@ public:
     void
     dec() noexcept;
 
-
     /// @brief
     ///   Negate this instance's value in-place.
     void
     neg() noexcept;
+
+    /// @brief
+    ///   Flip all bits in this instance's value in-place.
+    void
+    inv() noexcept;
 
     /// @brief
     ///   Set this instance's value to the minimum it can represent.
