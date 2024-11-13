@@ -57,7 +57,7 @@ __patomic_assert_fail(
 
 #if defined(NDEBUG) && !defined(NNDEBUG)
     #define patomic_assert_unreachable_(expr) (PATOMIC_IGNORE_UNUSED((expr || \
-        (PATOMIC_UNREACHABLE(), 0)))
+        (PATOMIC_UNREACHABLE(), 0))))
 #else
     #define patomic_assert_unreachable_(expr) patomic_assert_always(expr)
 #endif

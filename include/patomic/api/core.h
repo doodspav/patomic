@@ -59,9 +59,6 @@ typedef struct {
      *         transaction, and non-atomic transaction specific operations. */
     patomic_ops_transaction_t ops;
 
-    /** @brief Alignment requirements for atomic operations. */
-    patomic_align_t align;
-
     /** @brief Recommended time and space bounds for atomic operations. */
     patomic_transaction_recommended_t recommended;
 

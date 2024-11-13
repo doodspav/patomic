@@ -35,7 +35,7 @@ extern "C" {
  * @param order
  *   Memory order to implicitly use for all atomic operations.
  *
- * @param opts
+ * @param options
  *   One or more patomic_option_t flags combined. Passed on to each internal
  *   implementation to be used in an unspecified manner.
  *
@@ -57,7 +57,7 @@ PATOMIC_EXPORT patomic_t
 patomic_create(
     size_t byte_width,
     patomic_memory_order_t order,
-    unsigned int opts,
+    unsigned int options,
     unsigned int kinds,
     unsigned long ids
 );
@@ -74,7 +74,7 @@ patomic_create(
  * @param byte_width
  *   Width in bytes of type to support.
  *
- * @param opts
+ * @param options
  *   One or more patomic_option_t flags combined. Passed on to each internal
  *   implementation to be used in an unspecified manner.
  *
@@ -95,7 +95,7 @@ patomic_create(
 PATOMIC_EXPORT patomic_explicit_t
 patomic_create_explicit(
     size_t byte_width,
-    unsigned int opts,
+    unsigned int options,
     unsigned int kinds,
     unsigned long ids
 );
@@ -116,7 +116,7 @@ patomic_create_explicit(
  *   than one set of APIs using hardware support for performing lock-free
  *   transactional operations.
  *
- * @param opts
+ * @param options
  *   One or more patomic_option_t flags combined. Passed on to each internal
  *   implementation to be used in an unspecified manner.
  *
@@ -130,14 +130,10 @@ patomic_create_explicit(
  *   The implementation with the most efficient kind that supports at least a
  *   single operation. If no such implementations exist, the NULL implementation
  *   is returned.
- *
- * @note
- *   The alignment requirements returned by this function will always be valid
- *   even if no operations are supported.
  */
 PATOMIC_EXPORT patomic_transaction_t
 patomic_create_transaction(
-    unsigned int opts,
+    unsigned int options,
     unsigned int kinds,
     unsigned long ids
 );

@@ -43,6 +43,76 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'restrict' is available as a keyword.
+     *
+     * @note
+     *   Usually required: C99.
+     */
+    #define PATOMIC_HAS_RESTRICT 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__restrict' is available as a keyword.
+     *
+     * @note
+     *   Usually required: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_RESTRICT 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__restrict__' is available as a keyword.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_RESTRICT 0
+#endif
+
+
+#ifndef PATOMIC_HAS_ATOMIC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Atomic' is available as a keyword.
+     *
+     * @note
+     *   Usually required: C11.
+     */
+    #define PATOMIC_HAS_ATOMIC 0
+#endif
+
+
+#ifndef PATOMIC_HAS_STDATOMIC_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdatomic.h> header is available.
+     *
+     * @note
+     *   Usually required: C11.
+     */
+    #define PATOMIC_HAS_STDATOMIC_H 0
+#endif
+
+
 #ifndef PATOMIC_HAS_STDINT_H
     /**
      * @addtogroup config.safe
@@ -369,6 +439,118 @@
      *   Usually requires: C95.
      */
     #define PATOMIC_HAS_WCHAR_FWPRINTF 0
+#endif
+
+
+#ifndef PATOMIC_HAS_C23_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: C23.
+     */
+    #define PATOMIC_HAS_C23_ALIGNOF 0
+#endif
+
+
+#ifndef PATOMIC_HAS_C23_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_C23_ALIGNOF_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_C11_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: C11.
+     */
+    #define PATOMIC_HAS_C11_ALIGNOF 0
+#endif
+
+
+#ifndef PATOMIC_HAS_C11_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ _Alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_C11_ALIGNOF_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_ALIGNOF 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_ALIGNOF_EXTN 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__alignof__(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_ALIGNOF 0
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __alignof__(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_ALIGNOF_EXTN 0
 #endif
 
 

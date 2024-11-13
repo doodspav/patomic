@@ -7,7 +7,7 @@ patomic_t
 patomic_impl_create_null(
     const size_t byte_width,
     const patomic_memory_order_t order,
-    const unsigned int opts
+    const unsigned int options
 )
 {
     /* zero all fields */
@@ -16,7 +16,7 @@ patomic_impl_create_null(
     /* ignore parameters */
     PATOMIC_IGNORE_UNUSED(byte_width);
     PATOMIC_IGNORE_UNUSED(order);
-    PATOMIC_IGNORE_UNUSED(opts);
+    PATOMIC_IGNORE_UNUSED(options);
 
     /* set a valid minimal alignment */
     impl.align.recommended = 1;
@@ -30,7 +30,7 @@ patomic_impl_create_null(
 patomic_explicit_t
 patomic_impl_create_explicit_null(
     const size_t byte_width,
-    const unsigned int opts
+    const unsigned int options
 )
 {
     /* zero all fields */
@@ -38,7 +38,7 @@ patomic_impl_create_explicit_null(
 
     /* ignore parameters */
     PATOMIC_IGNORE_UNUSED(byte_width);
-    PATOMIC_IGNORE_UNUSED(opts);
+    PATOMIC_IGNORE_UNUSED(options);
 
     /* set a valid minimal alignment */
     impl.align.recommended = 1;
@@ -51,18 +51,14 @@ patomic_impl_create_explicit_null(
 
 patomic_transaction_t
 patomic_impl_create_transaction_null(
-    const unsigned int opts
+    const unsigned int options
 )
 {
     /* zero all fields */
     patomic_transaction_t impl = {0};
 
     /* ignore parameters */
-    PATOMIC_IGNORE_UNUSED(opts);
-
-    /* set a valid minimal alignment */
-    impl.align.recommended = 1;
-    impl.align.minimum = 1;
+    PATOMIC_IGNORE_UNUSED(options);
 
     /* return */
     return impl;
