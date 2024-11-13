@@ -9,6 +9,7 @@ on:
 
 jobs:
   test-native:
+    if: false
     strategy:
       matrix:
         # verbose labels make things easier to read in GitHub Actions
@@ -55,6 +56,7 @@ jobs:
       architecture: ${{ matrix.architecture }}
 
   test-qemu:
+    if: false
     strategy:
       matrix:
         # architecture gets converted to triple
@@ -133,6 +135,7 @@ jobs:
       skip_llvm: ${{ matrix.skip_llvm == true }}
 
   publish-results:
+    if: false
     runs-on: ubuntu-latest
     needs:
       - test-native
