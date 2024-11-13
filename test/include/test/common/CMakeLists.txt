@@ -3,6 +3,7 @@ target_sources(${test_target_name}-include INTERFACE
     align.hpp
     compare.hpp
     death.hpp
+    generic_int.hpp
     make_ops.hpp
     math.hpp
     utility.hpp

@@ -1,0 +1,214 @@
+#include <test/common/generic_int.hpp>
+
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <limits>
+
+namespace
+{
+
+
+/// @brief
+///   Implementation of generic_integer requires that the platform uses
+///   two's complement integer representation.
+static_assert(
+    -INT_MAX != INT_MIN,
+    "integer representation must be two's complement"
+);
+
+
+/// @brief
+///   Check if the runtime endianness is little-endian.
+bool
+is_little_endian() noexcept
+{
+    // ensure check is possible
+    static_assert(
+        sizeof(unsigned long long) > 1,
+        "all integer types are 1 byte, cannot perform endianness check"
+    );
+
+    // check endianness
+    unsigned int x = 1;
+    return *reinterpret_cast<unsigned char *>(&x);
+}
+
+
+}  // namespace
+
+namespace test
+{
+
+
+generic_integer::generic_integer(
+    const std::size_t width, const sign_flag is_signed
+)
+    : m_is_signed(is_signed)
+{
+    // check pre-condition
+    assert(width != 0);
+
+    // fill representation with zeros
+    m_buf.resize(width);
+    std::fill(m_buf.begin(), m_buf.end(), 0);
+}
+
+
+bool
+generic_integer::is_signed() const noexcept
+{
+    return static_cast<bool>(m_is_signed);
+}
+
+
+std::size_t
+generic_integer::width() const noexcept
+{
+    return m_buf.size();
+}
+
+
+unsigned char *
+generic_integer::data() noexcept
+{
+    return m_buf.data();
+}
+
+
+const unsigned char *
+generic_integer::data() const noexcept
+{
+    return m_buf.data();
+}
+
+
+void
+generic_integer::store(
+    const unsigned char *const buf, const std::size_t size
+) noexcept
+{
+    // check pre-condition
+    assert(size == width());
+
+    // store value
+    const auto ssize = static_cast<std::ptrdiff_t>(size);
+    static_cast<void>(std::copy(buf, std::next(buf, ssize), data()));
+}
+
+
+void
+generic_integer::add(const generic_integer& other) noexcept
+{
+    // check pre-condition
+    assert(other.width() == width());
+
+    // ensure operation is possible
+    static_assert(
+        sizeof(int) > sizeof(char),
+        "int not big enough to hold carry for char without overflow"
+    );
+
+    // setup
+    constexpr auto max_uc = std::numeric_limits<unsigned char>::max();
+    unsigned int carry = 0;
+
+    // perform operation
+    for (std::size_t i = 0; i < width(); ++i)
+    {
+        // sum byte
+        std::size_t index = is_little_endian() ? i : (width() - i - 1u);
+        carry += data()[index];
+        carry += other.data()[index];
+
+        // write byte back
+        data()[index] = static_cast<unsigned char>(carry & max_uc);
+        carry >>= CHAR_BIT;
+    }
+
+    // carry can be discarded since we wraparound on overflow
+    static_cast<void>(carry);
+}
+
+
+void
+generic_integer::sub(const generic_integer& other) noexcept
+{
+    // negate other so we can defer to addition
+    auto arg = other;
+    arg.neg();
+
+    // defer to addition
+    add(arg);
+}
+
+
+void
+generic_integer::inc() noexcept
+{
+    // create int with value of 1
+    generic_integer one { width(), m_is_signed };
+    const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
+    one.data()[lsbIndex] = 1u;
+
+    // defer to addition
+    add(one);
+}
+
+
+void
+generic_integer::dec() noexcept
+{
+    // create int with value of 1
+    generic_integer one { width(), m_is_signed };
+    const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
+    one.data()[lsbIndex] = 1u;
+
+    // defer to subtraction
+    sub(one);
+}
+
+
+void
+generic_integer::neg() noexcept
+{
+    // invert all bits
+    for (std::size_t i = 0; i < width(); ++i)
+    {
+        data()[i] = static_cast<unsigned char>(~(data()[i]));
+    }
+
+    // increment result
+    inc();
+}
+
+
+void
+generic_integer::set_min() noexcept
+{
+    // zero all bytes
+    std::fill(m_buf.begin(), m_buf.end(), 0);
+
+    // special case for signed integers
+    if (is_signed())
+    {
+        // set most significant bit to 1
+        std::size_t msbIndex = is_little_endian() ? (width() - 1u) : 0u;
+        unsigned char msb = 1u;
+        msb <<= (std::numeric_limits<unsigned char>::digits - 1u);
+        data()[msbIndex] = msb;
+    }
+}
+
+
+void
+generic_integer::set_max() noexcept
+{
+    // we can simply negate the value of min + 1 (two's complement)
+    set_min();
+    inc();
+    neg();
+}
+
+
+}  // namespace test
