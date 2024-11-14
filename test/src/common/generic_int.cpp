@@ -1,8 +1,10 @@
+#include <test/common/align.hpp>
 #include <test/common/generic_int.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <iterator>
 #include <limits>
 
 namespace
@@ -42,16 +44,29 @@ namespace test
 
 
 generic_integer::generic_integer(
-    const std::size_t width, const sign_flag is_signed
+    const std::size_t width,
+    const std::align_val_t alignment,
+    const sign_flag is_signed
 )
-    : m_is_signed(is_signed)
+    : m_width(width),
+      m_alignment(alignment),
+      m_is_signed(is_signed)
 {
-    // check pre-condition
+    // check pre-conditions
     assert(width != 0);
+    assert(static_cast<std::size_t>(alignment) != 0);
+    assert(static_cast<std::size_t>(alignment) % 2u == 0);
 
-    // fill representation with zeros
-    m_buf.resize(width);
+    // reserve enough space for width and alignment padding
+    const auto align = static_cast<std::size_t>(alignment);
+    m_buf.resize(width + align - 1u);
+
+    // fill buffer with zeros
     std::fill(m_buf.begin(), m_buf.end(), 0);
+
+    // get offset to aligned representation
+    void *ptr = aligned_pointer(m_buf.data(), m_buf.size(), align, width);
+    m_offset = std::distance(m_buf.data(), static_cast<unsigned char *>(ptr));
 }
 
 
@@ -65,21 +80,28 @@ generic_integer::is_signed() const noexcept
 std::size_t
 generic_integer::width() const noexcept
 {
-    return m_buf.size();
+    return m_width;
+}
+
+
+std::align_val_t
+generic_integer::alignment() const noexcept
+{
+    return m_alignment;
 }
 
 
 unsigned char *
 generic_integer::data() noexcept
 {
-    return m_buf.data();
+    return std::next(m_buf.data(), m_offset);
 }
 
 
 const unsigned char *
 generic_integer::data() const noexcept
 {
-    return m_buf.data();
+    return std::next(m_buf.data(), m_offset);
 }
 
 
@@ -147,7 +169,7 @@ void
 generic_integer::inc() noexcept
 {
     // create int with value of 1
-    generic_integer one { width(), m_is_signed };
+    generic_integer one { width(), alignment(), m_is_signed };
     const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
     one.data()[lsbIndex] = 1u;
 
@@ -160,7 +182,7 @@ void
 generic_integer::dec() noexcept
 {
     // create int with value of 1
-    generic_integer one { width(), m_is_signed };
+    generic_integer one { width(), alignment(), m_is_signed };
     const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
     one.data()[lsbIndex] = 1u;
 
@@ -193,7 +215,8 @@ void
 generic_integer::set_min() noexcept
 {
     // zero all bytes
-    std::fill(m_buf.begin(), m_buf.end(), 0);
+    const auto ssize = static_cast<std::ptrdiff_t>(width());
+    std::fill(data(), std::next(data(), ssize), 0);
 
     // special case for signed integers
     if (is_signed())

@@ -9,7 +9,8 @@ namespace test
 
 
 /// @brief
-///   Generic integer type which can assume any width and signedness.
+///   Generic integer type which can assume any width, alignment, and
+///   signedness.
 /// @note
 ///   Internal integer representation is two's complement.
 class generic_integer
@@ -24,12 +25,16 @@ public:
     };
 
     /// @brief
-    ///   Create a generic integer of a given width and signedness.
+    ///   Create a generic integer of a given width, alignment, and signedness.
     /// @pre
     ///   The width cannot be 0.
+    /// @pre
+    ///   The alignment must be a power of 2.
     /// @post
     ///   Initial value will be 0.
-    generic_integer(std::size_t width, sign_flag is_signed);
+    generic_integer(
+        std::size_t width, std::align_val_t alignment, sign_flag is_signed
+    );
 
     /// @brief
     ///   Check if the integer is signed.
@@ -40,6 +45,12 @@ public:
     ///   Get the byte width of the integer.
     std::size_t
     width() const noexcept;
+
+
+    /// @brief
+    ///   Get the alignment of the integer.
+    std::align_val_t
+    alignment() const noexcept;
 
     /// @brief
     ///   Get a pointer to the start of the internal buffer.
@@ -103,10 +114,19 @@ public:
     set_max() noexcept;
 
 private:
+    /// @brief Width of integer.
+    std::size_t m_width {};
+
+    /// @brief Alignment of integer.
+    std::align_val_t m_alignment {};
+
     /// @brief Flag holding signed state.
     sign_flag m_is_signed {};
 
-    /// @brief Buffer holding internal representation.
+    /// @brief Index to first byte of integer representation in buffer.
+    std::ptrdiff_t m_offset {};
+
+    /// @brief Buffer holding aligned internal representation.
     std::vector<unsigned char> m_buf;
 };
 
