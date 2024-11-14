@@ -17,14 +17,6 @@ class generic_integer
 {
 public:
     /// @brief
-    ///   Typed boolean representing if an integer is signed or unsigned.
-    enum class sign_flag
-    {
-        UNSIGNED = 0,
-        SIGNED = 1
-    };
-
-    /// @brief
     ///   Create a generic integer of a given width, alignment, and signedness.
     /// @pre
     ///   The width cannot be 0.
@@ -32,9 +24,7 @@ public:
     ///   The alignment must be a power of 2.
     /// @post
     ///   Initial value will be 0.
-    generic_integer(
-        std::size_t width, std::align_val_t alignment, sign_flag is_signed
-    );
+    generic_integer(std::size_t width, std::size_t alignment, bool is_signed);
 
     /// @brief
     ///   Check if the integer is signed.
@@ -49,7 +39,7 @@ public:
 
     /// @brief
     ///   Get the alignment of the integer.
-    std::align_val_t
+    std::size_t
     alignment() const noexcept;
 
     /// @brief
@@ -118,10 +108,10 @@ private:
     std::size_t m_width {};
 
     /// @brief Alignment of integer.
-    std::align_val_t m_alignment {};
+    std::size_t m_alignment {};
 
-    /// @brief Flag holding signed state.
-    sign_flag m_is_signed {};
+    /// @brief If the underlying integer is signed or not.
+    bool m_is_signed {};
 
     /// @brief Index to first byte of integer representation in buffer.
     std::ptrdiff_t m_offset {};

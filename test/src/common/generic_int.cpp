@@ -45,8 +45,8 @@ namespace test
 
 generic_integer::generic_integer(
     const std::size_t width,
-    const std::align_val_t alignment,
-    const sign_flag is_signed
+    const std::size_t alignment,
+    const bool is_signed
 )
     : m_width(width),
       m_alignment(alignment),
@@ -54,18 +54,17 @@ generic_integer::generic_integer(
 {
     // check pre-conditions
     assert(width != 0);
-    assert(static_cast<std::size_t>(alignment) != 0);
-    assert(static_cast<std::size_t>(alignment) % 2u == 0);
+    assert(alignment != 0);
+    assert(alignment % 2u == 0);
 
     // reserve enough space for width and alignment padding
-    const auto align = static_cast<std::size_t>(alignment);
-    m_buf.resize(width + align - 1u);
+    m_buf.resize(width + alignment - 1u);
 
     // fill buffer with zeros
     std::fill(m_buf.begin(), m_buf.end(), 0);
 
     // get offset to aligned representation
-    void *ptr = aligned_pointer(m_buf.data(), m_buf.size(), align, width);
+    void *ptr = aligned_pointer(m_buf.data(), m_buf.size(), alignment, width);
     m_offset = std::distance(m_buf.data(), static_cast<unsigned char *>(ptr));
 }
 
@@ -73,7 +72,7 @@ generic_integer::generic_integer(
 bool
 generic_integer::is_signed() const noexcept
 {
-    return static_cast<bool>(m_is_signed);
+    return m_is_signed;
 }
 
 
@@ -84,7 +83,7 @@ generic_integer::width() const noexcept
 }
 
 
-std::align_val_t
+std::size_t
 generic_integer::alignment() const noexcept
 {
     return m_alignment;
@@ -169,7 +168,7 @@ void
 generic_integer::inc() noexcept
 {
     // create int with value of 1
-    generic_integer one { width(), alignment(), m_is_signed };
+    generic_integer one { width(), alignment(), is_signed() };
     const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
     one.data()[lsbIndex] = 1u;
 
@@ -182,7 +181,7 @@ void
 generic_integer::dec() noexcept
 {
     // create int with value of 1
-    generic_integer one { width(), alignment(), m_is_signed };
+    generic_integer one { width(), alignment(), is_signed() };
     const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
     one.data()[lsbIndex] = 1u;
 
