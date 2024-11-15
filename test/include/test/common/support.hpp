@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <set>
+#include <string>
 #include <tuple>
 
 namespace test
@@ -50,24 +51,25 @@ std::set<patomic_id_t>
 supported_ids();
 
 
-/// @brief Combination of parameters for creating a patomic struct.
+/// @brief
+///    Combination of parameters for creating a patomic struct.
 struct SupportCombination
 {
+    /// @brief Implementation id to request.
+    patomic_id_t id {};
+
     /// @brief Byte width of atomic object to be supported.
     std::size_t width {};
 
     /// @brief Memory order used for all operations.
     patomic_memory_order_t order {};
 
-    /// @brief Implementation id to request.
-    patomic_id_t id {};
-
     /// @brief Options to pass to constructor.
     unsigned int options {};
 
     /// @brief Type passed to tuple constructor.
     using TupleT = std::tuple<
-        std::size_t, patomic_memory_order_t , patomic_id_t, unsigned int
+        patomic_id_t, std::size_t, patomic_memory_order_t, unsigned int
     >;
 
     /// @brief Allow conversions from tuple.
@@ -75,6 +77,10 @@ struct SupportCombination
 
     /// @brief Explicitly defined default constructor necessary.
     SupportCombination() noexcept = default;
+
+    /// @brief Convert to string suitable for use as a test name suffix.
+    std::string
+    as_test_suffix() const;
 };
 
 

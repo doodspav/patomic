@@ -1,6 +1,9 @@
+#include <test/common/name.hpp>
 #include <test/common/support.hpp>
 
+#include <algorithm>
 #include <array>
+#include <cctype>
 
 namespace test
 {
@@ -102,11 +105,31 @@ supported_ids()
 
 
 SupportCombination::SupportCombination(TupleT tup) noexcept
-    : width(std::get<0>(tup)),
-      order(std::get<1>(tup)),
-      id(std::get<2>(tup)),
+    : id(std::get<0>(tup)),
+      width(std::get<1>(tup)),
+      order(std::get<2>(tup)),
       options(std::get<3>(tup))
 {}
+
+
+std::string
+SupportCombination::as_test_suffix() const
+{
+    // create suffix string
+    std::string suffix = "id_" + name_id(id);
+    suffix += "_width_" + std::to_string(width);
+    suffix += "_order_" + name_order(order);
+    suffix += "_options_" + name_options(options);
+
+    // convert to lower case
+    std::transform(suffix.begin(), suffix.end(), suffix.begin(),
+                   [](unsigned char c) noexcept -> char {
+        return static_cast<char>(std::tolower(c));
+    });
+
+    // return
+    return suffix;
+}
 
 
 }  // namespace test
