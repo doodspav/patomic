@@ -4,9 +4,21 @@
 #include <patomic/internal/combine.h>
 #include <patomic/internal/feature_check.h>
 
+#include <patomic/stdlib/assert.h>
+#include <patomic/stdlib/math.h>
 #include <patomic/stdlib/sort.h>
 
 #include "impl/register.h"
+
+
+static void
+assert_valid_alignment(patomic_align_t align)
+{
+    patomic_assert_always(patomic_unsigned_is_pow2(align.recommended));
+    patomic_assert_always(patomic_unsigned_is_pow2(align.minimum));
+    patomic_assert_always(patomic_unsigned_is_pow2_or_zero(align.size_within));
+    patomic_assert_always(align.recommended >= align.minimum);
+}
 
 
 static int
@@ -62,8 +74,13 @@ patomic_create(
         if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
              ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
-            /* only add to array if some operation is supported */
+            /* create implementation */
             *end = patomic_impl_register[i].fp_create(byte_width, order, options);
+
+            /* check that alignment values are valid */
+            assert_valid_alignment(end->align);
+
+            /* only add to array if some operation is supported */
             if (opcats != patomic_internal_feature_check_any(&end->ops, opcats))
             {
                 ++end;
@@ -112,8 +129,13 @@ patomic_create_explicit(
         if ( ((unsigned long) patomic_impl_register[i].id & ids) &&
              ((unsigned int)  patomic_impl_register[i].kind & kinds))
         {
-            /* only add to array if some operation is supported */
+            /* create implementation */
             *end = patomic_impl_register[i].fp_create_explicit(byte_width, options);
+
+            /* check that alignment values are valid */
+            assert_valid_alignment(end->align);
+
+            /* only add to array if some operation is supported */
             if (opcats != patomic_internal_feature_check_any_explicit(&end->ops, opcats))
             {
                 ++end;

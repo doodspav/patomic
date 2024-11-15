@@ -23,7 +23,8 @@ extern "C" {
  * @note
  *   All patomic APIs returning this type guarantee that "recommended" and
  *   "minimum" are a positive power of 2, and that "minimum" is never larger
- *   than "recommended". The "size_within" value has no restrictions.
+ *   than "recommended". The "size_within" value will either be zero, or a
+ *   positive power of 2.
  *
  * @details
  *   Within the semantics of this type, buffers are considered aligned to the
