@@ -2,6 +2,7 @@
 
 #include <test/common/death.hpp>
 #include <test/common/math.hpp>
+#include <test/common/support.hpp>
 
 #include <gtest/gtest.h>
 
@@ -39,6 +40,16 @@ public:
 class BtApiIds_DeathTest : public testing::Test
 {};
 
+
+/// @brief All ids match values from support header.
+TEST_F(BtApiIds, all_ids_in_support_header)
+{
+    // setup
+    const std::set<patomic_id_t> ids_set { ids.begin(), ids.end() };
+
+    // test
+    EXPECT_EQ(ids_set, test::supported_ids());
+}
 
 /// @brief All ids are unique.
 TEST_F(BtApiIds, all_ids_are_unique)

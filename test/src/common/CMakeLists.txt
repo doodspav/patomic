@@ -5,4 +5,5 @@ target_sources(${test_target_name}-src PRIVATE
     death.cpp
     generic_int.cpp
     make_ops.cpp
+    support.cpp
 )
