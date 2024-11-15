@@ -1,5 +1,7 @@
 #include <patomic/api/memory_order.h>
 
+#include <test/common/support.hpp>
+
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -59,6 +61,26 @@ public:
     }
 };
 
+
+/// @brief Check that support header has correct orders.
+TEST_F(BtApiMemoryOrder, matches_support_header)
+{
+    // setup
+    const std::set<patomic_memory_order_t> store {
+        store_orders.begin(), store_orders.end()
+    };
+    const std::set<patomic_memory_order_t> load {
+        load_orders.begin(), load_orders.end()
+    };
+    const std::set<patomic_memory_order_t> all {
+        valid_orders.begin(), valid_orders.end()
+    };
+
+    // test
+    EXPECT_EQ(store, test::supported_orders_store());
+    EXPECT_EQ(load, test::supported_orders_load());
+    EXPECT_EQ(all, test::supported_orders());
+}
 
 /// @brief Valid orders are allowed by patomic_is_valid_order.
 TEST_F(BtApiMemoryOrder, is_valid_order_allows_all_valid_orders)

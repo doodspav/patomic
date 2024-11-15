@@ -64,4 +64,12 @@ supported_ids()
 }
 
 
+SupportCombination::SupportCombination(TupleT tup) noexcept
+    : width(std::get<0>(tup)),
+      order(std::get<1>(tup)),
+      id(std::get<2>(tup)),
+      options(std::get<3>(tup))
+{}
+
+
 }  // namespace test
