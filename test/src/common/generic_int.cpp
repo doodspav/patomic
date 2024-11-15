@@ -1,5 +1,6 @@
 #include <test/common/align.hpp>
 #include <test/common/generic_int.hpp>
+#include <test/common/math.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -55,8 +56,7 @@ generic_integer::generic_integer(
 {
     // check pre-conditions
     assert(width != 0);
-    assert(alignment != 0);
-    assert(alignment % 2u == 0);
+    assert(test::is_positive_pow2(alignment));
 
     // reserve enough space for width and alignment padding
     m_buf.resize(width + alignment - 1u);
