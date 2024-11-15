@@ -54,6 +54,43 @@ supported_options()
 }
 
 
+std::set<patomic_memory_order_t>
+supported_orders_store()
+{
+    return {
+        patomic_RELAXED,
+        patomic_RELEASE,
+        patomic_SEQ_CST
+    };
+}
+
+
+std::set<patomic_memory_order_t>
+supported_orders_load()
+{
+    return {
+        patomic_RELAXED,
+        patomic_CONSUME,
+        patomic_ACQUIRE,
+        patomic_SEQ_CST
+    };
+}
+
+
+std::set<patomic_memory_order_t>
+supported_orders()
+{
+    return {
+        patomic_RELAXED,
+        patomic_CONSUME,
+        patomic_ACQUIRE,
+        patomic_RELEASE,
+        patomic_ACQ_REL,
+        patomic_SEQ_CST
+    };
+}
+
+
 std::set<patomic_id_t>
 supported_ids()
 {
