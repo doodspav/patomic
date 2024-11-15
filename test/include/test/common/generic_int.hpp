@@ -103,6 +103,20 @@ public:
     void
     set_max() noexcept;
 
+    /// @brief
+    ///   Equality comparison.
+    /// @pre
+    ///   other.width() == width()
+    friend bool
+    operator==(const generic_integer& lhs, const generic_integer& rhs) noexcept;
+
+    /// @brief
+    ///   Inequality comparison.
+    /// @pre
+    ///   other.width() == width()
+    friend bool
+    operator!=(const generic_integer& lhs, const generic_integer& rhs) noexcept;
+
 private:
     /// @brief Width of integer.
     std::size_t m_width {};

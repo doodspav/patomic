@@ -60,9 +60,6 @@ generic_integer::generic_integer(
     // reserve enough space for width and alignment padding
     m_buf.resize(width + alignment - 1u);
 
-    // fill buffer with zeros
-    std::fill(m_buf.begin(), m_buf.end(), 0);
-
     // get offset to aligned representation
     void *ptr = aligned_pointer(m_buf.data(), m_buf.size(), alignment, width);
     m_offset = std::distance(m_buf.data(), static_cast<unsigned char *>(ptr));
@@ -236,6 +233,28 @@ generic_integer::set_max() noexcept
     set_min();
     inc();
     neg();
+}
+
+
+bool
+operator==(const generic_integer& lhs, const generic_integer& rhs) noexcept
+{
+    // check pre-condition
+    assert(lhs.width() == rhs.width());
+
+    // compare underlying buffer
+    return lhs.m_buf == rhs.m_buf;
+}
+
+
+bool
+operator!=(const generic_integer& lhs, const generic_integer& rhs) noexcept
+{
+    // check pre-condition
+    assert(lhs.width() == rhs.width());
+
+    // defer to equality comparison
+    return !(lhs == rhs);
 }
 
 
