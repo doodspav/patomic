@@ -53,13 +53,6 @@ public:
     data() const noexcept;
 
     /// @brief
-    ///   Directly store a raw buffer as the integer value.
-    /// @pre
-    ///   size == .width()
-    void
-    store(const unsigned char *buf, std::size_t size) noexcept;
-
-    /// @brief
     ///   Add another generic integer to this instance's value in-place.
     /// @pre
     ///   other.width() == .width()
@@ -94,14 +87,26 @@ public:
     inv() noexcept;
 
     /// @brief
+    ///   Directly store a raw buffer as the integer value.
+    /// @pre
+    ///   size == .width()
+    void
+    store(const unsigned char *buf, std::size_t size) noexcept;
+
+    /// @brief
+    ///   Set value to zero.
+    void
+    store_zero() noexcept;
+
+    /// @brief
     ///   Set this instance's value to the minimum it can represent.
     void
-    set_min() noexcept;
+    store_min() noexcept;
 
     /// @brief
     ///   Set this instance's value to the maximum it can represent.
     void
-    set_max() noexcept;
+    store_max() noexcept;
 
     /// @brief
     ///   Equality comparison.

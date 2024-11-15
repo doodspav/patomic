@@ -102,20 +102,6 @@ generic_integer::data() const noexcept
 
 
 void
-generic_integer::store(
-    const unsigned char *const buf, const std::size_t size
-) noexcept
-{
-    // check pre-condition
-    assert(size == width());
-
-    // store value
-    const auto ssize = static_cast<std::ptrdiff_t>(size);
-    static_cast<void>(std::copy(buf, std::next(buf, ssize), data()));
-}
-
-
-void
 generic_integer::add(const generic_integer& other) noexcept
 {
     // check pre-condition
@@ -208,7 +194,29 @@ generic_integer::inv() noexcept
 
 
 void
-generic_integer::set_min() noexcept
+generic_integer::store(
+        const unsigned char *const buf, const std::size_t size
+) noexcept
+{
+    // check pre-condition
+    assert(size == width());
+
+    // store value
+    const auto ssize = static_cast<std::ptrdiff_t>(size);
+    static_cast<void>(std::copy(buf, std::next(buf, ssize), data()));
+}
+
+
+void
+generic_integer::store_zero() noexcept
+{
+    // zero all bytes
+    std::fill(m_buf.begin(), m_buf.end(), 0);
+}
+
+
+void
+generic_integer::store_min() noexcept
 {
     // zero all bytes
     const auto ssize = static_cast<std::ptrdiff_t>(width());
@@ -227,10 +235,10 @@ generic_integer::set_min() noexcept
 
 
 void
-generic_integer::set_max() noexcept
+generic_integer::store_max() noexcept
 {
     // we can simply negate the value of min + 1 (two's complement)
-    set_min();
+    store_min();
     inc();
     neg();
 }
