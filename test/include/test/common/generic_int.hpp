@@ -2,6 +2,7 @@
 #define PATOMIC_TEST_COMMON_GENERIC_INT_HPP
 
 #include <cstddef>
+#include <ostream>
 #include <vector>
 
 namespace test
@@ -107,6 +108,19 @@ public:
     ///   Set this instance's value to the maximum it can represent.
     void
     store_max() noexcept;
+
+    /// @brief
+    ///   Implicitly convertible to void *.
+    operator void *() noexcept;
+
+    /// @brief
+    ///   Implicitly convertible to const void *.
+    operator const void *() const noexcept;
+
+    /// @brief
+    ///   Stream to output.
+    friend std::ostream&
+    operator<<(std::ostream& os, const generic_integer& gi);
 
     /// @brief
     ///   Equality comparison.

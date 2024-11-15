@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <iomanip>
 #include <iterator>
 #include <limits>
 
@@ -63,6 +64,9 @@ generic_integer::generic_integer(
     // get offset to aligned representation
     void *ptr = aligned_pointer(m_buf.data(), m_buf.size(), alignment, width);
     m_offset = std::distance(m_buf.data(), static_cast<unsigned char *>(ptr));
+
+    // set to zero
+    store_zero();
 }
 
 
@@ -241,6 +245,49 @@ generic_integer::store_max() noexcept
     store_min();
     inc();
     neg();
+}
+
+
+generic_integer::operator void *() noexcept
+{
+    return data();
+}
+
+
+generic_integer::operator const void *() const noexcept
+{
+    return data();
+}
+
+
+std::ostream&
+operator<<(std::ostream& os, const generic_integer& gi)
+{
+    // save old flag state
+    auto flags = os.flags();
+
+    // output as hex
+    os << "0x";
+    if (is_little_endian())
+    {
+        // print back to front
+        for (auto it = gi.data() + gi.width() - 1; it >= gi.data(); --it)
+        {
+            os << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(*it);
+        }
+    }
+    else
+    {
+        // print front to back
+        for (auto it = gi.data(); it < gi.data() + gi.width(); ++it)
+        {
+            os << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(*it);
+        }
+    }
+
+    // revert state before returning
+    os.flags(flags);
+    return os;
 }
 
 
