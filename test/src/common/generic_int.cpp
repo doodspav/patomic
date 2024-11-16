@@ -55,7 +55,6 @@ generic_integer::generic_integer(
       m_is_signed(is_signed)
 {
     // check pre-conditions
-    assert(width != 0);
     assert(test::is_positive_pow2(alignment));
 
     // reserve enough space for width and alignment padding
@@ -154,6 +153,12 @@ generic_integer::sub(const generic_integer& other) noexcept
 void
 generic_integer::inc() noexcept
 {
+    // skip if width is zero
+    if (width() == 0u)
+    {
+        return;
+    }
+
     // create int with value of 1
     generic_integer one { width(), alignment(), is_signed() };
     const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
@@ -167,6 +172,12 @@ generic_integer::inc() noexcept
 void
 generic_integer::dec() noexcept
 {
+    // skip if width is zero
+    if (width() == 0u)
+    {
+        return;
+    }
+
     // create int with value of 1
     generic_integer one { width(), alignment(), is_signed() };
     const std::size_t lsbIndex = is_little_endian() ? 0u : (width() - 1u);
@@ -222,6 +233,12 @@ generic_integer::store_zero() noexcept
 void
 generic_integer::store_min() noexcept
 {
+    // skip if width is zero
+    if (width() == 0u)
+    {
+        return;
+    }
+
     // zero all bytes
     const auto ssize = static_cast<std::ptrdiff_t>(width());
     std::fill(data(), std::next(data(), ssize), 0);
@@ -263,6 +280,12 @@ generic_integer::operator const void *() const noexcept
 std::ostream&
 operator<<(std::ostream& os, const generic_integer& gi)
 {
+    // special case if width is zero
+    if (gi.width() == 0u)
+    {
+        return os << "0xempty";
+    }
+
     // save old flag state
     auto flags = os.flags();
 
