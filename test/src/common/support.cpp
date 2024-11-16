@@ -13,7 +13,7 @@ namespace test
 std::vector<std::size_t>
 supported_widths()
 {
-    return {
+    std::set<std::size_t> widths {
 
         // null implementation
 
@@ -24,6 +24,7 @@ supported_widths()
         sizeof(long),
         sizeof(long long)
     };
+    return { widths.begin(), widths.end() };
 }
 
 
