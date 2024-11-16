@@ -4,12 +4,13 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <set>
 
 namespace test
 {
 
 
-std::set<std::size_t>
+std::vector<std::size_t>
 supported_widths()
 {
     return {
@@ -26,7 +27,7 @@ supported_widths()
 }
 
 
-std::set<unsigned int>
+std::vector<unsigned int>
 supported_options()
 {
     // get options to combine
@@ -53,34 +54,21 @@ supported_options()
     }
 
     // success
-    return combined_options;
+    return { combined_options.begin(), combined_options.end() };
 }
 
 
-std::set<patomic_memory_order_t>
-supported_orders_store()
+std::vector<patomic_id_t>
+supported_ids()
 {
     return {
-        patomic_RELAXED,
-        patomic_RELEASE,
-        patomic_SEQ_CST
+        patomic_id_NULL,
+        patomic_id_STDC
     };
 }
 
 
-std::set<patomic_memory_order_t>
-supported_orders_load()
-{
-    return {
-        patomic_RELAXED,
-        patomic_CONSUME,
-        patomic_ACQUIRE,
-        patomic_SEQ_CST
-    };
-}
-
-
-std::set<patomic_memory_order_t>
+std::vector<patomic_memory_order_t>
 supported_orders()
 {
     return {
@@ -94,41 +82,31 @@ supported_orders()
 }
 
 
-std::set<patomic_id_t>
-supported_ids()
+std::vector<patomic_memory_order_t>
+supported_orders_store()
 {
     return {
-        patomic_id_NULL,
-        patomic_id_STDC
+        patomic_RELAXED,
+        // patomic_CONSUME; undefined behaviour
+        // patomic_ACQUIRE; undefined behaviour
+        patomic_RELEASE,
+        // patomic_ACQ_REL; undefined behaviour
+        patomic_SEQ_CST
     };
 }
 
 
-SupportCombination::SupportCombination(TupleT tup) noexcept
-    : id(std::get<0>(tup)),
-      width(std::get<1>(tup)),
-      order(std::get<2>(tup)),
-      options(std::get<3>(tup))
-{}
-
-
-std::string
-SupportCombination::as_test_suffix() const
+std::vector<patomic_memory_order_t>
+supported_orders_load()
 {
-    // create suffix string
-    std::string suffix = "id_" + name_id(id);
-    suffix += "_width_" + std::to_string(width);
-    suffix += "_order_" + name_order(order);
-    suffix += "_options_" + name_options(options);
-
-    // convert to lower case
-    std::transform(suffix.begin(), suffix.end(), suffix.begin(),
-                   [](unsigned char c) noexcept -> char {
-        return static_cast<char>(std::tolower(c));
-    });
-
-    // return
-    return suffix;
+    return {
+        patomic_RELAXED,
+        patomic_CONSUME,
+        patomic_ACQUIRE,
+        // patomic_RELEASE; undefined behaviour
+        // patomic_ACQ_REL; undefined behaviour
+        patomic_SEQ_CST
+    };
 }
 
 
