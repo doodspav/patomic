@@ -6,5 +6,6 @@ target_sources(${test_target_name}-src PRIVATE
     generic_int.cpp
     make_ops.cpp
     name.cpp
+    params.cpp
     support.cpp
 )

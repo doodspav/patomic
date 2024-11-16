@@ -7,6 +7,7 @@ target_sources(${test_target_name}-include INTERFACE
     make_ops.hpp
     math.hpp
     name.hpp
+    params.hpp
     support.hpp
     utility.hpp
 )
