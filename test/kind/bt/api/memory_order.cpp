@@ -92,6 +92,7 @@ public:
         return orders;
     }
 
+    /// @brief Check if a vector of memory orders contains a memory order.
     static bool
     contains(const std::vector<patomic_memory_order_t>& orders,
              const patomic_memory_order_t order) noexcept
