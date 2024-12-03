@@ -47,9 +47,9 @@ extern "C" {
  * @example
  *   - type: avx_128 (size=16, align=16)                                        \n
  *   - operation: load                                                          \n
- *   - potentially assembly (x86) VMOVDQU, no alignment required                \n
+ *   - potential assembly (x86): VMOVDQU, no alignment required                 \n
  *   - atomic if: whole object sits in a single cache line (e.g. 64 bytes)      \n
- *   - example value: {.recommended=16, .minimum=1, .sie_within=4}              \n
+ *   - example value: {.recommended=16, .minimum=1, .size_within=64}            \n
  */
 typedef struct {
 

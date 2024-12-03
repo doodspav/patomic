@@ -300,56 +300,6 @@ typedef struct {
 } patomic_transaction_recommended_t;
 
 
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Transaction safe counterparts to core <string.h> functions.
- *
- * @warning
- *   These functions are **NOT** atomic (which is why they're here are not in
- *   the header with the rest of the atomic functions). They are designed to be
- *   used inside transactions.
- *
- * @warning
- *   Compilers may insert calls to <string.h> functions such as memcpy without
- *   these functions being called explicitly. If "required" is 1, then these
- *   implicit usages of these functions may cause a transaction to unexpectedly
- *   abort.
- *
- * @details
- *   - these functions are direct counterparts to their <string.h> variants,
- *     with identical semantics and constraints                                 \n
- *   - the <string.h> variants may use instructions which may cause a
- *     transaction to abort (e.g. vzeroupper on x86_64 in memcmp)               \n
- *   - these functions are guaranteed not to cause an abort due to the usage of
- *     such instructions (although they may still cause an abort for other
- *     reasons, such as accessing too much memory)                              \n
- *   - these counterparts will typically be significantly faster than a volatile
- *     char loop
- */
-typedef struct {
-
-    /** @brief Value is 1 if <string.h> functions may cause a transactional
-     *         abort, and 0 if they're safe to use (in which case the function
-     *         pointers here will point to the <string.h> variants). */
-    int required;
-
-    /** @brief Transaction safe version of <string.h> function memcpy. */
-    void * (* fp_memcpy) (void *dst, const void *src, size_t len);
-
-    /** @brief Transaction safe version of <string.h> function memmove. */
-    void * (* fp_memmove) (void *dst, const void *src, size_t len);
-
-    /** @brief Transaction safe version of <string.h> function memset. */
-    void * (* fp_memset) (void *dst, int value, size_t len);
-
-    /** @brief Transaction safe version of <string.h> function memcmp. */
-    void * (* fp_memcmp) (const void *lhs, const void *rhs, size_t len);
-
-} patomic_transaction_safe_string_t;
-
-
 #ifdef __cplusplus
 }  /* extern "C" */
 #endif

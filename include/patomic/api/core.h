@@ -50,7 +50,7 @@ typedef struct {
  * @addtogroup patomic
  *
  * @brief
- *   Struct containing al information and functionality required to perform
+ *   Struct containing all information and functionality required to perform
  *   atomic operations implemented using a sequentially consistent transaction.
  */
 typedef struct {
@@ -61,9 +61,6 @@ typedef struct {
 
     /** @brief Recommended time and space bounds for atomic operations. */
     patomic_transaction_recommended_t recommended;
-
-    /** @brief Transaction safe versions of core <string.h> functions. */
-    patomic_transaction_safe_string_t string;
 
 } patomic_transaction_t;
 
