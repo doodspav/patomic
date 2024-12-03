@@ -11,14 +11,11 @@
 #include "impl/register.h"
 
 
-static void
-assert_valid_alignment(patomic_align_t align)
-{
-    patomic_assert_always(patomic_unsigned_is_pow2(align.recommended));
-    patomic_assert_always(patomic_unsigned_is_pow2(align.minimum));
-    patomic_assert_always(patomic_unsigned_is_pow2_or_zero(align.size_within));
-    patomic_assert_always(align.recommended >= align.minimum);
-}
+#define assert_valid_alignment(align)                                           \
+    patomic_assert_always(patomic_unsigned_is_pow2(align.recommended));         \
+    patomic_assert_always(patomic_unsigned_is_pow2(align.minimum));             \
+    patomic_assert_always(patomic_unsigned_is_pow2_or_zero(align.size_within)); \
+    patomic_assert_always(align.recommended >= align.minimum)
 
 
 static int
