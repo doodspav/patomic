@@ -7,30 +7,26 @@
 #include <random>
 #include <set>
 
-namespace test
+namespace
 {
 
 
-ParamsImpExp::ParamsImpExp(TupleT tup) noexcept
-    : id(std::get<0>(tup)),
-      width(std::get<1>(tup)),
-      order(std::get<2>(tup)),
-      options(std::get<3>(tup))
-{}
-
-
+/// @brief
+///   Convert implicit or explicit params to string suitable for use as a test
+///   name suffix.
+template <class Params>
 std::string
-ParamsImpExp::as_test_suffix() const
+as_text_suffix_imp_exp(const Params& p)
 {
     // create suffix string
-    std::string suffix = "id_" + name_id(id);
-    suffix += "_width_" + std::to_string(width);
-    suffix += "_order_" + name_order(order);
-    suffix += "_options_" + name_options(options);
+    std::string suffix = "id_" + test::name_id(p.id);
+    suffix += "_width_" + std::to_string(p.width);
+    suffix += "_order_" + test::name_order(p.order);
+    suffix += "_options_" + test::name_options(p.options);
 
     // convert to lower case
     std::transform(suffix.begin(), suffix.end(), suffix.begin(),
-                   [](unsigned char c) noexcept -> char {
+                   [](const unsigned char c) noexcept -> char {
         return static_cast<char>(std::tolower(c));
     });
 
@@ -39,20 +35,24 @@ ParamsImpExp::as_test_suffix() const
 }
 
 
-std::vector<ParamsImpExp>
-ParamsImpExp::combinations()
+/// @brief
+///   Create all combinations of implicit or explicit params for tests with the
+///   provided orders.
+template <class Params>
+std::vector<Params>
+combinations_imp_exp(const std::vector<patomic_memory_order_t>& orders)
 {
     // setup
-    std::vector<ParamsImpExp> params;
+    std::vector<Params> params;
 
     // create cartesian product
-    for (patomic_id_t id : supported_ids())
+    for (patomic_id_t id : test::supported_ids())
     {
-        for (std::size_t width : supported_widths())
+        for (std::size_t width : test::supported_widths())
         {
-            for (patomic_memory_order_t order : supported_orders())
+            for (patomic_memory_order_t order : orders)
             {
-                for (unsigned int options : supported_options())
+                for (unsigned int options : test::supported_options())
                 {
                     params.emplace_back(
                         std::make_tuple(id, width, order, options)
@@ -67,59 +67,81 @@ ParamsImpExp::combinations()
 }
 
 
-std::vector<ParamsImpExp>
-ParamsImpExp::combinations_store()
+}  // namespace
+
+namespace test
 {
-    // setup
-    std::vector<ParamsImpExp> params;
 
-    // create cartesian product
-    for (patomic_id_t id : supported_ids())
-    {
-        for (std::size_t width : supported_widths())
-        {
-            for (patomic_memory_order_t order : supported_orders_store())
-            {
-                for (unsigned int options : supported_options())
-                {
-                    params.emplace_back(
-                        std::make_tuple(id, width, order, options)
-                    );
-                }
-            }
-        }
-    }
 
-    // return
-    return params;
+ParamsImplicit::ParamsImplicit(TupleT tup) noexcept
+    : id(std::get<0>(tup)),
+      width(std::get<1>(tup)),
+      order(std::get<2>(tup)),
+      options(std::get<3>(tup))
+{}
+
+
+std::string
+ParamsImplicit::as_test_suffix() const
+{
+    return as_text_suffix_imp_exp(*this);
 }
 
 
-std::vector<ParamsImpExp>
-ParamsImpExp::combinations_load()
+std::vector<ParamsImplicit>
+ParamsImplicit::combinations()
 {
-    // setup
-    std::vector<ParamsImpExp> params;
+    return combinations_imp_exp<ParamsImplicit>(supported_orders());
+}
 
-    // create cartesian product
-    for (patomic_id_t id : supported_ids())
-    {
-        for (std::size_t width : supported_widths())
-        {
-            for (patomic_memory_order_t order : supported_orders_load())
-            {
-                for (unsigned int options : supported_options())
-                {
-                    params.emplace_back(
-                        std::make_tuple(id, width, order, options)
-                    );
-                }
-            }
-        }
-    }
 
-    // return
-    return params;
+std::vector<ParamsImplicit>
+ParamsImplicit::combinations_store()
+{
+    return combinations_imp_exp<ParamsImplicit>(supported_orders_store());
+}
+
+
+std::vector<ParamsImplicit>
+ParamsImplicit::combinations_load()
+{
+    return combinations_imp_exp<ParamsImplicit>(supported_orders_load());
+}
+
+
+ParamsExplicit::ParamsExplicit(TupleT tup) noexcept
+    : id(std::get<0>(tup)),
+      width(std::get<1>(tup)),
+      order(std::get<2>(tup)),
+      options(std::get<3>(tup))
+{}
+
+
+std::string
+ParamsExplicit::as_test_suffix() const
+{
+    return as_text_suffix_imp_exp(*this);
+}
+
+
+std::vector<ParamsExplicit>
+ParamsExplicit::combinations()
+{
+    return combinations_imp_exp<ParamsExplicit>(supported_orders());
+}
+
+
+std::vector<ParamsExplicit>
+ParamsExplicit::combinations_store()
+{
+    return combinations_imp_exp<ParamsExplicit>(supported_orders_store());
+}
+
+
+std::vector<ParamsExplicit>
+ParamsExplicit::combinations_load()
+{
+    return combinations_imp_exp<ParamsExplicit>(supported_orders_load());
 }
 
 
