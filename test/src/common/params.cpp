@@ -145,7 +145,7 @@ ParamsExplicit::combinations_load()
 }
 
 
-ParamsTsx::ParamsTsx(TupleT tup) noexcept
+ParamsTransaction::ParamsTransaction(TupleT tup) noexcept
     : id(std::get<0>(tup)),
       options(std::get<1>(tup)),
       widths(std::move(std::get<2>(tup)))
@@ -153,7 +153,7 @@ ParamsTsx::ParamsTsx(TupleT tup) noexcept
 
 
 std::string
-ParamsTsx::as_test_suffix() const
+ParamsTransaction::as_test_suffix() const
 {
     // create suffix string
     std::string suffix = "id_" + name_id(id);
@@ -161,7 +161,7 @@ ParamsTsx::as_test_suffix() const
 
     // convert to lower case
     std::transform(suffix.begin(), suffix.end(), suffix.begin(),
-                   [](unsigned char c) noexcept -> char {
+                   [](const unsigned char c) noexcept -> char {
         return static_cast<char>(std::tolower(c));
     });
 
@@ -170,11 +170,11 @@ ParamsTsx::as_test_suffix() const
 }
 
 
-std::vector<ParamsTsx>
-ParamsTsx::combinations()
+std::vector<ParamsTransaction>
+ParamsTransaction::combinations()
 {
     // setup
-    std::vector<ParamsTsx> params;
+    std::vector<ParamsTransaction> params;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> distrib;

@@ -109,7 +109,7 @@ struct ParamsExplicit
 
 /// @brief
 ///   Combination of parameters for creating a patomic transaction struct.
-struct ParamsTsx
+struct ParamsTransaction
 {
     /// @brief Implementation id to request.
     patomic_id_t id {};
@@ -126,17 +126,17 @@ struct ParamsTsx
     >;
 
     /// @brief Construct from tuple of members.
-    explicit ParamsTsx(TupleT tup) noexcept;
+    explicit ParamsTransaction(TupleT tup) noexcept;
 
     /// @brief Default constructor.
-    ParamsTsx() noexcept = default;
+    ParamsTransaction() noexcept = default;
 
     /// @brief Convert to string suitable for use as a test name suffix.
     std::string
     as_test_suffix() const;
 
     /// @brief Create all combinations of params for tests.
-    static std::vector<ParamsTsx>
+    static std::vector<ParamsTransaction>
     combinations();
 };
 
