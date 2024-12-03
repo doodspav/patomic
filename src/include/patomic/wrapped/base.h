@@ -5,7 +5,8 @@
 
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/stdalign.h>
-#include <patomic/stdlib/string.h>
+
+#include <string.h>
 
 
 /* redefined below */
@@ -95,7 +96,7 @@
  *   value of memcpy is not used.
  */
 #define PATOMIC_WRAPPED_DO_MEMCPY(dest, src, count) \
-    PATOMIC_IGNORE_UNUSED(patomic_memcpy(dest, src, count))
+    PATOMIC_IGNORE_UNUSED(memcpy(dest, src, count))
 
 
 #endif  /* PATOMIC_WRAPPED_BASE_H */
