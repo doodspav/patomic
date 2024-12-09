@@ -20,7 +20,7 @@
     {                                                                    \
         GTEST_SKIP() << "Skipping; order '" << ::test::name_order(order) \
                      << "' (" << static_cast<int>(order)                 \
-                     << ") is not valid for a store operation";          \
+                     << ") is not valid for store operations";           \
     }                                                                    \
     REQUIRE_SEMICOLON()
 
@@ -33,7 +33,7 @@
     {                                                                    \
         GTEST_SKIP() << "Skipping; order '" << ::test::name_order(order) \
                      << "' (" << static_cast<int>(order)                 \
-                     << ") is not valid for a load operation";           \
+                     << ") is not valid for load operations";            \
     }                                                                    \
     REQUIRE_SEMICOLON()
 
