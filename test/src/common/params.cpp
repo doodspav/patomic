@@ -95,6 +95,20 @@ ParamsImplicit::combinations()
 }
 
 
+std::vector<ParamsImplicit>
+ParamsImplicit::combinations_store()
+{
+    return combinations_imp_exp<ParamsImplicit>(supported_orders_store());
+}
+
+
+std::vector<ParamsImplicit>
+ParamsImplicit::combinations_load()
+{
+    return combinations_imp_exp<ParamsImplicit>(supported_orders_load());
+}
+
+
 ParamsExplicit::ParamsExplicit(TupleT tup) noexcept
     : id(std::get<0>(tup)),
       width(std::get<1>(tup)),
@@ -114,6 +128,20 @@ std::vector<ParamsExplicit>
 ParamsExplicit::combinations()
 {
     return combinations_imp_exp<ParamsExplicit>(supported_orders());
+}
+
+
+std::vector<ParamsExplicit>
+ParamsExplicit::combinations_store()
+{
+    return combinations_imp_exp<ParamsExplicit>(supported_orders_store());
+}
+
+
+std::vector<ParamsExplicit>
+ParamsExplicit::combinations_load()
+{
+    return combinations_imp_exp<ParamsExplicit>(supported_orders_load());
 }
 
 
