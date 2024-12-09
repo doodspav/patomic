@@ -8,6 +8,7 @@ target_sources(${test_target_name}-include INTERFACE
     math.hpp
     name.hpp
     params.hpp
+    skip.hpp
     support.hpp
     utility.hpp
 )
