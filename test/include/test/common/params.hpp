@@ -47,16 +47,6 @@ struct ParamsImplicit
     /// @brief Create all combinations of params for tests.
     static std::vector<ParamsImplicit>
     combinations();
-
-    /// @brief Create all combinations of params for tests with only memory
-    ///        orders which are valid for store operations.
-    static std::vector<ParamsImplicit>
-    combinations_store();
-
-    /// @brief Create all combinations of params for tests with only memory
-    ///        orders which are valid for load operations.
-    static std::vector<ParamsImplicit>
-    combinations_load();
 };
 
 
@@ -94,16 +84,6 @@ struct ParamsExplicit
     /// @brief Create all combinations of params for tests.
     static std::vector<ParamsExplicit>
     combinations();
-
-    /// @brief Create all combinations of params for tests with only memory
-    ///        orders which are valid for store operations.
-    static std::vector<ParamsExplicit>
-    combinations_store();
-
-    /// @brief Create all combinations of params for tests with only memory
-    ///        orders which are valid for load operations.
-    static std::vector<ParamsExplicit>
-    combinations_load();
 };
 
 
