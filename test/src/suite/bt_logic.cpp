@@ -41,6 +41,7 @@ BtLogicTransaction::SetUp()
 
     // initialize members
     m_ops = pat.ops;
+    m_recommended = pat.recommended;
 }
 
 

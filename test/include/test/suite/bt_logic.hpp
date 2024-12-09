@@ -55,6 +55,7 @@ public:
 protected:
     // helper members
     patomic_ops_transaction_t m_ops {};
+    patomic_transaction_recommended_t m_recommended {};
 };
 
 
