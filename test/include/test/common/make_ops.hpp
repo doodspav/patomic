@@ -1,5 +1,5 @@
-#ifndef PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
-#define PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
+#ifndef PATOMIC_TEST_COMMON_MAKE_OPS_HPP
+#define PATOMIC_TEST_COMMON_MAKE_OPS_HPP
 
 #include <patomic/api/core.h>
 #include <patomic/api/feature_check.h>
@@ -342,4 +342,4 @@ make_ops_raw_array_transaction(const patomic_ops_transaction_raw_t& raw) noexcep
 
 }  // namespace test
 
-#endif  // PATOMIC_TEST_PATOMIC_MAKE_OPS_HPP
+#endif  // PATOMIC_TEST_COMMON_MAKE_OPS_HPP
