@@ -18,3 +18,4 @@ target_compile_features(${test_target_name}-src PRIVATE
 # add all subdirectories
 add_subdirectory(common)
 add_subdirectory(sanitizer)
+add_subdirectory(suite)
