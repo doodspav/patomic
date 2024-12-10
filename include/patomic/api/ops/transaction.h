@@ -31,7 +31,7 @@ extern "C" {
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -77,7 +77,7 @@ typedef void (* patomic_opsig_transaction_store_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -128,7 +128,7 @@ typedef void (* patomic_opsig_transaction_load_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -188,7 +188,7 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -258,7 +258,7 @@ typedef int (* patomic_opsig_transaction_cmpxchg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -310,7 +310,7 @@ typedef int (* patomic_opsig_transaction_test_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -368,7 +368,7 @@ typedef int (* patomic_opsig_transaction_test_modify_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -419,7 +419,7 @@ typedef void (* patomic_opsig_transaction_fetch_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -469,7 +469,7 @@ typedef void (* patomic_opsig_transaction_fetch_noarg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -515,7 +515,7 @@ typedef void (* patomic_opsig_transaction_void_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -566,7 +566,7 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -639,7 +639,7 @@ typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -709,7 +709,7 @@ typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -764,7 +764,7 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @note
@@ -886,14 +886,12 @@ typedef void (* patomic_opsig_transaction_flag_clear_t) (
  *   invocation.
  *
  * @returns
- *   A status code which will be 0 if the transaction has been successfully
+ *   A status which will be 0 if the transaction has been successfully
  *   committed.
  *
  * @note
- *   On failure, a bitwise-and with patomic_transaction_status_t
- *   values will tell you the general failure reason. An explicitly passed
- *   abort reason can be obtained from the return value by passing it to
- *   patomic_transaction_abort_reason.
+ *   To get more information from the status, pass the status to
+ *   PATOMIC_TRANSACTION_EXIT_STATUS and PATOMIC_TRANSACTION_ABORT_REASON.
  */
 typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
     void
@@ -908,7 +906,7 @@ typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
  *
  * @details
  *   Explicitly aborts a live transaction with a reason that is passed in the
- *   status code, which itself will always match patomic_TABORT_EXPLICIT. Only
+ *   the status, which itself will always match patomic_TABORT_EXPLICIT. Only
  *   the 8 least significant bits of reason are used (if CHAR_BIT happens to be
  *   larger than 8).
  *

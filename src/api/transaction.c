@@ -1,24 +1,19 @@
 #include <patomic/api/transaction.h>
 
 
+patomic_transaction_exit_status_t
+patomic_transaction_exit_status(
+    const unsigned int status
+)
+{
+    return PATOMIC_TRANSACTION_EXIT_STATUS(status);
+}
+
+
 unsigned char
 patomic_transaction_abort_reason(
     const unsigned int status
 )
 {
-    /* declarations */
-    unsigned int kind;
-    unsigned int reason;
-
-    /* first 8 bits are the kind of status */
-    /* check that explicit abort happened */
-    kind = status & 0xffU;
-    if (kind != patomic_TABORT_EXPLICIT)
-    {
-        return 0;
-    }
-
-    /* next 8 bits are the abort reason */
-    reason = (status >> 8U) & 0xffU;
-    return (unsigned char) reason;
+    return PATOMIC_TRANSACTION_ABORT_REASON(status);
 }

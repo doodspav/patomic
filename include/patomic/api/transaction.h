@@ -141,8 +141,8 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
- *   A set of constants used to denote the status of a transaction. The status
- *   is always 8 significant bits.
+ *   A set of constants used to denote the exit status of a transaction. The
+ *   exit status always has 8 significant bits.
  *
  * @note
  *   In transactional operations with a fallback path, an explicit abort will
@@ -175,23 +175,7 @@ typedef enum {
     /** @brief An interrupt caused the transaction to abort. */
     ,patomic_TABORT_INT      = 0x40 | patomic_TABORTED
 
-} patomic_transaction_status_t;
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Obtains the abort reason from the status of an explicitly aborted
- *   transaction. If the transaction was not explicitly aborted, returns 0.
- *
- * @note
- *   The abort reason has 8 significant bits.
- */
-PATOMIC_EXPORT unsigned char
-patomic_transaction_abort_reason(
-    unsigned int status
-);
+} patomic_transaction_exit_status_t;
 
 
 /**
@@ -202,7 +186,9 @@ patomic_transaction_abort_reason(
  */
 typedef struct {
 
-    /** @brief Status from the final attempt at committing the transaction. */
+    /** @brief Status from the final attempt at committing the transaction.
+     *         The value is an exit status potentially combined with an abort
+     *         reason. */
     unsigned int status;
 
     /** @brief Attempts made to commit the transaction. */
@@ -219,20 +205,91 @@ typedef struct {
  */
 typedef struct {
 
-    /** @brief Status from the final attempt at committing the transaction. */
+    /** @brief Status from the final attempt at committing the primary
+     *         transaction. The value is an exit status potentially combined
+     *         with an abort reason. */
     unsigned int status;
 
     /** @brief Status from the final attempt at committing the fallback
-     *         transaction. */
+     *         transaction. The value is an exit status potentially combined
+     *         with an abort reason. */
     unsigned int fallback_status;
 
-    /** @brief Attempts made to commit the transaction. */
+    /** @brief Attempts made to commit the primary transaction. */
     unsigned long attempts_made;
 
     /** @brief Attempts made to commit the fallback transaction. */
     unsigned long fallback_attempts_made;
 
 } patomic_transaction_result_wfb_t;
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit status from the status of a transaction.
+ *
+ * @note
+ *   The exit status has 8 significant bits.
+ */
+#define PATOMIC_TRANSACTION_EXIT_STATUS(status) \
+    ((patomic_transaction_exit_status_t) (status & 0xFFu))
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the abort reason from the status of an explicitly aborted
+ *   transaction. If the transaction was not explicitly aborted, the abort
+ *   reason will be 0.
+ *
+ * @note
+ *   The abort reason has 8 significant bits.
+ */
+#define PATOMIC_TRANSACTION_ABORT_REASON(status)                             \
+    ((unsigned char) (                                                       \
+        (PATOMIC_TRANSACTION_EXIT_STATUS(status) == patomic_TABORT_EXPLICIT) \
+        ? ((status) >> 8u) & 0xFFu                                           \
+        : 0u                                                                 \
+    ))
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit status from the status of a transaction.
+ *
+ * @note
+ *   The exit status has 8 significant bits.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_TRANSACTION_EXIT_STATUS macro value.
+ */
+PATOMIC_EXPORT patomic_transaction_exit_status_t
+patomic_transaction_exit_status(unsigned int status);
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the abort reason from the status of an explicitly aborted
+ *   transaction. If the transaction was not explicitly aborted, the abort
+ *   reason will be 0.
+ *
+ * @note
+ *   The abort reason has 8 significant bits.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_TRANSACTION_ABORT_REASON macro value.
+ */
+PATOMIC_EXPORT unsigned char
+patomic_transaction_abort_reason(unsigned int status);
 
 
 /**
