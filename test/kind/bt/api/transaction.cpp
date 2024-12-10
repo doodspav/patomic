@@ -74,8 +74,8 @@ TEST_F(BtApiTransaction, reason_only_saves_first_8_bits)
     EXPECT_EQ(extended_reason & 0xFFu, PATOMIC_TRANSACTION_ABORT_REASON(status));
 }
 
-/// @brief Check that only second 8 bits of status are provided.
-TEST_F(BtApiTransaction, exit_status_is_second_8_bits_of_status)
+/// @brief Check that only first 8 bits of status are provided.
+TEST_F(BtApiTransaction, exit_status_is_first_8_bits_of_status)
 {
     // go through all combinations of 8 bits
     for (unsigned int status = 0u; status < 0xFFu; ++status)
