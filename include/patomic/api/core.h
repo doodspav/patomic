@@ -56,7 +56,8 @@ typedef struct {
 typedef struct {
 
     /** @brief Atomic operations implemented using a sequentially consistent
-     *         transaction, and non-atomic transaction specific operations. */
+     *         transaction, helper non-transactional atomic flag operations,
+     *         and raw transaction primitives. */
     patomic_ops_transaction_t ops;
 
     /** @brief Recommended time and space bounds for atomic operations. */
