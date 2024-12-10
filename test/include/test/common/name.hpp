@@ -3,6 +3,7 @@
 
 #include <patomic/api/ids.h>
 #include <patomic/api/memory_order.h>
+#include <patomic/api/transaction.h>
 
 #include <string>
 
@@ -26,6 +27,12 @@ name_options(unsigned int options);
 ///   Convert a memory order to a string.
 std::string
 name_order(patomic_memory_order_t order);
+
+
+/// @brief
+///   Convert a transaction exit status to a string.
+std::string
+name_exit_status(patomic_transaction_exit_status_t exit_status);
 
 
 }  // namespace test
