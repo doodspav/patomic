@@ -86,10 +86,6 @@ typedef struct {
  *
  * @details
  *   The flag may be NULL, in which case a locally allocated flag is used.
- *
- * @note
- *   Width is expected to be non-zero, so the zero value is not explicitly
- *   checked and optimised for, however zero is still a valid value.
  */
 typedef struct {
 
@@ -120,10 +116,6 @@ typedef struct {
  *   to guard a read-only code path.                                            \n
  *   With this in mind, it is recommended to use flag as a unique read-write
  *   lock and fallback_flag as a shared read-only lock.
- *
- * @note
- *   Width is expected to be non-zero, so the zero value is not explicitly
- *   checked and optimised for, however zero is still a valid value.
  */
 typedef struct {
 
@@ -207,10 +199,6 @@ patomic_transaction_abort_reason(
  *
  * @brief
  *   Represents the outcome of a transaction operation.
- *
- * @note
- *   If the transaction was configured to run zero attempts, then the status
- *   will default to patomic_TSUCCESS.
  */
 typedef struct {
 
@@ -228,14 +216,6 @@ typedef struct {
  *
  * @brief
  *   Represents the outcome of a transaction operation with a fallback path.
- *
- * @note
- *   If the transaction was configured to run zero attempts, then the status
- *   will default to patomic_TSUCCESS.
- *
- * @note
- *   If fallback_attempts_made is zero, the fallback_status will default to
- *   patomic_TSUCCESS, even if more fallback attempts were configured.
  */
 typedef struct {
 

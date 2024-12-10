@@ -221,6 +221,11 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
  *   the value of config.fallback_attempts only takes place if the primary
  *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_cmpxchg_t) (
     volatile void *obj,
@@ -595,6 +600,11 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
  *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
  *   the value of config.fallback_attempts only takes place if the primary
  *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
     patomic_transaction_cmpxchg_t cxa,
@@ -663,6 +673,11 @@ typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
  *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
  *   the value of config.fallback_attempts only takes place if the primary
  *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
     const patomic_transaction_cmpxchg_t *cxs_buf,
@@ -779,6 +794,11 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
  *   the value of config.fallback_attempts only takes place if the primary
  *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_generic_wfb_t) (
     void (* fn) (void *),
