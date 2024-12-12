@@ -1191,9 +1191,9 @@ typedef struct {
  *   are NULL if operation is not supported.
  *
  * @note
- *   If any operations are supported, then both fp_tbegin and fp_tcommit will
- *   also be supported. Otherwise, feature_check_any on opcat_TRAW would be
- *   useless.
+ *   If any raw operations are supported, then both fp_tbegin and fp_tcommit
+ *   will also be supported. Otherwise, patomic_feature_check_any_transaction
+ *   on opcat_TRAW would be useless.
  *
  * @note
  *   The op fp_ttest is always supported if fp_tdepth is supported. If both are

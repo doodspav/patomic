@@ -194,7 +194,7 @@ typedef struct {
  *
  * @brief
  *   A set of constants used to denote the exit code of a transaction. The
- *   exit code always has 8 significant bits and is never negative.
+ *   exit code always has 8 significant bits.
  *
  * @note
  *   In transactional operations with a fallback path, an explicit abort will
