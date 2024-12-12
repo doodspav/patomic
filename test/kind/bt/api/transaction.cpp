@@ -9,7 +9,22 @@
 
 /// @brief Test fixture.
 class BtApiTransaction : public testing::Test
-{};
+{
+public:
+    static std::vector<patomic_transaction_exit_code_t>
+    supported_exit_codes()
+    {
+        return {
+            patomic_TSUCCESS,
+            patomic_TABORT_UNKNOWN,
+            patomic_TABORT_EXPLICIT,
+            patomic_TABORT_CONFLICT,
+            patomic_TABORT_CAPACITY,
+            patomic_TABORT_DEBUG,
+            patomic_TABORT_NESTED
+        };
+    }
+};
 
 /// @brief Success exit code is zero.
 TEST_F(BtApiTransaction, exit_code_success_is_zero)
@@ -21,7 +36,7 @@ TEST_F(BtApiTransaction, exit_code_success_is_zero)
 TEST_F(BtApiTransaction, exit_code_is_8_bits_nonnegative)
 {
     // go through all supported exit codes
-    for (auto code : test::supported_tsx_exit_codes())
+    for (auto code : supported_exit_codes())
     {
         EXPECT_GE(code, 0);
         EXPECT_LE(code, 255);
