@@ -110,7 +110,7 @@ typedef struct {
  *   by patomic_transaction_cmpxchg_t objects.
  *
  * @details
- *   The flag and fallback_flag may point to the same flag, or may be NULL.     \n                         \n
+ *   The flag and fallback_flag may point to the same flag, or may be NULL.     \n
  *   The flag tends to guard a read-write code path, and the fallback flag tends
  *   to guard a read-only code path.                                            \n
  *   With this in mind, it is recommended to use flag as a unique writer lock
