@@ -1225,8 +1225,8 @@ typedef struct {
  *   supported.
  *
  * @note
- *   The op fp_ttest is always supported if fp_tdepth is supported. If both are
- *   supported, they will point to the same function and can be use
+ *   The operation fp_ttest is always supported if fp_tdepth is supported. If
+ *   both are supported, they will point to the same function and can be use
  *   interchangeably.
  */
 typedef struct {

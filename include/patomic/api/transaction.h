@@ -196,7 +196,7 @@ typedef struct {
  *   A set of constants used to denote the success or failure of a transaction.
  *   The exit code always has 8 significant bits.
  *
- * @note
+ * @warning
  *   In transactional operations with a fallback path, an explicit abort will
  *   immediately shift execution to the fallback path, regardless of whether
  *   all attempts on the primary path have been exhausted.
