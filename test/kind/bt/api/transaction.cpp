@@ -20,8 +20,7 @@ public:
             patomic_TABORT_EXPLICIT,
             patomic_TABORT_CONFLICT,
             patomic_TABORT_CAPACITY,
-            patomic_TABORT_DEBUG,
-            patomic_TABORT_NESTED
+            patomic_TABORT_DEBUG
         };
     }
 };

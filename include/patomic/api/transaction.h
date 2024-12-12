@@ -223,9 +223,6 @@ typedef enum {
     /** @brief The transaction encountered a debug trap or exception. */
     ,patomic_TABORT_DEBUG
 
-    /** @brief An inner nested transaction aborted. */
-    ,patomic_TABORT_NESTED
-
 } patomic_transaction_exit_code_t;
 
 
