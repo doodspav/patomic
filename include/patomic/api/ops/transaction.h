@@ -890,8 +890,9 @@ typedef void (* patomic_opsig_transaction_flag_clear_t) (
  *   committed.
  *
  * @note
- *   To get more information from the status, pass the status to
- *   PATOMIC_TRANSACTION_EXIT_STATUS and PATOMIC_TRANSACTION_ABORT_REASON.
+ *   More information can be obtained from the status using the
+ *   patomic_transaction_status_* functions or the
+ *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
 typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
     void

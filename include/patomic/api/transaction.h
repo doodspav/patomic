@@ -85,7 +85,7 @@ typedef struct {
  *   by patomic_transaction_cmpxchg_t objects.
  *
  * @details
- *   The flag may be NULL, in which case a locally allocated flag is used.
+ *   The flag may be NULL.
  */
 typedef struct {
 
@@ -110,12 +110,11 @@ typedef struct {
  *   by patomic_transaction_cmpxchg_t objects.
  *
  * @details
- *   The flag and fallback_flag may point to the same flag, or may be NULL, in
- *   which case a locally allocated flag is used.                               \n
+ *   The flag and fallback_flag may point to the same flag, or may be NULL.     \n                         \n
  *   The flag tends to guard a read-write code path, and the fallback flag tends
  *   to guard a read-only code path.                                            \n
- *   With this in mind, it is recommended to use flag as a unique read-write
- *   lock and fallback_flag as a shared read-only lock.
+ *   With this in mind, it is recommended to use flag as a unique writer lock
+ *   and fallback_flag as a shared reader lock.
  */
 typedef struct {
 
@@ -141,55 +140,18 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
- *   A set of constants used to denote the exit status of a transaction. The
- *   exit status always has 8 significant bits.
+ *   Represents the outcome of a transaction operation.
  *
  * @note
- *   In transactional operations with a fallback path, an explicit abort will
- *   immediately shift execution to the fallback path, regardless of whether
- *   all attempts on the primary path have been exhausted.
- */
-typedef enum {
-
-    /** @brief The transaction was committed. */
-    patomic_TSUCCESS = 0
-
-    /** @brief The transaction was not committed. */
-    ,patomic_TABORTED = 1
-
-    /** @brief The transaction was explicitly aborted by the user. */
-    ,patomic_TABORT_EXPLICIT = 0x2  | patomic_TABORTED
-
-    /** @brief There was a memory conflict with another thread. */
-    ,patomic_TABORT_CONFLICT = 0x4  | patomic_TABORTED
-
-    /** @brief The transaction accessed too much memory. */
-    ,patomic_TABORT_CAPACITY = 0x8  | patomic_TABORTED
-
-    /** @brief An inner nested transaction aborted. */
-    ,patomic_TABORT_NESTED   = 0x10 | patomic_TABORTED
-
-    /** @brief A debug trap caused the transaction to abort. */
-    ,patomic_TABORT_DEBUG    = 0x20 | patomic_TABORTED
-
-    /** @brief An interrupt caused the transaction to abort. */
-    ,patomic_TABORT_INT      = 0x40 | patomic_TABORTED
-
-} patomic_transaction_exit_status_t;
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Represents the outcome of a transaction operation.
+ *   More information can be obtained from the status using the
+ *   patomic_transaction_status_* functions or the
+ *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
 typedef struct {
 
     /** @brief Status from the final attempt at committing the transaction.
-     *         The value is an exit status potentially combined with an abort
-     *         reason. */
-    unsigned int status;
+     *         The value is always zero on success. */
+    unsigned long status;
 
     /** @brief Attempts made to commit the transaction. */
     unsigned long attempts_made;
@@ -202,18 +164,21 @@ typedef struct {
  *
  * @brief
  *   Represents the outcome of a transaction operation with a fallback path.
+ *
+ * @note
+ *   More information can be obtained from the status and fallback_status using
+ *   the patomic_transaction_status_* functions or the
+ *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
 typedef struct {
 
     /** @brief Status from the final attempt at committing the primary
-     *         transaction. The value is an exit status potentially combined
-     *         with an abort reason. */
-    unsigned int status;
+     *         transaction. The value is always zero on success. */
+    unsigned long status;
 
     /** @brief Status from the final attempt at committing the fallback
-     *         transaction. The value is an exit status potentially combined
-     *         with an abort reason. */
-    unsigned int fallback_status;
+     *         transaction. The value is always zero on success. */
+    unsigned long fallback_status;
 
     /** @brief Attempts made to commit the primary transaction. */
     unsigned long attempts_made;
@@ -228,13 +193,50 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
- *   Obtains the exit status from the status of a transaction.
+ *   A set of constants used to denote the exit code of a transaction. The
+ *   exit code always has 8 significant bits and is never negative.
  *
  * @note
- *   The exit status has 8 significant bits.
+ *   In transactional operations with a fallback path, an explicit abort will
+ *   immediately shift execution to the fallback path, regardless of whether
+ *   all attempts on the primary path have been exhausted.
  */
-#define PATOMIC_TRANSACTION_EXIT_STATUS(status) \
-    ((patomic_transaction_exit_status_t) (status & 0xFFu))
+typedef enum {
+
+    /** @brief The transaction was started and committed successfully. */
+    patomic_TSUCCESS = 0
+
+    /** @brief The transaction failed for an unknown or implementation specific
+     *         reason. */
+    ,patomic_TABORT_UNKNOWN = 255
+
+    /** @brief The transaction was explicitly aborted by the user. */
+    ,patomic_TABORT_EXPLICIT = 1
+
+    /** @brief The transaction encountered a memory conflict with another
+     *         thread. */
+    ,patomic_TABORT_CONFLICT
+
+    /** @brief The transaction accessed too much memory. */
+    ,patomic_TABORT_CAPACITY
+
+    /** @brief The transaction encountered a debug trap or exception. */
+    ,patomic_TABORT_DEBUG
+
+    /** @brief An inner nested transaction aborted. */
+    ,patomic_TABORT_NESTED
+
+} patomic_transaction_exit_code_t;
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit code from the status of a transaction.
+ */
+#define PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
+    ((patomic_transaction_exit_code_t) (((unsigned long) (status)) & 0xFFul))
 
 
 /**
@@ -244,15 +246,12 @@ typedef struct {
  *   Obtains the abort reason from the status of an explicitly aborted
  *   transaction. If the transaction was not explicitly aborted, the abort
  *   reason will be 0.
- *
- * @note
- *   The abort reason has 8 significant bits.
  */
-#define PATOMIC_TRANSACTION_ABORT_REASON(status)                             \
-    ((unsigned char) (                                                       \
-        (PATOMIC_TRANSACTION_EXIT_STATUS(status) == patomic_TABORT_EXPLICIT) \
-        ? ((status) >> 8u) & 0xFFu                                           \
-        : 0u                                                                 \
+#define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status)             \
+    ((unsigned char) ((PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
+                      == patomic_TABORT_EXPLICIT)                   \
+        ? (((unsigned long) (status)) >> 8ul) & 0xFFul              \
+        : 0ul                                                       \
     ))
 
 
@@ -260,17 +259,14 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
- *   Obtains the exit status from the status of a transaction.
- *
- * @note
- *   The exit status has 8 significant bits.
+ *   Obtains the exit code from the status of a transaction.
  *
  * @note
  *   The value returned by this function is identical to the
- *   PATOMIC_TRANSACTION_EXIT_STATUS macro value.
+ *   PATOMIC_TRANSACTION_STATUS_EXIT_CODE macro value.
  */
-PATOMIC_EXPORT patomic_transaction_exit_status_t
-patomic_transaction_exit_status(unsigned int status);
+PATOMIC_EXPORT patomic_transaction_exit_code_t
+patomic_transaction_status_exit_code(unsigned long status);
 
 
 /**
@@ -282,14 +278,11 @@ patomic_transaction_exit_status(unsigned int status);
  *   reason will be 0.
  *
  * @note
- *   The abort reason has 8 significant bits.
- *
- * @note
  *   The value returned by this function is identical to the
  *   PATOMIC_TRANSACTION_ABORT_REASON macro value.
  */
 PATOMIC_EXPORT unsigned char
-patomic_transaction_abort_reason(unsigned int status);
+patomic_transaction_status_abort_reason(unsigned long status);
 
 
 /**

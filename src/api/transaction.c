@@ -1,19 +1,19 @@
 #include <patomic/api/transaction.h>
 
 
-patomic_transaction_exit_status_t
-patomic_transaction_exit_status(
-    const unsigned int status
+patomic_transaction_exit_code_t
+patomic_transaction_status_exit_code(
+    const unsigned long status
 )
 {
-    return PATOMIC_TRANSACTION_EXIT_STATUS(status);
+    return PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status);
 }
 
 
 unsigned char
-patomic_transaction_abort_reason(
-    const unsigned int status
+patomic_transaction_status_abort_reason(
+    const unsigned long status
 )
 {
-    return PATOMIC_TRANSACTION_ABORT_REASON(status);
+    return PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status);
 }
