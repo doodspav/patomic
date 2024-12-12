@@ -950,6 +950,10 @@ typedef void (* patomic_opsig_transaction_tcommit_t) (
  *
  * @returns
  *   A non-zero value if currently executing inside a transaction, otherwise 0.
+ *
+ * @note
+ *   The returned value represents the transaction nesting depth on supported
+ *   platforms.
  */
 typedef int (* patomic_opsig_transaction_ttest_t) (
     void
@@ -1185,6 +1189,11 @@ typedef struct {
  * @brief
  *   Set of function pointers for raw transaction-specific operations. Pointers
  *   are NULL if operation is not supported.
+ *
+ * @note
+ *   The op fp_ttest is always supported if fp_tdepth is supported. If both are
+ *   supported, they will point to the same function and can be use
+ *   interchangeably.
  */
 typedef struct {
 
@@ -1199,6 +1208,9 @@ typedef struct {
 
     /** @brief Test if currently executing inside a transaction. */
     patomic_opsig_transaction_ttest_t fp_ttest;
+
+    /** @brief Get the current transaction nesting depth. */
+    patomic_opsig_transaction_ttest_t fp_tdepth;
 
 } patomic_ops_transaction_raw_t;
 

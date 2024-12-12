@@ -279,7 +279,7 @@ patomic_transaction_status_exit_code(unsigned long status);
  *
  * @note
  *   The value returned by this function is identical to the
- *   PATOMIC_TRANSACTION_ABORT_REASON macro value.
+ *   PATOMIC_TRANSACTION_STATUS_ABORT_REASON macro value.
  */
 PATOMIC_EXPORT unsigned char
 patomic_transaction_status_abort_reason(unsigned long status);

@@ -185,6 +185,14 @@ patomic_create_transaction(
             ret = patomic_impl_register[i].fp_create_transaction(options);
             if(opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
             {
+                /* if fp_tdepth is supported, fp_ttest must have the same value */
+                if (ret.ops.raw_ops.fp_tdepth != NULL)
+                {
+                    patomic_assert_always(
+                        ret.ops.raw_ops.fp_ttest == ret.ops.raw_ops.fp_tdepth
+                    );
+                }
+
                 /* ignore previous implementations if current one has a better kind */
                 if (patomic_impl_register[i].kind > last_kind)
                 {
