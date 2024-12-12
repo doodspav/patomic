@@ -110,4 +110,19 @@ supported_orders_load()
 }
 
 
+std::vector<patomic_transaction_exit_code_t>
+supported_tsx_exit_codes()
+{
+    return {
+        patomic_TSUCCESS,
+        patomic_TABORT_UNKNOWN,
+        patomic_TABORT_EXPLICIT,
+        patomic_TABORT_CONFLICT,
+        patomic_TABORT_CAPACITY,
+        patomic_TABORT_DEBUG,
+        patomic_TABORT_NESTED
+    };
+}
+
+
 }  // namespace test
