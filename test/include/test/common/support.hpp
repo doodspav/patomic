@@ -4,7 +4,6 @@
 #include <patomic/api/ids.h>
 #include <patomic/api/memory_order.h>
 #include <patomic/api/options.h>
-#include <patomic/api/transaction.h>
 
 #include <cstddef>
 #include <vector>
@@ -50,12 +49,6 @@ supported_orders_store();
 ///   Set of memory orders which can be used for load operations.
 std::vector<patomic_memory_order_t>
 supported_orders_load();
-
-
-/// @brief
-///   Set of all transaction exit codes.
-std::vector<patomic_transaction_exit_code_t>
-supported_tsx_exit_codes();
 
 
 }  // namespace test

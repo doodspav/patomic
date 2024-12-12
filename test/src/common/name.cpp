@@ -58,29 +58,4 @@ name_order(patomic_memory_order_t order)
 }
 
 
-std::string
-name_exit_status(patomic_transaction_exit_status_t exit_status)
-{
-    switch (exit_status)
-    {
-        case patomic_TSUCCESS:
-            return "TSUCCESS";
-        case patomic_TABORT_EXPLICIT:
-            return "TABORT_EXPLICIT";
-        case patomic_TABORT_CONFLICT:
-            return "TABORT_CONFLICT";
-        case patomic_TABORT_CAPACITY:
-            return "TABORT_CAPACITY";
-        case patomic_TABORT_NESTED:
-            return "TABORT_NESTED";
-        case patomic_TABORT_DEBUG:
-            return "TABORT_DEBUG";
-        case patomic_TABORT_INT:
-            return "TABORT_INT";
-        default:
-            return "(unknown)";
-    }
-}
-
-
 }  // namespace test
