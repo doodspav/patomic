@@ -167,10 +167,12 @@ TEST_F(BtApiFeatureCheckLeaf, all_opkinds_have_expected_bits)
         patomic_opkind_TEST_SET |
         patomic_opkind_CLEAR;
     constexpr auto expected_traw =
-        patomic_opkind_TBEGIN  |
-        patomic_opkind_TABORT  |
-        patomic_opkind_TCOMMIT |
-        patomic_opkind_TTEST;
+        patomic_opkind_TBEGIN        |
+        patomic_opkind_TCOMMIT       |
+        patomic_opkind_TABORT_ALL    |
+        patomic_opkind_TABORT_SINGLE |
+        patomic_opkind_TTEST         |
+        patomic_opkind_TDEPTH;
     // sets of values
     const std::vector<int> expected_vec {
         expected_ldst,

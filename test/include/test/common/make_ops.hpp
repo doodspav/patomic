@@ -336,7 +336,7 @@ make_ops_raw_combinations_transaction();
 /// @brief
 ///   Create an array of members in a patomic_ops_transaction_raw_t object,
 ///   with the types cast to void(*)().
-std::array<void(*)(), 4>
+std::array<void(*)(), 6>
 make_ops_raw_array_transaction(const patomic_ops_transaction_raw_t& raw) noexcept;
 
 

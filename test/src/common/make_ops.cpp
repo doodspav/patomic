@@ -603,9 +603,11 @@ make_opkinds_all_solo()
         patomic_opkind_GENERIC,
         patomic_opkind_GENERIC_WFB,
         patomic_opkind_TBEGIN,
-        patomic_opkind_TABORT,
         patomic_opkind_TCOMMIT,
-        patomic_opkind_TTEST
+        patomic_opkind_TABORT_ALL,
+        patomic_opkind_TABORT_SINGLE,
+        patomic_opkind_TTEST,
+        patomic_opkind_TDEPTH
     };
 }
 
@@ -665,10 +667,12 @@ make_ops_all_nonnull<ops_domain::TRANSACTION>(void(*nonnull_value)()) noexcept
     ops.flag_ops.fp_test_set = non_null;
     ops.flag_ops.fp_clear    = non_null;
     // TRAW
-    ops.raw_ops.fp_tbegin  = non_null;
-    ops.raw_ops.fp_tabort  = non_null;
-    ops.raw_ops.fp_tcommit = non_null;
-    ops.raw_ops.fp_ttest   = non_null;
+    ops.raw_ops.fp_tbegin        = non_null;
+    ops.raw_ops.fp_tcommit       = non_null;
+    ops.raw_ops.fp_tabort_all    = non_null;
+    ops.raw_ops.fp_tabort_single = non_null;
+    ops.raw_ops.fp_ttest         = non_null;
+    ops.raw_ops.fp_tdepth        = non_null;
 
     // return fully nonnull ops
     return ops;
@@ -779,14 +783,18 @@ make_ops_raw_combinations_transaction(void(*nonnull_value)())
     // lambda helpers
     using T = patomic_ops_transaction_raw_t;
     CREATE_SETTER_LAMBDA(tbegin, TBEGIN);
-    CREATE_SETTER_LAMBDA(tabort, TABORT);
     CREATE_SETTER_LAMBDA(tcommit, TCOMMIT);
+    CREATE_SETTER_LAMBDA(tabort_all, TABORT_ALL);
+    CREATE_SETTER_LAMBDA(tabort_single, TABORT_SINGLE);
     CREATE_SETTER_LAMBDA(ttest, TTEST);
+    CREATE_SETTER_LAMBDA(tdepth, TDEPTH);
     const std::vector<void(*)(T&, unsigned int&, void(*)())> setters {
         set_tbegin,
-        set_tabort,
         set_tcommit,
-        set_ttest
+        set_tabort_all,
+        set_tabort_single,
+        set_ttest,
+        set_tdepth
     };
 
     // create all combinations
@@ -859,21 +867,25 @@ make_ops_flag_array_transaction(
 }
 
 
-std::array<void(*)(), 4>
+std::array<void(*)(), 6>
 make_ops_raw_array_transaction(
     const patomic_ops_transaction_raw_t& raw) noexcept
 {
     // lambda helpers
     using T = patomic_ops_transaction_raw_t;
     CREATE_GETTER_LAMBDA(tbegin);
-    CREATE_GETTER_LAMBDA(tabort);
     CREATE_GETTER_LAMBDA(tcommit);
+    CREATE_GETTER_LAMBDA(tabort_all);
+    CREATE_GETTER_LAMBDA(tabort_single);
     CREATE_GETTER_LAMBDA(ttest);
-    const std::array<void(*(*)(const T&))(), 4> getters {
+    CREATE_GETTER_LAMBDA(tdepth);
+    const std::array<void(*(*)(const T&))(), 6> getters {
         get_tbegin,
-        get_tabort,
         get_tcommit,
-        get_ttest
+        get_tabort_all,
+        get_tabort_single,
+        get_ttest,
+        get_tdepth
     };
 
     // create array
