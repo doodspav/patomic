@@ -167,7 +167,7 @@ patomic_create_transaction(
 )
 {
     /* declare variables */
-    const unsigned int opcats = ~0u;
+    unsigned int opcats;
     patomic_kind_t last_kind = patomic_kind_UNKN;
     patomic_transaction_t ret;
     patomic_transaction_t objs[PATOMIC_IMPL_REGISTER_SIZE];
@@ -183,9 +183,18 @@ patomic_create_transaction(
         {
             /* only add to array if some operation is supported */
             ret = patomic_impl_register[i].fp_create_transaction(options);
-            if(opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
+            opcats = patomic_opcats_TRANSACTION;
+            if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
             {
-                /* if fp_tdepth is supported, fp_ttest must have the same value */
+                /* tbegin and tcommit must be supported if any raw operation is supported */
+                opcats = patomic_opcat_TRAW;
+                if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
+                {
+                    patomic_assert_always(ret.ops.raw_ops.fp_tbegin != NULL);
+                    patomic_assert_always(ret.ops.raw_ops.fp_tcommit != NULL);
+                }
+
+                /* if tdepth is supported, ttest must have the same value */
                 if (ret.ops.raw_ops.fp_tdepth != NULL)
                 {
                     patomic_assert_always(

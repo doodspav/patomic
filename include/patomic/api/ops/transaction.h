@@ -1191,6 +1191,11 @@ typedef struct {
  *   are NULL if operation is not supported.
  *
  * @note
+ *   If any operations are supported, then both fp_tbegin and fp_tcommit will
+ *   also be supported. Otherwise, feature_check_any on opcat_TRAW would be
+ *   useless.
+ *
+ * @note
  *   The op fp_ttest is always supported if fp_tdepth is supported. If both are
  *   supported, they will point to the same function and can be use
  *   interchangeably.
@@ -1200,11 +1205,11 @@ typedef struct {
     /** @brief Start a transaction. */
     patomic_opsig_transaction_tbegin_t fp_tbegin;
 
-    /** @brief Explicitly abort a transaction. */
-    patomic_opsig_transaction_tabort_t fp_tabort;
-
     /** @brief Commit a transaction. */
     patomic_opsig_transaction_tcommit_t fp_tcommit;
+
+    /** @brief Explicitly abort a transaction. */
+    patomic_opsig_transaction_tabort_t fp_tabort;
 
     /** @brief Test if currently executing inside a transaction. */
     patomic_opsig_transaction_ttest_t fp_ttest;
