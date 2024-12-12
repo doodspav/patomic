@@ -73,11 +73,13 @@
     PATOMIC_UNSET_OPKIND(ops->flag_ops.fp_clear,    kinds, CLEAR)
 
 
-#define PATOMIC_UNSET_OPKINDS_TRAW(ops, kinds)                     \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tbegin,  kinds, TBEGIN);  \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tabort,  kinds, TABORT);  \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tcommit, kinds, TCOMMIT); \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_ttest,   kinds, TTEST)
+#define PATOMIC_UNSET_OPKINDS_TRAW(ops, kinds)                                 \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tbegin,        kinds, TBEGIN);        \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tcommit,       kinds, TCOMMIT);       \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tabort_all,    kinds, TABORT_ALL);    \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tabort_single, kinds, TABORT_SINGLE); \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_ttest,         kinds, TTEST);         \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tdepth,        kinds, TDEPTH)
 
 
 #define PATOMIC_CASE_UNSET_OPKINDS(cat, ops, kinds) \
