@@ -903,30 +903,6 @@ typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
  * @addtogroup ops.transaction
  *
  * @brief
- *   Function signature for aborting a transaction.
- *
- * @details
- *   Explicitly aborts a live transaction with a reason that is passed in the
- *   the status, which itself will always match patomic_TABORT_EXPLICIT. Only
- *   the 8 least significant bits of reason are used (if CHAR_BIT happens to be
- *   larger than 8).
- *
- * @warning
- *   Aborting a nested transaction will abort ALL nested transactions, and
- *   execution control will pass back to the caller of the outermost tbegin.
- *
- * @note
- *   Calling this outside of an active transaction is a no-op.
- */
-typedef void (* patomic_opsig_transaction_tabort_t) (
-    unsigned char reason
-);
-
-
-/**
- * @addtogroup ops.transaction
- *
- * @brief
  *   Function signature for committing a transaction.
  *
  * @details
@@ -939,6 +915,55 @@ typedef void (* patomic_opsig_transaction_tabort_t) (
  */
 typedef void (* patomic_opsig_transaction_tcommit_t) (
     void
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for aborting all transaction layers.
+ *
+ * @details
+ *   Explicitly aborts a live transaction with a reason that is passed in the
+ *   status and an exit code of patomic_TABORT_EXPLICIT. Only the 8 least
+ *   significant bits of reason are used (if CHAR_BIT happens to be larger
+ *   than 8).
+ *
+ * @warning
+ *   Aborting a nested transaction will abort ALL nested transactions, and
+ *   execution control will pass back to the caller of the outermost tbegin.
+ *
+ * @note
+ *   Calling this outside of an active transaction is a no-op.
+ */
+typedef void (* patomic_opsig_transaction_tabort_all_t) (
+    unsigned char reason
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for aborting a single transaction layer.
+ *
+ * @details
+ *   Explicitly aborts a live transaction with a reason that is passed in the
+ *   status and an exit code of patomic_TABORT_EXPLICIT. Only the 8 least
+ *   significant bits of reason are used (if CHAR_BIT happens to be larger
+ *   than 8).
+ *
+ * @warning
+ *   Aborting a nested transaction will only abort the current transaction
+ *   layer, and execution control will pass back to the last caller of tbegin.
+ *
+ * @note
+ *   Calling this outside of an active transaction is a no-op.
+ */
+typedef void (* patomic_opsig_transaction_tabort_single_t) (
+    unsigned char reason,
+    int unused_tag_type_parameter
 );
 
 
@@ -1196,6 +1221,10 @@ typedef struct {
  *   on opcat_TRAW would be useless.
  *
  * @note
+ *   If fp_tabort_single is supported, then fp_tabort_all will also be
+ *   supported.
+ *
+ * @note
  *   The op fp_ttest is always supported if fp_tdepth is supported. If both are
  *   supported, they will point to the same function and can be use
  *   interchangeably.
@@ -1208,8 +1237,11 @@ typedef struct {
     /** @brief Commit a transaction. */
     patomic_opsig_transaction_tcommit_t fp_tcommit;
 
-    /** @brief Explicitly abort a transaction. */
-    patomic_opsig_transaction_tabort_t fp_tabort;
+    /** @brief Explicitly abort all transaction layers */
+    patomic_opsig_transaction_tabort_all_t fp_tabort_all;
+
+    /** @brief Explicitly abort a single transaction layer. */
+    patomic_opsig_transaction_tabort_single_t fp_tabort_single;
 
     /** @brief Test if currently executing inside a transaction. */
     patomic_opsig_transaction_ttest_t fp_ttest;

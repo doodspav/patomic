@@ -193,8 +193,8 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
- *   A set of constants used to denote the exit code of a transaction. The
- *   exit code always has 8 significant bits.
+ *   A set of constants used to denote the success or failure of a transaction.
+ *   The exit code always has 8 significant bits.
  *
  * @note
  *   In transactional operations with a fallback path, an explicit abort will
@@ -290,7 +290,7 @@ patomic_transaction_status_abort_reason(unsigned long status);
  *
  * @brief
  *   Provides the recommended limits for transactions. The limits are generated
- *   by tests run internally with successively harder values.
+ *   by tests run internally with progressively higher limits.
  *
  * @details
  *   - "rmw" models cmpxchg's success path (load, compare, store)               \n
@@ -299,7 +299,7 @@ patomic_transaction_status_abort_reason(unsigned long status);
  *     execution                                                                \n
  *   - tests may be run multiple times until they succeed internally, with the
  *     number of times being unspecified                                        \n
- *   - implementations may cache the values
+ *   - implementations should cache the values
  *
  * @note
  *   The tests used to generate the values for this type are likely run under

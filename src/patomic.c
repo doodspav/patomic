@@ -194,6 +194,12 @@ patomic_create_transaction(
                     patomic_assert_always(ret.ops.raw_ops.fp_tcommit != NULL);
                 }
 
+                /* of tabort_single is supported, then tabort_all must be supported too */
+                if (ret.ops.raw_ops.fp_tabort_single != NULL)
+                {
+                    patomic_assert_always(ret.ops.raw_ops.fp_tabort_all != NULL);
+                }
+
                 /* if tdepth is supported, ttest must have the same value */
                 if (ret.ops.raw_ops.fp_tdepth != NULL)
                 {
