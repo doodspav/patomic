@@ -17,7 +17,96 @@ test_fetch_add(
     )>& fp_fetch_add
 )
 {
-    // todo
+    // create integers
+    // params
+    test::generic_integer object { width, align, false };
+    test::generic_integer argument { width, align, false };
+    test::generic_integer ret { width, align, false };
+    // old
+    test::generic_integer object_old { width, align, false };
+    test::generic_integer object_exp { width, align, false };
+    test::generic_integer argument_old { width, align, false };
+
+#define DO_TEST_FETCH_ADD()              \
+    object_old = object;                 \
+    argument_old = argument;             \
+    object_exp = object;                 \
+    object_exp.add(argument);            \
+    fp_fetch_add(object, argument, ret); \
+    ASSERT_EQ(object, object_exp);       \
+    ASSERT_EQ(argument, argument_old);   \
+    ASSERT_EQ(ret, object_old);          \
+    object = object_old;                 \
+    ret.inc();                           \
+    fp_fetch_add(argument, object, ret); \
+    ASSERT_EQ(argument, object_exp);     \
+    ASSERT_EQ(object, argument_old);     \
+    ASSERT_EQ(ret, object_old);          \
+    object.swap(argument)
+
+    // 0 + 0 -> 0
+    DO_TEST_FETCH_ADD();
+
+    // 0 + 1 -> 1
+    argument.inc();
+    DO_TEST_FETCH_ADD();
+
+    // 0 + 2 -> 2
+    object.store_zero();
+    argument.inc();
+    DO_TEST_FETCH_ADD();
+
+    // 0 + max -> max
+    object.store_zero();
+    argument.store_max();
+    DO_TEST_FETCH_ADD();
+
+    // 1 + 1 -> 2
+    object.store_zero();
+    object.inc();
+    argument = object;
+    DO_TEST_FETCH_ADD();
+
+    // 1 + 2 -> 3
+    object.swap(argument);
+    DO_TEST_FETCH_ADD();
+
+    // 1 + max -> 0
+    object.store_zero();
+    object.inc();
+    argument.store_max();
+    DO_TEST_FETCH_ADD();
+
+    // max + 2 -> 1
+    object.store_max();
+    argument.store_zero();
+    argument.inc();
+    argument.inc();
+    DO_TEST_FETCH_ADD();
+
+    // max + max -> (max - 1)
+    object.store_max();
+    argument.store_max();
+    DO_TEST_FETCH_ADD();
+
+    // (max - 1) + 0 -> (max - 1)
+    argument.store_zero();
+    DO_TEST_FETCH_ADD();
+
+    // (max - 1) + 1 -> max
+    argument.inc();
+    DO_TEST_FETCH_ADD();
+
+    // (max - 1) + 2 -> 0
+    object.dec();
+    argument.inc();
+    DO_TEST_FETCH_ADD();
+
+    // (max - 1) + max -> (max - 2)
+    object.store_max();
+    object.dec();
+    argument.store_max();
+    DO_TEST_FETCH_ADD();
 }
 
 void
