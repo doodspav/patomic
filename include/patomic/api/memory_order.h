@@ -41,12 +41,12 @@ typedef enum {
  *   patomic_memory_order_t.
  */
 #define PATOMIC_IS_VALID_ORDER(order) \
-    ( (order == patomic_RELAXED) ||   \
-      (order == patomic_CONSUME) ||   \
-      (order == patomic_ACQUIRE) ||   \
-      (order == patomic_RELEASE) ||   \
-      (order == patomic_ACQ_REL) ||   \
-      (order == patomic_SEQ_CST) )
+    ( ((order) == patomic_RELAXED) || \
+      ((order) == patomic_CONSUME) || \
+      ((order) == patomic_ACQUIRE) || \
+      ((order) == patomic_RELEASE) || \
+      ((order) == patomic_ACQ_REL) || \
+      ((order) == patomic_SEQ_CST) )
 
 
 /**
@@ -57,9 +57,9 @@ typedef enum {
  *   patomic_memory_order_t, and is valid to use for an atomic store operation.
  */
 #define PATOMIC_IS_VALID_STORE_ORDER(order) \
-    ( (order == patomic_RELAXED) ||         \
-      (order == patomic_RELEASE) ||         \
-      (order == patomic_SEQ_CST) )
+    ( ((order) == patomic_RELAXED) ||       \
+      ((order) == patomic_RELEASE) ||       \
+      ((order) == patomic_SEQ_CST) )
 
 
 /**
@@ -70,10 +70,10 @@ typedef enum {
  *   patomic_memory_order_t, and is valid to use for an atomic load operation.
  */
 #define PATOMIC_IS_VALID_LOAD_ORDER(order) \
-    ( (order == patomic_RELAXED) ||        \
-      (order == patomic_CONSUME) ||        \
-      (order == patomic_ACQUIRE) ||        \
-      (order == patomic_SEQ_CST) )
+    ( ((order) == patomic_RELAXED) ||      \
+      ((order) == patomic_CONSUME) ||      \
+      ((order) == patomic_ACQUIRE) ||      \
+      ((order) == patomic_SEQ_CST) )
 
 
 /**
@@ -85,7 +85,7 @@ typedef enum {
  *   patomic_RELEASE or patomic_ACQ_REL.
  */
 #define PATOMIC_IS_VALID_FAIL_ORDER(succ, fail) \
-    ( (succ >= fail)               &&           \
+    ( ((succ) >= (fail))           &&           \
       PATOMIC_IS_VALID_ORDER(succ) &&           \
       PATOMIC_IS_VALID_LOAD_ORDER(fail) )
 
@@ -101,10 +101,10 @@ typedef enum {
  *   If an invalid memory order is passed to this macro, it will be returned
  *   unmodified.
  */
-#define PATOMIC_CMPXCHG_FAIL_ORDER(succ)                   \
-    ( (succ == patomic_ACQ_REL || succ == patomic_RELEASE) \
-      ? patomic_ACQUIRE                                    \
-      : succ )
+#define PATOMIC_CMPXCHG_FAIL_ORDER(succ)                       \
+    ( ((succ) == patomic_ACQ_REL || (succ) == patomic_RELEASE) \
+      ? patomic_ACQUIRE                                        \
+      : (succ) )
 
 
 /**
