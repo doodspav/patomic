@@ -26,6 +26,7 @@ static_assert(
     "integer representation must be two's complement"
 );
 
+
 /// @brief
 ///   Usage of generic_integer requires that native integer types do not
 ///   have trap or padding bits.
@@ -42,31 +43,17 @@ static_assert(
 ///   If this poses an issue, this could be fixed by having a parameter in the
 ///   constructor to signify if generic_int should use a native type as the
 ///   underlying representation or a vector of bytes.
-static_assert(
-    std::numeric_limits<signed char>::digits + 1 == sizeof(signed char) * CHAR_BIT &&
-    std::numeric_limits<unsigned char>::digits == sizeof(unsigned char) * CHAR_BIT,
-    "(signed/unsigned) char must not have trap or padding bits"
-);
-static_assert(
-    std::numeric_limits<signed short>::digits + 1 == sizeof(signed short) * CHAR_BIT &&
-    std::numeric_limits<unsigned short>::digits == sizeof(unsigned short) * CHAR_BIT,
-    "(signed/unsigned) short must not have trap or padding bits"
-);
-static_assert(
-    std::numeric_limits<signed int>::digits + 1 == sizeof(signed int) * CHAR_BIT &&
-    std::numeric_limits<unsigned int>::digits == sizeof(unsigned int) * CHAR_BIT,
-    "(signed/unsigned) int must not have trap or padding bits"
-);
-static_assert(
-    std::numeric_limits<signed long>::digits + 1 == sizeof(signed long) * CHAR_BIT &&
-    std::numeric_limits<unsigned long>::digits == sizeof(unsigned long) * CHAR_BIT,
-    "(signed/unsigned) long must not have trap or padding bits"
-);
-static_assert(
-    std::numeric_limits<signed long long>::digits + 1 == sizeof(signed long long) * CHAR_BIT &&
-    std::numeric_limits<unsigned long long>::digits == sizeof(unsigned long long) * CHAR_BIT,
-    "(signed/unsigned) long long must not have trap or padding bits"
-);
+#define ALL_INT_BITS_ARE_VALUE(type)                                                      \
+    static_assert(                                                                        \
+        std::numeric_limits<signed type>::digits + 1 == sizeof(signed type) * CHAR_BIT && \
+        std::numeric_limits<unsigned type>::digits == sizeof(unsigned type) * CHAR_BIT,   \
+        "(signed/unsigned) " #type " must not have trap or padding bits"                  \
+    )
+ALL_INT_BITS_ARE_VALUE(char);
+ALL_INT_BITS_ARE_VALUE(short);
+ALL_INT_BITS_ARE_VALUE(int);
+ALL_INT_BITS_ARE_VALUE(long);
+ALL_INT_BITS_ARE_VALUE(long long);
 
 
 /// @brief
