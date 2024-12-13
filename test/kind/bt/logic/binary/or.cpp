@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -113,3 +114,123 @@ test_bin_or(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_OR(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_or, "or")
+
+#define SKIP_NULL_OP_FP_FETCH_OR(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_fetch_or, "fetch_or")
+
+
+/// @brief Check that the non-atomic logic of implicit or works correctly.
+TEST_P(BtLogicImplicit, fp_or)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_OR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_or = [&](void *object, const void *argument) -> void {
+        return m_ops.binary_ops.fp_or(object, argument);
+    };
+
+    // test
+    test_bin_or(p.width, m_align.recommended, fp_or);
+}
+
+/// @brief Check that the non-atomic logic of implicit fetch_or works correctly.
+TEST_P(BtLogicImplicit, fp_fetch_or)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_OR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_or = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_or(object, argument, ret);
+    };
+
+    // test
+    test_bin_fetch_or(p.width, m_align.recommended, fp_fetch_or);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit or works correctly.
+TEST_P(BtLogicExplicit, fp_or)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_OR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_or = [&](void *object, const void *argument) -> void {
+        return m_ops.binary_ops.fp_or(object, argument, p.order);
+    };
+
+    // test
+    test_bin_or(p.width, m_align.recommended, fp_or);
+}
+
+/// @brief Check that the non-atomic logic of explicit fetch_or works correctly.
+TEST_P(BtLogicExplicit, fp_fetch_or)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_OR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_or = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_or(object, argument, p.order, ret);
+    };
+
+    // test
+    test_bin_fetch_or(p.width, m_align.recommended, fp_fetch_or);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction or works correctly.
+TEST_P(BtLogicTransaction, fp_or)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_OR(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_or = [&](void *object, const void *argument) -> void {
+            return m_ops.binary_ops.fp_or(object, argument, m_config, nullptr);
+        };
+
+        // test
+        test_bin_or(width, 1u, fp_or);
+    }
+}
+
+/// @brief Check that the non-atomic logic of transaction fetch_or works correctly.
+TEST_P(BtLogicTransaction, fp_fetch_or)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_OR(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_fetch_or = [&](void *object, const void *argument, void *ret) -> void {
+            return m_ops.binary_ops.fp_fetch_or(object, argument, ret, m_config, nullptr);
+        };
+
+        // test
+        test_bin_fetch_or(width, 1u, fp_fetch_or);
+    }
+}
