@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -61,3 +62,66 @@ test_exchange(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_EXCHANGE(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).xchg_ops.fp_exchange, "exchange")
+
+
+/// @brief Check that the non-atomic logic of implicit exchange works correctly.
+TEST_P(BtLogicImplicit, fp_exchange)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_EXCHANGE(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_exchange = [&](void *object, const void *desired, void *ret) -> void {
+        m_ops.xchg_ops.fp_exchange(object, desired, ret);
+    };
+
+    // test
+    test_exchange(p.width, m_align.recommended, fp_exchange);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit exchange works correctly.
+TEST_P(BtLogicExplicit, fp_exchange)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_EXCHANGE(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_exchange = [&](void *object, const void *desired, void *ret) -> void {
+        m_ops.xchg_ops.fp_exchange(object, desired, p.order, ret);
+    };
+
+    // test
+    test_exchange(p.width, m_align.recommended, fp_exchange);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction exchange works correctly.
+TEST_P(BtLogicTransaction, fp_exchange)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_EXCHANGE(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_exchange = [&](void *object, const void *desired, void *ret) -> void {
+            m_ops.xchg_ops.fp_exchange(object, desired, ret, m_config, nullptr);
+        };
+
+        // test
+        test_exchange(width, 1u, fp_exchange);
+    }
+}
+
