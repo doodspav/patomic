@@ -42,9 +42,21 @@ BtLogicTransaction::SetUp()
         p.options, patomic_kinds_ALL, p.id
     );
 
-    // initialize members
+    // initialize base members
     m_ops = pat.ops;
     m_recommended = pat.recommended;
+
+    // configure generous attempts
+    auto make_generous = [](unsigned long attempts) noexcept -> unsigned long {
+        const unsigned long extra_attempts = 100ul + (attempts / 10ul);
+        return std::max(attempts, attempts + extra_attempts);
+    };
+    m_config.attempts = make_generous(std::max(
+        m_recommended.min_rmw_attempts,
+        m_recommended.min_load_attempts
+    ));
+    m_config_wfb.attempts = make_generous(m_recommended.min_rmw_attempts);
+    m_config_wfb.fallback_attempts = make_generous(m_recommended.min_load_attempts);
 }
 
 
@@ -62,9 +74,57 @@ INSTANTIATE_TEST_SUITE_P(
 
 INSTANTIATE_TEST_SUITE_P(
     ,  // no name necessary
+    BtLogicImplicitStore,
+    testing::ConvertGenerator(
+        testing::ValuesIn(test::ParamsImplicit::combinations_store())
+    ),
+    [](const testing::TestParamInfo<test::ParamsImplicit>& info) -> std::string {
+        return info.param.as_test_suffix();
+    }
+);
+
+
+INSTANTIATE_TEST_SUITE_P(
+    ,  // no name necessary
+    BtLogicImplicitLoad,
+    testing::ConvertGenerator(
+        testing::ValuesIn(test::ParamsImplicit::combinations_load())
+    ),
+    [](const testing::TestParamInfo<test::ParamsImplicit>& info) -> std::string {
+        return info.param.as_test_suffix();
+    }
+);
+
+
+INSTANTIATE_TEST_SUITE_P(
+    ,  // no name necessary
     BtLogicExplicit,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsExplicit::combinations())
+    ),
+    [](const testing::TestParamInfo<test::ParamsExplicit>& info) -> std::string {
+        return info.param.as_test_suffix();
+    }
+);
+
+
+INSTANTIATE_TEST_SUITE_P(
+    ,  // no name necessary
+    BtLogicExplicitStore,
+    testing::ConvertGenerator(
+        testing::ValuesIn(test::ParamsExplicit::combinations_store())
+    ),
+    [](const testing::TestParamInfo<test::ParamsExplicit>& info) -> std::string {
+        return info.param.as_test_suffix();
+    }
+);
+
+
+INSTANTIATE_TEST_SUITE_P(
+    ,  // no name necessary
+    BtLogicExplicitLoad,
+    testing::ConvertGenerator(
+        testing::ValuesIn(test::ParamsExplicit::combinations_load())
     ),
     [](const testing::TestParamInfo<test::ParamsExplicit>& info) -> std::string {
         return info.param.as_test_suffix();

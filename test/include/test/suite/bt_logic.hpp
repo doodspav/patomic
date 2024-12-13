@@ -9,7 +9,7 @@
 
 
 /// @brief
-///   Test fixture for implicit logic operations.
+///   Test fixture for implicit logic operations with all memory orders.
 class BtLogicImplicit : public testing::TestWithParam<test::ParamsImplicit>
 {
 public:
@@ -26,7 +26,19 @@ protected:
 
 
 /// @brief
-///   Test fixture for explicit logic operations.
+///   Test fixture for implicit logic operations with store memory orders.
+class BtLogicImplicitStore : public BtLogicImplicit
+{};
+
+
+/// @brief
+///   Test fixture for implicit logic operations with load memory orders.
+class BtLogicImplicitLoad : public BtLogicImplicit
+{};
+
+
+/// @brief
+///   Test fixture for explicit logic operations with all memory orders.
 class BtLogicExplicit : public testing::TestWithParam<test::ParamsExplicit>
 {
 public:
@@ -43,6 +55,18 @@ protected:
 
 
 /// @brief
+///   Test fixture for explicit logic operations with store memory orders.
+class BtLogicExplicitStore : public BtLogicExplicit
+{};
+
+
+/// @brief
+///   Test fixture for explicit logic operations with load memory orders.
+class BtLogicExplicitLoad : public BtLogicExplicit
+{};
+
+
+/// @brief
 ///   Test fixture for transaction logic operations.
 class BtLogicTransaction : public testing::TestWithParam<test::ParamsTransaction>
 {
@@ -56,6 +80,8 @@ protected:
     // helper members
     patomic_ops_transaction_t m_ops {};
     patomic_transaction_recommended_t m_recommended {};
+    patomic_transaction_config_t m_config {};
+    patomic_transaction_config_wfb_t m_config_wfb {};
 };
 
 
