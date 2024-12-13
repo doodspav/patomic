@@ -17,47 +17,46 @@ test_load(
 )
 {
     // create integers
-    // base is here to make sure fp_load doesn't modify object
-    test::generic_integer base { width, align, false };
     test::generic_integer object { width, align, false };
     test::generic_integer ret {width, align, false };
+    test::generic_integer object_old { width, align, false };
 
     // set ret to non-zero
     ret.inc();
 
     // 0
     fp_load(object, ret);
-    EXPECT_EQ(base, object);
     EXPECT_EQ(object, ret);
+    EXPECT_EQ(object_old, object);
 
     // ~0
     object.inv();
-    base = object;
+    object_old = object;
     fp_load(object, ret);
-    EXPECT_EQ(base, object);
     EXPECT_EQ(object, ret);
+    EXPECT_EQ(object_old, object);
 
     // 1
     object.store_zero();
     object.inc();
-    base = object;
+    object_old = object;
     fp_load(object, ret);
-    EXPECT_EQ(base, object);
     EXPECT_EQ(object, ret);
+    EXPECT_EQ(object_old, object);
 
     // max
     object.store_max();
-    base = object;
+    object_old = object;
     fp_load(object, ret);
-    EXPECT_EQ(base, object);
     EXPECT_EQ(object, ret);
+    EXPECT_EQ(object_old, object);
 
     // min
     object.store_min();
-    base = object;
+    object_old = object;
     fp_load(object, ret);
-    EXPECT_EQ(base, object);
     EXPECT_EQ(object, ret);
+    EXPECT_EQ(object_old, object);
 }
 
 }  // namespace
