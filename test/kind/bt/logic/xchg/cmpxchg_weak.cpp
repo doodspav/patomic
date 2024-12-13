@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -47,14 +48,13 @@ test_cmpxchg_weak(
         {                                                             \
             ASSERT_EQ(object, desired);                               \
             ASSERT_EQ(expected, expected_old);                        \
-            ASSERT_EQ(desired, desired_old);                          \
         }                                                             \
         else                                                          \
         {                                                             \
             ASSERT_EQ(object, object_old);                            \
             ASSERT_EQ(expected, object);                              \
-            ASSERT_EQ(desired, desired_old);                          \
         }                                                             \
+        ASSERT_EQ(desired, desired_old);                              \
     }                                                                 \
     if (!ok)                                                          \
     {                                                                 \
@@ -69,7 +69,7 @@ test_cmpxchg_weak(
             << "\n\texpected_old: " << expected_old                   \
             << "\n\tdesired_old:  " << desired_old;                   \
     }                                                                 \
-    static_assert(true, "")
+    REQUIRE_SEMICOLON()
 
     // 0 -> ~0
     desired.inv();
