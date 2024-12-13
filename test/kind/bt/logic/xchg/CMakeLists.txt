@@ -5,3 +5,15 @@ create_bt(
     SOURCE
         exchange.cpp
 )
+
+create_bt(
+    NAME BtLogicCmpxchgWeak
+    SOURCE
+        cmpxchg_weak.cpp
+)
+
+create_bt(
+    NAME BtLogicCmpxchgStrong
+    SOURCE
+        cmpxchg_strong.cpp
+)

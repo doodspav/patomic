@@ -28,8 +28,8 @@ test_exchange(
 
 #define DO_TEST_EXCHANGE()             \
     ASSERT_NE(object, ret);            \
-    desired_old = desired;             \
     object_old = object;               \
+    desired_old = desired;             \
     fp_exchange(object, desired, ret); \
     ASSERT_EQ(object, desired);        \
     ASSERT_EQ(desired, desired_old);   \
