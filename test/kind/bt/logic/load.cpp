@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -55,3 +56,65 @@ test_load(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_LOAD(ops) \
+    SKIP_NULL_OP_FP((ops).fp_load, "load")
+
+
+/// @brief Check that the non-atomic logic of implicit load works correctly.
+TEST_P(BtLogicImplicitLoad, fp_load)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_LOAD(m_ops);
+
+    // wrap operation
+    const auto fp_load = [&](const void *object, void *ret) -> void {
+        m_ops.fp_load(object, ret);
+    };
+
+    // test
+    test_load(p.width, m_align.recommended, fp_load);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit load works correctly.
+TEST_P(BtLogicExplicitLoad, fp_load)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_LOAD(m_ops);
+
+    // wrap operation
+    const auto fp_load = [&](const void *object, void *ret) -> void {
+        m_ops.fp_load(object, p.order, ret);
+    };
+
+    // test
+    test_load(p.width, m_align.recommended, fp_load);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction load works correctly.
+TEST_P(BtLogicTransaction, fp_load)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_LOAD(m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_load = [&](const void *object, void *ret) -> void {
+            m_ops.fp_load(object, ret, m_config, nullptr);
+        };
+
+        // test
+        test_load(width, 1u, fp_load);
+    }
+}
