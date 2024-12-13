@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -81,3 +82,122 @@ test_bin_not(
 }
 
 }  // namespace
+
+#define SKIP_NULL_OP_FP_NOT(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_not, "not")
+
+#define SKIP_NULL_OP_FP_FETCH_NOT(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_fetch_not, "fetch_not")
+
+
+/// @brief Check that the non-atomic logic of implicit not works correctly.
+TEST_P(BtLogicImplicit, fp_not)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_NOT(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_not = [&](void *object) -> void {
+        return m_ops.binary_ops.fp_not(object);
+    };
+
+    // test
+    test_bin_not(p.width, m_align.recommended, fp_not);
+}
+
+/// @brief Check that the non-atomic logic of implicit fetch_not works correctly.
+TEST_P(BtLogicImplicit, fp_fetch_not)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_NOT(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_not = [&](void *object, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_not(object, ret);
+    };
+
+    // test
+    test_bin_fetch_not(p.width, m_align.recommended, fp_fetch_not);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit not works correctly.
+TEST_P(BtLogicExplicit, fp_not)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_NOT(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_not = [&](void *object) -> void {
+        return m_ops.binary_ops.fp_not(object, p.order);
+    };
+
+    // test
+    test_bin_not(p.width, m_align.recommended, fp_not);
+}
+
+/// @brief Check that the non-atomic logic of explicit fetch_not works correctly.
+TEST_P(BtLogicExplicit, fp_fetch_not)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_NOT(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_not = [&](void *object, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_not(object, p.order, ret);
+    };
+
+    // test
+    test_bin_fetch_not(p.width, m_align.recommended, fp_fetch_not);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction not works correctly.
+TEST_P(BtLogicTransaction, fp_not)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_NOT(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_not = [&](void *object) -> void {
+            return m_ops.binary_ops.fp_not(object, m_config, nullptr);
+        };
+
+        // test
+        test_bin_not(width, 1u, fp_not);
+    }
+}
+
+/// @brief Check that the non-atomic logic of transaction fetch_not works correctly.
+TEST_P(BtLogicTransaction, fp_fetch_not)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_NOT(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_fetch_not = [&](void *object, void *ret) -> void {
+            return m_ops.binary_ops.fp_fetch_not(object, ret, m_config, nullptr);
+        };
+
+        // test
+        test_bin_fetch_not(width, 1u, fp_fetch_not);
+    }
+}

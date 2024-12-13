@@ -1091,7 +1091,7 @@ typedef struct {
 
     /** @brief Atomic NOT implemented using a sequentially consistent
      *         transaction, returning original value from before operation. */
-    patomic_opsig_transaction_fetch_t fp_fetch_not;
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_not;
 
 } patomic_ops_transaction_binary_t;
 
