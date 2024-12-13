@@ -27,6 +27,7 @@ test_exchange(
     test::generic_integer desired_old { width, align, false };
 
 #define DO_TEST_EXCHANGE()             \
+    ASSERT_NE(object, ret);            \
     desired_old = desired;             \
     object_old = object;               \
     fp_exchange(object, desired, ret); \

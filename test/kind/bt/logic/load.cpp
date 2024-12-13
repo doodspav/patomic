@@ -24,6 +24,7 @@ test_load(
     test::generic_integer object_old { width, align, false };
 
 #define DO_TEST_LOAD()         \
+    ASSERT_NE(object, ret);    \
     object_old = object;       \
     fp_load(object, ret);      \
     ASSERT_EQ(object, ret);    \
