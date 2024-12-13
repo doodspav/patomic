@@ -1,25 +1,7 @@
-# ---- Create Tests ----
-
-create_bt(
-    NAME BtLogicBinaryOr
-    SOURCE
-        or.cpp
-)
-
-create_bt(
-    NAME BtLogicBinaryXor
-    SOURCE
-        xor.cpp
-)
-
-create_bt(
-    NAME BtLogicBinaryAnd
-    SOURCE
-        and.cpp
-)
-
-create_bt(
-    NAME BtLogicBinaryNot
-    SOURCE
-        not.cpp
+# add sources to test target
+target_sources(dummy_target_bt_logic PRIVATE
+    or.cpp
+    xor.cpp
+    and.cpp
+    not.cpp
 )

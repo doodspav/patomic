@@ -1,31 +1,8 @@
-# ---- Create Tests ----
-
-create_bt(
-    NAME BtLogicArithmeticAdd
-    SOURCE
-        add.cpp
-)
-
-create_bt(
-    NAME BtLogicArithmeticSub
-    SOURCE
-        sub.cpp
-)
-
-create_bt(
-    NAME BtLogicArithmeticInc
-    SOURCE
-        inc.cpp
-)
-
-create_bt(
-    NAME BtLogicArithmeticDec
-    SOURCE
-        dec.cpp
-)
-
-create_bt(
-    NAME BtLogicArithmeticNeg
-    SOURCE
-        neg.cpp
+# add sources to test target
+target_sources(dummy_target_bt_logic PRIVATE
+    add.cpp
+    sub.cpp
+    inc.cpp
+    dec.cpp
+    neg.cpp
 )
