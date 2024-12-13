@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -115,3 +116,123 @@ test_bin_xor(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_XOR(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_xor, "xor")
+
+#define SKIP_NULL_OP_FP_FETCH_XOR(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_fetch_xor, "fetch_xor")
+
+
+/// @brief Check that the non-atomic logic of implicit xor works correctly.
+TEST_P(BtLogicImplicit, fp_xor)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_XOR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_xor = [&](void *object, const void *argument) -> void {
+        return m_ops.binary_ops.fp_xor(object, argument);
+    };
+
+    // test
+    test_bin_xor(p.width, m_align.recommended, fp_xor);
+}
+
+/// @brief Check that the non-atomic logic of implicit fetch_xor works correctly.
+TEST_P(BtLogicImplicit, fp_fetch_xor)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_XOR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_xor = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_xor(object, argument, ret);
+    };
+
+    // test
+    test_bin_fetch_xor(p.width, m_align.recommended, fp_fetch_xor);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit xor works correctly.
+TEST_P(BtLogicExplicit, fp_xor)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_XOR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_xor = [&](void *object, const void *argument) -> void {
+        return m_ops.binary_ops.fp_xor(object, argument, p.order);
+    };
+
+    // test
+    test_bin_xor(p.width, m_align.recommended, fp_xor);
+}
+
+/// @brief Check that the non-atomic logic of explicit fetch_xor works correctly.
+TEST_P(BtLogicExplicit, fp_fetch_xor)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_XOR(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_xor = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_xor(object, argument, p.order, ret);
+    };
+
+    // test
+    test_bin_fetch_xor(p.width, m_align.recommended, fp_fetch_xor);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction xor works correctly.
+TEST_P(BtLogicTransaction, fp_xor)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_XOR(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_xor = [&](void *object, const void *argument) -> void {
+            return m_ops.binary_ops.fp_xor(object, argument, m_config, nullptr);
+        };
+
+        // test
+        test_bin_xor(width, 1u, fp_xor);
+    }
+}
+
+/// @brief Check that the non-atomic logic of transaction fetch_xor works correctly.
+TEST_P(BtLogicTransaction, fp_fetch_xor)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_XOR(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_fetch_xor = [&](void *object, const void *argument, void *ret) -> void {
+            return m_ops.binary_ops.fp_fetch_xor(object, argument, ret, m_config, nullptr);
+        };
+
+        // test
+        test_bin_fetch_xor(width, 1u, fp_fetch_xor);
+    }
+}
