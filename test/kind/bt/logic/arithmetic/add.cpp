@@ -27,6 +27,10 @@ test_fetch_add(
     test::generic_integer object_exp { width, align, false };
     test::generic_integer argument_old { width, align, false };
 
+    // since addition is commutative, all tests are done with swapped arguments
+    //   as well as normal ordering
+    // object and argument will have the values as if only normal ordering was
+    //   done
 #define DO_TEST_FETCH_ADD()              \
     object_old = object;                 \
     argument_old = argument;             \
