@@ -16,6 +16,11 @@ namespace
 /// @brief
 ///   Implementation of generic_integer requires that the platform uses
 ///   two's complement integer representation.
+///
+/// @note
+///   This does not affect any tests (since arithmetic operations are only
+///   supported for two's complement platforms), so a solution would be to
+///   improve the implementation of this type.
 static_assert(
     -INT_MAX != INT_MIN,
     "integer representation must be two's complement"
@@ -32,6 +37,11 @@ static_assert(
 ///   If the native integer types have trap or padding bits, then the objects
 ///   don't match bytes, and this type won't work for implicit/explicit
 ///   operations.
+///
+/// @note
+///   If this poses an issue, this could be fixed by having a parameter in the
+///   constructor to signify if generic_int should use a native type as the
+///   underlying representation or a vector of bytes.
 static_assert(
     std::numeric_limits<signed char>::digits + 1 == sizeof(signed char) * CHAR_BIT &&
     std::numeric_limits<unsigned char>::digits == sizeof(unsigned char) * CHAR_BIT,
