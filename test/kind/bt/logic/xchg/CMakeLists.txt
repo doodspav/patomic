@@ -1,19 +1,19 @@
 # ---- Create Tests ----
 
 create_bt(
-    NAME BtLogicExchange
+    NAME BtLogicXchgExchange
     SOURCE
         exchange.cpp
 )
 
 create_bt(
-    NAME BtLogicCmpxchgWeak
+    NAME BtLogicXchgCmpxchgWeak
     SOURCE
         cmpxchg_weak.cpp
 )
 
 create_bt(
-    NAME BtLogicCmpxchgStrong
+    NAME BtLogicXchgCmpxchgStrong
     SOURCE
         cmpxchg_strong.cpp
 )
