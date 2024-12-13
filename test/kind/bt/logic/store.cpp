@@ -25,41 +25,32 @@ test_store(
     test::generic_integer desired { width, align, false };
     test::generic_integer desired_old { width, align, false };
 
+#define DO_TEST()                   \
+    desired_old = desired;          \
+    fp_store(object, desired);      \
+    ASSERT_EQ(object, desired);     \
+    ASSERT_EQ(desired, desired_old)
+
     // 0 -> ~0
     desired.inv();
-    desired_old = desired;
-    fp_store(object.data(), desired.data());
-    EXPECT_EQ(object, desired);
-    EXPECT_EQ(desired_old, desired);
+    DO_TEST();
 
     // ~0 -> 1
     desired.store_zero();
     desired.inc();
-    desired_old = desired;
-    fp_store(object, desired);
-    EXPECT_EQ(object, desired);
-    EXPECT_EQ(desired_old, desired);
+    DO_TEST();
 
     // 1 -> max
     desired.store_max();
-    desired_old = desired;
-    fp_store(object, desired);
-    EXPECT_EQ(object, desired);
-    EXPECT_EQ(desired_old, desired);
+    DO_TEST();
 
     // max -> min
     desired.store_min();
-    desired_old = desired;
-    fp_store(object, desired);
-    EXPECT_EQ(object, desired);
-    EXPECT_EQ(desired_old, desired);
+    DO_TEST();
 
     // min -> 0
     desired.store_zero();
-    desired_old = desired;
-    fp_store(object, desired);
-    EXPECT_EQ(object, desired);
-    EXPECT_EQ(desired_old, desired);
+    DO_TEST();
 }
 
 }  // namespace

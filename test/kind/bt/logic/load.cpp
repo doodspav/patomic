@@ -21,42 +21,34 @@ test_load(
     test::generic_integer ret {width, align, false };
     test::generic_integer object_old { width, align, false };
 
+#define DO_TEST()              \
+    object_old = object;       \
+    fp_load(object, ret);      \
+    ASSERT_EQ(object, ret);    \
+    ASSERT_EQ(ret, object_old)
+
     // set ret to non-zero
     ret.inc();
 
     // 0
-    fp_load(object, ret);
-    EXPECT_EQ(object, ret);
-    EXPECT_EQ(object_old, object);
+    DO_TEST();
 
     // ~0
     object.inv();
-    object_old = object;
-    fp_load(object, ret);
-    EXPECT_EQ(object, ret);
-    EXPECT_EQ(object_old, object);
+    DO_TEST();
 
     // 1
     object.store_zero();
     object.inc();
-    object_old = object;
-    fp_load(object, ret);
-    EXPECT_EQ(object, ret);
-    EXPECT_EQ(object_old, object);
+    DO_TEST();
 
     // max
     object.store_max();
-    object_old = object;
-    fp_load(object, ret);
-    EXPECT_EQ(object, ret);
-    EXPECT_EQ(object_old, object);
+    DO_TEST();
 
     // min
     object.store_min();
-    object_old = object;
-    fp_load(object, ret);
-    EXPECT_EQ(object, ret);
-    EXPECT_EQ(object_old, object);
+    DO_TEST();
 }
 
 }  // namespace
