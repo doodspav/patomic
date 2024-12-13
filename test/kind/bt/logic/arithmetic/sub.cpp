@@ -24,18 +24,16 @@ test_fetch_sub(
     test::generic_integer ret { width, align, false };
     // old
     test::generic_integer object_old { width, align, false };
-    test::generic_integer object_exp { width, align, false };
     test::generic_integer argument_old { width, align, false };
 
 #define DO_TEST_FETCH_SUB()              \
     object_old = object;                 \
     argument_old = argument;             \
-    object_exp = object;                 \
-    object_exp.sub(argument);            \
     fp_fetch_sub(object, argument, ret); \
-    ASSERT_EQ(object, object_exp);       \
+    ASSERT_EQ(ret, object_old);          \
     ASSERT_EQ(argument, argument_old);   \
-    ASSERT_EQ(ret, object_old)
+    object_old.sub(argument);            \
+    ASSERT_EQ(object, object_old)
 
     // 0 - 0 -> 0
     DO_TEST_FETCH_SUB();

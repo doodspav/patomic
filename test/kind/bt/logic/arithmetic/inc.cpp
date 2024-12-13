@@ -16,7 +16,33 @@ test_fetch_inc(
     )>& fp_fetch_inc
 )
 {
-    // todo
+    // create integers
+    // params
+    test::generic_integer object { width, align, false };
+    test::generic_integer ret { width, align, false };
+    // old
+    test::generic_integer object_old { width, align, false };
+
+#define DO_TEST_FETCH_INC()        \
+    object_old = object;           \
+    fp_fetch_inc(object, ret);     \
+    ASSERT_EQ(ret, object_old);    \
+    object_old.inc();              \
+    ASSERT_EQ(object, object_old)
+
+    // ++(max - 1) -> max
+    object.dec();
+    object.dec();
+    DO_TEST_FETCH_INC();
+
+    // ++max -> 0
+    DO_TEST_FETCH_INC();
+
+    // ++0 -> 1
+    DO_TEST_FETCH_INC();
+
+    // ++1 -> 2
+    DO_TEST_FETCH_INC();
 }
 
 void
