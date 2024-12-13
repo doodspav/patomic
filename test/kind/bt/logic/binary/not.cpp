@@ -16,7 +16,47 @@ test_bin_fetch_not(
     )>& fp_fetch_not
 )
 {
-    // todo
+    // start with all bits unset
+    test::generic_integer object { width, align, false };
+    test::generic_integer ret { width, align, false };
+    test::generic_integer object_old { width, align, false };
+
+    // go through all bit offsets
+    for (std::size_t i = 0; i < object.bit_width(); ++i)
+    {
+        // set up object
+        object.inv_at(i);
+        object_old = object;
+
+        // test
+        fp_fetch_not(object, ret);
+        ASSERT_EQ(ret, object_old);
+        object.inv();
+        ASSERT_EQ(object, object_old);
+
+        // reset
+        object.inv_at(i);
+    }
+
+    // start with all bits set
+    object.inv();
+
+    // go through all bit offsets
+    for (std::size_t i = 0; i < object.bit_width(); ++i)
+    {
+        // set up object
+        object.inv_at(i);
+        object_old = object;
+
+        // test
+        fp_fetch_not(object, ret);
+        ASSERT_EQ(ret, object_old);
+        object.inv();
+        ASSERT_EQ(object, object_old);
+
+        // reset
+        object.inv_at(i);
+    }
 }
 
 void
