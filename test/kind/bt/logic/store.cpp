@@ -25,7 +25,7 @@ test_store(
     test::generic_integer desired { width, align, false };
     test::generic_integer desired_old { width, align, false };
 
-#define DO_TEST()                   \
+#define DO_TEST_STORE()             \
     desired_old = desired;          \
     fp_store(object, desired);      \
     ASSERT_EQ(object, desired);     \
@@ -33,24 +33,24 @@ test_store(
 
     // 0 -> ~0
     desired.inv();
-    DO_TEST();
+    DO_TEST_STORE();
 
     // ~0 -> 1
     desired.store_zero();
     desired.inc();
-    DO_TEST();
+    DO_TEST_STORE();
 
     // 1 -> max
     desired.store_max();
-    DO_TEST();
+    DO_TEST_STORE();
 
     // max -> min
     desired.store_min();
-    DO_TEST();
+    DO_TEST_STORE();
 
     // min -> 0
     desired.store_zero();
-    DO_TEST();
+    DO_TEST_STORE();
 }
 
 }  // namespace

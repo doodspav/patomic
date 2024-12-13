@@ -21,7 +21,7 @@ test_load(
     test::generic_integer ret {width, align, false };
     test::generic_integer object_old { width, align, false };
 
-#define DO_TEST()              \
+#define DO_TEST_LOAD()         \
     object_old = object;       \
     fp_load(object, ret);      \
     ASSERT_EQ(object, ret);    \
@@ -31,24 +31,24 @@ test_load(
     ret.inc();
 
     // 0
-    DO_TEST();
+    DO_TEST_LOAD();
 
     // ~0
     object.inv();
-    DO_TEST();
+    DO_TEST_LOAD();
 
     // 1
     object.store_zero();
     object.inc();
-    DO_TEST();
+    DO_TEST_LOAD();
 
     // max
     object.store_max();
-    DO_TEST();
+    DO_TEST_LOAD();
 
     // min
     object.store_min();
-    DO_TEST();
+    DO_TEST_LOAD();
 }
 
 }  // namespace

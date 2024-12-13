@@ -25,7 +25,7 @@ test_exchange(
     test::generic_integer object_old { width, align, false };
     test::generic_integer desired_old { width, align, false };
 
-#define DO_TEST()                      \
+#define DO_TEST_EXCHANGE()             \
     desired_old = desired;             \
     object_old = object;               \
     fp_exchange(object, desired, ret); \
@@ -38,24 +38,24 @@ test_exchange(
 
     // 0 -> ~0
     desired.inv();
-    DO_TEST();
+    DO_TEST_EXCHANGE();
 
     // ~0 -> 1
     desired.store_zero();
     desired.inc();
-    DO_TEST();
+    DO_TEST_EXCHANGE();
 
     // 1 -> max
     desired.store_max();
-    DO_TEST();
+    DO_TEST_EXCHANGE();
 
     // max -> min
     desired.store_min();
-    DO_TEST();
+    DO_TEST_EXCHANGE();
 
     // min -> 0
     desired.store_zero();
-    DO_TEST();
+    DO_TEST_EXCHANGE();
 }
 
 }  // namespace
