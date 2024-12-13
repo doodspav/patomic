@@ -1193,6 +1193,10 @@ typedef struct {
  * @brief
  *   Set of function pointers for atomic flag operations with fixed memory
  *   order. Pointers are NULL if operation is not supported.
+ *
+ * @note
+ *   If any non-flag operation is supported, all flag operations will also be
+ *   supported, otherwise no flag operations will be supported.
  */
 typedef struct {
 

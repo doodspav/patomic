@@ -186,6 +186,26 @@ patomic_create_transaction(
             opcats = patomic_opcats_TRANSACTION;
             if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
             {
+                /* flag operations must be supported if any other operation is supported */
+                /* if no other operation is supported, no flag operation must be supported */
+                opcats &= ~((unsigned int) patomic_opcat_TFLAG);
+                if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
+                {
+                    /* other operation supported -> full flag supported */
+                    opcats = patomic_opkinds_TFLAG;
+                    patomic_assert_always(patomic_internal_feature_check_leaf_transaction(
+                        &ret.ops, patomic_opcat_TFLAG, opcats
+                    ) == 0ul);
+                }
+                else
+                {
+                    /* no other operation supported -> no flag supported */
+                    opcats = patomic_opkinds_TFLAG;
+                    patomic_assert_always(patomic_internal_feature_check_leaf_transaction(
+                        &ret.ops, patomic_opcat_TFLAG, opcats
+                    ) == opcats);
+                }
+
                 /* tbegin and tcommit must be supported if any raw operation is supported */
                 opcats = patomic_opcat_TRAW;
                 if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))

@@ -195,7 +195,7 @@ patomic_feature_check_leaf_explicit(
 
 
 unsigned int
-patomic_feature_check_leaf_transaction(
+patomic_internal_feature_check_leaf_transaction(
     const patomic_ops_transaction_t *const ops,
     const patomic_opcat_t opcat,
     unsigned int opkinds
@@ -244,4 +244,18 @@ patomic_feature_check_leaf_transaction(
 
     /* return updated opkinds */
     return opkinds;
+}
+
+
+unsigned int
+patomic_feature_check_leaf_transaction(
+    const patomic_ops_transaction_t *const ops,
+    const patomic_opcat_t opcat,
+    const unsigned int opkinds
+)
+{
+    /* defer to internal implementation */
+    return patomic_internal_feature_check_leaf_transaction(
+        ops, opcat, opkinds
+    );
 }
