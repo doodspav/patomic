@@ -3,8 +3,6 @@
 
 #include "name.hpp"
 
-#include <patomic/api/ids.h>
-
 
 /// @brief
 ///   Requires a semicolon be placed after calling this macro.
