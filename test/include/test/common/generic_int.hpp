@@ -58,6 +58,15 @@ public:
     data() const noexcept;
 
     /// @brief
+    ///   Swap the values of two integers.
+    /// @pre
+    ///   other.width() == .width()         &&
+    ///   other.alignment() == .alignment() &&
+    ///   other.is_signed() == .is_signed()
+    void
+    swap(generic_integer& other) noexcept;
+
+    /// @brief
     ///   Add another generic integer to this instance's value in-place.
     /// @pre
     ///   other.width() == .width()

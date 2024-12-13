@@ -146,6 +146,19 @@ generic_integer::data() const noexcept
 
 
 void
+generic_integer::swap(generic_integer& other) noexcept
+{
+    // check pre-condition
+    assert(other.width() == width());
+    assert(other.alignment() == alignment());
+    assert(other.is_signed() == is_signed());
+
+    // swap values
+    std::swap(other.m_buf, m_buf);
+}
+
+
+void
 generic_integer::add(const generic_integer& other) noexcept
 {
     // check pre-condition
