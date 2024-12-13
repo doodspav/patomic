@@ -3,13 +3,13 @@
 create_bt(
     NAME BtLogicStore
     SOURCE
-        store.cpp
+    ldst/store.cpp
 )
 
 create_bt(
     NAME BtLogicLoad
     SOURCE
-        load.cpp
+    ldst/load.cpp
 )
 
 # add all subdirectories
