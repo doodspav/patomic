@@ -18,10 +18,11 @@ test_exchange(
 )
 {
     // create integers
-    // base is here to make sure fp_exchange doesn't modify desired
+    // params
     test::generic_integer object { width, align, false };
     test::generic_integer desired { width, align, false };
     test::generic_integer ret { width, align, false };
+    // old
     test::generic_integer object_old { width, align, false };
     test::generic_integer desired_old { width, align, false };
 

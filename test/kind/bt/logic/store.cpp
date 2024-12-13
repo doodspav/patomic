@@ -21,8 +21,10 @@ test_store(
 )
 {
     // create integers
+    // params
     test::generic_integer object { width, align, false };
     test::generic_integer desired { width, align, false };
+    // old
     test::generic_integer desired_old { width, align, false };
 
 #define DO_TEST_STORE()             \
