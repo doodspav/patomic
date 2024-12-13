@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -55,3 +56,65 @@ test_bit_test_compl(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_TEST_COMPL(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).bitwise_ops.fp_test_compl, "test_compl")
+
+
+/// @brief Check that the non-atomic logic of implicit test_compl works correctly.
+TEST_P(BtLogicImplicit, fp_test_compl)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_TEST_COMPL(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_test_compl = [&](void *object, int offset) -> int {
+        return m_ops.bitwise_ops.fp_test_compl(object, offset);
+    };
+
+    // test
+    test_bit_test_compl(p.width, m_align.recommended, fp_test_compl);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit test_compl works correctly.
+TEST_P(BtLogicExplicit, fp_test_compl)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_TEST_COMPL(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_test_compl = [&](void *object, int offset) -> int {
+        return m_ops.bitwise_ops.fp_test_compl(object, offset, p.order);
+    };
+
+    // test
+    test_bit_test_compl(p.width, m_align.recommended, fp_test_compl);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction test_compl works correctly.
+TEST_P(BtLogicTransaction, fp_test_compl)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_TEST_COMPL(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_test_compl = [&](void *object, int offset) -> int {
+            return m_ops.bitwise_ops.fp_test_compl(object, offset, m_config, nullptr);
+        };
+
+        // test
+        test_bit_test_compl(width, 1u, fp_test_compl);
+    }
+}
