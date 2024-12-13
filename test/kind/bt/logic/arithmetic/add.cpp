@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -134,3 +135,123 @@ test_add(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_ADD(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).arithmetic_ops.fp_add, "add")
+
+#define SKIP_NULL_OP_FP_FETCH_ADD(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).arithmetic_ops.fp_fetch_add, "fetch_add")
+
+
+/// @brief Check that the non-atomic logic of implicit add works correctly.
+TEST_P(BtLogicImplicit, fp_add)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_ADD(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_add = [&](void *object, const void *argument) -> void {
+        return m_ops.arithmetic_ops.fp_add(object, argument);
+    };
+
+    // test
+    test_add(p.width, m_align.recommended, fp_add);
+}
+
+/// @brief Check that the non-atomic logic of implicit fetch_add works correctly.
+TEST_P(BtLogicImplicit, fp_fetch_add)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_ADD(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_add = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.arithmetic_ops.fp_fetch_add(object, argument, ret);
+    };
+
+    // test
+    test_fetch_add(p.width, m_align.recommended, fp_fetch_add);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit add works correctly.
+TEST_P(BtLogicExplicit, fp_add)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_ADD(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_add = [&](void *object, const void *argument) -> void {
+        return m_ops.arithmetic_ops.fp_add(object, argument, p.order);
+    };
+
+    // test
+    test_add(p.width, m_align.recommended, fp_add);
+}
+
+/// @brief Check that the non-atomic logic of explicit fetch_add works correctly.
+TEST_P(BtLogicExplicit, fp_fetch_add)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_ADD(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_add = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.arithmetic_ops.fp_fetch_add(object, argument, p.order, ret);
+    };
+
+    // test
+    test_fetch_add(p.width, m_align.recommended, fp_fetch_add);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction add works correctly.
+TEST_P(BtLogicTransaction, fp_add)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_ADD(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_add = [&](void *object, const void *argument) -> void {
+            return m_ops.arithmetic_ops.fp_add(object, argument, m_config, nullptr);
+        };
+
+        // test
+        test_add(width, 1u, fp_add);
+    }
+}
+
+/// @brief Check that the non-atomic logic of transaction fetch_add works correctly.
+TEST_P(BtLogicTransaction, fp_fetch_add)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_ADD(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_fetch_add = [&](void *object, const void *argument, void *ret) -> void {
+            return m_ops.arithmetic_ops.fp_fetch_add(object, argument, ret, m_config, nullptr);
+        };
+
+        // test
+        test_fetch_add(width, 1u, fp_fetch_add);
+    }
+}
