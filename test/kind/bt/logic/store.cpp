@@ -6,8 +6,6 @@
 
 #include <test/suite/bt_logic.hpp>
 
-#include <functional>
-
 
 namespace
 {
@@ -20,33 +18,45 @@ test_store(
 )
 {
     // create integers
+    // base is here to make sure fp_store doesn't modify desired
+    test::generic_integer base { width, align, false };
     test::generic_integer object { width, align, false };
     test::generic_integer desired { width, align, false };
 
     // 0 -> ~0
     desired.inv();
+    base = desired;
     fp_store(object.data(), desired.data());
+    EXPECT_EQ(base, desired);
     EXPECT_EQ(object, desired);
 
     // ~0 -> 1
     desired.store_zero();
     desired.inc();
+    base = desired;
     fp_store(object, desired);
+    EXPECT_EQ(base, desired);
     EXPECT_EQ(object, desired);
 
     // 1 -> max
     desired.store_max();
+    base = desired;
     fp_store(object, desired);
+    EXPECT_EQ(base, desired);
     EXPECT_EQ(object, desired);
 
     // max -> min
     desired.store_min();
+    base = desired;
     fp_store(object, desired);
+    EXPECT_EQ(base, desired);
     EXPECT_EQ(object, desired);
 
     // min -> 0
     desired.store_zero();
+    base = desired;
     fp_store(object, desired);
+    EXPECT_EQ(base, desired);
     EXPECT_EQ(object, desired);
 }
 
