@@ -14,7 +14,10 @@ void
 test_store(
     std::size_t width,
     std::size_t align,
-    const std::function<void(void *, const void *)>& fp_store
+    const std::function<void(
+        void *object,
+        const void *desired
+    )>& fp_store
 )
 {
     // create integers
