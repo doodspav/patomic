@@ -12,7 +12,7 @@ test_bin_fetch_xor(
     std::size_t align,
     const std::function<void(
         void *object,
-        const void *arg,
+        const void *argument,
         void *ret
     )>& fp_fetch_xor
 )
@@ -98,14 +98,14 @@ test_bin_xor(
     std::size_t align,
     const std::function<void(
         void *object,
-        const void *arg
+        const void *argument
     )>& fp_xor
 )
 {
     // wrap as fetch
-    auto fetch_xor = [&](void *object, const void *arg, void *ret) -> void {
+    auto fetch_xor = [&](void *object, const void *argument, void *ret) -> void {
         std::memcpy(ret, object, width);
-        return fp_xor(object, arg);
+        return fp_xor(object, argument);
     };
 
     // defer to fetch variant

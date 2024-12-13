@@ -12,7 +12,7 @@ test_bin_fetch_and(
     std::size_t align,
     const std::function<void(
         void *object,
-        const void *arg,
+        const void *argument,
         void *ret
     )>& fp_fetch_and
 )
@@ -96,14 +96,14 @@ test_bin_and(
     std::size_t align,
     const std::function<void(
         void *object,
-        const void *arg
+        const void *argument
     )>& fp_and
 )
 {
     // wrap as fetch
-    auto fetch_and = [&](void *object, const void *arg, void *ret) -> void {
+    auto fetch_and = [&](void *object, const void *argument, void *ret) -> void {
         std::memcpy(ret, object, width);
-        return fp_and(object, arg);
+        return fp_and(object, argument);
     };
 
     // defer to fetch variant
