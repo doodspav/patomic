@@ -37,6 +37,10 @@ public:
     std::size_t
     width() const noexcept;
 
+    /// @brief
+    ///   Get the bit width of the integer.
+    std::size_t
+    bit_width() const noexcept;
 
     /// @brief
     ///   Get the alignment of the integer.

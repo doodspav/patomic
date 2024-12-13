@@ -118,6 +118,13 @@ generic_integer::width() const noexcept
 
 
 std::size_t
+generic_integer::bit_width() const noexcept
+{
+    return m_width * CHAR_BIT;
+}
+
+
+std::size_t
 generic_integer::alignment() const noexcept
 {
     return m_alignment;
