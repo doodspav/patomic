@@ -19,7 +19,7 @@ test_load(
     // create integers
     // params
     test::generic_integer object { width, align, false };
-    test::generic_integer ret {width, align, false };
+    test::generic_integer ret { width, align, false };
     // old
     test::generic_integer object_old { width, align, false };
 
