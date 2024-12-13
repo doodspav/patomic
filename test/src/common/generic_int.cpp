@@ -21,6 +21,43 @@ static_assert(
     "integer representation must be two's complement"
 );
 
+/// @brief
+///   Usage of generic_integer requires that native integer types do not
+///   have trap or padding bits.
+///
+/// @details
+///   This is because we use generic_int for both tests on implicit/explicit
+///   operations and tests on transaction operations.
+///   The former operate on objects while the latter operate on bytes.
+///   If the native integer types have trap or padding bits, then the objects
+///   don't match bytes, and this type won't work for implicit/explicit
+///   operations.
+static_assert(
+    std::numeric_limits<signed char>::digits + 1 == sizeof(signed char) * CHAR_BIT &&
+    std::numeric_limits<unsigned char>::digits == sizeof(unsigned char) * CHAR_BIT,
+    "(signed/unsigned) char must not have trap or padding bits"
+);
+static_assert(
+    std::numeric_limits<signed short>::digits + 1 == sizeof(signed short) * CHAR_BIT &&
+    std::numeric_limits<unsigned short>::digits == sizeof(unsigned short) * CHAR_BIT,
+    "(signed/unsigned) short must not have trap or padding bits"
+);
+static_assert(
+    std::numeric_limits<signed int>::digits + 1 == sizeof(signed int) * CHAR_BIT &&
+    std::numeric_limits<unsigned int>::digits == sizeof(unsigned int) * CHAR_BIT,
+    "(signed/unsigned) int must not have trap or padding bits"
+);
+static_assert(
+    std::numeric_limits<signed long>::digits + 1 == sizeof(signed long) * CHAR_BIT &&
+    std::numeric_limits<unsigned long>::digits == sizeof(unsigned long) * CHAR_BIT,
+    "(signed/unsigned) long must not have trap or padding bits"
+);
+static_assert(
+    std::numeric_limits<signed long long>::digits + 1 == sizeof(signed long long) * CHAR_BIT &&
+    std::numeric_limits<unsigned long long>::digits == sizeof(unsigned long long) * CHAR_BIT,
+    "(signed/unsigned) long long must not have trap or padding bits"
+);
+
 
 /// @brief
 ///   Check if the runtime endianness is little-endian.
