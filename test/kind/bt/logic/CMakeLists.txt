@@ -11,3 +11,9 @@ create_bt(
     SOURCE
         load.cpp
 )
+
+# add all subdirectories
+add_subdirectory(xchg)
+add_subdirectory(bitwise)
+add_subdirectory(binary)
+add_subdirectory(arithmetic)
