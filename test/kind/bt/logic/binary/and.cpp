@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -113,3 +114,123 @@ test_bin_and(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_AND(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_and, "and")
+
+#define SKIP_NULL_OP_FP_FETCH_AND(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).binary_ops.fp_fetch_and, "fetch_and")
+
+
+/// @brief Check that the non-atomic logic of implicit and works correctly.
+TEST_P(BtLogicImplicit, fp_and)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_AND(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_and = [&](void *object, const void *argument) -> void {
+        return m_ops.binary_ops.fp_and(object, argument);
+    };
+
+    // test
+    test_bin_and(p.width, m_align.recommended, fp_and);
+}
+
+/// @brief Check that the non-atomic logic of implicit fetch_and works correctly.
+TEST_P(BtLogicImplicit, fp_fetch_and)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_AND(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_and = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_and(object, argument, ret);
+    };
+
+    // test
+    test_bin_fetch_and(p.width, m_align.recommended, fp_fetch_and);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit and works correctly.
+TEST_P(BtLogicExplicit, fp_and)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_AND(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_and = [&](void *object, const void *argument) -> void {
+        return m_ops.binary_ops.fp_and(object, argument, p.order);
+    };
+
+    // test
+    test_bin_and(p.width, m_align.recommended, fp_and);
+}
+
+/// @brief Check that the non-atomic logic of explicit fetch_and works correctly.
+TEST_P(BtLogicExplicit, fp_fetch_and)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_AND(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_and = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.binary_ops.fp_fetch_and(object, argument, p.order, ret);
+    };
+
+    // test
+    test_bin_fetch_and(p.width, m_align.recommended, fp_fetch_and);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction and works correctly.
+TEST_P(BtLogicTransaction, fp_and)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_AND(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_and = [&](void *object, const void *argument) -> void {
+            return m_ops.binary_ops.fp_and(object, argument, m_config, nullptr);
+        };
+
+        // test
+        test_bin_and(width, 1u, fp_and);
+    }
+}
+
+/// @brief Check that the non-atomic logic of transaction fetch_and works correctly.
+TEST_P(BtLogicTransaction, fp_fetch_and)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_AND(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_fetch_and = [&](void *object, const void *argument, void *ret) -> void {
+            return m_ops.binary_ops.fp_fetch_and(object, argument, ret, m_config, nullptr);
+        };
+
+        // test
+        test_bin_fetch_and(width, 1u, fp_fetch_and);
+    }
+}
