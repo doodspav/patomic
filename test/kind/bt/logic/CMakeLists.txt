@@ -5,3 +5,9 @@ create_bt(
     SOURCE
         store.cpp
 )
+
+create_bt(
+    NAME BtLogicLoad
+    SOURCE
+        load.cpp
+)
