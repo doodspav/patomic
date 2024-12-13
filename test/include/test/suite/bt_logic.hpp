@@ -1,7 +1,7 @@
 #ifndef PATOMIC_TEST_SUITE_BT_LOGIC_HPP
 #define PATOMIC_TEST_SUITE_BT_LOGIC_HPP
 
-#include <patomic/patomic.h>
+#include <patomic/api/core.h>
 
 #include <test/common/params.hpp>
 

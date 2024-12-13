@@ -8,6 +8,7 @@ add_library(${test_target_name}-src OBJECT EXCLUDE_FROM_ALL)
 # - we shouldn't need anything from patomic here (or UTs would break)
 target_link_libraries(${test_target_name}-src PRIVATE
     ${test_target_name}-include
+    patomic::patomic
 )
 
 # require C++14 as minimum

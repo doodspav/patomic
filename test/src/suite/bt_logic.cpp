@@ -1,5 +1,8 @@
 #include <test/suite/bt_logic.hpp>
 
+#include <patomic/patomic.h>
+
+
 void
 BtLogicImplicit::SetUp()
 {
