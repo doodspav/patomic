@@ -243,6 +243,30 @@ generic_integer::inv() noexcept
 
 
 void
+generic_integer::inv_at(unsigned long long offset) noexcept
+{
+    // check pre-condition
+    assert(offset == 0u || offset < (width() * CHAR_BIT));
+
+    // skip if empty
+    if (width() == 0u)
+    {
+        return;
+    }
+
+    // calculate bit and byte offsets
+    const std::size_t byte_offset = offset / CHAR_BIT;
+    const unsigned bit_offset = offset % CHAR_BIT;
+
+    // get the correct index based on endianness
+    const std::size_t index = is_little_endian() ? byte_offset : (width() - byte_offset - 1u);
+
+    // flip the bit
+    data()[index] ^= (1u << bit_offset);
+}
+
+
+void
 generic_integer::store(
         const unsigned char *const buf, const std::size_t size
 ) noexcept

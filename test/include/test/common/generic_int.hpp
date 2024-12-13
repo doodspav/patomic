@@ -88,6 +88,13 @@ public:
     inv() noexcept;
 
     /// @brief
+    ///   Flip a single bit at a given offset in this instance's value in-place.
+    /// @pre
+    ///   offset == 0 || offset < (.width() * CHAR_BIT)
+    void
+    inv_at(unsigned long long offset) noexcept;
+
+    /// @brief
     ///   Directly store a raw buffer as the integer value.
     /// @pre
     ///   size == .width()
