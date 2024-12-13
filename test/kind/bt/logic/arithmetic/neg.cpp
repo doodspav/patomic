@@ -16,7 +16,36 @@ test_fetch_neg(
     )>& fp_fetch_neg
 )
 {
-    // todo
+    // create integers
+    // params
+    test::generic_integer object { width, align, false };
+    test::generic_integer ret { width, align, false };
+    // old
+    test::generic_integer object_old { width, align, false };
+
+#define DO_TEST_FETCH_NEG()        \
+    object_old = object;           \
+    fp_fetch_neg(object, ret);     \
+    ASSERT_EQ(ret, object_old);    \
+    object_old.neg();              \
+    ASSERT_EQ(object, object_old)
+
+    // -0 -> 0
+    DO_TEST_FETCH_NEG();
+
+    // -1 -> max
+    object.inc();
+    DO_TEST_FETCH_NEG();
+
+    // -max -> 1
+    DO_TEST_FETCH_NEG();
+
+    // -2 -> (max - 1)
+    object.inc();
+    DO_TEST_FETCH_NEG();
+
+    // -(max - 1) -> 2
+    DO_TEST_FETCH_NEG();
 }
 
 void
