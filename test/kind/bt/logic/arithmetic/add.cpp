@@ -42,6 +42,7 @@ test_fetch_add(
     ASSERT_EQ(argument, argument_old);   \
     ASSERT_EQ(ret, object_old);          \
     object = object_old;                 \
+    object_old.swap(argument_old);       \
     ret.inc();                           \
     fp_fetch_add(argument, object, ret); \
     ASSERT_EQ(argument, object_exp);     \
