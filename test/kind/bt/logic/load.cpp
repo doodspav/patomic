@@ -58,8 +58,8 @@ test_load(
 }  // namespace
 
 
-#define SKIP_NULL_OP_FP_LOAD(ops) \
-    SKIP_NULL_OP_FP((ops).fp_load, "load")
+#define SKIP_NULL_OP_FP_LOAD(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).fp_load, "load")
 
 
 /// @brief Check that the non-atomic logic of implicit load works correctly.
@@ -67,7 +67,7 @@ TEST_P(BtLogicImplicitLoad, fp_load)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_LOAD(m_ops);
+    SKIP_NULL_OP_FP_LOAD(p.id, m_ops);
 
     // wrap operation
     const auto fp_load = [&](const void *object, void *ret) -> void {
@@ -84,7 +84,7 @@ TEST_P(BtLogicExplicitLoad, fp_load)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_LOAD(m_ops);
+    SKIP_NULL_OP_FP_LOAD(p.id, m_ops);
 
     // wrap operation
     const auto fp_load = [&](const void *object, void *ret) -> void {
@@ -101,7 +101,7 @@ TEST_P(BtLogicTransaction, fp_load)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_LOAD(m_ops);
+    SKIP_NULL_OP_FP_LOAD(p.id, m_ops);
 
     // go through all widths
     for (std::size_t width : p.widths)

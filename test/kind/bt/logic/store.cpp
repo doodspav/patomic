@@ -55,8 +55,8 @@ test_store(
 }  // namespace
 
 
-#define SKIP_NULL_OP_FP_STORE(ops) \
-    SKIP_NULL_OP_FP((ops).fp_store, "store")
+#define SKIP_NULL_OP_FP_STORE(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).fp_store, "store")
 
 
 /// @brief Check that the non-atomic logic of implicit store works correctly.
@@ -64,7 +64,7 @@ TEST_P(BtLogicImplicitStore, fp_store)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_STORE(m_ops);
+    SKIP_NULL_OP_FP_STORE(p.id, m_ops);
 
     // wrap operation
     const auto fp_store = [&](void *object, const void *desired) -> void {
@@ -81,7 +81,7 @@ TEST_P(BtLogicExplicitStore, fp_store)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_STORE(m_ops);
+    SKIP_NULL_OP_FP_STORE(p.id, m_ops);
 
     // wrap operation
     const auto fp_store = [&](void *object, const void *desired) -> void {
@@ -98,7 +98,7 @@ TEST_P(BtLogicTransaction, fp_store)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_STORE(m_ops);
+    SKIP_NULL_OP_FP_STORE(p.id, m_ops);
 
     // go through all widths
     for (std::size_t width : p.widths)

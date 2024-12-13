@@ -3,6 +3,8 @@
 
 #include "name.hpp"
 
+#include <patomic/api/ids.h>
+
 
 /// @brief
 ///   Requires a semicolon be placed after calling this macro.
@@ -41,11 +43,20 @@
 /// @brief
 ///   Returns from the current test function with a skip message if the given
 ///   op function pointer is NULL.
-#define SKIP_NULL_OP_FP(fp, name)                             \
-    if ((fp) == nullptr)                                      \
-    {                                                         \
-        GTEST_SKIP() << "Skipping; op '" name "' is nullptr"; \
-    }                                                         \
+///   Special case will return with a success message if the NULL
+///   implementation is used.
+#define SKIP_NULL_OP_FP(id, fp, name)                             \
+    if ((fp) == nullptr)                                          \
+    {                                                             \
+        if ((id) == patomic_id_NULL)                              \
+        {                                                         \
+            return GTEST_SUCCEED();                               \
+        }                                                         \
+        else                                                      \
+        {                                                         \
+            GTEST_SKIP() << "Skipping; op '" name "' is nullptr"; \
+        }                                                         \
+    }                                                             \
     REQUIRE_SEMICOLON()
 
 
