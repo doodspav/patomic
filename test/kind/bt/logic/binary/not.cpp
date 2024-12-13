@@ -17,8 +17,10 @@ test_bin_fetch_not(
 )
 {
     // start with all bits unset
+    // params
     test::generic_integer object { width, align, false };
     test::generic_integer ret { width, align, false };
+    // old
     test::generic_integer object_old { width, align, false };
 
     // go through all bit offsets

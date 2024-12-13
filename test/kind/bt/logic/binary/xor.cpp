@@ -18,9 +18,11 @@ test_bin_fetch_xor(
 )
 {
     // start with all bits unset
+    // params
     test::generic_integer object { width, align, false };
     test::generic_integer argument { width, align, false };
     test::generic_integer ret { width, align, false };
+    // old
     test::generic_integer object_old { width, align, false };
     test::generic_integer object_exp { width, align, false };
     test::generic_integer argument_old { width, align, false };
