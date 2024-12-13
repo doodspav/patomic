@@ -77,7 +77,7 @@ TEST_P(BtLogicImplicit, fp_exchange)
 
     // wrap operation
     const auto fp_exchange = [&](void *object, const void *desired, void *ret) -> void {
-        m_ops.xchg_ops.fp_exchange(object, desired, ret);
+        return m_ops.xchg_ops.fp_exchange(object, desired, ret);
     };
 
     // test
@@ -94,7 +94,7 @@ TEST_P(BtLogicExplicit, fp_exchange)
 
     // wrap operation
     const auto fp_exchange = [&](void *object, const void *desired, void *ret) -> void {
-        m_ops.xchg_ops.fp_exchange(object, desired, p.order, ret);
+        return m_ops.xchg_ops.fp_exchange(object, desired, p.order, ret);
     };
 
     // test
@@ -117,7 +117,7 @@ TEST_P(BtLogicTransaction, fp_exchange)
 
         // wrap operation
         const auto fp_exchange = [&](void *object, const void *desired, void *ret) -> void {
-            m_ops.xchg_ops.fp_exchange(object, desired, ret, m_config, nullptr);
+            return m_ops.xchg_ops.fp_exchange(object, desired, ret, m_config, nullptr);
         };
 
         // test

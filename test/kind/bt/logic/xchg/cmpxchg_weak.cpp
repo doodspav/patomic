@@ -94,3 +94,67 @@ test_cmpxchg_weak(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_CMPXCHG_WEAK(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).xchg_ops.fp_cmpxchg_weak, "cmpxchg_weak")
+
+
+/// @brief Check that the non-atomic logic of implicit cmpxchg_weak works correctly.
+TEST_P(BtLogicImplicit, fp_cmpxchg_weak)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_CMPXCHG_WEAK(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_cmpxchg_weak = [&](void *object, void *expected, const void *desired) -> int {
+        return m_ops.xchg_ops.fp_cmpxchg_weak(object, expected, desired);
+    };
+
+    // test
+    test_cmpxchg_weak(p.width, m_align.recommended, fp_cmpxchg_weak);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit cmpxchg_weak works correctly.
+TEST_P(BtLogicExplicit, fp_cmpxchg_weak)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_CMPXCHG_WEAK(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_cmpxchg_weak = [&](void *object, void *expected, const void *desired) -> int {
+        auto fail = PATOMIC_CMPXCHG_FAIL_ORDER(p.order);
+        return m_ops.xchg_ops.fp_cmpxchg_weak(object, expected, desired, p.order, fail);
+    };
+
+    // test
+    test_cmpxchg_weak(p.width, m_align.recommended, fp_cmpxchg_weak);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction cmpxchg_weak works correctly.
+TEST_P(BtLogicTransaction, fp_cmpxchg_weak)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_CMPXCHG_WEAK(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+
+        // setup
+        m_config_wfb.width = width;
+
+        // wrap operation
+        const auto fp_cmpxchg_weak = [&](void *object, void *expected, const void *desired) -> int {
+            return m_ops.xchg_ops.fp_cmpxchg_weak(object, expected, desired, m_config_wfb, nullptr);
+        };
+
+        // test
+        test_cmpxchg_weak(width, 1u, fp_cmpxchg_weak);
+    }
+}

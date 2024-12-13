@@ -71,7 +71,7 @@ TEST_P(BtLogicImplicitLoad, fp_load)
 
     // wrap operation
     const auto fp_load = [&](const void *object, void *ret) -> void {
-        m_ops.fp_load(object, ret);
+        return m_ops.fp_load(object, ret);
     };
 
     // test
@@ -88,7 +88,7 @@ TEST_P(BtLogicExplicitLoad, fp_load)
 
     // wrap operation
     const auto fp_load = [&](const void *object, void *ret) -> void {
-        m_ops.fp_load(object, p.order, ret);
+        return m_ops.fp_load(object, p.order, ret);
     };
 
     // test
@@ -111,7 +111,7 @@ TEST_P(BtLogicTransaction, fp_load)
 
         // wrap operation
         const auto fp_load = [&](const void *object, void *ret) -> void {
-            m_ops.fp_load(object, ret, m_config, nullptr);
+            return m_ops.fp_load(object, ret, m_config, nullptr);
         };
 
         // test

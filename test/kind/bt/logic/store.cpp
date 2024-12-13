@@ -68,7 +68,7 @@ TEST_P(BtLogicImplicitStore, fp_store)
 
     // wrap operation
     const auto fp_store = [&](void *object, const void *desired) -> void {
-        m_ops.fp_store(object, desired);
+        return m_ops.fp_store(object, desired);
     };
 
     // test
@@ -85,7 +85,7 @@ TEST_P(BtLogicExplicitStore, fp_store)
 
     // wrap operation
     const auto fp_store = [&](void *object, const void *desired) -> void {
-        m_ops.fp_store(object, desired, p.order);
+        return m_ops.fp_store(object, desired, p.order);
     };
 
     // test
@@ -108,7 +108,7 @@ TEST_P(BtLogicTransaction, fp_store)
 
         // wrap operation
         const auto fp_store = [=](void *object, const void *desired) -> void {
-            m_ops.fp_store(object, desired, m_config, nullptr);
+            return m_ops.fp_store(object, desired, m_config, nullptr);
         };
 
         // test
