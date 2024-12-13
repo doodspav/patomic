@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -68,3 +69,67 @@ test_cmpxchg_strong(
 }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_CMPXCHG_STRONG(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).xchg_ops.fp_cmpxchg_strong, "cmpxchg_strong")
+
+
+/// @brief Check that the non-atomic logic of implicit cmpxchg_strong works correctly.
+TEST_P(BtLogicImplicit, fp_cmpxchg_strong)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_CMPXCHG_STRONG(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_cmpxchg_strong = [&](void *object, void *expected, const void *desired) -> int {
+        return m_ops.xchg_ops.fp_cmpxchg_strong(object, expected, desired);
+    };
+
+    // test
+    test_cmpxchg_strong(p.width, m_align.recommended, fp_cmpxchg_strong);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit cmpxchg_strong works correctly.
+TEST_P(BtLogicExplicit, fp_cmpxchg_strong)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_CMPXCHG_STRONG(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_cmpxchg_strong = [&](void *object, void *expected, const void *desired) -> int {
+        auto fail = PATOMIC_CMPXCHG_FAIL_ORDER(p.order);
+        return m_ops.xchg_ops.fp_cmpxchg_strong(object, expected, desired, p.order, fail);
+    };
+
+    // test
+    test_cmpxchg_strong(p.width, m_align.recommended, fp_cmpxchg_strong);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction cmpxchg_strong works correctly.
+TEST_P(BtLogicTransaction, fp_cmpxchg_strong)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_CMPXCHG_STRONG(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+
+        // setup
+        m_config_wfb.width = width;
+
+        // wrap operation
+        const auto fp_cmpxchg_strong = [&](void *object, void *expected, const void *desired) -> int {
+            return m_ops.xchg_ops.fp_cmpxchg_strong(object, expected, desired, m_config_wfb, nullptr);
+        };
+
+        // test
+        test_cmpxchg_strong(width, 1u, fp_cmpxchg_strong);
+    }
+}
