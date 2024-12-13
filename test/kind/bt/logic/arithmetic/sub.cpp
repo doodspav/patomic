@@ -1,4 +1,5 @@
 #include <test/common/generic_int.hpp>
+#include <test/common/skip.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -112,3 +113,123 @@ test_sub(
     }
 
 }  // namespace
+
+
+#define SKIP_NULL_OP_FP_SUB(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).arithmetic_ops.fp_sub, "sub")
+
+#define SKIP_NULL_OP_FP_FETCH_SUB(id, ops) \
+    SKIP_NULL_OP_FP(id, (ops).arithmetic_ops.fp_fetch_sub, "fetch_sub")
+
+
+/// @brief Check that the non-atomic logic of implicit sub works correctly.
+TEST_P(BtLogicImplicit, fp_sub)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_SUB(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_sub = [&](void *object, const void *argument) -> void {
+        return m_ops.arithmetic_ops.fp_sub(object, argument);
+    };
+
+    // test
+    test_sub(p.width, m_align.recommended, fp_sub);
+}
+
+/// @brief Check that the non-atomic logic of implicit fetch_sub works correctly.
+TEST_P(BtLogicImplicit, fp_fetch_sub)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_SUB(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_sub = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.arithmetic_ops.fp_fetch_sub(object, argument, ret);
+    };
+
+    // test
+    test_fetch_sub(p.width, m_align.recommended, fp_fetch_sub);
+}
+
+
+/// @brief Check that the non-atomic logic of explicit sub works correctly.
+TEST_P(BtLogicExplicit, fp_sub)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_SUB(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_sub = [&](void *object, const void *argument) -> void {
+        return m_ops.arithmetic_ops.fp_sub(object, argument, p.order);
+    };
+
+    // test
+    test_sub(p.width, m_align.recommended, fp_sub);
+}
+
+/// @brief Check that the non-atomic logic of explicit fetch_sub works correctly.
+TEST_P(BtLogicExplicit, fp_fetch_sub)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_SUB(p.id, m_ops);
+
+    // wrap operation
+    const auto fp_fetch_sub = [&](void *object, const void *argument, void *ret) -> void {
+        return m_ops.arithmetic_ops.fp_fetch_sub(object, argument, p.order, ret);
+    };
+
+    // test
+    test_fetch_sub(p.width, m_align.recommended, fp_fetch_sub);
+}
+
+
+/// @brief Check that the non-atomic logic of transaction sub works correctly.
+TEST_P(BtLogicTransaction, fp_sub)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_SUB(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_sub = [&](void *object, const void *argument) -> void {
+            return m_ops.arithmetic_ops.fp_sub(object, argument, m_config, nullptr);
+        };
+
+        // test
+        test_sub(width, 1u, fp_sub);
+    }
+}
+
+/// @brief Check that the non-atomic logic of transaction fetch_sub works correctly.
+TEST_P(BtLogicTransaction, fp_fetch_sub)
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_FETCH_SUB(p.id, m_ops);
+
+    // go through all widths
+    for (std::size_t width : p.widths)
+    {
+        // setup
+        m_config.width = width;
+
+        // wrap operation
+        const auto fp_fetch_sub = [&](void *object, const void *argument, void *ret) -> void {
+            return m_ops.arithmetic_ops.fp_fetch_sub(object, argument, ret, m_config, nullptr);
+        };
+
+        // test
+        test_fetch_sub(width, 1u, fp_fetch_sub);
+    }
+}
