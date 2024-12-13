@@ -61,7 +61,7 @@ BtLogicTransaction::SetUp()
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicImplicit,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsImplicit::combinations())
@@ -73,7 +73,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicImplicitStore,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsImplicit::combinations_store())
@@ -85,7 +85,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicImplicitLoad,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsImplicit::combinations_load())
@@ -97,7 +97,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicExplicit,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsExplicit::combinations())
@@ -109,7 +109,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicExplicitStore,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsExplicit::combinations_store())
@@ -121,7 +121,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicExplicitLoad,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsExplicit::combinations_load())
@@ -133,7 +133,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 INSTANTIATE_TEST_SUITE_P(
-    ,  // no name necessary
+    patomic,  // necessary, otherwise CTest pattern won't find tests
     BtLogicTransaction,
     testing::ConvertGenerator(
         testing::ValuesIn(test::ParamsTransaction::combinations())
