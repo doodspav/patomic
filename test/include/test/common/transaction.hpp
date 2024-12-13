@@ -124,7 +124,7 @@
         patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status))  \
     {                                                                                      \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);                   \
-        auto code_wfb = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status)       \
+        auto code_wfb = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status);      \
         auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);              \
         auto reason_wfb = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.fallback_status); \
         ADD_FAILURE()                                                                      \

@@ -1,5 +1,6 @@
 #include <test/common/generic_int.hpp>
 #include <test/common/skip.hpp>
+#include <test/common/transaction.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -202,9 +203,14 @@ TEST_P(BtLogicTransaction, fp_or)
         // setup
         m_config.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO(m_ops.binary_ops.fp_or, nullptr, nullptr);
+
         // wrap operation
         const auto fp_or = [&](void *object, const void *argument) -> void {
-            return m_ops.binary_ops.fp_or(object, argument, m_config, nullptr);
+            patomic_transaction_result_t result {};
+            m_ops.binary_ops.fp_or(object, argument, m_config, &result);
+            ADD_FAILURE_TSX_SUCCESS(m_config, result);
         };
 
         // test
@@ -225,9 +231,14 @@ TEST_P(BtLogicTransaction, fp_fetch_or)
         // setup
         m_config.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_or, nullptr, nullptr, nullptr);
+
         // wrap operation
         const auto fp_fetch_or = [&](void *object, const void *argument, void *ret) -> void {
-            return m_ops.binary_ops.fp_fetch_or(object, argument, ret, m_config, nullptr);
+            patomic_transaction_result_t result {};
+            m_ops.binary_ops.fp_fetch_or(object, argument, ret, m_config, &result);
+            ADD_FAILURE_TSX_SUCCESS(m_config, result);
         };
 
         // test

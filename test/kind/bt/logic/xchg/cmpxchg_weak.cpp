@@ -1,5 +1,6 @@
 #include <test/common/generic_int.hpp>
 #include <test/common/skip.hpp>
+#include <test/common/transaction.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -149,9 +150,15 @@ TEST_P(BtLogicTransaction, fp_cmpxchg_weak)
         // setup
         m_config_wfb.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO_WFB(m_ops.xchg_ops.fp_cmpxchg_weak, nullptr, nullptr, nullptr);
+
         // wrap operation
         const auto fp_cmpxchg_weak = [&](void *object, void *expected, const void *desired) -> int {
-            return m_ops.xchg_ops.fp_cmpxchg_weak(object, expected, desired, m_config_wfb, nullptr);
+            patomic_transaction_result_wfb_t result {};
+            int ok = m_ops.xchg_ops.fp_cmpxchg_weak(object, expected, desired, m_config_wfb, &result);
+            ADD_FAILURE_TSX_SUCCESS_WFB(m_config_wfb, result);
+            return ok;
         };
 
         // test

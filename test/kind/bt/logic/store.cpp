@@ -1,5 +1,6 @@
 #include <test/common/generic_int.hpp>
 #include <test/common/skip.hpp>
+#include <test/common/transaction.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -106,9 +107,14 @@ TEST_P(BtLogicTransaction, fp_store)
         // setup
         m_config.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO(m_ops.fp_store, nullptr, nullptr);
+
         // wrap operation
         const auto fp_store = [=](void *object, const void *desired) -> void {
-            return m_ops.fp_store(object, desired, m_config, nullptr);
+            patomic_transaction_result_t result {};
+            m_ops.fp_store(object, desired, m_config, &result);
+            ADD_FAILURE_TSX_SUCCESS(m_config, result);
         };
 
         // test

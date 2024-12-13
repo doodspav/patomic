@@ -1,5 +1,6 @@
 #include <test/common/generic_int.hpp>
 #include <test/common/skip.hpp>
+#include <test/common/transaction.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -111,9 +112,15 @@ TEST_P(BtLogicTransaction, fp_test_set)
         // setup
         m_config.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test_compl, nullptr, 0);
+
         // wrap operation
         const auto fp_test_set = [&](void *object, int offset) -> int {
-            return m_ops.bitwise_ops.fp_test_set(object, offset, m_config, nullptr);
+            patomic_transaction_result_t result {};
+            int bit = m_ops.bitwise_ops.fp_test_set(object, offset, m_config, &result);
+            ADD_FAILURE_TSX_SUCCESS(m_config, result);
+            return bit;
         };
 
         // test

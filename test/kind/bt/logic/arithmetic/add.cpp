@@ -1,5 +1,6 @@
 #include <test/common/generic_int.hpp>
 #include <test/common/skip.hpp>
+#include <test/common/transaction.hpp>
 
 #include <test/suite/bt_logic.hpp>
 
@@ -224,9 +225,14 @@ TEST_P(BtLogicTransaction, fp_add)
         // setup
         m_config.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_add, nullptr, nullptr);
+
         // wrap operation
         const auto fp_add = [&](void *object, const void *argument) -> void {
-            return m_ops.arithmetic_ops.fp_add(object, argument, m_config, nullptr);
+            patomic_transaction_result_t result {};
+            m_ops.arithmetic_ops.fp_add(object, argument, m_config, &result);
+            ADD_FAILURE_TSX_SUCCESS(m_config, result);
         };
 
         // test
@@ -247,9 +253,14 @@ TEST_P(BtLogicTransaction, fp_fetch_add)
         // setup
         m_config.width = width;
 
+        // test zero
+        ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_fetch_add, nullptr, nullptr, nullptr);
+
         // wrap operation
         const auto fp_fetch_add = [&](void *object, const void *argument, void *ret) -> void {
-            return m_ops.arithmetic_ops.fp_fetch_add(object, argument, ret, m_config, nullptr);
+            patomic_transaction_result_t result {};
+            m_ops.arithmetic_ops.fp_fetch_add(object, argument, ret, m_config, &result);
+            ADD_FAILURE_TSX_SUCCESS(m_config, result);
         };
 
         // test
