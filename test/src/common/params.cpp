@@ -181,14 +181,18 @@ ParamsTransaction::combinations()
 
     // create a selection of constant and random widths
     std::set<std::size_t> widths_set;
-    widths_set.insert(0u);
     for (std::size_t width : supported_widths())
     {
         widths_set.insert(width);
     }
     while (widths_set.size() < 16u)
     {
-        widths_set.insert(distrib(gen));
+        // zero is tested explicitly
+        auto w = distrib(gen);
+        if (w != 0)
+        {
+            widths_set.insert(w);
+        }
     }
 
     // convert to vector

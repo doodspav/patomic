@@ -1196,7 +1196,9 @@ typedef struct {
  *
  * @note
  *   If any non-flag operation is supported, all flag operations will also be
- *   supported, otherwise no flag operations will be supported.
+ *   supported, otherwise no flag operations will be supported. This is so that
+ *   there is always a way to write to the flag from another thread without
+ *   incurring undefined behaviour.
  */
 typedef struct {
 
