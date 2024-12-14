@@ -744,9 +744,9 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  * @details
  *   The function "fn" is called inside a transaction and is directly passed
  *   "ctx", which is not dereferenced, access, or modified in any way before
- *   being passed to the function. If this transaction fails, the same is
- *   attempted with "fallback_fn" and "fallback_ctx". If either transaction
- *   path fails, 0 is returned.
+ *   being passed to the function. If this transaction fails, "result" is
+ *   updated and then the same is attempted with "fallback_fn" and
+ *   "fallback_ctx". If either transaction path fails, 0 is returned.
  *
  * @param fn
  *   Function to be called inside primary transaction.
@@ -766,6 +766,9 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  * @param result
  *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
+ *
+ * @returns
+ *   The value 1 if the primary transaction succeeds, otherwise the value 0.
  *
  * @note
  *   If config.attempts == 0, the primary transaction will not be attempted.

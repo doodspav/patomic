@@ -44,20 +44,16 @@ TEST_P(BtLogicTransaction, fp_generic)
     // test zero
     ASSERT_TSX_ZERO(m_ops.special_ops.fp_generic, nullptr, nullptr);
 
-    // go through all widths
-    for (std::size_t width : p.widths)
-    {
-        // setup
-        m_config.width = width;
+    // make sure width is non-zero
+    m_config.width = 1;
 
-        // wrap operation
-        const auto fp_generic = [&](void (* fn)(void *), void *ctx) -> void {
-            patomic_transaction_result_t result {};
-            m_ops.special_ops.fp_generic(fn, ctx, m_config, &result);
-            ADD_FAILURE_TSX_SUCCESS(m_config, result);
-        };
+    // wrap operation
+    const auto fp_generic = [&](void (* fn)(void *), void *ctx) -> void {
+        patomic_transaction_result_t result {};
+        m_ops.special_ops.fp_generic(fn, ctx, m_config, &result);
+        ADD_FAILURE_TSX_SUCCESS(m_config, result);
+    };
 
-        // test
-        test_generic(fp_generic);
-    }
+    // test
+    test_generic(fp_generic);
 }
