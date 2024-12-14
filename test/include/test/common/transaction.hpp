@@ -160,8 +160,7 @@ struct generic_cmpxchg
     /// @brief
     ///   Create a patomic_transaction_cmpxchg_t object referencing the owned
     ///   generic_integer objects.
-    patomic_transaction_cmpxchg_t
-    as_patomic() noexcept;
+    operator patomic_transaction_cmpxchg_t() noexcept;
 
     // core data members
     test::generic_integer object;

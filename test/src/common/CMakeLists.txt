@@ -8,4 +8,5 @@ target_sources(${test_target_name}-src PRIVATE
     name.cpp
     params.cpp
     support.cpp
+    transaction.cpp
 )

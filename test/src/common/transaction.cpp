@@ -13,8 +13,7 @@ generic_cmpxchg::generic_cmpxchg(
 {}
 
 
-patomic_transaction_cmpxchg_t
-generic_cmpxchg::as_patomic() noexcept
+generic_cmpxchg::operator patomic_transaction_cmpxchg_t() noexcept
 {
     patomic_transaction_cmpxchg_t ret;
     ret.obj = object;
