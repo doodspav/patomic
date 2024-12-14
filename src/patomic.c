@@ -186,23 +186,22 @@ patomic_create_transaction(
             opcats = patomic_opcats_TRANSACTION;
             if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
             {
-                /* flag operations must be supported if any other operation is supported */
+                /* all flag operations must be supported if any other operation is supported */
                 /* if no other operation is supported, no flag operation must be supported */
                 opcats &= ~((unsigned int) patomic_opcat_TFLAG);
                 if (opcats != patomic_internal_feature_check_any_transaction(&ret.ops, opcats))
                 {
-                    /* other operation supported -> full flag supported */
-                    opcats = patomic_opkinds_TFLAG;
+                    /* other operation supported -> full flag support */
                     patomic_assert_always(patomic_internal_feature_check_leaf_transaction(
-                        &ret.ops, patomic_opcat_TFLAG, opcats
+                        &ret.ops, patomic_opcat_TFLAG, patomic_opkinds_TFLAG
                     ) == 0ul);
                 }
                 else
                 {
-                    /* no other operation supported -> no flag supported */
+                    /* no other operation supported -> no flag support */
                     opcats = patomic_opkinds_TFLAG;
                     patomic_assert_always(patomic_internal_feature_check_leaf_transaction(
-                        &ret.ops, patomic_opcat_TFLAG, opcats
+                        &ret.ops, patomic_opcat_TFLAG, patomic_opkinds_TFLAG
                     ) == opcats);
                 }
 
@@ -214,7 +213,7 @@ patomic_create_transaction(
                     patomic_assert_always(ret.ops.raw_ops.fp_tcommit != NULL);
                 }
 
-                /* of tabort_single is supported, then tabort_all must be supported too */
+                /* if tabort_single is supported, then tabort_all must be supported too */
                 if (ret.ops.raw_ops.fp_tabort_single != NULL)
                 {
                     patomic_assert_always(ret.ops.raw_ops.fp_tabort_all != NULL);
