@@ -121,7 +121,6 @@ TEST_P(BtLogicTransaction, fp_cmpxchg_strong)
     // go through all widths
     for (std::size_t width : p.widths)
     {
-
         // setup
         m_config_wfb.width = width;
 
