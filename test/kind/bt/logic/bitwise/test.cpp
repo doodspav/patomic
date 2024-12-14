@@ -107,14 +107,14 @@ TEST_P(BtLogicTransaction, fp_test)
     const auto& p = GetParam();
     SKIP_NULL_OP_FP_TEST(p.id, m_ops);
 
+    // test zero
+    ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test, nullptr, 0);
+
     // go through all widths
     for (std::size_t width : p.widths)
     {
         // setup
         m_config.width = width;
-
-        // test zero
-        ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test, nullptr, 0);
 
         // wrap operation
         const auto fp_test = [&](const void *object, int offset) -> int {

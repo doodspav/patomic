@@ -197,14 +197,14 @@ TEST_P(BtLogicTransaction, fp_and)
     const auto& p = GetParam();
     SKIP_NULL_OP_FP_AND(p.id, m_ops);
 
+    // test zero
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_and, nullptr, nullptr);
+
     // go through all widths
     for (std::size_t width : p.widths)
     {
         // setup
         m_config.width = width;
-
-        // test zero
-        ASSERT_TSX_ZERO(m_ops.binary_ops.fp_and, nullptr, nullptr);
 
         // wrap operation
         const auto fp_and = [&](void *object, const void *argument) -> void {
@@ -225,14 +225,14 @@ TEST_P(BtLogicTransaction, fp_fetch_and)
     const auto& p = GetParam();
     SKIP_NULL_OP_FP_FETCH_AND(p.id, m_ops);
 
+    // test zero
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_and, nullptr, nullptr, nullptr);
+
     // go through all widths
     for (std::size_t width : p.widths)
     {
         // setup
         m_config.width = width;
-
-        // test zero
-        ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_and, nullptr, nullptr, nullptr);
 
         // wrap operation
         const auto fp_fetch_and = [&](void *object, const void *argument, void *ret) -> void {

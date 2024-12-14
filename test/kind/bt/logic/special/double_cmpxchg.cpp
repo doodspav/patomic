@@ -78,14 +78,14 @@ TEST_P(BtLogicTransaction, fp_double_cmpxchg)
     const auto& p = GetParam();
     SKIP_NULL_OP_FP_DOUBLE_CMPXCHG(p.id, m_ops);
 
+    // test zero
+    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_double_cmpxchg, {}, {});
+
     // go through all widths
     for (std::size_t width : p.widths)
     {
         // setup
         m_config_wfb.width = width;
-
-        // test zero
-        ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_double_cmpxchg, {}, {});
 
         // wrap operation
         using cmpxchg_t = patomic_transaction_cmpxchg_t;

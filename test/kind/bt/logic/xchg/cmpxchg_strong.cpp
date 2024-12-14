@@ -118,14 +118,14 @@ TEST_P(BtLogicTransaction, fp_cmpxchg_strong)
     const auto& p = GetParam();
     SKIP_NULL_OP_FP_CMPXCHG_STRONG(p.id, m_ops);
 
+    // test zero
+    ASSERT_TSX_ZERO_WFB(m_ops.xchg_ops.fp_cmpxchg_strong, nullptr, nullptr, nullptr);
+
     // go through all widths
     for (std::size_t width : p.widths)
     {
         // setup
         m_config_wfb.width = width;
-
-        // test zero
-        ASSERT_TSX_ZERO_WFB(m_ops.xchg_ops.fp_cmpxchg_strong, nullptr, nullptr, nullptr);
 
         // wrap operation
         const auto fp_cmpxchg_strong = [&](void *object, void *expected, const void *desired) -> int {
