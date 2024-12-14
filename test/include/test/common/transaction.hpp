@@ -1,6 +1,7 @@
 #ifndef PATOMIC_TEST_COMMON_TRANSACTION_HPP
 #define PATOMIC_TEST_COMMON_TRANSACTION_HPP
 
+#include "generic_int.hpp"
 #include "name.hpp"
 
 
@@ -143,5 +144,32 @@
     }                                                                                      \
     REQUIRE_SEMICOLON()
 
+
+namespace test
+{
+
+
+/// @brief
+///   Helper type for use in testing double and multi cmpxchg ops.
+struct generic_cmpxchg
+{
+    /// @brief
+    ///   Constructor to initialize all generic integers the same.
+    generic_cmpxchg(std::size_t width, std::size_t align, bool is_signed);
+
+    /// @brief
+    ///   Create a patomic_transaction_cmpxchg_t object referencing the owned
+    ///   generic_integer objects.
+    patomic_transaction_cmpxchg_t
+    as_patomic() noexcept;
+
+    // core data members
+    test::generic_integer object;
+    test::generic_integer expected;
+    test::generic_integer desired;
+};
+
+
+}  // namespace test
 
 #endif  // PATOMIC_TEST_COMMON_TRANSACTION_HPP
