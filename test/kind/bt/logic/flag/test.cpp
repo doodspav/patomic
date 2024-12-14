@@ -3,15 +3,16 @@
 #include <test/suite/bt_logic.hpp>
 
 
-#define SKIP_NULL_OP_FP_TEST(id, ops) \
+// testy rather than test so that gtest doesn't think it's a test
+#define SKIP_NULL_OP_FP_TESTY(id, ops) \
     SKIP_NULL_OP_FP(id, (ops).flag_ops.fp_test, "test")
 
 
-TEST_P(BtLogicTransaction, fp_test_set)
+TEST_P(BtLogicTransaction, flag_fp_test)
 {
     // check pre-condition
     const auto &p = GetParam();
-    SKIP_NULL_OP_FP_TEST(p.id, m_ops);
+    SKIP_NULL_OP_FP_TESTY(p.id, m_ops);
 
     // wrap operation
     const auto fp_test = [=](const patomic_transaction_flag_t &flag) -> int {

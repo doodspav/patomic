@@ -62,7 +62,8 @@ test_bit_test(
 }  // namespace
 
 
-#define SKIP_NULL_OP_FP_TEST(id, ops) \
+// testy rather than test so that gtest doesn't think it's a test
+#define SKIP_NULL_OP_FP_TESTY(id, ops) \
     SKIP_NULL_OP_FP(id, (ops).bitwise_ops.fp_test, "test")
 
 
@@ -71,7 +72,7 @@ TEST_P(BtLogicImplicitLoad, fp_test)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_TEST(p.id, m_ops);
+    SKIP_NULL_OP_FP_TESTY(p.id, m_ops);
 
     // wrap operation
     const auto fp_test = [&](const void *object, int offset) -> int {
@@ -88,7 +89,7 @@ TEST_P(BtLogicExplicitLoad, fp_test)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_TEST(p.id, m_ops);
+    SKIP_NULL_OP_FP_TESTY(p.id, m_ops);
 
     // wrap operation
     const auto fp_test = [&](const void *object, int offset) -> int {
@@ -105,7 +106,7 @@ TEST_P(BtLogicTransaction, fp_test)
 {
     // check pre-conditions
     const auto& p = GetParam();
-    SKIP_NULL_OP_FP_TEST(p.id, m_ops);
+    SKIP_NULL_OP_FP_TESTY(p.id, m_ops);
 
     // test zero
     ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test, nullptr, 0);

@@ -7,7 +7,7 @@
     SKIP_NULL_OP_FP(id, (ops).flag_ops.fp_test_set, "test_set")
 
 
-TEST_P(BtLogicTransaction, fp_test_set)
+TEST_P(BtLogicTransaction, flag_fp_test_set)
 {
     // check pre-condition
     const auto &p = GetParam();
