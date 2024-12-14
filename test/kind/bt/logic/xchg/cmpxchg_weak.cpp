@@ -150,6 +150,7 @@ TEST_P(BtLogicTransaction, fp_cmpxchg_weak)
     for (std::size_t width : p.widths)
     {
         // setup
+        SCOPED_TRACE(width);
         m_config_wfb.width = width;
 
         // wrap operation

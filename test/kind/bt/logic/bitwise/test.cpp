@@ -114,6 +114,7 @@ TEST_P(BtLogicTransaction, fp_test)
     for (std::size_t width : p.widths)
     {
         // setup
+        SCOPED_TRACE(width);
         m_config.width = width;
 
         // wrap operation

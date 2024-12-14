@@ -159,6 +159,7 @@ TEST_P(BtLogicTransaction, fp_neg)
     for (std::size_t width : p.widths)
     {
         // setup
+        SCOPED_TRACE(width);
         m_config.width = width;
 
         // wrap operation
@@ -187,6 +188,7 @@ TEST_P(BtLogicTransaction, fp_fetch_neg)
     for (std::size_t width : p.widths)
     {
         // setup
+        SCOPED_TRACE(width);
         m_config.width = width;
 
         // wrap operation
