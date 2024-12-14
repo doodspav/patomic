@@ -64,14 +64,9 @@ test_multi_cmpxchg(
     };
 
     // as many cmpxchg as there are states
-    std::vector<test::generic_cmpxchg> cxs;
-    cxs.reserve(states.size());
-    for (auto&& state : states)
-    {
-        test::generic_cmpxchg cx { width, align, false };
-        state(cx.object);
-        cxs.push_back(std::move(cx));
-    }
+    std::vector<test::generic_cmpxchg> cxs {
+        states.size(), { width, align, false }
+    };
 
     // wrap operation
     const auto fp_wrapped = [&](std::vector<test::generic_cmpxchg>& cxs_vec) -> int {
