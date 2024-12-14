@@ -7,6 +7,7 @@
     SKIP_NULL_OP_FP(id, (ops).flag_ops.fp_clear, "clear")
 
 
+/// @brief Check that the non-atomic logic of transaction clear works correctly.
 TEST_P(BtLogicTransaction, flag_fp_clear)
 {
     // check pre-condition

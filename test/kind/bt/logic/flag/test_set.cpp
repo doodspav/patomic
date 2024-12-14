@@ -7,6 +7,7 @@
     SKIP_NULL_OP_FP(id, (ops).flag_ops.fp_test_set, "test_set")
 
 
+/// @brief Check that the non-atomic logic of transaction test_set works correctly.
 TEST_P(BtLogicTransaction, flag_fp_test_set)
 {
     // check pre-condition
