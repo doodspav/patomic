@@ -144,6 +144,68 @@
     }                                                                                      \
     REQUIRE_SEMICOLON()
 
+/// @brief
+///   Tests that fp_multi_cmpxchg (or another function wrapped to fit that API)
+///   works correctly.
+/// @details
+///   Goes through all the cmpxchg structs, and sets expected equal to object
+///   in all but one, and expects the operation to fail. This is done once for
+///   every cmpxchg struct.
+///   Then, all cmpxchg structs have expected set equal to object and the
+///   operation is expected to succeed.
+///
+/// @param cxs std::vector<test::generic_cmpxchg>
+/// @param fp_multi_cmpxchg int(std::vector<test::generic_cmpxchg>&)
+#define DO_TEST_MULTI_CMPXCHG(cxs, fp_multi_cmpxchg)      \
+    {                                                     \
+        std::vector<test::generic_cmpxchg> cxs_old = cxs; \
+                                                          \
+        for (std::size_t i = 0; i < cxs.size(); ++i)      \
+        {                                                 \
+            auto& cx = cxs[i];                            \
+            auto& cx_old = cxs_old[i];                    \
+                                                          \
+            cx.expected = cx.object;                      \
+            cx_old.object = cx.object;                    \
+            cx_old.desired = cx.desired;                  \
+        }                                                 \
+                                                          \
+        for (std::size_t i = 0; i < cxs.size(); ++i)      \
+        {                                                 \
+            cxs[i].expected.inv();                        \
+            int ok = fp_multi_cmpxchg(cxs);               \
+            ASSERT_FALSE(ok);                             \
+                                                          \
+            for (std::size_t j = 0; j < cxs.size(); ++j)  \
+            {                                             \
+                auto& cx = cxs[j];                        \
+                auto& cx_old = cxs_old[j];                \
+                                                          \
+                ASSERT_EQ(cx.object, cx_old.object);      \
+                ASSERT_EQ(cx.expected, cx.object);        \
+                ASSERT_EQ(cx.desired, cx_old.desired);    \
+            }                                             \
+        }                                                 \
+                                                          \
+        for (std::size_t i = 0; i < cxs.size(); ++i)      \
+        {                                                 \
+            cxs_old[i].expected = cxs[i].expected;        \
+        }                                                 \
+                                                          \
+        int ok = fp_multi_cmpxchg(cxs);                   \
+                                                          \
+        for (std::size_t i = 0; i < cxs.size(); ++i)      \
+        {                                                 \
+            auto& cx = cxs[i];                            \
+            auto& cx_old = cxs_old[i];                    \
+                                                          \
+            ASSERT_EQ(cx.object, cx.desired);             \
+            ASSERT_EQ(cx.expected, cx_old.expected);      \
+            ASSERT_EQ(cx.desired, cx_old.desired);        \
+        }                                                 \
+    }                                                     \
+    REQUIRE_SEMICOLON()
+
 
 namespace test
 {
