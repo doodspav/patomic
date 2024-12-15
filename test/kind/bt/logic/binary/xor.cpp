@@ -4,6 +4,8 @@
 
 #include <test/suite/bt_logic.hpp>
 
+#include <cstring>
+
 
 namespace
 {
