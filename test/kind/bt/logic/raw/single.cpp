@@ -187,7 +187,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
             }
 
             // test
-            auto exit_code = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
+            auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
             auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
             if (exit_code == patomic_TABORT_EXPLICIT)
             {
@@ -245,13 +245,13 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
             }
 
             // test
-            auto exit_code = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
-            auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+            auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
+            auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
             auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
             if (exit_code == patomic_TABORT_EXPLICIT)
             {
                 ASSERT_EQ(r, reason);
-                ASSERT_FALSE(info & patomic_TINFO_NESTED);
+                ASSERT_FALSE(exit_info & patomic_TINFO_NESTED);
                 break;
             }
         }
