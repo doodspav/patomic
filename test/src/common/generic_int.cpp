@@ -275,7 +275,7 @@ generic_integer::inv_at(unsigned long long offset) noexcept
     }
 
     // calculate bit and byte offsets
-    const std::size_t byte_offset = offset / CHAR_BIT;
+    const auto byte_offset = static_cast<std::size_t>(offset / CHAR_BIT);
     const unsigned bit_offset = offset % CHAR_BIT;
 
     // get the correct index based on endianness

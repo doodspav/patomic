@@ -332,7 +332,7 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tabort_single)
                 static_cast<void>(*outer.flag());
 
                 // inner run
-                for (unsigned long j = 0; m_config.attempts; ++j)
+                for (unsigned long j = 0; j < m_config.attempts; ++j)
                 {
                     ++inner.result.attempts_made;
                     inner.result.status = fp_tbegin();

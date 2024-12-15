@@ -23,7 +23,7 @@ test_bit_test_compl(
     test::generic_integer object_exp { width, align, false };
 
     // go through all bit offsets
-    for (std::size_t i = 0; i < object.bit_width(); ++i)
+    for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
         // 0 -> 1
         object_exp.inv_at(i);
@@ -42,7 +42,7 @@ test_bit_test_compl(
     object_exp = object;
 
     // go through all bit offsets
-    for (std::size_t i = 0; i < object.bit_width(); ++i)
+    for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
         // 1 -> 0
         object_exp.inv_at(i);

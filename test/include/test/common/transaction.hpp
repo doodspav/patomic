@@ -199,6 +199,7 @@
         }                                                 \
                                                           \
         int ok = fp_multi_cmpxchg(cxs);                   \
+        ASSERT_TRUE(ok);                                  \
                                                           \
         for (std::size_t i = 0; i < cxs.size(); ++i)      \
         {                                                 \

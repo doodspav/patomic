@@ -1,4 +1,5 @@
 #include <patomic/api/feature_check.h>
+#include <patomic/internal/feature_check.h>
 
 #include <patomic/macros/unreachable.h>
 #include <patomic/stdlib/assert.h>
