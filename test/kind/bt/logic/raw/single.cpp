@@ -188,19 +188,19 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
 
             // test
             auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
-            auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
             if (exit_code == patomic_TABORT_EXPLICIT)
             {
-                ASSERT_EQ(r, reason);
                 break;
             }
         }
 
         // test
-        auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
-        ASSERT_EQ(patomic_TABORT_EXPLICIT, exit_code);
-        auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+        auto exit_code = patomic_transaction_status_exit_code(result.status);
+        auto exit_info = patomic_transaction_status_exit_info(result.status);
+        auto reason = patomic_transaction_status_abort_reason(result.status);
+        ASSERT_EQ(exit_code, patomic_TABORT_EXPLICIT);
         ASSERT_FALSE(exit_info & patomic_TINFO_NESTED);
+        ASSERT_EQ(reason, r);
     }
 }
 
@@ -246,20 +246,18 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
 
             // test
             auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
-            auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
-            auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
             if (exit_code == patomic_TABORT_EXPLICIT)
             {
-                ASSERT_EQ(r, reason);
-                ASSERT_FALSE(exit_info & patomic_TINFO_NESTED);
                 break;
             }
         }
 
         // test
-        auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
-        ASSERT_EQ(patomic_TABORT_EXPLICIT, exit_code);
-        auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+        auto exit_code = patomic_transaction_status_exit_code(result.status);
+        auto exit_info = patomic_transaction_status_exit_info(result.status);
+        auto reason = patomic_transaction_status_abort_reason(result.status);
+        ASSERT_EQ(exit_code, patomic_TABORT_EXPLICIT);
         ASSERT_FALSE(exit_info & patomic_TINFO_NESTED);
+        ASSERT_EQ(reason, r);
     }
 }
