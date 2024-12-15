@@ -222,7 +222,77 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tdepth)
 
 /// @brief Test nested transaction with tbegin + tcommit + tabort_all.
 TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tabort_all)
-{}
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
+    SKIP_NULL_OP_FP_TABORT_ALL(p.id, m_ops);
+
+    // alias but do not wrap operations
+    auto fp_tbegin = m_ops.raw_ops.fp_tbegin;
+    auto fp_tcommit = m_ops.raw_ops.fp_tcommit;
+    auto fp_tabort_all = m_ops.raw_ops.fp_tabort_all;
+
+    // go through all possible abort reasons
+    constexpr int reason_count = (1 << 8);
+    for (int r = 0; r < reason_count; ++r)
+    {
+        // run without transaction, should be no-op
+        // use a different reason here to below in case it makes a difference
+        // it shouldn't make a difference (hence the test)
+        fp_tabort_all(static_cast<unsigned char>(reason_count - r - 1));
+
+        // setup
+        tsx_setup outer {};
+        tsx_setup inner {};
+        inner.result.status = patomic_TABORT_UNKNOWN;
+
+        // outer run
+        for (unsigned long i = 0; i < m_config.attempts; ++i)
+        {
+            ++outer.result.attempts_made;
+            outer.result.status = fp_tbegin();
+            if (outer.result.status == 0)
+            {
+                static_cast<void>(*outer.flag());
+
+                // inner run
+                for (unsigned long j = 0; j < m_config.attempts; ++j)
+                {
+                    ++inner.result.attempts_made;
+                    inner.result.status = fp_tbegin();
+                    if (inner.result.status == 0)
+                    {
+                        // inner commit with tabort
+                        static_cast<void>(*inner.flag());
+                        fp_tabort_all(static_cast<unsigned char>(r));
+                        fp_tcommit();
+                    }
+                }
+
+                // outer commit without tabort
+                fp_tcommit();
+            }
+
+            // outer test
+            auto outer_exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(outer.result.status);
+            if (outer_exit_code == patomic_TABORT_EXPLICIT)
+            {
+                break;
+            }
+        }
+
+        // test
+        // no check for inner because it would have been rolled back (depending on the implementation)
+        auto outer_exit_code = patomic_transaction_status_exit_code(outer.result.status);
+        auto outer_exit_info = patomic_transaction_status_exit_info(outer.result.status);
+        auto outer_reason = patomic_transaction_status_abort_reason(outer.result.status);
+        ASSERT_EQ(outer_exit_code, patomic_TABORT_EXPLICIT);
+        ASSERT_TRUE(outer_exit_info & patomic_TINFO_NESTED);
+        ASSERT_EQ(outer_reason, r);
+
+    }
+}
 
 
 /// @brief Test nested transaction with tbegin + tcommit + tabort_single.
