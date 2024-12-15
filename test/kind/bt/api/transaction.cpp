@@ -23,7 +23,17 @@ public:
             patomic_TABORT_DEBUG
         };
     }
+
+    static std::vector<patomic_transaction_exit_info_t>
+    supported_exit_infos()
+    {
+        return {
+            patomic_TINFO_RETRY,
+            patomic_TINFO_NESTED
+        };
+    }
 };
+
 
 /// @brief Success exit code is zero.
 TEST_F(BtApiTransaction, exit_code_success_is_zero)
@@ -31,7 +41,8 @@ TEST_F(BtApiTransaction, exit_code_success_is_zero)
     EXPECT_EQ(0, patomic_TSUCCESS);
 }
 
-/// @brief All exit codes are non-negative have no more than 8 significant bits.
+/// @brief All exit codes are non-negative and have no more than 8 significant
+///        bits.
 TEST_F(BtApiTransaction, exit_code_is_8_bits_nonnegative)
 {
     // go through all supported exit codes
@@ -42,7 +53,7 @@ TEST_F(BtApiTransaction, exit_code_is_8_bits_nonnegative)
     }
 }
 
-/// @brief Only first 8 bits of status is provided for exit code.
+/// @brief Only first 8 bits of status are provided for exit code.
 TEST_F(BtApiTransaction, exit_code_is_first_8_bits_of_status)
 {
     // go through all combinations of 8 bits
@@ -57,6 +68,37 @@ TEST_F(BtApiTransaction, exit_code_is_first_8_bits_of_status)
     EXPECT_EQ(0ul, patomic_transaction_status_exit_code(status));
     EXPECT_EQ(0ul, PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status));
 }
+
+
+/// @brief All exit infos are non-negative and have no more than 8 significant
+///        bits.
+TEST_F(BtApiTransaction, exit_info_is_8_bits_nonnegative)
+{
+    // go through all supported exit infos
+    for (auto info : supported_exit_infos())
+    {
+        EXPECT_GE(info, 0);
+        EXPECT_LE(info, 255);
+    }
+}
+
+/// @brief Only third 8 bits of status are provided for exit info.
+TEST_F(BtApiTransaction, exit_info_is_third_8_bits_of_status)
+{
+    // go through all combinations of 8 bits (offset by 16)
+    for (unsigned long status = 0xFFFFul; status < 0xFFFFFFul; ++status)
+    {
+        unsigned long s = (status << 16ul) | 0xFFul;
+        EXPECT_EQ(s, patomic_transaction_status_exit_info(status));
+        EXPECT_EQ(s, PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status));
+    }
+
+    // go into 9th bit with first 8 bits zeroed (offset by 16)
+    unsigned long status = 0x1000000ul;
+    EXPECT_EQ(0ul, patomic_transaction_status_exit_info(status));
+    EXPECT_EQ(0ul, PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status));
+}
+
 
 /// @brief Reason returned is 0 if status is not patomic_TABORT_EXPLICIT.
 TEST_F(BtApiTransaction, reason_is_zero_if_not_explicit_abort)
