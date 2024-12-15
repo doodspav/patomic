@@ -131,7 +131,7 @@ TEST_P(BtLogicTransaction, fp_multi_cmpxchg)
     ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_multi_cmpxchg, {}, {});
 
     // go through all widths
-    for (std::size_t width : p.widths)
+    for (std::size_t width : m_widths)
     {
         // setup
         SCOPED_TRACE(width);

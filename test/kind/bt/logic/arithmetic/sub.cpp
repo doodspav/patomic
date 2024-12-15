@@ -202,7 +202,7 @@ TEST_P(BtLogicTransaction, fp_sub)
     ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_sub, nullptr, nullptr);
 
     // go through all widths
-    for (std::size_t width : p.widths)
+    for (std::size_t width : m_widths)
     {
         // setup
         SCOPED_TRACE(width);
@@ -231,7 +231,7 @@ TEST_P(BtLogicTransaction, fp_fetch_sub)
     ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_fetch_sub, nullptr, nullptr, nullptr);
 
     // go through all widths
-    for (std::size_t width : p.widths)
+    for (std::size_t width : m_widths)
     {
         // setup
         SCOPED_TRACE(width);

@@ -78,6 +78,7 @@ public:
 
 protected:
     // helper members
+    std::vector<std::size_t> m_widths {};
     patomic_ops_transaction_t m_ops {};
     patomic_transaction_recommended_t m_recommended {};
     patomic_transaction_config_t m_config {};
