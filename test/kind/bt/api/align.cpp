@@ -13,7 +13,7 @@
 struct OverAlignedBuffer
 {
     static constexpr auto align =
-        std::max(alignof(std::max_align_t), static_cast<std::size_t>(64U));
+        std::max(alignof(std::max_align_t), static_cast<std::size_t>(64u));
     alignas(align) unsigned char data[align] {};
     size_t size { align };
 };
@@ -161,7 +161,7 @@ TEST_F(BtApiAlign, meets_recommended_succeeds_cmp_lt_pointer_align)
 TEST_F(BtApiAlign_Experimental, meets_recommended_succeeds_pointer_is_null)
 {
     // setup
-    constexpr patomic_align_t align { 32768U, 0, 0 };
+    constexpr patomic_align_t align { 32768u, 0, 0 };
     const void *ptr = nullptr;
 
     // test
@@ -390,7 +390,7 @@ TEST_F(BtApiAlign, meets_minimum_fails_buffer_fits_but_misaligned_for_size_withi
 TEST_F(BtApiAlign_Experimental, meets_minimum_succeeds_pointer_is_null)
 {
     // setup
-    constexpr patomic_align_t align { 0, 32768U, 8 };
+    constexpr patomic_align_t align { 0, 32768u, 8 };
     const void *ptr = nullptr;
 
     // test

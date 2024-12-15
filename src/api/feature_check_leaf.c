@@ -1,4 +1,5 @@
 #include <patomic/api/feature_check.h>
+#include <patomic/internal/feature_check.h>
 
 #include <patomic/macros/unreachable.h>
 #include <patomic/stdlib/assert.h>
@@ -73,11 +74,13 @@
     PATOMIC_UNSET_OPKIND(ops->flag_ops.fp_clear,    kinds, CLEAR)
 
 
-#define PATOMIC_UNSET_OPKINDS_TRAW(ops, kinds)                     \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tbegin,  kinds, TBEGIN);  \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tabort,  kinds, TABORT);  \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tcommit, kinds, TCOMMIT); \
-    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_ttest,   kinds, TTEST)
+#define PATOMIC_UNSET_OPKINDS_TRAW(ops, kinds)                                 \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tbegin,        kinds, TBEGIN);        \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tcommit,       kinds, TCOMMIT);       \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tabort_all,    kinds, TABORT_ALL);    \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tabort_single, kinds, TABORT_SINGLE); \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_ttest,         kinds, TTEST);         \
+    PATOMIC_UNSET_OPKIND(ops->raw_ops.fp_tdepth,        kinds, TDEPTH)
 
 
 #define PATOMIC_CASE_UNSET_OPKINDS(cat, ops, kinds) \
@@ -193,7 +196,7 @@ patomic_feature_check_leaf_explicit(
 
 
 unsigned int
-patomic_feature_check_leaf_transaction(
+patomic_internal_feature_check_leaf_transaction(
     const patomic_ops_transaction_t *const ops,
     const patomic_opcat_t opcat,
     unsigned int opkinds
@@ -242,4 +245,18 @@ patomic_feature_check_leaf_transaction(
 
     /* return updated opkinds */
     return opkinds;
+}
+
+
+unsigned int
+patomic_feature_check_leaf_transaction(
+    const patomic_ops_transaction_t *const ops,
+    const patomic_opcat_t opcat,
+    const unsigned int opkinds
+)
+{
+    /* defer to internal implementation */
+    return patomic_internal_feature_check_leaf_transaction(
+        ops, opcat, opkinds
+    );
 }

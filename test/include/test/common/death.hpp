@@ -1,5 +1,5 @@
-#ifndef PATOMIC_TEST_COMMON_KILLED_BY_HPP
-#define PATOMIC_TEST_COMMON_KILLED_BY_HPP
+#ifndef PATOMIC_TEST_COMMON_DEATH_HPP
+#define PATOMIC_TEST_COMMON_DEATH_HPP
 
 #include <gtest/gtest.h>
 
@@ -33,4 +33,4 @@ KilledByAbort();
 
 }  // namespace test
 
-#endif  // PATOMIC_TEST_COMMON_KILLED_BY_HPP
+#endif  // PATOMIC_TEST_COMMON_DEATH_HPP

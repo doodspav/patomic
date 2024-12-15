@@ -1,6 +1,7 @@
 #include <patomic/api/options.h>
 
 #include <test/common/math.hpp>
+#include <test/common/support.hpp>
 
 #include <gtest/gtest.h>
 
@@ -19,6 +20,26 @@ public:
     };
 };
 
+
+/// @brief All options from support header combined equal all options from
+///        solo_options combined.
+TEST_F(BtApiOptions, all_solo_options_eq_all_support_options)
+{
+    // setup
+    unsigned int combined_solo = 0u;
+    unsigned int combined_support = 0u;
+    for (patomic_option_t opt : solo_options)
+    {
+        combined_solo |= static_cast<unsigned int>(opt);
+    }
+    for (unsigned int opts : test::supported_options())
+    {
+        combined_support |= opts;
+    }
+
+    // test
+    EXPECT_EQ(combined_solo, combined_support);
+}
 
 /// @brief All "option" options have exactly one bit set, except for
 ///        patomic_option_NONE which has zero bits set.

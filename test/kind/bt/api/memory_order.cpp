@@ -1,5 +1,7 @@
 #include <patomic/api/memory_order.h>
 
+#include <test/common/support.hpp>
+
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -11,45 +13,86 @@
 class BtApiMemoryOrder : public testing::Test
 {
 public:
-    const std::vector<int> invalid_orders {
-        -1, -10, 10,
-        std::numeric_limits<int>::min(),
-        std::numeric_limits<int>::max(),
-    };
+    
+    /// @brief Return set of invalid memory orders.
+    static const std::vector<int>&
+    invalid_orders()
+    {
+        static const std::vector<int> orders {
+            -1, -10, 10,
+            std::numeric_limits<int>::min(),
+            std::numeric_limits<int>::max(),
+        };
+        return orders;
+    }
 
-    const std::vector<patomic_memory_order_t> valid_orders {
-        patomic_RELAXED,
-        patomic_CONSUME,
-        patomic_ACQUIRE,
-        patomic_RELEASE,
-        patomic_ACQ_REL,
-        patomic_SEQ_CST
+    /// @brief Return set of all valid memory orders.
+    static const std::vector<patomic_memory_order_t>&
+    valid_orders()
+    {
+        static const auto orders = test::supported_orders();
+        return orders;
     };
-
-    const std::vector<patomic_memory_order_t> load_orders {
-        patomic_RELAXED,
-        patomic_CONSUME,
-        patomic_ACQUIRE,
-        patomic_SEQ_CST
+    
+    /// @brief Return set of all memory orders valid for store operations.
+    static const std::vector<patomic_memory_order_t>&
+    store_orders()
+    {
+        static const auto orders = test::supported_orders_store();
+        return orders;
+    }
+    
+    /// @brief Return set of all memory orders valid for load operations.
+    static const std::vector<patomic_memory_order_t>& 
+    load_orders()
+    {
+        static const auto orders = test::supported_orders_load();
+        return orders;
     };
+    
+    /// @brief Return set of all valid memory orders which are not valid for
+    ///        store operations.
+    static const std::vector<patomic_memory_order_t>&
+    non_store_orders() 
+    {
+        static const auto get_orders = []() -> std::vector<patomic_memory_order_t> {
+            using Bt = BtApiMemoryOrder;
+            std::vector<patomic_memory_order_t> orders;
+            for (auto order : test::supported_orders())
+            {
+                if (!Bt::contains(test::supported_orders_store(), order))
+                {
+                    orders.push_back(order);
+                }
+            }
+            return orders;
+        };
+        static const auto orders = get_orders();
+        return orders;
+    }
+    
+    /// @brief Return set of all valid memory orders which are not valid for
+    ///        load operations.
+    static const std::vector<patomic_memory_order_t>&
+    non_load_orders()
+    {
+        static const auto get_orders = []() -> std::vector<patomic_memory_order_t> {
+            using Bt = BtApiMemoryOrder;
+            std::vector<patomic_memory_order_t> orders;
+            for (auto order : test::supported_orders())
+            {
+                if (!Bt::contains(test::supported_orders_load(), order))
+                {
+                    orders.push_back(order);
+                }
+            }
+            return orders;
+        };
+        static const auto orders = get_orders();
+        return orders;
+    }
 
-    const std::vector<patomic_memory_order_t> non_load_orders {
-        patomic_RELEASE,
-        patomic_ACQ_REL
-    };
-
-    const std::vector<patomic_memory_order_t> store_orders {
-        patomic_RELAXED,
-        patomic_RELEASE,
-        patomic_ACQ_REL,
-        patomic_SEQ_CST
-    };
-
-    const std::vector<patomic_memory_order_t> non_store_orders {
-        patomic_CONSUME,
-        patomic_ACQUIRE
-    };
-
+    /// @brief Check if a vector of memory orders contains a memory order.
     static bool
     contains(const std::vector<patomic_memory_order_t>& orders,
              const patomic_memory_order_t order) noexcept
@@ -64,7 +107,7 @@ public:
 TEST_F(BtApiMemoryOrder, is_valid_order_allows_all_valid_orders)
 {
     // test orders on function and macro
-    for (const patomic_memory_order_t order : this->valid_orders)
+    for (const patomic_memory_order_t order : valid_orders())
     {
         EXPECT_EQ(1, patomic_is_valid_order(order));
         EXPECT_EQ(1, PATOMIC_IS_VALID_ORDER(order));
@@ -75,7 +118,7 @@ TEST_F(BtApiMemoryOrder, is_valid_order_allows_all_valid_orders)
 TEST_F(BtApiMemoryOrder, is_valid_order_rejects_invalid_orders)
 {
     // test orders on function and macro
-    for (const int order : this->invalid_orders)
+    for (const int order : invalid_orders())
     {
         EXPECT_EQ(0, patomic_is_valid_order(order));
         EXPECT_EQ(0, PATOMIC_IS_VALID_ORDER(order));
@@ -86,7 +129,7 @@ TEST_F(BtApiMemoryOrder, is_valid_order_rejects_invalid_orders)
 TEST_F(BtApiMemoryOrder, is_valid_store_order_allows_all_valid_store_orders)
 {
     // test orders on function and macro
-    for (const patomic_memory_order_t order : this->store_orders)
+    for (const patomic_memory_order_t order : store_orders())
     {
         EXPECT_EQ(1, patomic_is_valid_store_order(order));
         EXPECT_EQ(1, PATOMIC_IS_VALID_STORE_ORDER(order));
@@ -97,8 +140,8 @@ TEST_F(BtApiMemoryOrder, is_valid_store_order_allows_all_valid_store_orders)
 TEST_F(BtApiMemoryOrder, is_valid_store_order_rejects_invalid_store_orders)
 {
     // orders to test
-    std::vector<int> bad_orders = this->invalid_orders;
-    for (const int order : this->non_store_orders)
+    std::vector<int> bad_orders = invalid_orders();
+    for (const int order : non_store_orders())
     {
         bad_orders.push_back(order);
     }
@@ -115,7 +158,7 @@ TEST_F(BtApiMemoryOrder, is_valid_store_order_rejects_invalid_store_orders)
 TEST_F(BtApiMemoryOrder, is_valid_load_order_allows_all_valid_load_orders)
 {
     // test orders on function and macro
-    for (const patomic_memory_order_t order : this->load_orders)
+    for (const patomic_memory_order_t order : load_orders())
     {
         EXPECT_EQ(1, patomic_is_valid_load_order(order));
         EXPECT_EQ(1, PATOMIC_IS_VALID_LOAD_ORDER(order));
@@ -126,8 +169,8 @@ TEST_F(BtApiMemoryOrder, is_valid_load_order_allows_all_valid_load_orders)
 TEST_F(BtApiMemoryOrder, is_valid_load_order_rejects_invalid_load_orders)
 {
     // orders to test
-    std::vector<int> bad_orders = this->invalid_orders;
-    for (const int order : this->non_load_orders)
+    std::vector<int> bad_orders = invalid_orders();
+    for (const int order : non_load_orders())
     {
         bad_orders.push_back(order);
     }
@@ -144,12 +187,12 @@ TEST_F(BtApiMemoryOrder, is_valid_load_order_rejects_invalid_load_orders)
 TEST_F(BtApiMemoryOrder, is_valid_fail_order_allows_all_valid_pairs)
 {
     // go through all combinations of orders
-    for (const patomic_memory_order_t succ : this->valid_orders)
+    for (const patomic_memory_order_t succ : valid_orders())
     {
-        for (const patomic_memory_order_t fail : this->valid_orders)
+        for (const patomic_memory_order_t fail : valid_orders())
         {
             // skip non-load fail orders or fail > succ
-            if (fail > succ || contains(this->non_load_orders, fail))
+            if (fail > succ || contains(non_load_orders(), fail))
             {
                 continue;
             }
@@ -165,8 +208,8 @@ TEST_F(BtApiMemoryOrder, is_valid_fail_order_allows_all_valid_pairs)
 TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_succ_lt_fail)
 {
     // setup iterators
-    const auto begin = std::begin(this->valid_orders);
-    const auto end = std::end(this->valid_orders);
+    const auto begin = std::begin(valid_orders());
+    const auto end = std::end(valid_orders());
 
     // ensure orders are sorted
     ASSERT_TRUE(std::is_sorted(begin, end));
@@ -187,9 +230,9 @@ TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_succ_lt_fail)
 TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_invalid_succ_order)
 {
     // go through all combinations of orders
-    for (const int succ : this->invalid_orders)
+    for (const int succ : invalid_orders())
     {
-        for (const patomic_memory_order_t fail : this->valid_orders)
+        for (const patomic_memory_order_t fail : valid_orders())
         {
             // test orders on function and macro
             EXPECT_EQ(0, patomic_is_valid_fail_order(succ, fail));
@@ -202,8 +245,8 @@ TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_invalid_succ_order)
 TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_invalid_fail_order)
 {
     // fail is also invalid if it's a non-load order
-    std::vector<int> bad_orders = this->invalid_orders;
-    for (const int order : this->non_load_orders)
+    std::vector<int> bad_orders = invalid_orders();
+    for (const int order : non_load_orders())
     {
         bad_orders.push_back(order);
     }
@@ -211,7 +254,7 @@ TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_invalid_fail_order)
     // go through all combinations of orders
     for (const int fail : bad_orders)
     {
-        for (const patomic_memory_order_t succ : this->valid_orders)
+        for (const patomic_memory_order_t succ : valid_orders())
         {
             // test orders on function and macro
             EXPECT_EQ(0, patomic_is_valid_fail_order(succ, fail));
@@ -224,14 +267,14 @@ TEST_F(BtApiMemoryOrder, is_valid_fail_order_rejects_invalid_fail_order)
 TEST_F(BtApiMemoryOrder, cmpxchg_fail_order_converts_valid_succ_order)
 {
     // test load orders on function and macro, stay the same
-    for (const patomic_memory_order_t order : this->load_orders)
+    for (const patomic_memory_order_t order : load_orders())
     {
         EXPECT_EQ(order, patomic_cmpxchg_fail_order(order));
         EXPECT_EQ(order, PATOMIC_CMPXCHG_FAIL_ORDER(order));
     }
 
     // test non-load orders on function and macro, are converted
-    for (const patomic_memory_order_t order : this->non_load_orders)
+    for (const patomic_memory_order_t order : non_load_orders())
     {
         EXPECT_EQ(patomic_ACQUIRE, patomic_cmpxchg_fail_order(order));
         EXPECT_EQ(patomic_ACQUIRE, PATOMIC_CMPXCHG_FAIL_ORDER(order));
@@ -242,7 +285,7 @@ TEST_F(BtApiMemoryOrder, cmpxchg_fail_order_converts_valid_succ_order)
 TEST_F(BtApiMemoryOrder, cmpxchg_fail_order_returns_invalid_succ_order)
 {
     // test orders on function and macro
-    for (const int order : this->invalid_orders)
+    for (const int order : invalid_orders())
     {
         EXPECT_EQ(order, patomic_cmpxchg_fail_order(order));
         EXPECT_EQ(order, PATOMIC_CMPXCHG_FAIL_ORDER(order));

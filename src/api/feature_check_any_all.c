@@ -109,17 +109,19 @@
     while (0)
 
 
-#define PATOMIC_UNSET_OPCAT_TRAW(ops, cats, and_or)      \
-    do {                                                 \
-        if ((cats & patomic_opcat_TRAW)                  \
-            && ((ops->raw_ops.fp_tbegin  != NULL) and_or \
-                (ops->raw_ops.fp_tabort  != NULL) and_or \
-                (ops->raw_ops.fp_tcommit != NULL) and_or \
-                (ops->raw_ops.fp_ttest != NULL)))        \
-        {                                                \
-            cats ^= patomic_opcat_TRAW;                  \
-        }                                                \
-    }                                                    \
+#define PATOMIC_UNSET_OPCAT_TRAW(ops, cats, and_or)            \
+    do {                                                       \
+        if ((cats & patomic_opcat_TRAW)                        \
+            && ((ops->raw_ops.fp_tbegin        != NULL) and_or \
+                (ops->raw_ops.fp_tcommit       != NULL) and_or \
+                (ops->raw_ops.fp_tabort_all    != NULL) and_or \
+                (ops->raw_ops.fp_tabort_single != NULL) and_or \
+                (ops->raw_ops.fp_ttest         != NULL) and_or \
+                (ops->raw_ops.fp_tdepth        != NULL)))      \
+        {                                                      \
+            cats ^= patomic_opcat_TRAW;                        \
+        }                                                      \
+    }                                                          \
     while (0)
 
 

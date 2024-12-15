@@ -6,5 +6,4 @@ target_sources(${target_name} PRIVATE
     sort.h
     stdalign.h
     stdint.h
-    string.h
 )

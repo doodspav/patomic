@@ -23,7 +23,8 @@ extern "C" {
  * @note
  *   All patomic APIs returning this type guarantee that "recommended" and
  *   "minimum" are a positive power of 2, and that "minimum" is never larger
- *   than "recommended". The "size_within" value has no restrictions.
+ *   than "recommended". The "size_within" value will either be zero, or a
+ *   positive power of 2.
  *
  * @details
  *   Within the semantics of this type, buffers are considered aligned to the
@@ -46,9 +47,9 @@ extern "C" {
  * @example
  *   - type: avx_128 (size=16, align=16)                                        \n
  *   - operation: load                                                          \n
- *   - potentially assembly (x86) VMOVDQU, no alignment required                \n
+ *   - potential assembly (x86): VMOVDQU, no alignment required                 \n
  *   - atomic if: whole object sits in a single cache line (e.g. 64 bytes)      \n
- *   - example value: {.recommended=16, .minimum=1, .sie_within=4}              \n
+ *   - example value: {.recommended=16, .minimum=1, .size_within=64}            \n
  */
 typedef struct {
 

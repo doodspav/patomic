@@ -40,10 +40,10 @@ patomic_assert_fxprint(
         const int _ = fwprintf(
 #ifdef _MSC_VER
             /* msvc uses %S for narrow strings in wide functions */
-            stream, L"%S:%u: %S: Assertion `%S` failed.\n",
+            stream, L"%S:%u:\n\t%S:\n\tAssertion `%S` failed.\n",
 #else
             /* standard treats %s as normal even in wide functions */
-            stream, L"%s:%u: %s: Assertion `%s` failed.\n",
+            stream, L"%s:%u:\n\t%s:\n\tAssertion `%s` failed.\n",
 #endif
             file, line, func, expr
         );
@@ -55,7 +55,7 @@ patomic_assert_fxprint(
 #endif
         /* print assertion */
         PATOMIC_IGNORE_UNUSED(fprintf(
-            stream, "%s:%u: %s: Assertion `%s` failed.\n",
+            stream, "%s:%u:\n\t%s:\n\tAssertion `%s` failed.\n",
             file, line, func, expr
         ));
 #if PATOMIC_ASSERT_WIDE

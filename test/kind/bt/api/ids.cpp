@@ -2,6 +2,7 @@
 
 #include <test/common/death.hpp>
 #include <test/common/math.hpp>
+#include <test/common/support.hpp>
 
 #include <gtest/gtest.h>
 
@@ -21,8 +22,7 @@ public:
     };
 
     const std::vector<patomic_id_t> ids {
-        patomic_id_NULL,
-        patomic_id_STDC
+        test::supported_ids()
     };
 
     const std::vector<patomic_kind_t> kinds {

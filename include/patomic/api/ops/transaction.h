@@ -31,19 +31,23 @@ extern "C" {
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_store_t) (
     volatile void *obj,
@@ -73,19 +77,23 @@ typedef void (* patomic_opsig_transaction_store_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_load_t) (
     const volatile void *obj,
@@ -120,19 +128,23 @@ typedef void (* patomic_opsig_transaction_load_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_exchange_t) (
     volatile void *obj,
@@ -176,7 +188,7 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -184,22 +196,36 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *   "expected", otherwise the value 0. If the transaction fails, 0 is returned.
  *
  * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
- *
- * @note
- *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   The parameter "desired" may be passed a default value of 0 or NULL.
+ *   If config.attempts == 0, the primary transaction will not be attempted.
+ *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
+ *   to 0. The parameter "desired" may be passed a default value of 0 or NULL.
  *   Execution will pass to the fallback transaction.
  *
  * @note
- *   If config.fallback_attempts == 0, the fallback transaction will not be
- *   attempted. The fallback status will be set to TABORT_EXPLICIT with reason
- *   0, and fallback_attempts_made to 0. If config.attempts also == 0, then
- *   parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   If config.fallback_attempts == 0 and execution passes to the fallback
+ *   transaction, the fallback transaction will not be attempted. The
+ *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
+ *   fallback_attempts_made to 0. If config.attempts also == 0, then parameters
+ *   (except for "config" and "result") may be passed a default value of 0 or
+ *   NULL.
+ *
+ * @note
+ *   If config.width == 0, the primary or fallback transaction (whichever is
+ *   about to be executed when the check takes place) will not be attempted.
+ *   The status or fallback_status will be set to TSUCCESS and attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters (except for "config"
+ *   and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.width == 0 only takes place after either
+ *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
+ *   the value of config.fallback_attempts only takes place if the primary
+ *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_cmpxchg_t) (
     volatile void *obj,
@@ -232,22 +258,26 @@ typedef int (* patomic_opsig_transaction_cmpxchg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
  *   The value of the tested bit, or 0 if the transaction failed.
  *
  * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
- *
- * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef int (* patomic_opsig_transaction_test_t) (
     const volatile void *obj,
@@ -280,7 +310,7 @@ typedef int (* patomic_opsig_transaction_test_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
@@ -288,15 +318,19 @@ typedef int (* patomic_opsig_transaction_test_t) (
  *   transaction failed.
  *
  * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
- *
- * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef int (* patomic_opsig_transaction_test_modify_t) (
     volatile void *obj,
@@ -334,19 +368,23 @@ typedef int (* patomic_opsig_transaction_test_modify_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_fetch_t) (
     volatile void *obj,
@@ -381,19 +419,23 @@ typedef void (* patomic_opsig_transaction_fetch_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_fetch_noarg_t) (
     volatile void *obj,
@@ -427,19 +469,23 @@ typedef void (* patomic_opsig_transaction_fetch_noarg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_void_t) (
     volatile void *obj,
@@ -469,19 +515,23 @@ typedef void (* patomic_opsig_transaction_void_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
- *
- * @note
- *   If config.width == 0, the transaction proceeds as normal with no
- *   short-circuiting. Parameters (except for "config" and "result") may be
- *   passed a default value of 0 or NULL.
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
  *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
  *   Parameters (except for "config" and "result") may be passed a default value
  *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_void_noarg_t) (
     volatile void *obj,
@@ -516,12 +566,45 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
  *   The value 1 if both sets of bytes compare equal to their expected values,
  *   otherwise the value 0. If either transaction fails, 0 is returned.
+ *
+ * @note
+ *   If config.attempts == 0, the primary transaction will not be attempted.
+ *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
+ *   to 0. The "desired" member of parameters "cxa" and "cxb" may be passed a
+ *   default value of 0 or NULL. Execution will pass to the fallback
+ *   transaction.
+ *
+ * @note
+ *   If config.fallback_attempts == 0 and execution passes to the fallback
+ *   transaction, the fallback transaction will not be attempted. The
+ *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
+ *   fallback_attempts_made to 0. If config.attempts also == 0, then parameters
+ *   (except for "config" and "result") may be passed a default value of 0 or
+ *   NULL.
+ *
+ * @note
+ *   If config.width == 0, the primary or fallback transaction (whichever is
+ *   about to be executed when the check takes place) will not be attempted.
+ *   The status or fallback_status will be set to TSUCCESS and attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters (except for "config"
+ *   and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.width == 0 only takes place after either
+ *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
+ *   the value of config.fallback_attempts only takes place if the primary
+ *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
     patomic_transaction_cmpxchg_t cxa,
@@ -556,12 +639,45 @@ typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
  *
  * @returns
  *   The value 1 if all N sets of bytes compare equal to their expected values,
  *   otherwise the value 0. If either transaction fails, 0 is returned.
+ *
+ * @note
+ *   If config.attempts == 0, the primary transaction will not be attempted.
+ *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
+ *   to 0. The "desired" member of all elements of parameter "cxs_buf" may be
+ *   passed a default value of 0 or NULL. Execution will pass to the fallback
+ *   transaction.
+ *
+ * @note
+ *   If config.fallback_attempts == 0 and execution passes to the fallback
+ *   transaction, the fallback transaction will not be attempted. The
+ *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
+ *   fallback_attempts_made to 0. If config.attempts also == 0, then parameters
+ *   (except for "config" and "result") may be passed a default value of 0 or
+ *   NULL.
+ *
+ * @note
+ *   If config.width == 0, the primary or fallback transaction (whichever is
+ *   about to be executed when the check takes place) will not be attempted.
+ *   The status or fallback_status will be set to TSUCCESS and attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters (except for "config"
+ *   and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.width == 0 only takes place after either
+ *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
+ *   the value of config.fallback_attempts only takes place if the primary
+ *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
     const patomic_transaction_cmpxchg_t *cxs_buf,
@@ -593,8 +709,23 @@ typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
+ *
+ * @note
+ *   If config.attempts == 0, the transaction will not be attempted. The status
+ *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") may be passed a default value
+ *   of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the transaction will not be attempted. The status
+ *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
+ *   "config" and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.attempts == 0 takes precedence over the check for
+ *   config.width == 0.
  */
 typedef void (* patomic_opsig_transaction_generic_t) (
     void (* fn) (void *),
@@ -613,9 +744,9 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  * @details
  *   The function "fn" is called inside a transaction and is directly passed
  *   "ctx", which is not dereferenced, access, or modified in any way before
- *   being passed to the function. If this transaction fails, the same is
- *   attempted with "fallback_fn" and "fallback_ctx". If either transaction
- *   path fails, 0 is returned.
+ *   being passed to the function. If this transaction fails, "result" is
+ *   updated and then the same is attempted with "fallback_fn" and
+ *   "fallback_ctx". If either transaction path fails, 0 is returned.
  *
  * @param fn
  *   Function to be called inside primary transaction.
@@ -633,8 +764,44 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  *   Configuration for transaction.
  *
  * @param result
- *   Pointer to object holding result of transaction, including status code and
+ *   Pointer to object holding result of transaction, including the status and
  *   attempts made.
+ *
+ * @returns
+ *   The value 1 if the primary transaction succeeds, otherwise the value 0.
+ *
+ * @note
+ *   If config.attempts == 0, the primary transaction will not be attempted.
+ *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
+ *   to 0. Parameters "fn" and "ctx" may be passed a default value of 0 or NULL.
+ *   Execution will pass to the fallback transaction.
+ *
+ * @note
+ *   If config.fallback_attempts == 0 and execution passes to the fallback
+ *   transaction, the fallback transaction will not be attempted. The
+ *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
+ *   fallback_attempts_made to 0. Parameters "fallback_fn" and "fallback_ctx"
+ *   may be passed a default value of 0 or NULL. If config.attempts also == 0,
+ *   then parameters (except for "config" and "result") may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   If config.width == 0, the primary or fallback transaction (whichever is
+ *   about to be executed when the check takes place) will not be attempted.
+ *   The status or fallback_status will be set to TSUCCESS and attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters (except for "config"
+ *   and "result") may be passed a default value of 0 or NULL.
+ *
+ * @note
+ *   The check for config.width == 0 only takes place after either
+ *   config.attempts > 0 or config.fallback_attempts > 0, and the check for
+ *   the value of config.fallback_attempts only takes place if the primary
+ *   transaction has failed.
+ *
+ * @note
+ *   If the primary transaction succeeds, then execution will not pass to
+ *   the fallback transaction, and the value of fallback_status and
+ *   fallback_attempts_made is unspecified.
  */
 typedef int (* patomic_opsig_transaction_generic_wfb_t) (
     void (* fn) (void *),
@@ -722,41 +889,16 @@ typedef void (* patomic_opsig_transaction_flag_clear_t) (
  *   invocation.
  *
  * @returns
- *   A status code which will be 0 if the transaction has been successfully
+ *   A status which will be 0 if the transaction has been successfully
  *   committed.
  *
  * @note
- *   On failure, a bitwise-and with patomic_transaction_status_t
- *   values will tell you the general failure reason. An explicitly passed
- *   abort reason can be obtained from the return value by passing it to
- *   patomic_transaction_abort_reason.
+ *   More information can be obtained from the status using the
+ *   patomic_transaction_status_* functions or the
+ *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
 typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
     void
-);
-
-
-/**
- * @addtogroup ops.transaction
- *
- * @brief
- *   Function signature for aborting a transaction.
- *
- * @details
- *   Explicitly aborts a live transaction with a reason that is passed in the
- *   status code, which itself will always match patomic_TABORT_EXPLICIT. Only
- *   the 8 least significant bits of reason are used (if CHAR_BIT happens to be
- *   larger than 8).
- *
- * @warning
- *   Aborting a nested transaction will abort ALL nested transactions, and
- *   execution control will pass back to the caller of the outermost tbegin.
- *
- * @note
- *   Calling this outside of an active transaction is a no-op.
- */
-typedef void (* patomic_opsig_transaction_tabort_t) (
-    unsigned char reason
 );
 
 
@@ -783,10 +925,63 @@ typedef void (* patomic_opsig_transaction_tcommit_t) (
  * @addtogroup ops.transaction
  *
  * @brief
+ *   Function signature for aborting all transaction layers.
+ *
+ * @details
+ *   Explicitly aborts a live transaction with a reason that is passed in the
+ *   status and an exit code of patomic_TABORT_EXPLICIT. Only the 8 least
+ *   significant bits of reason are used (if CHAR_BIT happens to be larger
+ *   than 8).
+ *
+ * @warning
+ *   Aborting a nested transaction will abort ALL nested transactions, and
+ *   execution control will pass back to the caller of the outermost tbegin.
+ *
+ * @note
+ *   Calling this outside of an active transaction is a no-op.
+ */
+typedef void (* patomic_opsig_transaction_tabort_all_t) (
+    unsigned char reason
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
+ *   Function signature for aborting a single transaction layer.
+ *
+ * @details
+ *   Explicitly aborts a live transaction with a reason that is passed in the
+ *   status and an exit code of patomic_TABORT_EXPLICIT. Only the 8 least
+ *   significant bits of reason are used (if CHAR_BIT happens to be larger
+ *   than 8).
+ *
+ * @warning
+ *   Aborting a nested transaction will only abort the current transaction
+ *   layer, and execution control will pass back to the last caller of tbegin.
+ *
+ * @note
+ *   Calling this outside of an active transaction is a no-op.
+ */
+typedef void (* patomic_opsig_transaction_tabort_single_t) (
+    unsigned char reason,
+    int unused_tag_type_parameter
+);
+
+
+/**
+ * @addtogroup ops.transaction
+ *
+ * @brief
  *   Function signature for testing if currently executing inside a transaction.
  *
  * @returns
  *   A non-zero value if currently executing inside a transaction, otherwise 0.
+ *
+ * @note
+ *   The returned value represents the transaction nesting depth on supported
+ *   platforms.
  */
 typedef int (* patomic_opsig_transaction_ttest_t) (
     void
@@ -899,7 +1094,7 @@ typedef struct {
 
     /** @brief Atomic NOT implemented using a sequentially consistent
      *         transaction, returning original value from before operation. */
-    patomic_opsig_transaction_fetch_t fp_fetch_not;
+    patomic_opsig_transaction_fetch_noarg_t fp_fetch_not;
 
 } patomic_ops_transaction_binary_t;
 
@@ -1001,6 +1196,12 @@ typedef struct {
  * @brief
  *   Set of function pointers for atomic flag operations with fixed memory
  *   order. Pointers are NULL if operation is not supported.
+ *
+ * @note
+ *   If any non-flag operation is supported, all flag operations will also be
+ *   supported, otherwise no flag operations will be supported. This is so that
+ *   there is always a way to write to the flag from another thread without
+ *   incurring undefined behaviour.
  */
 typedef struct {
 
@@ -1022,20 +1223,40 @@ typedef struct {
  * @brief
  *   Set of function pointers for raw transaction-specific operations. Pointers
  *   are NULL if operation is not supported.
+ *
+ * @note
+ *   If any raw operations are supported, then both fp_tbegin and fp_tcommit
+ *   will also be supported. Otherwise, patomic_feature_check_any_transaction
+ *   on opcat_TRAW would be useless.
+ *
+ * @note
+ *   If fp_tabort_single is supported, then fp_tabort_all will also be
+ *   supported.
+ *
+ * @note
+ *   The operation fp_ttest is always supported if fp_tdepth is supported. If
+ *   both are supported, they will point to the same function and can be use
+ *   interchangeably.
  */
 typedef struct {
 
     /** @brief Start a transaction. */
     patomic_opsig_transaction_tbegin_t fp_tbegin;
 
-    /** @brief Explicitly abort a transaction. */
-    patomic_opsig_transaction_tabort_t fp_tabort;
-
     /** @brief Commit a transaction. */
     patomic_opsig_transaction_tcommit_t fp_tcommit;
 
+    /** @brief Explicitly abort all transaction layers */
+    patomic_opsig_transaction_tabort_all_t fp_tabort_all;
+
+    /** @brief Explicitly abort a single transaction layer. */
+    patomic_opsig_transaction_tabort_single_t fp_tabort_single;
+
     /** @brief Test if currently executing inside a transaction. */
     patomic_opsig_transaction_ttest_t fp_ttest;
+
+    /** @brief Get the current transaction nesting depth. */
+    patomic_opsig_transaction_ttest_t fp_tdepth;
 
 } patomic_ops_transaction_raw_t;
 

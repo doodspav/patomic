@@ -217,20 +217,28 @@ typedef enum {
     /** @brief opcat_TRAW: transaction start operation. */
     patomic_opkind_TBEGIN = 0x1,
 
-    /** @brief opcat_TRAW: transaction abort operation. */
-    patomic_opkind_TABORT = 0x2,
-
     /** @brief opcat_TRAW: transaction commit operation. */
-    patomic_opkind_TCOMMIT = 0x4,
+    patomic_opkind_TCOMMIT = 0x2,
+
+    /** @brief opcat_TRAW: all layers transaction abort operation. */
+    patomic_opkind_TABORT_ALL = 0x4,
+
+    /** @brief opcat_TRAW: single layer transaction abort operation. */
+    patomic_opkind_TABORT_SINGLE = 0x8,
 
     /** @brief opcat_TRAW: transaction test operation. */
-    patomic_opkind_TTEST = 0x8,
+    patomic_opkind_TTEST = 0x10,
+
+    /** @brief opcat_TRAW: transaction depth operation. */
+    patomic_opkind_TDEPTH = 0x20,
 
     /** @brief opcat_TRAW: all operations. */
-    patomic_opkinds_TRAW = patomic_opkind_TBEGIN  |
-                           patomic_opkind_TABORT  |
-                           patomic_opkind_TCOMMIT |
-                           patomic_opkind_TTEST
+    patomic_opkinds_TRAW = patomic_opkind_TBEGIN        |
+                           patomic_opkind_TCOMMIT       |
+                           patomic_opkind_TABORT_ALL    |
+                           patomic_opkind_TABORT_SINGLE |
+                           patomic_opkind_TTEST         |
+                           patomic_opkind_TDEPTH
 
 } patomic_opkind_t;
 

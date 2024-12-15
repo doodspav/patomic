@@ -9,8 +9,9 @@ on:
 
 jobs:
   test-native:
-    if: false
+    if: true
     strategy:
+      fail-fast: false
       matrix:
         # verbose labels make things easier to read in GitHub Actions
         # platform gets converted to os, preset, compiler, architecture
@@ -56,8 +57,9 @@ jobs:
       architecture: ${{ matrix.architecture }}
 
   test-qemu:
-    if: false
+    if: true
     strategy:
+      fail-fast: false
       matrix:
         # architecture gets converted to triple
         # short form here so that it doesn't take up the whole GitHub Action name

@@ -41,12 +41,12 @@ typedef enum {
  *   patomic_memory_order_t.
  */
 #define PATOMIC_IS_VALID_ORDER(order) \
-    ( (order == patomic_RELAXED) ||   \
-      (order == patomic_CONSUME) ||   \
-      (order == patomic_ACQUIRE) ||   \
-      (order == patomic_RELEASE) ||   \
-      (order == patomic_ACQ_REL) ||   \
-      (order == patomic_SEQ_CST) )
+    ( ((order) == patomic_RELAXED) || \
+      ((order) == patomic_CONSUME) || \
+      ((order) == patomic_ACQUIRE) || \
+      ((order) == patomic_RELEASE) || \
+      ((order) == patomic_ACQ_REL) || \
+      ((order) == patomic_SEQ_CST) )
 
 
 /**
@@ -57,10 +57,9 @@ typedef enum {
  *   patomic_memory_order_t, and is valid to use for an atomic store operation.
  */
 #define PATOMIC_IS_VALID_STORE_ORDER(order) \
-    ( (order == patomic_RELAXED) ||         \
-      (order == patomic_RELEASE) ||         \
-      (order == patomic_ACQ_REL) ||         \
-      (order == patomic_SEQ_CST) )
+    ( ((order) == patomic_RELAXED) ||       \
+      ((order) == patomic_RELEASE) ||       \
+      ((order) == patomic_SEQ_CST) )
 
 
 /**
@@ -71,10 +70,10 @@ typedef enum {
  *   patomic_memory_order_t, and is valid to use for an atomic load operation.
  */
 #define PATOMIC_IS_VALID_LOAD_ORDER(order) \
-    ( (order == patomic_RELAXED) ||        \
-      (order == patomic_CONSUME) ||        \
-      (order == patomic_ACQUIRE) ||        \
-      (order == patomic_SEQ_CST) )
+    ( ((order) == patomic_RELAXED) ||      \
+      ((order) == patomic_CONSUME) ||      \
+      ((order) == patomic_ACQUIRE) ||      \
+      ((order) == patomic_SEQ_CST) )
 
 
 /**
@@ -86,7 +85,7 @@ typedef enum {
  *   patomic_RELEASE or patomic_ACQ_REL.
  */
 #define PATOMIC_IS_VALID_FAIL_ORDER(succ, fail) \
-    ( (succ >= fail)               &&           \
+    ( ((succ) >= (fail))           &&           \
       PATOMIC_IS_VALID_ORDER(succ) &&           \
       PATOMIC_IS_VALID_LOAD_ORDER(fail) )
 
@@ -102,10 +101,10 @@ typedef enum {
  *   If an invalid memory order is passed to this macro, it will be returned
  *   unmodified.
  */
-#define PATOMIC_CMPXCHG_FAIL_ORDER(succ)                   \
-    ( (succ == patomic_ACQ_REL || succ == patomic_RELEASE) \
-      ? patomic_ACQUIRE                                    \
-      : succ )
+#define PATOMIC_CMPXCHG_FAIL_ORDER(succ)                       \
+    ( ((succ) == patomic_ACQ_REL || (succ) == patomic_RELEASE) \
+      ? patomic_ACQUIRE                                        \
+      : (succ) )
 
 
 /**
@@ -113,10 +112,14 @@ typedef enum {
  *
  * @brief
  *   Checks that order has a value corresponding to a label in
- *   patomic_memory_order_t. This value is identical to the
- *   PATOMIC_IS_VALID_ORDER macro value.
+ *   patomic_memory_order_t.
  *
- * @returns If the check succeeds returns 1, else 0.
+ * @returns
+ *   If the check succeeds returns 1, else 0.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_IS_VALID_ORDER macro value.
  */
 PATOMIC_EXPORT int
 patomic_is_valid_order(int order);
@@ -128,9 +131,13 @@ patomic_is_valid_order(int order);
  * @brief
  *   Checks that order has a value corresponding to a label in
  *   patomic_memory_order_t, and is valid to use for an atomic store operation.
- *   This value is identical to the PATOMIC_IS_VALID_STORE_ORDER macro value.
  *
- * @returns If the check succeeds returns 1, else 0.
+ * @returns
+ *   If the check succeeds returns 1, else 0.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_IS_VALID_STORE_ORDER macro value.
  */
 PATOMIC_EXPORT int
 patomic_is_valid_store_order(int order);
@@ -142,9 +149,13 @@ patomic_is_valid_store_order(int order);
  * @brief
  *   Checks that order has a value corresponding to a label in
  *   patomic_memory_order_t, and is valid to use for an atomic load operation.
- *   This value is identical to the PATOMIC_IS_VALID_LOAD_ORDER macro value.
  *
- * @returns If the check succeeds returns 1, else 0.
+ * @returns
+ *   If the check succeeds returns 1, else 0.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_IS_VALID_LOAD_ORDER macro value.
  */
 PATOMIC_EXPORT int
 patomic_is_valid_load_order(int order);
@@ -156,10 +167,14 @@ patomic_is_valid_load_order(int order);
  * @brief
  *   Checks that both succ and fail have a value corresponding to a label in
  *   patomic_memory_order_t, and fail is not stronger than succ or equal to
- *   patomic_RELEASE or patomic_ACQ_REL. This value is identical to the
- *   PATOMIC_IS_VALID_FAIL_ORDER macro value.
+ *   patomic_RELEASE or patomic_ACQ_REL.
  *
- * @returns If the check succeeds returns 1, else 0.
+ * @returns
+ *   If the check succeeds returns 1, else 0.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_IS_VALID_FAIL_ORDER macro value.
  */
 PATOMIC_EXPORT int
 patomic_is_valid_fail_order(int succ, int fail);
@@ -170,12 +185,15 @@ patomic_is_valid_fail_order(int succ, int fail);
  *
  * @brief
  *   Returns the strictest memory order that would satisfy the checks done by
- *   patomic_is_valid_fail_order(succ, <return>). This value is identical to the
- *   PATOMIC_CMPXCHG_FAIL_ORDER macro value.
+ *   patomic_is_valid_fail_order(succ, <return>).
  *
  * @warning
  *   If an invalid memory order is passed to this function, it will be returned
  *   unmodified.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_CMPXCHG_FAIL_ORDER macro value.
  */
 PATOMIC_EXPORT int
 patomic_cmpxchg_fail_order(int succ);

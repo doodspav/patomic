@@ -85,11 +85,7 @@ typedef struct {
  *   by patomic_transaction_cmpxchg_t objects.
  *
  * @details
- *   The flag may be NULL, in which case a locally allocated flag is used.
- *
- * @note
- *   Width is expected to be non-zero, so the zero value is not explicitly
- *   checked and optimised for, however zero is still a valid value.
+ *   The flag may be NULL.
  */
 typedef struct {
 
@@ -114,16 +110,11 @@ typedef struct {
  *   by patomic_transaction_cmpxchg_t objects.
  *
  * @details
- *   The flag and fallback_flag may point to the same flag, or may be NULL, in
- *   which case a locally allocated flag is used.                               \n
+ *   The flag and fallback_flag may point to the same flag, or may be NULL.     \n
  *   The flag tends to guard a read-write code path, and the fallback flag tends
  *   to guard a read-only code path.                                            \n
- *   With this in mind, it is recommended to use flag as a unique read-write
- *   lock and fallback_flag as a shared read-only lock.
- *
- * @note
- *   Width is expected to be non-zero, so the zero value is not explicitly
- *   checked and optimised for, however zero is still a valid value.
+ *   With this in mind, it is recommended to use flag as a unique writer lock
+ *   and fallback_flag as a shared reader lock.
  */
 typedef struct {
 
@@ -149,73 +140,18 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
- *   A set of constants used to denote the status of a transaction. The status
- *   is always 8 significant bits.
- *
- * @note
- *   In transactional operations with a fallback path, an explicit abort will
- *   immediately shift execution to the fallback path, regardless of whether
- *   all attempts on the primary path have been exhausted.
- */
-typedef enum {
-
-    /** @brief The transaction was committed. */
-    patomic_TSUCCESS = 0
-
-    /** @brief The transaction was not committed. */
-    ,patomic_TABORTED = 1
-
-    /** @brief The transaction was explicitly aborted by the user. */
-    ,patomic_TABORT_EXPLICIT = 0x2  | patomic_TABORTED
-
-    /** @brief There was a memory conflict with another thread. */
-    ,patomic_TABORT_CONFLICT = 0x4  | patomic_TABORTED
-
-    /** @brief The transaction accessed too much memory. */
-    ,patomic_TABORT_CAPACITY = 0x8  | patomic_TABORTED
-
-    /** @brief An inner nested transaction aborted. */
-    ,patomic_TABORT_NESTED   = 0x10 | patomic_TABORTED
-
-    /** @brief A debug trap caused the transaction to abort. */
-    ,patomic_TABORT_DEBUG    = 0x20 | patomic_TABORTED
-
-    /** @brief An interrupt caused the transaction to abort. */
-    ,patomic_TABORT_INT      = 0x40 | patomic_TABORTED
-
-} patomic_transaction_status_t;
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Obtains the abort reason from the status of an explicitly aborted
- *   transaction. If the transaction was not explicitly aborted, returns 0.
- *
- * @note
- *   The abort reason has 8 significant bits.
- */
-PATOMIC_EXPORT unsigned char
-patomic_transaction_abort_reason(
-    unsigned int status
-);
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
  *   Represents the outcome of a transaction operation.
  *
  * @note
- *   If the transaction was configured to run zero attempts, then the status
- *   will default to patomic_TSUCCESS.
+ *   More information can be obtained from the status using the
+ *   patomic_transaction_status_* functions or the
+ *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
 typedef struct {
 
-    /** @brief Status from the final attempt at committing the transaction. */
-    unsigned int status;
+    /** @brief Status from the final attempt at committing the transaction.
+     *         The value is always zero on success. */
+    unsigned long status;
 
     /** @brief Attempts made to commit the transaction. */
     unsigned long attempts_made;
@@ -230,23 +166,21 @@ typedef struct {
  *   Represents the outcome of a transaction operation with a fallback path.
  *
  * @note
- *   If the transaction was configured to run zero attempts, then the status
- *   will default to patomic_TSUCCESS.
- *
- * @note
- *   If fallback_attempts_made is zero, the fallback_status will default to
- *   patomic_TSUCCESS, even if more fallback attempts were configured.
+ *   More information can be obtained from the status and fallback_status using
+ *   the patomic_transaction_status_* functions or the
+ *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
 typedef struct {
 
-    /** @brief Status from the final attempt at committing the transaction. */
-    unsigned int status;
+    /** @brief Status from the final attempt at committing the primary
+     *         transaction. The value is always zero on success. */
+    unsigned long status;
 
     /** @brief Status from the final attempt at committing the fallback
-     *         transaction. */
-    unsigned int fallback_status;
+     *         transaction. The value is always zero on success. */
+    unsigned long fallback_status;
 
-    /** @brief Attempts made to commit the transaction. */
+    /** @brief Attempts made to commit the primary transaction. */
     unsigned long attempts_made;
 
     /** @brief Attempts made to commit the fallback transaction. */
@@ -259,8 +193,164 @@ typedef struct {
  * @addtogroup transaction
  *
  * @brief
+ *   A set of constants used to denote the success or failure of a transaction.
+ *   The exit code always has 8 significant bits and is non-negative.
+ *
+ * @note
+ *   The status will contain a single exit code value.
+ *
+ * @warning
+ *   In transactional operations with a fallback path, an explicit abort will
+ *   immediately shift execution to the fallback path, regardless of whether
+ *   all attempts on the primary path have been exhausted.
+ */
+typedef enum {
+
+    /** @brief The transaction was started and committed successfully. */
+    patomic_TSUCCESS = 0
+
+    /** @brief The transaction failed for an unknown or implementation specific
+     *         reason. */
+    ,patomic_TABORT_UNKNOWN = 255
+
+    /** @brief The transaction was explicitly aborted by the user. */
+    ,patomic_TABORT_EXPLICIT = 1
+
+    /** @brief The transaction encountered a memory conflict with another
+     *         thread. */
+    ,patomic_TABORT_CONFLICT
+
+    /** @brief The transaction accessed too much memory. */
+    ,patomic_TABORT_CAPACITY
+
+    /** @brief The transaction encountered a debug trap or exception. */
+    ,patomic_TABORT_DEBUG
+
+} patomic_transaction_exit_code_t;
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   A set of constants providing additional transaction exit information to
+ *   supplement what is provided by the exit code.
+ *   The exit information always has 8 significant bits and is non-negative.
+ *
+ * @warning
+ *   The information should be taken as a hint and not depended upon. Some
+ *   implementations may provided more information for certain scenarios than
+ *   other implementations.
+ *
+ * @note
+ *   The status may contain zero or more combined exit info values.
+ */
+typedef enum {
+
+    /** @brief The transaction might not fail if retried. */
+    patomic_TINFO_RETRY = (1 << 0)
+
+    /** @brief The transaction was aborted from an inner nested transaction. */
+    ,patomic_TINFO_NESTED = (1 << 1)
+
+} patomic_transaction_exit_info_t;
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit code from the status of a transaction.
+ *
+ * @details
+ *   This is bits [0:7] of status.
+ */
+#define PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
+    ((patomic_transaction_exit_code_t) (((unsigned long) (status)) & 0xFFul))
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit information from the status of a transaction.
+ *
+ * @details
+ *   This is bits [16:23] of status.
+ */
+#define PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status) \
+    ((unsigned int) ((((unsigned long) (status)) >> 16ul) & 0xFFul))
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the abort reason from the status of an explicitly aborted
+ *   transaction. If the transaction was not explicitly aborted, the abort
+ *   reason will be 0.
+ *
+ * @details
+ *   This is bits [8:15] of status.
+ */
+#define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status)             \
+    ((unsigned char) ((PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
+                      == patomic_TABORT_EXPLICIT)                   \
+        ? (((unsigned long) (status)) >> 8ul) & 0xFFul              \
+        : 0ul                                                       \
+    ))
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit code from the status of a transaction.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_TRANSACTION_STATUS_EXIT_CODE macro value.
+ */
+PATOMIC_EXPORT patomic_transaction_exit_code_t
+patomic_transaction_status_exit_code(unsigned long status);
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit information from the status of a transaction.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_TRANSACTION_STATUS_EXIT_INFO macro value.
+ */
+PATOMIC_EXPORT unsigned int
+patomic_transaction_status_exit_info(unsigned long status);
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the abort reason from the status of an explicitly aborted
+ *   transaction. If the transaction was not explicitly aborted, the abort
+ *   reason will be 0.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_TRANSACTION_STATUS_ABORT_REASON macro value.
+ */
+PATOMIC_EXPORT unsigned char
+patomic_transaction_status_abort_reason(unsigned long status);
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
  *   Provides the recommended limits for transactions. The limits are generated
- *   by tests run internally with successively harder values.
+ *   by tests run internally with progressively higher limits.
  *
  * @details
  *   - "rmw" models cmpxchg's success path (load, compare, store)               \n
@@ -269,7 +359,7 @@ typedef struct {
  *     execution                                                                \n
  *   - tests may be run multiple times until they succeed internally, with the
  *     number of times being unspecified                                        \n
- *   - implementations may cache the values
+ *   - implementations should cache the values
  *
  * @note
  *   The tests used to generate the values for this type are likely run under
@@ -298,56 +388,6 @@ typedef struct {
     unsigned long min_load_attempts;
 
 } patomic_transaction_recommended_t;
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Transaction safe counterparts to core <string.h> functions.
- *
- * @warning
- *   These functions are **NOT** atomic (which is why they're here are not in
- *   the header with the rest of the atomic functions). They are designed to be
- *   used inside transactions.
- *
- * @warning
- *   Compilers may insert calls to <string.h> functions such as memcpy without
- *   these functions being called explicitly. If "required" is 1, then these
- *   implicit usages of these functions may cause a transaction to unexpectedly
- *   abort.
- *
- * @details
- *   - these functions are direct counterparts to their <string.h> variants,
- *     with identical semantics and constraints                                 \n
- *   - the <string.h> variants may use instructions which may cause a
- *     transaction to abort (e.g. vzeroupper on x86_64 in memcmp)               \n
- *   - these functions are guaranteed not to cause an abort due to the usage of
- *     such instructions (although they may still cause an abort for other
- *     reasons, such as accessing too much memory)                              \n
- *   - these counterparts will typically be significantly faster than a volatile
- *     char loop
- */
-typedef struct {
-
-    /** @brief Value is 1 if <string.h> functions may cause a transactional
-     *         abort, and 0 if they're safe to use (in which case the function
-     *         pointers here will point to the <string.h> variants). */
-    int required;
-
-    /** @brief Transaction safe version of <string.h> function memcpy. */
-    void * (* fp_memcpy) (void *dst, const void *src, size_t len);
-
-    /** @brief Transaction safe version of <string.h> function memmove. */
-    void * (* fp_memmove) (void *dst, const void *src, size_t len);
-
-    /** @brief Transaction safe version of <string.h> function memset. */
-    void * (* fp_memset) (void *dst, int value, size_t len);
-
-    /** @brief Transaction safe version of <string.h> function memcmp. */
-    void * (* fp_memcmp) (const void *lhs, const void *rhs, size_t len);
-
-} patomic_transaction_safe_string_t;
 
 
 #ifdef __cplusplus
