@@ -22,7 +22,7 @@
     SKIP_NULL_OP_FP(id, (ops).raw_ops.fp_tdepth, "tdepth")
 
 
-/// @brief Test transaction with single tbegin + tcommit.
+/// @brief Test single transaction with tbegin + tcommit.
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit)
 {
     // check pre-conditions
@@ -56,7 +56,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit)
 }
 
 
-/// @brief Test transaction with single tbegin + tcommit + ttest.
+/// @brief Test single transaction with tbegin + tcommit + ttest.
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_ttest)
 {
     // check pre-conditions
@@ -74,6 +74,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_ttest)
     patomic_transaction_padded_flag_holder_abi_unstable_t holder {};
     patomic_transaction_flag_t *flag = &holder.flag;
     int test = 0;
+    ASSERT_EQ(0, fp_ttest());
 
     // run
     for (unsigned long i = 0; i < m_config.attempts; ++i)
@@ -91,21 +92,21 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_ttest)
 
     // test
     ADD_FAILURE_TSX_SUCCESS(m_config, result);
-    ASSERT_NE(0, test);
+    ASSERT_EQ(0, fp_ttest());
     if (m_ops.raw_ops.fp_tdepth != nullptr)
     {
         // guaranteed to be interchangeable with tdepth
-        ASSERT_EQ(1, fp_ttest());
+        ASSERT_EQ(1, test);
     }
     else
     {
         // just guaranteed to be non-zero
-        ASSERT_NE(0, fp_ttest());
+        ASSERT_NE(0, test);
     }
 }
 
 
-/// @brief Test transaction with single tbegin + tcommit + tdepth.
+/// @brief Test single transaction with tbegin + tcommit + tdepth.
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tdepth)
 {
     // check pre-conditions
@@ -123,6 +124,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tdepth)
     patomic_transaction_padded_flag_holder_abi_unstable_t holder {};
     patomic_transaction_flag_t *flag = &holder.flag;
     int depth = 0;
+    ASSERT_EQ(0, fp_tdepth());
 
     // run
     for (unsigned long i = 0; i < m_config.attempts; ++i)
@@ -140,11 +142,12 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tdepth)
 
     // test
     ADD_FAILURE_TSX_SUCCESS(m_config, result);
+    ASSERT_EQ(0, fp_tdepth());
     ASSERT_EQ(1, depth);
 }
 
 
-/// @brief Test transaction with single tbegin + tcommit + tabort_all.
+/// @brief Test single transaction with tbegin + tcommit + tabort_all.
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
 {
     // check pre-condition
@@ -200,7 +203,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
 }
 
 
-/// @brief Test transaction with single tbegin + tcommit + tabort_single.
+/// @brief Test single transaction with tbegin + tcommit + tabort_single.
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
 {
     // check pre-condition
