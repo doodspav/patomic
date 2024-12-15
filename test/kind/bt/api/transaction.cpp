@@ -57,10 +57,11 @@ TEST_F(BtApiTransaction, exit_code_is_8_bits_nonnegative)
 TEST_F(BtApiTransaction, exit_code_is_first_8_bits_of_status)
 {
     // go through all combinations of 8 bits
-    for (unsigned long status = 0ul; status < 0xFFul; ++status)
+    for (unsigned long code = 0ul; code < 0xFFul; ++code)
     {
-        EXPECT_EQ(status, patomic_transaction_status_exit_code(status));
-        EXPECT_EQ(status, PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status));
+        unsigned long status = code;
+        EXPECT_EQ(code, patomic_transaction_status_exit_code(status));
+        EXPECT_EQ(code, PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status));
     }
 
     // go into 9th bit with first 8 bits zeroed
@@ -86,11 +87,11 @@ TEST_F(BtApiTransaction, exit_info_is_8_bits_nonnegative)
 TEST_F(BtApiTransaction, exit_info_is_third_8_bits_of_status)
 {
     // go through all combinations of 8 bits (offset by 16)
-    for (unsigned long status = 0xFFFFul; status < 0xFFFFFFul; ++status)
+    for (unsigned long info = 0ul; info < 0xFFul; ++info)
     {
-        unsigned long s = (status << 16ul) | 0xFFul;
-        EXPECT_EQ(s, patomic_transaction_status_exit_info(status));
-        EXPECT_EQ(s, PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status));
+        unsigned long status = info << 16ul;
+        EXPECT_EQ(info, patomic_transaction_status_exit_info(status));
+        EXPECT_EQ(info, PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status));
     }
 
     // go into 9th bit with first 8 bits zeroed (offset by 16)
