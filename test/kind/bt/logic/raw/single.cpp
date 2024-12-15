@@ -53,6 +53,8 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit)
 
     // check
     ADD_FAILURE_TSX_SUCCESS(m_config, result);
+    auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+    ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
 }
 
 
@@ -103,6 +105,8 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_ttest)
         // just guaranteed to be non-zero
         ASSERT_NE(0, test);
     }
+    auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+    ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
 }
 
 
@@ -144,6 +148,8 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tdepth)
     ADD_FAILURE_TSX_SUCCESS(m_config, result);
     ASSERT_EQ(0, fp_tdepth());
     ASSERT_EQ(1, depth);
+    auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+    ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
 }
 
 
@@ -199,6 +205,8 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
         // test
         auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
         ASSERT_EQ(patomic_TABORT_EXPLICIT, exit_code);
+        auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+        ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
     }
 }
 
@@ -244,10 +252,12 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
 
             // test
             auto exit_code = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
+            auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
             auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);
             if (exit_code == patomic_TABORT_EXPLICIT)
             {
                 ASSERT_EQ(r, reason);
+                ASSERT_FALSE(info | patomic_TINFO_NESTED);
                 break;
             }
         }
@@ -255,5 +265,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
         // test
         auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
         ASSERT_EQ(patomic_TABORT_EXPLICIT, exit_code);
+        auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
+        ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
     }
 }
