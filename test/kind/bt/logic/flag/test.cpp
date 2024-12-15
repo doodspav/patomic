@@ -12,7 +12,7 @@
 TEST_P(BtLogicTransaction, flag_fp_test)
 {
     // check pre-condition
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TESTY(p.id, m_ops);
 
     // wrap operation

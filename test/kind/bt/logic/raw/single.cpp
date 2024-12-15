@@ -26,7 +26,7 @@
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit)
 {
     // check pre-conditions
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
 
     // alias but do not wrap operations
@@ -60,7 +60,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit)
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_ttest)
 {
     // check pre-conditions
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
     SKIP_NULL_OP_FP_TTESTY(p.id, m_ops);
 
@@ -110,7 +110,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_ttest)
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tdepth)
 {
     // check pre-conditions
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
     SKIP_NULL_OP_FP_TDEPTH(p.id, m_ops);
 
@@ -151,7 +151,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tdepth)
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
 {
     // check pre-condition
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
     SKIP_NULL_OP_FP_TABORT_ALL(p.id, m_ops);
 
@@ -200,7 +200,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
         auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
         ASSERT_EQ(patomic_TABORT_EXPLICIT, exit_code);
         auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
-        ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
+        ASSERT_FALSE(exit_info & patomic_TINFO_NESTED);
     }
 }
 
@@ -209,7 +209,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
 TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
 {
     // check pre-condition
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
     SKIP_NULL_OP_FP_TABORT_SINGLE(p.id, m_ops);
 
@@ -251,7 +251,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
             if (exit_code == patomic_TABORT_EXPLICIT)
             {
                 ASSERT_EQ(r, reason);
-                ASSERT_FALSE(info | patomic_TINFO_NESTED);
+                ASSERT_FALSE(info & patomic_TINFO_NESTED);
                 break;
             }
         }
@@ -260,6 +260,6 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
         auto exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);
         ASSERT_EQ(patomic_TABORT_EXPLICIT, exit_code);
         auto exit_info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);
-        ASSERT_FALSE(exit_info | patomic_TINFO_NESTED);
+        ASSERT_FALSE(exit_info & patomic_TINFO_NESTED);
     }
 }
