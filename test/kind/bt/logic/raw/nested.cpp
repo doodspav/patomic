@@ -41,7 +41,7 @@ struct tsx_setup
 TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit)
 {
     // check pre-conditions
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
 
     // alias but do not wrap operations
@@ -92,7 +92,7 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit)
 TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_ttest)
 {
     // check pre-conditions
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
     SKIP_NULL_OP_FP_TTESTY(p.id, m_ops);
 
@@ -163,7 +163,7 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_ttest)
 TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tdepth)
 {
     // check pre-conditions
-    const auto &p = GetParam();
+    const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
     SKIP_NULL_OP_FP_TTESTY(p.id, m_ops);
 
@@ -227,4 +227,81 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tabort_all)
 
 /// @brief Test nested transaction with tbegin + tcommit + tabort_single.
 TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tabort_single)
-{}
+{
+    // check pre-conditions
+    const auto& p = GetParam();
+    SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
+    SKIP_NULL_OP_FP_TABORT_SINGLE(p.id, m_ops);
+
+    // alias but do not wrap operations
+    auto fp_tbegin = m_ops.raw_ops.fp_tbegin;
+    auto fp_tcommit = m_ops.raw_ops.fp_tcommit;
+    auto fp_tabort_single = m_ops.raw_ops.fp_tabort_single;
+
+    // go through all possible abort reasons
+    constexpr int reason_count = (1 << 8);
+    for (int r = 0; r < reason_count; ++r)
+    {
+        // run without transaction, should be no-op
+        // use a different reason here to below in case it makes a difference
+        // it shouldn't make a difference (hence the test)
+        fp_tabort_single(static_cast<unsigned char>(reason_count - r - 1), 0);
+
+        // setup
+        tsx_setup outer {};
+        tsx_setup inner {};
+        inner.result.status = patomic_TABORT_UNKNOWN;
+
+        // outer run
+        for (unsigned long i = 0; i < m_config.attempts; ++i)
+        {
+            ++outer.result.attempts_made;
+            outer.result.status = fp_tbegin();
+            if (outer.result.status == 0)
+            {
+                static_cast<void>(*outer.flag());
+
+                // inner run
+                for (unsigned long j = 0; m_config.attempts; ++j)
+                {
+                    ++inner.result.attempts_made;
+                    inner.result.status = fp_tbegin();
+                    if (inner.result.status == 0)
+                    {
+                        // inner commit with tabort
+                        static_cast<void>(*inner.flag());
+                        fp_tabort_single(static_cast<unsigned char>(r), 0);
+                        fp_tcommit();
+                    }
+
+                    // inner test
+                    auto inner_exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(inner.result.status);
+                    if (inner_exit_code == patomic_TABORT_EXPLICIT)
+                    {
+                        break;
+                    }
+                }
+
+                // outer commit
+                fp_tcommit();
+                break;
+            }
+
+            // outer test (test inner again)
+            auto inner_exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(inner.result.status);
+            if (inner_exit_code == patomic_TABORT_EXPLICIT)
+            {
+                break;
+            }
+        }
+
+        // test
+        ADD_FAILURE_TSX_SUCCESS(m_config, outer.result);
+        auto inner_exit_code = patomic_transaction_status_exit_code(inner.result.status);
+        auto inner_exit_info = patomic_transaction_status_exit_info(inner.result.status);
+        auto inner_reason = patomic_transaction_status_abort_reason(inner.result.status);
+        ASSERT_EQ(inner_exit_code, patomic_TABORT_EXPLICIT);
+        ASSERT_FALSE(inner_exit_info & patomic_TINFO_NESTED);
+        ASSERT_EQ(inner_reason, r);
+    }
+}

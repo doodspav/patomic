@@ -171,7 +171,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_all)
         // run without transaction, should be no-op
         // use a different reason here to below in case it makes a difference
         // it shouldn't make a difference (hence the test)
-        fp_tabort_all(static_cast<unsigned char>(reason_count - r));
+        fp_tabort_all(static_cast<unsigned char>(reason_count - r - 1));
 
         // run
         patomic_transaction_result_t result {};
@@ -229,7 +229,7 @@ TEST_P(BtLogicTransaction, raw_single_tbegin_tcommit_tabort_single)
         // run without transaction, should be no-op
         // use a different reason here to below in case it makes a difference
         // it shouldn't make a difference (hence the test)
-        fp_tabort_single(static_cast<unsigned char>(reason_count - r), 0);
+        fp_tabort_single(static_cast<unsigned char>(reason_count - r - 1), 0);
 
         // run
         patomic_transaction_result_t result {};
