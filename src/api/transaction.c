@@ -10,6 +10,15 @@ patomic_transaction_status_exit_code(
 }
 
 
+unsigned int
+patomic_transaction_status_exit_info(
+    const unsigned long status
+)
+{
+    return PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status);
+}
+
+
 unsigned char
 patomic_transaction_status_abort_reason(
     const unsigned long status

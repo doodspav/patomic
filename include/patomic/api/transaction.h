@@ -194,7 +194,10 @@ typedef struct {
  *
  * @brief
  *   A set of constants used to denote the success or failure of a transaction.
- *   The exit code always has 8 significant bits.
+ *   The exit code always has 8 significant bits and is non-negative.
+ *
+ * @note
+ *   The status will contain a single exit code value.
  *
  * @warning
  *   In transactional operations with a fallback path, an explicit abort will
@@ -230,7 +233,32 @@ typedef enum {
  * @addtogroup transaction
  *
  * @brief
+ *   A set of constants providing additional transaction exit information to
+ *   supplement what is provided by the exit code.
+ *   The exit information always has 8 significant bits and is non-negative.
+ *
+ * @note
+ *   The status may contain zero or more combined exit info values.
+ */
+typedef enum {
+
+    /** @brief The transaction might not fail if retried. */
+    patomic_TINFO_RETRY = (1 << 0)
+
+    /** @brief The transaction was aborted from an inner nested transaction. */
+    ,patomic_TINFO_NESTED = (1 << 1)
+
+} patomic_transaction_exit_info_t;
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
  *   Obtains the exit code from the status of a transaction.
+ *
+ * @details
+ *   This is bits [0:7] of status.
  */
 #define PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
     ((patomic_transaction_exit_code_t) (((unsigned long) (status)) & 0xFFul))
@@ -240,9 +268,26 @@ typedef enum {
  * @addtogroup transaction
  *
  * @brief
+ *   Obtains the exit information from the status of a transaction.
+ *
+ * @details
+ *   This is bits [16:23] of status.
+ */
+#define PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status) \
+    ((patomic_transaction_exit_info_t)               \
+        ((((unsigned long) (status)) >> 16ul) & 0xFFul))
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
  *   Obtains the abort reason from the status of an explicitly aborted
  *   transaction. If the transaction was not explicitly aborted, the abort
  *   reason will be 0.
+ *
+ * @details
+ *   This is bits [8:15] of status.
  */
 #define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status)             \
     ((unsigned char) ((PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
@@ -264,6 +309,20 @@ typedef enum {
  */
 PATOMIC_EXPORT patomic_transaction_exit_code_t
 patomic_transaction_status_exit_code(unsigned long status);
+
+
+/**
+ * @addtogroup transaction
+ *
+ * @brief
+ *   Obtains the exit information from the status of a transaction.
+ *
+ * @note
+ *   The value returned by this function is identical to the
+ *   PATOMIC_TRANSACTION_STATUS_EXIT_INFO macro value.
+ */
+PATOMIC_EXPORT unsigned int
+patomic_transaction_status_exit_info(unsigned long status);
 
 
 /**
