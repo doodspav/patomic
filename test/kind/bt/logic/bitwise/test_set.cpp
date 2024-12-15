@@ -23,7 +23,7 @@ test_bit_test_set(
     test::generic_integer object_exp { width, align, false };
 
     // go through all bit offsets
-    for (std::size_t i = 0; i < object.bit_width(); ++i)
+    for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
         // 0 -> 1
         object_exp.inv_at(i);
@@ -45,7 +45,7 @@ test_bit_test_set(
     object_exp = object;
 
     // go through all bit offsets
-    for (std::size_t i = 0; i < object.bit_width(); ++i)
+    for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
         // 1 -> 1
         ASSERT_EQ(1, fp_test_set(object, i));
