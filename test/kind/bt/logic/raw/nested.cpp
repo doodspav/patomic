@@ -275,7 +275,7 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tabort_all)
             }
 
             // outer test
-            auto outer_exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(outer.result.status);
+            auto outer_exit_code = patomic_transaction_status_exit_code(outer.result.status);
             if (outer_exit_code == patomic_TABORT_EXPLICIT)
             {
                 break;
@@ -358,7 +358,7 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tabort_single)
             }
 
             // outer test (test inner again)
-            auto inner_exit_code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(inner.result.status);
+            auto inner_exit_code = patomic_transaction_status_exit_code(inner.result.status);
             if (inner_exit_code == patomic_TABORT_EXPLICIT)
             {
                 break;
