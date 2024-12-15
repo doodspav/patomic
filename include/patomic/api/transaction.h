@@ -274,8 +274,7 @@ typedef enum {
  *   This is bits [16:23] of status.
  */
 #define PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status) \
-    ((patomic_transaction_exit_info_t)               \
-        ((((unsigned long) (status)) >> 16ul) & 0xFFul))
+    ((unsigned int) ((((unsigned long) (status)) >> 16ul) & 0xFFul))
 
 
 /**
