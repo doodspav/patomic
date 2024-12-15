@@ -94,7 +94,7 @@
       "name": "_patomic-ci-flags-warning-clang",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories -Wno-reserved-identifier -Wno-documentation-unknown-command -Wno-unused-local-typedef",
+        "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories -Wno-reserved-identifier -Wno-documentation-unknown-command -Wno-unused-local-typedef -Wno-tautological-value-range-compare",
         "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wno-c++17-attribute-extensions"
       }
     },
