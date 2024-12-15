@@ -81,4 +81,41 @@ name_tsx_exit_code(patomic_transaction_exit_code_t code)
 }
 
 
+std::string
+name_tsx_exit_info(unsigned int info)
+{
+    // setup
+    std::string ret;
+
+#define CHECK_INFO(name)               \
+    if (info & patomic_TINFO_##name)   \
+    {                                  \
+        ret += "TINFO_" #name " | ";   \
+        info &= ~patomic_TINFO_##name; \
+    }                                  \
+    static_assert(true, "require semicolon")
+
+    // go through all values
+    CHECK_INFO(RETRY);
+    CHECK_INFO(NESTED);
+
+    // check for unknown values
+    if (info != 0)
+    {
+        ret += "(unknown) | ";
+    }
+
+    // cleanup
+    if (ret.empty())
+    {
+        return "(none)";
+    }
+    else
+    {
+        // remove trailing " | "
+        return ret.substr(0, ret.size() - 3);
+    }
+}
+
+
 }  // namespace test

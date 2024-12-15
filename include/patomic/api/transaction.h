@@ -237,6 +237,11 @@ typedef enum {
  *   supplement what is provided by the exit code.
  *   The exit information always has 8 significant bits and is non-negative.
  *
+ * @warning
+ *   The information should be taken as a hint and not depended upon. Some
+ *   implementations may provided more information for certain scenarios than
+ *   other implementations.
+ *
  * @note
  *   The status may contain zero or more combined exit info values.
  */

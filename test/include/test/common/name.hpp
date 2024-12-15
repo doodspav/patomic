@@ -35,6 +35,12 @@ std::string
 name_tsx_exit_code(patomic_transaction_exit_code_t code);
 
 
+/// @brief
+///   Convert transaction exit information to a string.
+std::string
+name_tsx_exit_info(unsigned int info);
+
+
 }  // namespace test
 
 #endif  // PATOMIC_TEST_COMMON_NAME_HPP

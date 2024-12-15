@@ -103,6 +103,7 @@
     if (patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status)) \
     {                                                                            \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);         \
+        auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);         \
         auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);    \
         ADD_FAILURE()                                                            \
             << "Transaction failed:"                                             \
@@ -111,6 +112,7 @@
             << "\n\t\t.attempts: " << config.attempts                            \
             << "\n\tresult:"                                                     \
             << "\n\t\t.status.code:   " << test::name_tsx_exit_code(code)        \
+            << "\n\t\t.status.info:   " << test::name_tsx_exit_info(info)        \
             << "\n\t\t.status.reason: " << static_cast<int>(reason)              \
             << "\n\t\t.attempts_made: " << result.attempts_made;                 \
     }                                                                            \
@@ -126,6 +128,8 @@
     {                                                                                      \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);                   \
         auto code_wfb = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status);      \
+        auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);                   \
+        auto info_wfb = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.fallback_status);      \
         auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);              \
         auto reason_wfb = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.fallback_status); \
         ADD_FAILURE()                                                                      \
@@ -136,9 +140,11 @@
             << "\n\t\t.fallback_attempts: " << config.fallback_attempts                    \
             << "\n\tresult:"                                                               \
             << "\n\t\t.status.code:   " << test::name_tsx_exit_code(code)                  \
+            << "\n\t\t.status.info:   " << test::name_tsx_exit_info(info)                  \
             << "\n\t\t.status.reason: " << static_cast<int>(reason)                        \
             << "\n\t\t.attempts_made: " << result.attempts_made                            \
             << "\n\t\t.fallback_status.code:   " << test::name_tsx_exit_code(code_wfb)     \
+            << "\n\t\t.fallback_status.info:   " << test::name_tsx_exit_info(info_wfb)     \
             << "\n\t\t.fallback_status.reason: " << static_cast<int>(reason_wfb)           \
             << "\n\t\t.fallback_attempts_made: " << result.fallback_attempts_made;         \
     }                                                                                      \
