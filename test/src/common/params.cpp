@@ -147,8 +147,7 @@ ParamsExplicit::combinations_load()
 
 ParamsTransaction::ParamsTransaction(TupleT tup) noexcept
     : id(std::get<0>(tup)),
-      options(std::get<1>(tup)),
-      widths(std::move(std::get<2>(tup)))
+      options(std::get<1>(tup))
 {}
 
 
@@ -175,38 +174,14 @@ ParamsTransaction::combinations()
 {
     // setup
     std::vector<ParamsTransaction> params;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<std::size_t> distrib;
 
-    // create a selection of constant and random widths
-    std::set<std::size_t> widths_set;
-    for (std::size_t width : supported_widths())
-    {
-        widths_set.insert(width);
-    }
-    while (widths_set.size() < 16u)
-    {
-        // zero is tested explicitly
-        auto w = distrib(gen);
-        if (w != 0)
-        {
-            widths_set.insert(w);
-        }
-    }
-
-    // convert to vector
-    const std::vector<std::size_t> widths {
-        widths_set.begin(), widths_set.end()
-    };
-
-    // cartesian product
+    // create cartesian product
     for (patomic_id_t id : supported_ids())
     {
         for (unsigned int options : supported_options())
         {
             params.emplace_back(
-                std::make_tuple(id, options, widths)
+                std::make_tuple(id, options)
             );
         }
     }

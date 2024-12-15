@@ -142,13 +142,9 @@ struct ParamsTransaction
     unsigned int options {};
 
     /// @brief
-    ///   Widths to use for operation.
-    std::vector<std::size_t> widths {};
-
-    /// @brief
     ///   Type passed to tuple constructor.
     using TupleT = std::tuple<
-        patomic_id_t, unsigned int, std::vector<std::size_t>
+        patomic_id_t, unsigned int
     >;
 
     /// @brief
