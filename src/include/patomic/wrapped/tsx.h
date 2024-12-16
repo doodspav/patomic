@@ -1774,6 +1774,148 @@
  * @addtogroup wrapped.tsx
  *
  * @brief
+ *   Defines a function which implements an atomic multi_cmpxchg operation
+ *   using tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_multi_cmpxchg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_MULTI_CMPXCHG(                   \
+    fn_name, tbegin, tcommit                                           \
+)                                                                      \
+    static int                                                         \
+    fn_name(                                                           \
+        const patomic_transaction_cmpxchg_t *const cxs_buf,            \
+        const size_t cxs_len,                                          \
+        patomic_transaction_config_wfb_t config,                       \
+        patomic_transaction_result_wfb_t *const result                 \
+    )                                                                  \
+    {                                                                  \
+        /* declarations */                                             \
+        size_t i;                                                      \
+        patomic_transaction_result_wfb_t res = {0};                    \
+        const patomic_transaction_flag_t flag = 0;                     \
+        if (config.flag_nullable == NULL)                              \
+        {                                                              \
+            config.flag_nullable = &flag;                              \
+        }                                                              \
+        if (config.fallback_flag_nullable == NULL)                     \
+        {                                                              \
+            config.fallback_flag_nullable = &flag;                     \
+        }                                                              \
+                                                                       \
+        /* assert early */                                             \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                     \
+                                                                       \
+        /* check zero */                                               \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                     \
+            config, res, fallback, cleanup                             \
+        );                                                             \
+                                                                       \
+        /* assertions */                                               \
+        for (i = 0; i < cxs_len; ++i)                                  \
+        {                                                              \
+            PATOMIC_WRAPPED_DO_ASSERT(cxs_buf[i].obj != NULL);         \
+            PATOMIC_WRAPPED_DO_ASSERT(cxs_buf[i].expected != NULL);    \
+            PATOMIC_WRAPPED_DO_ASSERT(cxs_buf[i].desired != NULL);     \
+        }                                                              \
+                                                                       \
+        /* operation */                                                \
+        while (config.attempts-- > 0ul)                                \
+        {                                                              \
+            ++res.attempts_made;                                       \
+            res.status = tbegin();                                     \
+            if (res.status == 0ul)                                     \
+            {                                                          \
+                size_t cmp = 0;                                        \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);          \
+                for (i = 0; i < cxs_len && cmp_all == 0; ++i)          \
+                {                                                      \
+                    cmp = memcmp(                                      \
+                        (const void *) cxs_buf[i].obj,                 \
+                        cxs_buf[i].expected,                           \
+                        config.width                                   \
+                    );                                                 \
+                }                                                      \
+                if (cmp == 0)                                          \
+                {                                                      \
+                    for (i = 0; i < cxs_len; ++i)                      \
+                    {                                                  \
+                        PATOMIC_WRAPPED_DO_MEMCPY(                     \
+                            (void *) cxs_buf[i].obj,                   \
+                            cxs_buf[i].desired,                        \
+                            config.width                               \
+                        );                                             \
+                    }                                                  \
+                }                                                      \
+                tcommit();                                             \
+                if (cmp != 0)                                          \
+                {                                                      \
+                    goto fallback;                                     \
+                }                                                      \
+                goto cleanup;                                          \
+            }                                                          \
+        }                                                              \
+                                                                       \
+        /* fallback */                                                 \
+    fallback:                                                          \
+                                                                       \
+        /* check zero */                                               \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_FALLBACK(                \
+            config, res, cleanup                                       \
+        );                                                             \
+                                                                       \
+        /* assertions */                                               \
+        for (i = 0; i < cxs_len; ++i)                                  \
+        {                                                              \
+            PATOMIC_WRAPPED_DO_ASSERT(cxs_buf[i].obj != NULL);         \
+            PATOMIC_WRAPPED_DO_ASSERT(cxs_buf[i].expected != NULL);    \
+        }                                                              \
+                                                                       \
+        /* operation */                                                \
+        while (config.fallback_attempts-- > 0ul)                       \
+        {                                                              \
+            ++res.fallback_attempts_made;                              \
+            res.fallback_status = tbegin();                            \
+            if (res.fallback_status == 0ul)                            \
+            {                                                          \
+                PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
+                for (i = 0; i < cxs_len; ++i)                          \
+                {                                                      \
+                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                        cxs_buf[i].expected,                           \
+                        (const void *) cxs_buf[i].obj,                 \
+                        config.width                                   \
+                    );                                                 \
+                }                                                      \
+                tcommit();                                             \
+                goto cleanup;                                          \
+            }                                                          \
+        }                                                              \
+                                                                       \
+        /* cleanup */                                                  \
+    cleanup:                                                           \
+        *result = res;                                                 \
+        return res.status == 0ul;                                      \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
  *   Defines all xchg operations as well as a function that returns an instance
  *   of patomic_ops_transaction_xchg_t that points to these functions.
  *
