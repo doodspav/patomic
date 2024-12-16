@@ -63,7 +63,7 @@
             if (res.status == 0ul)                                   \
             {                                                        \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_MEMCPY(                           \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
                     (void *) obj, desired, config.width              \
                 );                                                   \
                 tcommit();                                           \
@@ -136,7 +136,7 @@
             if (res.status == 0ul)                                   \
             {                                                        \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_MEMCPY(                           \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
                     ret, (const void *) obj, config.width            \
                 );                                                   \
                 tcommit();                                           \
@@ -211,10 +211,10 @@
             if (res.status == 0ul)                                   \
             {                                                        \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_MEMCPY(                           \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
                     ret, (const void *) obj, config.width            \
                 );                                                   \
-                PATOMIC_WRAPPED_DO_MEMCPY(                           \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
                     (void *) obj, desired, config.width              \
                 );                                                   \
                 tcommit();                                           \
@@ -301,7 +301,7 @@
                 );                                                     \
                 if (cmp == 0)                                          \
                 {                                                      \
-                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
                         (void *) obj, desired, config.width            \
                     );                                                 \
                 }                                                      \
@@ -334,7 +334,7 @@
             if (res.fallback_status == 0ul)                            \
             {                                                          \
                 PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
-                PATOMIC_WRAPPED_DO_MEMCPY(                             \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                         \
                     expected, (const void *) obj, config.width         \
                 );                                                     \
                 tcommit();                                             \
@@ -681,7 +681,7 @@
             if (res.status == 0ul)                                       \
             {                                                            \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);            \
-                PATOMIC_WRAPPED_DO_MEMCPY(                               \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                           \
                     ret, (const void *) obj, config.width                \
                 );                                                       \
                 do_op(uc_obj, uc_arg, config.width);                     \
@@ -761,7 +761,7 @@
             if (res.status == 0ul)                                   \
             {                                                        \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_MEMCPY(                           \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
                     ret, (const void *) obj, config.width            \
                 );                                                   \
                 do_op(uc_obj, config.width);                         \
@@ -1714,10 +1714,10 @@
                 )                                                      \
                 if (cmp_a == 0 && cmp_b == 0)                          \
                 {                                                      \
-                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
                         (void *) cxa.obj, cxa.desired, config.width    \
                     );                                                 \
-                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
                         (void *) cxb.obj, cxb.desired, config.width    \
                     );                                                 \
                 }                                                      \
@@ -1752,10 +1752,10 @@
             if (res.fallback_status == 0ul)                            \
             {                                                          \
                 PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
-                PATOMIC_WRAPPED_DO_MEMCPY(                             \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                         \
                     cxa.expected, (const void *) cxa.obj, config.width \
                 );                                                     \
-                PATOMIC_WRAPPED_DO_MEMCPY(                             \
+                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                         \
                     cxb.expected, (const void *) cxb.obj, config.width \
                 );                                                     \
                 tcommit();                                             \
@@ -1853,7 +1853,7 @@
                 {                                                      \
                     for (i = 0; i < cxs_len; ++i)                      \
                     {                                                  \
-                        PATOMIC_WRAPPED_DO_MEMCPY(                     \
+                        PATOMIC_WRAPPED_DO_TSX_MEMCPY(                 \
                             (void *) cxs_buf[i].obj,                   \
                             cxs_buf[i].desired,                        \
                             config.width                               \
@@ -1894,7 +1894,7 @@
                 PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
                 for (i = 0; i < cxs_len; ++i)                          \
                 {                                                      \
-                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
                         cxs_buf[i].expected,                           \
                         (const void *) cxs_buf[i].obj,                 \
                         config.width                                   \

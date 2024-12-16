@@ -17,16 +17,6 @@
 #include <string.h>
 
 
-/* redefined below */
-#undef HIDE
-#undef HIDE_P
-#undef SHOW
-#undef SHOW_P
-#undef PATOMIC_WRAPPED_DO_ASSERT
-#undef PATOMIC_WRAPPED_DO_ASSERT_ALIGNED
-#undef PATOMIC_WRAPPED_DO_MEMCPY
-
-
 /**
  * @addtogroup wrapped.base
  *
@@ -105,6 +95,29 @@
  */
 #define PATOMIC_WRAPPED_DO_MEMCPY(dest, src, count) \
     PATOMIC_IGNORE_UNUSED(memcpy(dest, src, count))
+
+
+/**
+ * @addtogroup wrapped.base
+ *
+ * @brief
+ *   Acts as memcpy would but in a transaction safe manner, and discards the
+ *   return value.
+ *
+ * @note
+ *   Necessary because on some platforms memcpy uses instructions which will
+ *   cause a transaction to abort.
+ */
+#define PATOMIC_WRAPPED_DO_TSX_MEMCPY(dest, src, count)                    \
+    do {                                                                   \
+        volatile unsigned char *const uc_dest = (unsigned char *) (dest);  \
+        const unsigned char *const uc_src = (const unsigned char *) (src); \
+        for (size_t i = 0; i < ((size_t) (count)); ++i)                    \
+        {                                                                  \
+            uc_dest[i] = uc_src[i];                                        \
+        }                                                                  \
+    }                                                                      \
+    while (0)
 
 
 /**
