@@ -1204,4 +1204,167 @@
     )
 
 
+// internal helper macros for arithmetic FETCH/VOID(_NOARG)
+#define patomic_wrapped_tsx_do_add(obj, arg, width)
+#define patomic_wrapped_tsx_do_sub(obj, arg, width)
+#define patomic_wrapped_tsx_do_inc(obj, width)
+#define patomic_wrapped_tsx_do_dec(obj, width)
+#define patomic_wrapped_tsx_do_neg(obj, width)
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic fetch_add operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_fetch_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_ADD( \
+    fn_name, tbegin, tcommit                     \
+)                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH(         \
+        fn_name, tbegin, tcommit,                \
+        patomic_wrapped_tsx_do_add               \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic fetch_sub operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_fetch_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_SUB( \
+    fn_name, tbegin, tcommit                     \
+)                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH(         \
+        fn_name, tbegin, tcommit,                \
+        patomic_wrapped_tsx_do_sub               \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic fetch_inc operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_fetch_noarg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_INC( \
+    fn_name, tbegin, tcommit                     \
+)                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOARG(   \
+        fn_name, tbegin, tcommit,                \
+        patomic_wrapped_tsx_do_inc               \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic fetch_dec operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_fetch_noarg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_DEC( \
+    fn_name, tbegin, tcommit                     \
+)                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOARG(   \
+        fn_name, tbegin, tcommit,                \
+        patomic_wrapped_tsx_do_dec               \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic fetch_neg operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_fetch_noarg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NEG( \
+    fn_name, tbegin, tcommit                     \
+)                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOARG(   \
+        fn_name, tbegin, tcommit,                \
+        patomic_wrapped_tsx_do_neg               \
+    )
+
+
 #endif  /* PATOMIC_WRAPPED_TSX_H */
