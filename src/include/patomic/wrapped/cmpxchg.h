@@ -3,10 +3,6 @@
 
 #include "base.h"
 
-#include <patomic/macros/static_assert.h>
-
-#include <patomic/api/memory_order.h>
-
 
 /**
  * @addtogroup wrapped.cmpxchg

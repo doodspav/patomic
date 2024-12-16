@@ -1,10 +1,13 @@
 #ifndef PATOMIC_WRAPPED_BASE_H
 #define PATOMIC_WRAPPED_BASE_H
 
+#include <patomic/api/memory_order.h>
 #include <patomic/api/transaction.h>
+
 #include <patomic/internal/transaction.h>
 
 #include <patomic/macros/ignore_unused.h>
+#include <patomic/macros/static_assert.h>
 
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/stdalign.h>
