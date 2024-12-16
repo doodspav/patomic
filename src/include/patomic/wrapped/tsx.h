@@ -290,11 +290,11 @@
         /* operation */                                                \
         while (config.attempts-- > 0ul)                                \
         {                                                              \
-            int cmp = 0;                                               \
             ++res.attempts_made;                                       \
             res.status = tbegin();                                     \
             if (res.status == 0ul)                                     \
             {                                                          \
+                int cmp;                                               \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);          \
                 cmp = memcmp(                                          \
                     (const void *) obj, expected, config.width         \
@@ -324,7 +324,7 @@
                                                                        \
         /* assertions */                                               \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                        \
-        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                        \
+        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                   \
                                                                        \
         /* operation */                                                \
         while (config.fallback_attempts-- > 0ul)                       \
@@ -1634,6 +1634,140 @@
         fn_name, tbegin, tcommit,             \
         patomic_wrapped_tsx_do_neg            \
     )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic double_cmpxchg operation
+ *   using tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_double_cmpxchg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_DOUBLE_CMPXCHG(                  \
+    fn_name, tbegin, tcommit                                           \
+)                                                                      \
+    static int                                                         \
+    fn_name(                                                           \
+        const patomic_transaction_cmpxchg_t cxa,                       \
+        const patomic_transaction_cmpxchg_t cxb,                       \
+        patomic_transaction_config_wfb_t config,                       \
+        patomic_transaction_result_wfb_t *const result                 \
+    )                                                                  \
+    {                                                                  \
+        /* declarations */                                             \
+        patomic_transaction_result_wfb_t res = {0};                    \
+        const patomic_transaction_flag_t flag = 0;                     \
+        if (config.flag_nullable == NULL)                              \
+        {                                                              \
+            config.flag_nullable = &flag;                              \
+        }                                                              \
+        if (config.fallback_flag_nullable == NULL)                     \
+        {                                                              \
+            config.fallback_flag_nullable = &flag;                     \
+        }                                                              \
+                                                                       \
+        /* assert early */                                             \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                     \
+                                                                       \
+        /* check zero */                                               \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                     \
+            config, res, fallback, cleanup                             \
+        );                                                             \
+                                                                       \
+        /* assertions */                                               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.obj != NULL);                    \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.expected != NULL);               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.desired != NULL);                \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.obj != NULL);                    \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.expected != NULL);               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.desired != NULL);                \
+                                                                       \
+        /* operation */                                                \
+        while (config.attempts-- > 0ul)                                \
+        {                                                              \
+            ++res.attempts_made;                                       \
+            res.status = tbegin();                                     \
+            if (res.status == 0ul)                                     \
+            {                                                          \
+                int cmp_a, cmp_b;                                      \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);          \
+                cmp_a = memcmp(                                        \
+                    (const void *) cxa.obj, cxa.expected, config.width \
+                );                                                     \
+                cmp_b = memcmp(                                        \
+                    (const void *) cxb.obj, cxb.expected, config.width \
+                )                                                      \
+                if (cmp_a == 0 && cmp_b == 0)                          \
+                {                                                      \
+                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                        (void *) cxa.obj, cxa.desired, config.width    \
+                    );                                                 \
+                    PATOMIC_WRAPPED_DO_MEMCPY(                         \
+                        (void *) cxb.obj, cxb.desired, config.width    \
+                    );                                                 \
+                }                                                      \
+                tcommit();                                             \
+                if (!(cmp_a == 0 && cmp_b == 0))                       \
+                {                                                      \
+                    goto fallback;                                     \
+                }                                                      \
+                goto cleanup;                                          \
+            }                                                          \
+        }                                                              \
+                                                                       \
+        /* fallback */                                                 \
+    fallback:                                                          \
+                                                                       \
+        /* check zero */                                               \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_FALLBACK(                \
+            config, res, cleanup                                       \
+        );                                                             \
+                                                                       \
+        /* assertions */                                               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.obj != NULL);                    \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.expected != NULL);               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.obj != NULL);                    \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.expected != NULL);               \
+                                                                       \
+        /* operation */                                                \
+        while (config.fallback_attempts-- > 0ul)                       \
+        {                                                              \
+            ++res.fallback_attempts_made;                              \
+            res.fallback_status = tbegin();                            \
+            if (res.fallback_status == 0ul)                            \
+            {                                                          \
+                PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
+                PATOMIC_WRAPPED_DO_MEMCPY(                             \
+                    cxa.expected, (const void *) cxa.obj, config.width \
+                );                                                     \
+                PATOMIC_WRAPPED_DO_MEMCPY(                             \
+                    cxb.expected, (const void *) cxb.obj, config.width \
+                );                                                     \
+                tcommit();                                             \
+                goto cleanup;                                          \
+            }                                                          \
+        }                                                              \
+                                                                       \
+        /* cleanup */                                                  \
+    cleanup:                                                           \
+        *result = res;                                                 \
+        return res.status == 0ul;                                      \
+    }
 
 
 /**
