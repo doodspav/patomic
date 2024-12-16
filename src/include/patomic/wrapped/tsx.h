@@ -1205,11 +1205,125 @@
 
 
 // internal helper macros for arithmetic FETCH/VOID(_NOARG)
-#define patomic_wrapped_tsx_do_add(obj, arg, width)
-#define patomic_wrapped_tsx_do_sub(obj, arg, width)
-#define patomic_wrapped_tsx_do_inc(obj, width)
-#define patomic_wrapped_tsx_do_dec(obj, width)
-#define patomic_wrapped_tsx_do_neg(obj, width)
+#define patomic_wrapped_tsx_do_add(obj, arg, width)                          \
+    do {                                                                     \
+        /* static assert */                                                  \
+        PATOMIC_STATIC_ASSERT(                                               \
+            ulong_big_enough,                                                \
+            (ULONG_MAX / 2ul) > ((unsigned long) UCHAR_MAX)                  \
+        );                                                                   \
+        /* setup */                                                          \
+        unsigned long carry = 0ul;                                           \
+        const int is_le = IMPL_DEFINED_IS_LE();                              \
+        for (size_t i = 0; i < (width); ++i) {                               \
+            const size_t idx = (is_le) ? i : ((size_t) ((width) - 1ul - i)); \
+            /* sum: obj[i] + arg[i] + carry */                               \
+            unsigned long sum = (unsigned long) ((obj)[idx]);                \
+            sum += (unsigned long) ((arg)[idx]);                             \
+            sum += carry;                                                    \
+            /* do add */                                                     \
+            (obj)[idx] = (unsigned char) (sum & 0xFFu);                      \
+            carry = (sum >> 8ul);                                            \
+        }                                                                    \
+    } while (0)
+#define patomic_wrapped_tsx_do_sub(obj, arg, width)                          \
+    do {                                                                     \
+        /* static assert */                                                  \
+        PATOMIC_STATIC_ASSERT(                                               \
+            long_big_enough,                                                 \
+            (LONG_MAX / 2l) > ((long) UCHAR_MAX)                             \
+        )                                                                    \
+        /* setup */                                                          \
+        long borrow = 0l;                                                    \
+        const int is_le = IMPL_DEFINED_IS_LE();                              \
+        for (size_t i = 0; i < (width); ++i) {                               \
+            const size_t idx = (is_le) ? i : ((size_t) ((width) - 1ul - i)); \
+            /* diff: obj[i] - arg[i] - borrow */                             \
+            long diff = (long) ((obj)[idx]);                                 \
+            diff -= (long) ((arg)[idx]);                                     \
+            diff -= borrow;                                                  \
+            /* check for negative */                                         \
+            if (diff < 0l) {                                                 \
+                diff += 256l;                                                \
+                borrow = 1l;                                                 \
+            } else {                                                         \
+                borrow = 0l;                                                 \
+            }                                                                \
+            /* do sub */                                                     \
+            (obj)[idx] = (unsigned char) (diff & 0xFFl);                     \
+        }                                                                    \
+    } while (0)
+#define patomic_wrapped_tsx_do_inc(obj, width)                               \
+    do {                                                                     \
+        /* static assert */                                                  \
+        PATOMIC_STATIC_ASSERT(                                               \
+            ulong_big_enough,                                                \
+            (ULONG_MAX / 2ul) > ((unsigned long) UCHAR_MAX)                  \
+        );                                                                   \
+        /* setup */                                                          \
+        unsigned long carry = 1ul;                                           \
+        const int is_le = IMPL_DEFINED_IS_LE();                              \
+        for (size_t i = 0; i < (width); ++i) {                               \
+            const size_t idx = (is_le) ? i : ((size_t) ((width) - 1ul - i)); \
+            /* sum: obj[i] + carry */                                        \
+            unsigned long sum = (unsigned long) ((obj)[idx]);                \
+            sum += carry;                                                    \
+            /* do inc */                                                     \
+            (obj)[idx] = (unsigned char) (sum & 0xFFu);                      \
+            carry = (sum >> 8ul);                                            \
+        }                                                                    \
+    } while (0)
+#define patomic_wrapped_tsx_do_dec(obj, width)                               \
+    do {                                                                     \
+        /* static assert */                                                  \
+        PATOMIC_STATIC_ASSERT(                                               \
+            long_big_enough,                                                 \
+            (LONG_MAX / 2l) > ((long) UCHAR_MAX)                             \
+        )                                                                    \
+        /* setup */                                                          \
+        long borrow = 1l;                                                    \
+        const int is_le = IMPL_DEFINED_IS_LE();                              \
+        for (size_t i = 0; i < (width); ++i) {                               \
+            const size_t idx = (is_le) ? i : ((size_t) ((width) - 1ul - i)); \
+            /* diff: obj[i] - borrow */                                      \
+            long diff = (long) ((obj)[idx]);                                 \
+            diff -= borrow;                                                  \
+            /* check for negative */                                         \
+            if (diff < 0l) {                                                 \
+                diff += 256l;                                                \
+                borrow = 1l;                                                 \
+            } else {                                                         \
+                borrow = 0l;                                                 \
+            }                                                                \
+            /* do sub */                                                     \
+            (obj)[idx] = (unsigned char) (diff & 0xFFl);                     \
+            if (borrow == 0l)                                                \
+            {                                                                \
+                break;                                                       \
+            }                                                                \
+        }                                                                    \
+    } while (0)
+#define patomic_wrapped_tsx_do_neg(obj, width)                               \
+    do {                                                                     \
+        /* static assert */                                                  \
+        PATOMIC_STATIC_ASSERT(                                               \
+            ulong_big_enough,                                                \
+            (ULONG_MAX / 2ul) > ((unsigned long) UCHAR_MAX)                  \
+        );                                                                   \
+        /* setup */                                                          \
+        unsigned long carry = 1ul;                                           \
+        const int is_le = IMPL_DEFINED_IS_LE();                              \
+        for (size_t i = 0; i < (width); ++i) {                               \
+            const size_t idx = (is_le) ? i : ((size_t) ((width) - 1ul - i)); \
+            /* inv -> sum: ~obj[i] + carry */                                \
+            unsigned long sum = (unsigned long) ((obj)[idx]);                \
+            sum = (unsigned long) ~sum;                                      \
+            sum += carry;                                                    \
+            /* do neg */                                                     \
+            (obj)[idx] = (unsigned char) (sum & 0xFFu);                      \
+            carry = (summ >> 8ul);                                           \
+        }                                                                    \
+    } while (0)
 
 
 /**
