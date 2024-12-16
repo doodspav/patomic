@@ -723,19 +723,100 @@
  *   'void(unsigned char *obj, size_t width)' which will perform the desired
  *   operation.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOARG(                       \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOARG(                   \
+    fn_name, tbegin, tcommit, do_op                                  \
+)                                                                    \
+    static void                                                      \
+    fn_name(                                                         \
+        volatile void *const obj,                                    \
+        void *const ret,                                             \
+        patomic_transaction_config_t config,                         \
+        patomic_transaction_result *const result                     \
+    )                                                                \
+    {                                                                \
+        /* declarations */                                           \
+        unsigned char *const uc_obj = (unsigned char *) obj;         \
+        patomic_transaction_result_t res = {0};                      \
+        const patomic_transaction_flag_t flag = 0;                   \
+        if (config.flag_nullable == NULL)                            \
+        {                                                            \
+            config.flag_nullable = &flag;                            \
+        }                                                            \
+                                                                     \
+        /* assert early */                                           \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                   \
+                                                                     \
+        /* check zero */                                             \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup); \
+                                                                     \
+        /* assertions */                                             \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                      \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                      \
+                                                                     \
+        /* operation */                                              \
+        while (config.attempts-- > 0ul)                              \
+        {                                                            \
+            ++res.attempts_made;                                     \
+            res.status = tbegin();                                   \
+            if (res.status == 0ul)                                   \
+            {                                                        \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
+                PATOMIC_WRAPPED_DO_MEMCPY(                           \
+                    ret, (const void *) obj, config.width            \
+                );                                                   \
+                do_op(uc_obj, config.width);                         \
+                tcommit();                                           \
+                goto cleanup;                                        \
+            }                                                        \
+        }                                                            \
+                                                                     \
+        /* cleanup */                                                \
+    cleanup:                                                         \
+        *result = res;                                               \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic void operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_void_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ *
+ * @param do_op
+ *   A callable with the signature
+ *   'void(unsigned char *obj, const unsigned char *arg, size_t width)' which
+ *   will perform the desired operation.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(                              \
     fn_name, tbegin, tcommit, do_op                                      \
 )                                                                        \
     static void                                                          \
     fn_name(                                                             \
         volatile void *const obj,                                        \
-        void *const ret,                                                 \
+        const void *const arg,                                           \
         patomic_transaction_config_t config,                             \
         patomic_transaction_result *const result                         \
     )                                                                    \
     {                                                                    \
         /* declarations */                                               \
         unsigned char *const uc_obj = (unsigned char *) obj;             \
+        const unsigned char *const uc_arg = (const unsigned char *) arg; \
         patomic_transaction_result_t res = {0};                          \
         const patomic_transaction_flag_t flag = 0;                       \
         if (config.flag_nullable == NULL)                                \
@@ -752,7 +833,6 @@
         /* assertions */                                                 \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                          \
         PATOMIC_WRAPPED_DO_ASSERT(arg != NULL);                          \
-        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                          \
                                                                          \
         /* operation */                                                  \
         while (config.attempts-- > 0ul)                                  \
@@ -762,10 +842,7 @@
             if (res.status == 0ul)                                       \
             {                                                            \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);            \
-                PATOMIC_WRAPPED_DO_MEMCPY(                               \
-                    ret, (const void *) obj, config.width                \
-                );                                                       \
-                do_op(uc_obj, config.width);                             \
+                do_op(uc_obj, uc_arg, config.width);                     \
                 tcommit();                                               \
                 goto cleanup;                                            \
             }                                                            \
