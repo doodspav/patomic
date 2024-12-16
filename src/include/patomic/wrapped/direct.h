@@ -7,8 +7,6 @@
 
 #include <patomic/api/memory_order.h>
 
-#include <limits.h>
-
 
 /**
  * @addtogroup wrapped.direct
