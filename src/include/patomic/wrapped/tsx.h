@@ -62,6 +62,7 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
                 PATOMIC_WRAPPED_DO_MEMCPY(                           \
                     (void *) obj, desired, config.width              \
                 );                                                   \
@@ -129,6 +130,7 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
                 PATOMIC_WRAPPED_DO_MEMCPY(                           \
                     ret, (const void *) obj, config.width            \
                 );                                                   \
