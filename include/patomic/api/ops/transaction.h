@@ -897,7 +897,7 @@ typedef void (* patomic_opsig_transaction_flag_clear_t) (
  *   patomic_transaction_status_* functions or the
  *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
-typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
+typedef unsigned long (* patomic_opsig_transaction_tbegin_t) (
     void
 );
 
