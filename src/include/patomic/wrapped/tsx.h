@@ -1102,12 +1102,12 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_OR( \
-    fn_name, tbegin, tcommit                   \
-)                                              \
-    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(        \
-        fn_name, tbegin, tcommit,              \
-        patomic_wrapped_tsx_do_bin_or          \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_OR( \
+    fn_name, tbegin, tcommit              \
+)                                         \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(   \
+        fn_name, tbegin, tcommit,         \
+        patomic_wrapped_tsx_do_bin_or     \
     )
 
 
@@ -1133,12 +1133,12 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_XOR( \
-    fn_name, tbegin, tcommit                    \
-)                                               \
-    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(         \
-        fn_name, tbegin, tcommit,               \
-        patomic_wrapped_tsx_do_bin_xor          \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_XOR( \
+    fn_name, tbegin, tcommit               \
+)                                          \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(    \
+        fn_name, tbegin, tcommit,          \
+        patomic_wrapped_tsx_do_bin_xor     \
     )
 
 
@@ -1164,12 +1164,12 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_AND( \
-    fn_name, tbegin, tcommit                    \
-)                                               \
-    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(         \
-        fn_name, tbegin, tcommit,               \
-        patomic_wrapped_tsx_do_bin_and          \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_AND( \
+    fn_name, tbegin, tcommit               \
+)                                          \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(    \
+        fn_name, tbegin, tcommit,          \
+        patomic_wrapped_tsx_do_bin_and     \
     )
 
 
@@ -1195,12 +1195,12 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_NOT( \
-    fn_name, tbegin, tcommit                    \
-)                                               \
-    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_NOARG(   \
-        fn_name, tbegin, tcommit,               \
-        patomic_wrapped_tsx_do_bin_not          \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_NOT(    \
+    fn_name, tbegin, tcommit                  \
+)                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_NOARG( \
+        fn_name, tbegin, tcommit,             \
+        patomic_wrapped_tsx_do_bin_not        \
     )
 
 
@@ -1364,6 +1364,161 @@
     PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOARG(   \
         fn_name, tbegin, tcommit,                \
         patomic_wrapped_tsx_do_neg               \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic add operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_void_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_ADD( \
+    fn_name, tbegin, tcommit               \
+)                                          \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(    \
+        fn_name, tbegin, tcommit,          \
+        patomic_wrapped_tsx_do_add         \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic sub operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_void_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_SUB( \
+    fn_name, tbegin, tcommit               \
+)                                          \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID(    \
+        fn_name, tbegin, tcommit,          \
+        patomic_wrapped_tsx_do_sub         \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic inc operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_void_noarg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_INC(    \
+    fn_name, tbegin, tcommit                  \
+)                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_NOARG( \
+        fn_name, tbegin, tcommit,             \
+        patomic_wrapped_tsx_do_inc            \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic dec operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_void_noarg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_DEC(    \
+    fn_name, tbegin, tcommit                  \
+)                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_NOARG( \
+        fn_name, tbegin, tcommit,             \
+        patomic_wrapped_tsx_do_dec            \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic neg operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_void_noarg_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_NEG(    \
+    fn_name, tbegin, tcommit                  \
+)                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_VOID_NOARG( \
+        fn_name, tbegin, tcommit,             \
+        patomic_wrapped_tsx_do_neg            \
     )
 
 
