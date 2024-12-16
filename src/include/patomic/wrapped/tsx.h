@@ -1232,7 +1232,7 @@
         PATOMIC_STATIC_ASSERT(                                               \
             long_big_enough,                                                 \
             (LONG_MAX / 2l) > ((long) UCHAR_MAX)                             \
-        )                                                                    \
+        );                                                                   \
         /* setup */                                                          \
         long borrow = 0l;                                                    \
         const int is_le = IMPL_DEFINED_IS_LE();                              \
@@ -1279,7 +1279,7 @@
         PATOMIC_STATIC_ASSERT(                                               \
             long_big_enough,                                                 \
             (LONG_MAX / 2l) > ((long) UCHAR_MAX)                             \
-        )                                                                    \
+        );                                                                   \
         /* setup */                                                          \
         long borrow = 1l;                                                    \
         const int is_le = IMPL_DEFINED_IS_LE();                              \
@@ -1321,7 +1321,7 @@
             sum += carry;                                                    \
             /* do neg */                                                     \
             (obj)[idx] = (unsigned char) (sum & 0xFFu);                      \
-            carry = (summ >> 8ul);                                           \
+            carry = (sum >> 8ul);                                            \
         }                                                                    \
     } while (0)
 
