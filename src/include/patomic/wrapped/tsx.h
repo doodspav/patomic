@@ -377,7 +377,7 @@
     static int                                                              \
     fn_name(                                                                \
         const volatile void *const obj,                                     \
-        int offset,                                                         \
+        const int offset,                                                   \
         patomic_transaction_config_t config,                                \
         patomic_transaction_result_t *const result                          \
     )                                                                       \
@@ -385,8 +385,8 @@
         /* declarations */                                                  \
         int bit = 0;                                                        \
         const unsigned char *const uc_obj = (const unsigned char *) obj;    \
-        const size_t byte_offset = (size_t) (offset / 8);                   \
-        const int bit_offset = offset % 8;                                  \
+        const size_t byte_offset = ((size_t) offset) / CHAR_BIT;            \
+        const int bit_offset = offset % ((int) CHAR_BIT);                   \
         patomic_transaction_result_t res = {0};                             \
         const patomic_transaction_flag_t flag = 0;                          \
         if (config.flag_nullable == NULL)                                   \
@@ -396,13 +396,13 @@
                                                                             \
         /* assert early */                                                  \
         PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                          \
-        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.widths);             \
                                                                             \
         /* check zero */                                                    \
         PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);        \
                                                                             \
         /* assertions */                                                    \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.widths);             \
                                                                             \
         /* operation */                                                     \
         while (config.attempts-- > 0ul)                                     \
@@ -423,6 +423,194 @@
         *result = res;                                                      \
         return bit;                                                         \
     }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic bit test-modify operation
+ *   using tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_test_modify_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ *
+ * @param do_bit_modify
+ *   A callable with the signature
+ *   'unsigned char(unsigned char byte, int offset)' which will evaluate to the
+ *   byte with the bit at offset modified in the appropriate manner. The offset
+ *   is guaranteed to be less than CHAR_BIT.
+ *
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_MODIFY(                      \
+    fn_name, tbegin, tcommit, do_bit_modify                                 \
+)                                                                           \
+    static int                                                              \
+    fn_name(                                                                \
+        volatile void *const obj,                                           \
+        const int offset,                                                   \
+        patomic_transaction_config_t config,                                \
+        patomic_transaction_result_t *const result                          \
+    )                                                                       \
+    {                                                                       \
+        /* declarations */                                                  \
+        int bit = 0;                                                        \
+        unsigned char *const uc_obj = (unsigned char *) obj;                \
+        const size_t byte_offset = ((size_t) offset) / CHAR_BIT;            \
+        const int bit_offset = offset % ((int) CHAR_BIT);                   \
+        patomic_transaction_result_t res = {0};                             \
+        const patomic_transaction_flag_t flag = 0;                          \
+        if (config.flag_nullable == NULL)                                   \
+        {                                                                   \
+            config.flag_nullable = &flag;                                   \
+        }                                                                   \
+                                                                            \
+        /* assert early */                                                  \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                          \
+                                                                            \
+        /* check zero */                                                    \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);        \
+                                                                            \
+        /* assertions */                                                    \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.widths);             \
+                                                                            \
+        /* operation */                                                     \
+        while (config.attempts-- > 0ul)                                     \
+        {                                                                   \
+            ++res.attempts_made;                                            \
+            res.status = tbegin();                                          \
+            if (res.status == 0ul)                                          \
+            {                                                               \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);               \
+                bit = (int) ((uc_obj[byte_offset] >> bit_offset) & 1u);     \
+                uc_obj[byte_offset] = do_bit_modify(                        \
+                    uc_obj[byte_offset], bit_offset                         \
+                );                                                          \
+                tcommit();                                                  \
+                goto cleanup;                                               \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        /* cleanup */                                                       \
+    cleanup:                                                                \
+        *result = res;                                                      \
+        return bit;                                                         \
+    }
+
+
+// internal helper macros for BIT_MODIFY
+#define patomic_wrapped_tsx_do_bit_compl(byte, offset) \
+    ((unsigned char) (byte ^ ((unsigned char) (1u << offset))))
+#define patomic_wrapped_tsx_do_bit_set(byte, offset) \
+    ((unsigned char) (byte | ((unsigned char) (1u << offset))))
+#define patomic_wrapped_tsx_do_bit_reset(byte, offset) \
+    ((unsigned char) (byte & ((unsigned char) (~((unsigned char) (1u << offset))))))
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic bit test_compl operation
+ *   using tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_test_modify_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_COMPL( \
+    fn_name, tbegin, tcommit                          \
+)                                                     \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_MODIFY(    \
+        fn_name, tbegin, tcommit,                     \
+        patomic_wrapped_tsx_do_bit_compl              \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic bit test_set operation
+ *   using tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_test_modify_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_SET( \
+    fn_name, tbegin, tcommit                        \
+)                                                   \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_MODIFY(  \
+        fn_name, tbegin, tcommit,                   \
+        patomic_wrapped_tsx_do_bit_set              \
+    )
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic bit test_reset operation
+ *   using tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_test_modify_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_RESET( \
+    fn_name, tbegin, tcommit                          \
+)                                                     \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_MODIFY(    \
+        fn_name, tbegin, tcommit,                     \
+        patomic_wrapped_tsx_do_bit_reset              \
+    )
 
 
 #endif  /* PATOMIC_WRAPPED_TSX_H */
