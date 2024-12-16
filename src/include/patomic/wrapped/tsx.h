@@ -45,7 +45,7 @@
             config.flag_nullable = &flag;                            \
         }                                                            \
                                                                      \
-        /* assert result early */                                    \
+        /* assert early */                                           \
         PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                   \
                                                                      \
         /* check zero */                                             \
@@ -118,7 +118,7 @@
             config.flag_nullable = &flag;                            \
         }                                                            \
                                                                      \
-        /* assert result early */                                    \
+        /* assert early */                                           \
         PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                   \
                                                                      \
         /* check zero */                                             \
@@ -192,7 +192,7 @@
             config.flag_nullable = &flag;                            \
         }                                                            \
                                                                      \
-        /* assert result early */                                    \
+        /* assert early */                                           \
         PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                   \
                                                                      \
         /* check zero */                                             \
@@ -274,13 +274,18 @@
             config.fallback_flag_nullable = &flag;                     \
         }                                                              \
                                                                        \
-        /* assert result early */                                      \
+        /* assert early */                                             \
         PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                     \
                                                                        \
         /* check zero */                                               \
         PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                     \
             config, res, fallback, cleanup                             \
         );                                                             \
+                                                                       \
+        /* assertions */                                               \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                        \
+        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                   \
+        PATOMIC_WRAPPED_DO_ASSERT(desired != NULL);                    \
                                                                        \
         /* operation */                                                \
         while (config.attempts-- > 0ul)                                \
@@ -317,6 +322,10 @@
             config, res, cleanup                                       \
         );                                                             \
                                                                        \
+        /* assertions */                                               \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                        \
+        PATOMIC_WRAPPED_DO_ASSERT(ret != NULL);                        \
+                                                                       \
         /* operation */                                                \
         while (config.fallback_attempts-- > 0ul)                       \
         {                                                              \
@@ -337,6 +346,82 @@
     cleanup:                                                           \
         *result = res;                                                 \
         return res.status == 0ul;                                      \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines a function which implements an atomic bit test operation using
+ *   tbegin and tcommit as the underlying atomic transaction primitives.
+ *
+ * @details
+ *   The defined function's signature will match
+ *   patomic_opsig_transaction_test_t.
+ *
+ * @param fn_name
+ *   The name of the function to be defined.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST(                             \
+    fn_name, tbegin, tcommit                                                \
+)                                                                           \
+    static int                                                              \
+    fn_name(                                                                \
+        const volatile void *const obj,                                     \
+        int offset,                                                         \
+        patomic_transaction_config_t config,                                \
+        patomic_transaction_result_t *const result                          \
+    )                                                                       \
+    {                                                                       \
+        /* declarations */                                                  \
+        int bit = 0;                                                        \
+        const unsigned char *const uc_obj = (const unsigned char *) obj;    \
+        const size_t byte_offset = (size_t) (offset / 8);                   \
+        const int bit_offset = offset % 8;                                  \
+        patomic_transaction_result_t res = {0};                             \
+        const patomic_transaction_flag_t flag = 0;                          \
+        if (config.flag_nullable == NULL)                                   \
+        {                                                                   \
+            config.flag_nullable = &flag;                                   \
+        }                                                                   \
+                                                                            \
+        /* assert early */                                                  \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                          \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.widths);             \
+                                                                            \
+        /* check zero */                                                    \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);        \
+                                                                            \
+        /* assertions */                                                    \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
+                                                                            \
+        /* operation */                                                     \
+        while (config.attempts-- > 0ul)                                     \
+        {                                                                   \
+            ++res.attempts_made;                                            \
+            res.status = tbegin();                                          \
+            if (res.status == 0ul)                                          \
+            {                                                               \
+                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);               \
+                bit = (int) ((uc_obj[byte_offset] >> bit_offset) & 1u);     \
+                tcommit();                                                  \
+                goto cleanup;                                               \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        /* cleanup */                                                       \
+    cleanup:                                                                \
+        *result = res;                                                      \
+        return bit;                                                         \
     }
 
 
