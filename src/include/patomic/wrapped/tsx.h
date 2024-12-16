@@ -1636,4 +1636,274 @@
     )
 
 
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines all xchg operations as well as a function that returns an instance
+ *   of patomic_ops_transaction_xchg_t that points to these functions.
+ *
+ * @param name
+ *   The name suffixed to all defined functions.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_XCHG_OPS_CREATE(               \
+    name, tbegin, tcommit                                         \
+)                                                                 \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_EXCHANGE(                       \
+        patomic_opimpl_exchange_##name, tbegin, tcommit           \
+    )                                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_CMPXCHG_WEAK(                   \
+        patomic_opimpl_cmpxchg_weak_##name, tbegin, tcommit       \
+    )                                                             \
+    static patomic_ops_transaction_xchg_t                         \
+    patomic_ops_xchg_create_##name(void)                          \
+    {                                                             \
+        patomic_ops_transaction_xchg_t pao;                       \
+        pao.fp_exchange = patomic_opimpl_exchange_##name;         \
+        pao.fp_cmpxchg_weak = patomic_opimpl_cmpxchg_weak_##name; \
+        pao.fp_cmpxchg_strong = NULL;                             \
+        return pao;                                               \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines all bitwise operations as well as a function that returns an
+ *   instance of patomic_ops_transaction_bitwise_t that points to these
+ *   functions.
+ *
+ * @param name
+ *   The name suffixed to all defined functions.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_BITWISE_OPS_CREATE(            \
+    name, tbegin, tcommit                                         \
+)                                                                 \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST(                       \
+        patomic_opimpl_bit_test_##name, tbegin, tcommit           \
+    )                                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_COMPL(                 \
+        patomic_opimpl_bit_test_compl_##name, tbegin, tcommit     \
+    )                                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_SET(                   \
+        patomic_opimpl_bit_test_set_##name, tbegin, tcommit       \
+    )                                                             \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_RESET(                 \
+        patomic_opimpl_bit_test_reset_##name, tbegin, tcommit     \
+    )                                                             \
+    static patomic_ops_transaction_bitwise_t                      \
+    patomic_ops_bitwise_create_##name(void)                       \
+    {                                                             \
+        patomic_ops_transaction_bitwise_t pao;                    \
+        pao.fp_test = patomic_opimpl_bit_test_##name;             \
+        pao.fp_test_compl = patomic_opimpl_bit_test_compl_##name; \
+        pao.fp_test_set = patomic_opimpl_bit_test_set_##name;     \
+        pao.fp_test_reset = patomic_opimpl_bit_test_reset_##name; \
+        return pao;                                               \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines all binary operations as well as a function that returns an
+ *   instance of patomic_ops_transaction_binary_t that points to these
+ *   functions.
+ *
+ * @param name
+ *   The name suffixed to all defined functions.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_BINARY_OPS_CREATE(       \
+    name, tbegin, tcommit                                   \
+)                                                           \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_OR(                       \
+        patomic_opimpl_void_or_##name, tbegin, tcommit      \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_XOR(                      \
+        patomic_opimpl_void_xor_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_AND(                      \
+        patomic_opimpl_void_and_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_NOT(                      \
+        patomic_opimpl_void_not_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_OR(                 \
+        patomic_opimpl_fetch_or_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_XOR(                \
+        patomic_opimpl_fetch_xor_##name, tbegin, tcommit    \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_AND(                \
+        patomic_opimpl_fetch_and_##name, tbegin, tcommit    \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NOT(                \
+        patomic_opimpl_fetch_not_##name, tbegin, tcommit    \
+    )                                                       \
+    static patomic_ops_transaction_binary_t                 \
+    patomic_ops_binary_create_##name(void)                  \
+    {                                                       \
+        patomic_ops_transaction_binary_t pao;               \
+        pao.fp_or  = patomic_opimpl_void_or_##name;         \
+        pao.fp_xor = patomic_opimpl_void_xor_##name;        \
+        pao.fp_and = patomic_opimpl_void_and_##name;        \
+        pao.fp_not = patomic_opimpl_void_not_##name;        \
+        pao.fp_fetch_or  = patomic_opimpl_fetch_or_##name;  \
+        pao.fp_fetch_xor = patomic_opimpl_fetch_xor_##name; \
+        pao.fp_fetch_and = patomic_opimpl_fetch_and_##name; \
+        pao.fp_fetch_not = patomic_opimpl_fetch_not_##name; \
+        return pao;                                         \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines all arithmetic operations as well as a function that returns an
+ *   instance of patomic_ops_transaction_arithmetic_t that points to these
+ *   functions.
+ *
+ * @param name
+ *   The name suffixed to all defined functions.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_ARITHMETIC_OPS_CREATE(   \
+    name, tbegin, tcommit                                   \
+)                                                           \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_ADD(                      \
+        patomic_opimpl_void_add_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_SUB(                      \
+        patomic_opimpl_void_sub_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_INC(                      \
+        patomic_opimpl_void_inc_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_DEC(                      \
+        patomic_opimpl_void_dec_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_NEG(                      \
+        patomic_opimpl_void_neg_##name, tbegin, tcommit     \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_ADD(                \
+        patomic_opimpl_fetch_add_##name, tbegin, tcommit    \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_SUB(                \
+        patomic_opimpl_fetch_sub_##name, tbegin, tcommit    \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_INC(                \
+        patomic_opimpl_fetch_inc_##name, tbegin, tcommit    \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_DEC(                \
+        patomic_opimpl_fetch_dec_##name, tbegin, tcommit    \
+    )                                                       \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_FETCH_NEG(                \
+        patomic_opimpl_fetch_neg_##name, tbegin, tcommit    \
+    )                                                       \
+    static patomic_ops_transaction_arithmetic_t             \
+    patomic_ops_arithmetic_create_##name(void)              \
+    {                                                       \
+        patomic_ops_transaction_arithmetic_t pao;           \
+        pao.fp_add = patomic_opimpl_void_add_##name;        \
+        pao.fp_sub = patomic_opimpl_void_sub_##name;        \
+        pao.fp_inc = patomic_opimpl_void_inc_##name;        \
+        pao.fp_dec = patomic_opimpl_void_dec_##name;        \
+        pao.fp_neg = patomic_opimpl_void_neg_##name;        \
+        pao.fp_fetch_add = patomic_opimpl_fetch_add_##name; \
+        pao.fp_fetch_sub = patomic_opimpl_fetch_sub_##name; \
+        pao.fp_fetch_inc = patomic_opimpl_fetch_inc_##name; \
+        pao.fp_fetch_dec = patomic_opimpl_fetch_dec_##name; \
+        pao.fp_fetch_neg = patomic_opimpl_fetch_neg_##name; \
+        return pao;                                         \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines all operations which are not unique to transactions as well as a
+ *   function that returns an instance of patomic_ops_transaction_t that points
+ *   to these functions.
+ *
+ * @param name
+ *   The name suffixed to all defined functions.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_OPS_CREATE(                       \
+    name, tbegin, tcommit                                            \
+)                                                                    \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_STORE(                             \
+        patomic_opimpl_store_##name, tbegin, tcommit                 \
+    )                                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_LOAD(                              \
+        patomic_opimpl_load_##name, tbegin, tcommit                  \
+    )                                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_XCHG_OPS_CREATE(                      \
+        name, tbegin, tcommit                                        \
+    )                                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_BITWISE_OPS_CREATE(                   \
+        name, tbegin, tcommit                                        \
+    )                                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_BINARY_OPS_CREATE(                    \
+        name, tbegin, tcommit                                        \
+    )                                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_ARITHMETIC_OPS_CREATE(                \
+        name, tbegin, tcommit                                        \
+    )                                                                \
+    static patomic_ops_transaction_t                                 \
+    patomic_ops_create_##name(void)                                  \
+    {                                                                \
+        patomic_ops_transaction_t pao;                               \
+        pao.fp_store = patomic_opimpl_store_##name;                  \
+        pao.fp_load = patomic_opimpl_load_##name;                    \
+        pao.xchg_ops = patomic_ops_xchg_create_##name();             \
+        pao.bitwise_ops = patomic_ops_bitwise_create_##name();       \
+        pao.binary_ops = patomic_ops_binary_create_##name();         \
+        pao.arithmetic_ops = patomic_ops_arithmetic_create_##name(); \
+        return pao;                                                  \
+    }
+
+
 #endif  /* PATOMIC_WRAPPED_TSX_H */
