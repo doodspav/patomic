@@ -11,7 +11,7 @@
  *   Create a status from exit code, exit info, and abort reason.
  *
  * @param code
- *   An expression of type patomic_transaction_exit_code_t.
+ *   A single patomic_transaction_exit_code_t value.
  *
  * @param info
  *   Zero or more combined patomic_transaction_exit_info_t values.
@@ -20,9 +20,9 @@
  *   A non-negative 8bit integer value.
  */
 #define PATOMIC_INTERNAL_TRANSACTION_STATUS_CREATE(code, info, reason) \
-    ( ((unsigned long) (code)) |                                       \
-      ((unsigned long) (info)) |                                       \
-      ((unsigned long) (reason)) )
+    ( (((unsigned long) (code)) & 0xFFul)           |                   \
+      ((((unsigned long) (info)) & 0xFFul) << 16ul) |                   \
+      ((((unsigned long) (reason)) & 0xFFul) << 8ul) )
 
 
 #endif  /* PATOMIC_INTERNAL_TRANSACTION */
