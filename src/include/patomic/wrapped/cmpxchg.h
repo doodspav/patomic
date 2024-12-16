@@ -8,7 +8,6 @@
 #include <patomic/api/memory_order.h>
 
 #include <limits.h>
-#include <stddef.h>
 
 
 /**

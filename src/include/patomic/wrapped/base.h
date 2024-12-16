@@ -9,6 +9,7 @@
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/stdalign.h>
 
+#include <stddef.h>
 #include <string.h>
 
 
