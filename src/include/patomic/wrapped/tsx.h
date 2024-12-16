@@ -2306,7 +2306,53 @@
  * @addtogroup wrapped.tsx
  *
  * @brief
- *   Defines all operations which are not unique to transactions as well as a
+ *   Defines all special operations as well as a function that returns an
+ *   instance of patomic_ops_transaction_special_t that points to these
+ *   functions.
+ *
+ * @param name
+ *   The name suffixed to all defined functions.
+ *
+ * @param tbegin
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tbegin_t.
+ *
+ * @param tcommit
+ *   A callable with the signature and semantics of
+ *   patomic_opsig_transaction_tcommit_t.
+ */
+#define PATOMIC_WRAPPED_TSX_DEFINE_SPECIAL_OPS_CREATE(                \
+    name, tbegin, tcommit                                             \
+)                                                                     \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_DOUBLE_CMPXCHG(                     \
+        patomic_opimpl_double_cmpxchg_##name, tbegin, tcommit         \
+    )                                                                 \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_MULTI_CMPXCHG(                      \
+        patomic_opimpl_multi_cmpxchg_##name, tbegin, tcommit          \
+    )                                                                 \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_GENERIC(                            \
+        patomic_opimpl_generic_##name, tbegin, tcommit                \
+    )                                                                 \
+    PATOMIC_WRAPPED_TSX_DEFINE_OP_GENERIC_WFB(                        \
+        patomic_opimpl_generic_wfb_##name, tbegin, tcommit            \
+    )                                                                 \
+    static patomic_ops_transaction_special_t                          \
+    patomic_ops_special_create_##name(void)                           \
+    {                                                                 \
+        patomic_ops_transaction_special_t pao;                        \
+        pao.fp_double_cmpxchg = patomic_opimpl_double_cmpxchg_##name; \
+        pao.fp_multi_cmpxchg = patomic_opimpl_multi_cmpxchg_##name;   \
+        pao.fp_generic = patomic_opimpl_generic_##name;               \
+        pao.fp_generic_wfb = patomic_opimpl_generic_wfb_##name;       \
+        return pao;                                                   \
+    }
+
+
+/**
+ * @addtogroup wrapped.tsx
+ *
+ * @brief
+ *   Defines all operations except flag and raw operations as well as a
  *   function that returns an instance of patomic_ops_transaction_t that points
  *   to these functions.
  *
@@ -2342,6 +2388,9 @@
     PATOMIC_WRAPPED_TSX_DEFINE_ARITHMETIC_OPS_CREATE(                \
         name, tbegin, tcommit                                        \
     )                                                                \
+    PATOMIC_WRAPPED_TSX_DEFINE_SPECIAL_OPS_CREATE(                   \
+        name, tbegin, tcommit                                        \
+    )                                                                \
     static patomic_ops_transaction_t                                 \
     patomic_ops_create_##name(void)                                  \
     {                                                                \
@@ -2352,6 +2401,7 @@
         pao.bitwise_ops = patomic_ops_bitwise_create_##name();       \
         pao.binary_ops = patomic_ops_binary_create_##name();         \
         pao.arithmetic_ops = patomic_ops_arithmetic_create_##name(); \
+        pao.special_ops = patomic_ops_special_create_##name();       \
         return pao;                                                  \
     }
 
