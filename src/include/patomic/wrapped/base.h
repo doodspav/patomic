@@ -124,6 +124,43 @@
  * @addtogroup wrapped.base
  *
  * @brief
+ *   Acts as memcmp would but in a transaction safe manner, and discards the
+ *   return value.
+ *
+ * @note
+ *   Necessary because on some platforms memcmp uses instructions which will
+ *   cause a transaction to abort.
+ */
+#define PATOMIC_WRAPPED_DO_TSX_MEMCMP(res, lhs, rhs, count) \
+    do {                                                    \
+        const volatile unsigned char *const uc_lhs =        \
+            (const unsigned char *) (lhs);                  \
+        const volatile unsigned char *const uc_rhs =        \
+            (const unsigned char *) (rhs);                  \
+        size_t i;                                           \
+        (res) = 0;                                          \
+        for (i = 0; i < ((size_t) (count)); ++i)            \
+        {                                                   \
+            const unsigned char a = uc_lhs[i];              \
+            const unsigned char b = uc_rhs[i];              \
+            if (a < b)                                      \
+            {                                               \
+                (res) = -1;                                 \
+                break;                                      \
+            }                                               \
+            else if (a > b)                                 \
+            {                                               \
+                (res) = 1;                                  \
+                break;                                      \
+            }                                               \
+        }                                                   \
+    }
+
+
+/**
+ * @addtogroup wrapped.base
+ *
+ * @brief
  *   Checks if either config.attempts or config.width is zero. If either are
  *   zero, sets result appropriately and either goes to the fallback label for
  *   config.attempts or goes to the cleanup label for config.width.
