@@ -2065,6 +2065,10 @@
         /* assertions */                                                     \
         PATOMIC_WRAPPED_DO_ASSERT(fallback_fn != NULL);                      \
                                                                              \
+        /* the result of fn should be visible from fallback_fn */            \
+        result->status = res.status;                                         \
+        result->attempts_made = res.attempts_made;                           \
+                                                                             \
         /* operation */                                                      \
         while (config.fallback_attempts-- > 0ul)                             \
         {                                                                    \
