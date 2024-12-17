@@ -107,7 +107,7 @@ TEST_P(BtLogicTransaction, fp_test_set)
     SKIP_NULL_OP_FP_TEST_SET(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test_compl, nullptr, 0);
+    ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test_set, nullptr, 0);
 
     // go through all widths
     for (std::size_t width : m_widths)
