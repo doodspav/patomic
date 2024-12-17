@@ -311,7 +311,7 @@
                 {                                                      \
                     goto fallback;                                     \
                 }                                                      \
-                int ok = 1;                                            \
+                ok = 1;                                                \
                 goto cleanup;                                          \
             }                                                          \
         }                                                              \
@@ -1729,7 +1729,7 @@
                 {                                                             \
                     goto fallback;                                            \
                 }                                                             \
-                int ok = 1;                                                   \
+                ok = 1;                                                       \
                 goto cleanup;                                                 \
             }                                                                 \
         }                                                                     \
@@ -1871,7 +1871,7 @@
                 {                                                      \
                     goto fallback;                                     \
                 }                                                      \
-                int ok = 1;                                            \
+                ok = 1;                                                \
                 goto cleanup;                                          \
             }                                                          \
         }                                                              \
