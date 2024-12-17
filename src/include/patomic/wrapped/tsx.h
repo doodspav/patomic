@@ -649,7 +649,7 @@
         const void *const arg,                                           \
         void *const ret,                                                 \
         patomic_transaction_config_t config,                             \
-        patomic_transaction_result *const result                         \
+        patomic_transaction_result_t *const result                       \
     )                                                                    \
     {                                                                    \
         /* declarations */                                               \
@@ -731,7 +731,7 @@
         volatile void *const obj,                                    \
         void *const ret,                                             \
         patomic_transaction_config_t config,                         \
-        patomic_transaction_result *const result                     \
+        patomic_transaction_result_t *const result                   \
     )                                                                \
     {                                                                \
         /* declarations */                                           \
@@ -811,7 +811,7 @@
         volatile void *const obj,                                        \
         const void *const arg,                                           \
         patomic_transaction_config_t config,                             \
-        patomic_transaction_result *const result                         \
+        patomic_transaction_result_t *const result                       \
     )                                                                    \
     {                                                                    \
         /* declarations */                                               \
@@ -888,7 +888,7 @@
     fn_name(                                                         \
         volatile void *const obj,                                    \
         patomic_transaction_config_t config,                         \
-        patomic_transaction_result *const result                     \
+        patomic_transaction_result_t *const result                   \
     )                                                                \
     {                                                                \
         /* declarations */                                           \
