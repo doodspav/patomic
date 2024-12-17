@@ -263,6 +263,7 @@
     )                                                                  \
     {                                                                  \
         /* declarations */                                             \
+        int ok = 0;                                                    \
         patomic_transaction_result_wfb_t res = {0};                    \
         const patomic_transaction_flag_t flag = 0;                     \
         if (config.flag_nullable == NULL)                              \
@@ -310,6 +311,7 @@
                 {                                                      \
                     goto fallback;                                     \
                 }                                                      \
+                int ok = 1;                                            \
                 goto cleanup;                                          \
             }                                                          \
         }                                                              \
@@ -345,7 +347,7 @@
         /* cleanup */                                                  \
     cleanup:                                                           \
         *result = res;                                                 \
-        return res.status == 0ul;                                      \
+        return ok;                                                     \
     }
 
 
@@ -1670,6 +1672,7 @@
     )                                                                         \
     {                                                                         \
         /* declarations */                                                    \
+        int ok = 0;                                                           \
         patomic_transaction_result_wfb_t res = {0};                           \
         const patomic_transaction_flag_t flag = 0;                            \
         if (config.flag_nullable == NULL)                                     \
@@ -1726,6 +1729,7 @@
                 {                                                             \
                     goto fallback;                                            \
                 }                                                             \
+                int ok = 1;                                                   \
                 goto cleanup;                                                 \
             }                                                                 \
         }                                                                     \
@@ -1766,7 +1770,7 @@
         /* cleanup */                                                         \
     cleanup:                                                                  \
         *result = res;                                                        \
-        return res.status == 0ul;                                             \
+        return ok;                                                            \
     }
 
 
@@ -1805,6 +1809,7 @@
     {                                                                  \
         /* declarations */                                             \
         size_t i;                                                      \
+        int ok = 0;                                                    \
         patomic_transaction_result_wfb_t res = {0};                    \
         const patomic_transaction_flag_t flag = 0;                     \
         if (config.flag_nullable == NULL)                              \
@@ -1866,6 +1871,7 @@
                 {                                                      \
                     goto fallback;                                     \
                 }                                                      \
+                int ok = 1;                                            \
                 goto cleanup;                                          \
             }                                                          \
         }                                                              \
@@ -1909,7 +1915,7 @@
         /* cleanup */                                                  \
     cleanup:                                                           \
         *result = res;                                                 \
-        return res.status == 0ul;                                      \
+        return ok;                                                     \
     }
 
 
