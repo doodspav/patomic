@@ -402,7 +402,7 @@
                                                                          \
         /* assertions */                                                 \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                          \
-        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.widths);          \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.width);           \
                                                                          \
         /* operation */                                                  \
         while (config.attempts-- > 0ul)                                  \
@@ -485,7 +485,7 @@
                                                                         \
         /* assertions */                                                \
         PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
-        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.widths);         \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.width);          \
                                                                         \
         /* operation */                                                 \
         while (config.attempts-- > 0ul)                                 \
