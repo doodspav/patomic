@@ -1711,7 +1711,7 @@
                 );                                                     \
                 cmp_b = memcmp(                                        \
                     (const void *) cxb.obj, cxb.expected, config.width \
-                )                                                      \
+                );                                                     \
                 if (cmp_a == 0 && cmp_b == 0)                          \
                 {                                                      \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
@@ -1841,7 +1841,7 @@
             {                                                          \
                 size_t cmp = 0;                                        \
                 PATOMIC_IGNORE_UNUSED(*config.flag_nullable);          \
-                for (i = 0; i < cxs_len && cmp_all == 0; ++i)          \
+                for (i = 0; i < cxs_len && cmp == 0; ++i)              \
                 {                                                      \
                     cmp = memcmp(                                      \
                         (const void *) cxs_buf[i].obj,                 \
