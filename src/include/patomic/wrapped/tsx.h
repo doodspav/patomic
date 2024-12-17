@@ -1316,8 +1316,7 @@
         for (size_t i = 0; i < (width); ++i) {                               \
             const size_t idx = (is_le) ? i : ((size_t) ((width) - 1ul - i)); \
             /* inv -> sum: ~obj[i] + carry */                                \
-            unsigned long sum = (unsigned long) ((obj)[idx]);                \
-            sum = (unsigned long) ~sum;                                      \
+            unsigned long sum = (unsigned long) ~((obj)[idx]);               \
             sum += carry;                                                    \
             /* do neg */                                                     \
             (obj)[idx] = (unsigned char) (sum & 0xFFu);                      \
