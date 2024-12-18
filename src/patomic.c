@@ -227,6 +227,9 @@ patomic_create_transaction(
                     );
                 }
 
+                /* not possible for cmpxchg_strong to be implemented */
+                patomic_assert_always(ret.ops.xchg_ops.fp_cmpxchg_strong == NULL);
+
                 /* ignore previous implementations if current one has a better kind */
                 if (patomic_impl_register[i].kind > last_kind)
                 {

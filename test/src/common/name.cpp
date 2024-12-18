@@ -87,7 +87,7 @@ name_tsx_exit_info(unsigned int info)
     // setup
     std::string ret;
 
-    /* separate name and label for easier searching */
+    /* separate name and label for easier project-wide searching */
 #define CHECK_INFO(name, label)        \
     if (info & patomic_TINFO_##name)   \
     {                                  \
