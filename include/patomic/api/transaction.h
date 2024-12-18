@@ -127,10 +127,12 @@ typedef struct {
     /** @brief Number of attempts to make committing fallback transaction. */
     unsigned long fallback_attempts;
 
-    /** @brief Read from at the start of each transaction attempt. */
+    /** @brief Read from at the start of each transaction attempt, which is
+     *         aborted if the value is non-zero. */
     const patomic_transaction_flag_t *flag_nullable;
 
-    /** @brief Read from at the start of each fallback transaction attempt. */
+    /** @brief Read from at the start of each fallback transaction attempt,
+     *         which is aborted if the value is non-zero. */
     const patomic_transaction_flag_t *fallback_flag_nullable;
 
 } patomic_transaction_config_wfb_t;
@@ -252,13 +254,11 @@ typedef enum {
 
     /** @brief The transaction explicitly aborted because attempts or fallback
      *         attempts was set to zero.
-     *  @note  This will only be set by non-raw transactional operations
-     *         provided by this library. */
+     *  @note  This is set by this library rather than by an implementation. */
     ,patomic_TINFO_ZERO_ATTEMPTS = (1 << 0)
 
     /** @brief The transaction explicitly aborted because the flag was set.
-     *  @note  This will only be set by non-raw transactional operations
-     *         provided by this library. */
+     *  @note  This is set by this library rather than by an implementation. */
     ,patomic_TINFO_FLAG_SET = (1 << 1)
 
     /** @brief The transaction might not fail if retried. */

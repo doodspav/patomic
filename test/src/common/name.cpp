@@ -87,7 +87,8 @@ name_tsx_exit_info(unsigned int info)
     // setup
     std::string ret;
 
-#define CHECK_INFO(name)               \
+    /* separate name and label for easier searching */
+#define CHECK_INFO(name, label)        \
     if (info & patomic_TINFO_##name)   \
     {                                  \
         ret += "TINFO_" #name " | ";   \
@@ -96,10 +97,10 @@ name_tsx_exit_info(unsigned int info)
     static_assert(true, "require semicolon")
 
     // go through all values
-    CHECK_INFO(ZERO_ATTEMPTS);
-    CHECK_INFO(FLAG_SET);
-    CHECK_INFO(RETRY);
-    CHECK_INFO(NESTED);
+    CHECK_INFO(ZERO_ATTEMPTS, patomic_TINFO_ZERO_ATTEMPTS);
+    CHECK_INFO(FLAG_SET, patomic_TINFO_FLAG_SET);
+    CHECK_INFO(RETRY, patomic_TINFO_RETRY);
+    CHECK_INFO(NESTED, patomic_TINFO_NESTED);
 
     // check for unknown values
     if (info != 0)
