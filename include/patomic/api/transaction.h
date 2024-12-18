@@ -233,7 +233,7 @@ typedef enum {
  * @addtogroup transaction
  *
  * @brief
- *   A set of constants providing additional transaction exit information to
+ *   A set of constants providing additional transaction abort information to
  *   supplement what is provided by the exit code.
  *   The exit information always has 8 significant bits and is non-negative.
  *
@@ -247,8 +247,22 @@ typedef enum {
  */
 typedef enum {
 
+    /** @brief No extra information is available. */
+    patomic_TINFO_NONE = 0
+
+    /** @brief The transaction explicitly aborted because attempts or fallback
+     *         attempts was set to zero.
+     *  @note  This will only be set by non-raw transactional operations
+     *         provided by this library. */
+    ,patomic_TINFO_ZERO_ATTEMPTS = (1 << 0)
+
+    /** @brief The transaction explicitly aborted because the flag was set.
+     *  @note  This will only be set by non-raw transactional operations
+     *         provided by this library. */
+    ,patomic_TINFO_FLAG_SET = (1 << 1)
+
     /** @brief The transaction might not fail if retried. */
-    patomic_TINFO_RETRY = (1 << 0)
+    ,patomic_TINFO_RETRY = (1 << 0)
 
     /** @brief The transaction was aborted from an inner nested transaction. */
     ,patomic_TINFO_NESTED = (1 << 1)

@@ -96,6 +96,8 @@ name_tsx_exit_info(unsigned int info)
     static_assert(true, "require semicolon")
 
     // go through all values
+    CHECK_INFO(ZERO_ATTEMPTS);
+    CHECK_INFO(FLAG_SET);
     CHECK_INFO(RETRY);
     CHECK_INFO(NESTED);
 

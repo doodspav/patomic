@@ -1,3 +1,4 @@
+#include <test/common/math.hpp>
 #include <test/common/support.hpp>
 
 #include <patomic/api/transaction.h>
@@ -28,6 +29,9 @@ public:
     supported_exit_infos()
     {
         return {
+            patomic_TINFO_NONE,
+            patomic_TINFO_ZERO_ATTEMPTS,
+            patomic_TINFO_FLAG_SET,
             patomic_TINFO_RETRY,
             patomic_TINFO_NESTED
         };
@@ -71,15 +75,27 @@ TEST_F(BtApiTransaction, exit_code_is_first_8_bits_of_status)
 }
 
 
-/// @brief All exit infos are non-negative and have no more than 8 significant
-///        bits.
-TEST_F(BtApiTransaction, exit_info_is_8_bits_nonnegative)
+/// @brief None exit info is zero.
+TEST_F(BtApiTransaction, exit_info_none_is_zero)
+{
+    EXPECT_EQ(0, patomic_TINFO_NONE);
+}
+
+/// @brief All exit infos are non-negative, have no more than 8 significant
+///        bits, and have exactly 1 bit set (except for NONE).
+TEST_F(BtApiTransaction, exit_info_is_8_bits_nonnegative_1_bit_set)
 {
     // go through all supported exit infos
     for (auto info : supported_exit_infos())
     {
-        EXPECT_GE(info, 0);
+        if (info == patomic_TINFO_NONE)
+        {
+            continue;
+        }
+        using E = std::underlying_type_t<decltype(info)>;
+        EXPECT_GT(info, 0);
         EXPECT_LE(info, 255);
+        EXPECT_TRUE(test::is_positive_pow2(static_cast<E>(info)));
     }
 }
 
