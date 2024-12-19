@@ -249,7 +249,8 @@ typedef enum {
  */
 typedef enum {
 
-    /** @brief No extra information is available. */
+    /** @brief No extra information is available.
+     *  @note  This will always be the case if the transaction succeeds. */
     patomic_TINFO_NONE = 0
 
     /** @brief The transaction explicitly aborted because attempts or fallback
@@ -300,19 +301,13 @@ typedef enum {
  * @addtogroup transaction
  *
  * @brief
- *   Obtains the abort reason from the status of an explicitly aborted
- *   transaction. If the transaction was not explicitly aborted, the abort
- *   reason will be 0.
+ *   Obtains the abort reason from the status of a transaction.
  *
  * @details
  *   This is bits [8:15] of status.
  */
-#define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status)             \
-    ((unsigned char) ((PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
-                      == patomic_TABORT_EXPLICIT)                   \
-        ? (((unsigned long) (status)) >> 8ul) & 0xFFul              \
-        : 0ul                                                       \
-    ))
+#define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status) \
+    ((unsigned char) ((((unsigned long) (status)) >> 8ul) & 0xFFul))
 
 
 /**

@@ -69,7 +69,7 @@ TEST_F(BtApiTransaction, exit_code_is_first_8_bits_of_status)
     }
 
     // go into 9th bit with first 8 bits zeroed
-    unsigned long status = 0x100ul;
+    unsigned long status = 1ul << 8ul;
     EXPECT_EQ(0ul, patomic_transaction_status_exit_code(status));
     EXPECT_EQ(0ul, PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status));
 }
@@ -111,70 +111,25 @@ TEST_F(BtApiTransaction, exit_info_is_third_8_bits_of_status)
     }
 
     // go into 9th bit with first 8 bits zeroed (offset by 16)
-    unsigned long status = 0x1000000ul;
+    unsigned long status = 1ul << 24ul;
     EXPECT_EQ(0ul, patomic_transaction_status_exit_info(status));
     EXPECT_EQ(0ul, PATOMIC_TRANSACTION_STATUS_EXIT_INFO(status));
 }
 
 
-/// @brief Reason returned is 0 if status is not patomic_TABORT_EXPLICIT.
-TEST_F(BtApiTransaction, reason_is_zero_if_not_explicit_abort)
+/// @brief Only second 8 bits of status are provided for abort reason.
+TEST_F(BtApiTransaction, abort_reason_is_second_8_bits_of_status)
 {
-    // create other statuses
-    // new status kinds may be added, but they are guaranteed to fit in 8 bits
-    std::vector<unsigned long> statuses;
-    for (unsigned long kind = 0ul; kind < 0xFFul; ++kind)
+    // go through all combinations of 8 bits (offset by 8)
+    for (unsigned long reason = 0ul; reason < 0xFFul; ++reason)
     {
-        // check we don't test explicit abort
-        if (kind == patomic_TABORT_EXPLICIT)
-        {
-            continue;
-        }
-
-        // combine status with a non-zero reason
-        statuses.push_back(kind | (0xFFul << 8ul));
-    }
-
-    // check that the reason for all of these is zero
-    for (const unsigned long status : statuses)
-    {
-        EXPECT_EQ(0u, patomic_transaction_status_abort_reason(status));
-        EXPECT_EQ(0u, PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status));
-    }
-}
-
-/// @brief Reason is returned if status is patomic_TABORT_EXPLICIT.
-TEST_F(BtApiTransaction, reason_returned_if_explicit_abort)
-{
-    // create reasons
-    const std::vector<unsigned long> reasons {
-        0x55ul,
-        0xAAul,
-        0x0Ful,
-        0xF0ul,
-        0xFFul,
-        0x00ul
-    };
-
-    // check that reason is returned from status
-    for (const unsigned long reason : reasons)
-    {
-        const unsigned long status = (reason << 8u) | patomic_TABORT_EXPLICIT;
+        unsigned long status = reason << 8ul;
         EXPECT_EQ(reason, patomic_transaction_status_abort_reason(status));
         EXPECT_EQ(reason, PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status));
     }
-}
 
-/// @brief Check that only first 8 bits of reason are provided.
-TEST_F(BtApiTransaction, reason_only_saves_first_8_bits)
-{
-    // create status with extended reason (more than 8 bits)
-    constexpr unsigned long extended_reason = 0xFFFul;
-    constexpr unsigned long status = (extended_reason << 8u) | patomic_TABORT_EXPLICIT;
-
-    // check that reason is truncated
-    EXPECT_NE(extended_reason, patomic_transaction_status_abort_reason(status));
-    EXPECT_NE(extended_reason, PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status));
-    EXPECT_EQ(extended_reason & 0xFFu, patomic_transaction_status_abort_reason(status));
-    EXPECT_EQ(extended_reason & 0xFFu, PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status));
+    // go into 9th bit with first 9 bits zeroed (offset by 8)
+    unsigned long status = 1ul << 16ul;
+    EXPECT_EQ(0ul, patomic_transaction_status_abort_reason(status));
+    EXPECT_EQ(0ul, PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status));
 }
