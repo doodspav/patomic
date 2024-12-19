@@ -342,9 +342,7 @@ patomic_transaction_status_exit_info(unsigned long status);
  * @addtogroup transaction
  *
  * @brief
- *   Obtains the abort reason from the status of an explicitly aborted
- *   transaction. If the transaction was not explicitly aborted, the abort
- *   reason will be 0.
+ *   Obtains the abort reason from the status of a transaction.
  *
  * @note
  *   The value returned by this function is identical to the
