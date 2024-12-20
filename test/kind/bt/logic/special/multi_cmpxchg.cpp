@@ -107,7 +107,7 @@ test_multi_cmpxchg(
             }
 
             // test with only len object
-            DO_TEST_MULTI_CMPXCHG(cxs_copy, fp_wrapped);
+            DO_TEST_TSX_MULTI_CMPXCHG(cxs_copy, fp_wrapped);
         }
     }
 }

@@ -35,33 +35,33 @@ test_double_cmpxchg(
     // (0, ~0) -> (~0, 1)
     cxa.desired.inv();
     cxb.desired.inc();
-    DO_TEST_MULTI_CMPXCHG(cxs, fp_wrapped);
+    DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_wrapped);
 
     // (~0, 1) -> (1, max)
     cxa.desired.store_zero();
     cxa.desired.inc();
     cxb.desired.store_max();
-    DO_TEST_MULTI_CMPXCHG(cxs, fp_wrapped);
+    DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_wrapped);
 
     // (1, max) -> (max, min)
     cxa.desired.store_max();
     cxb.desired.store_min();
-    DO_TEST_MULTI_CMPXCHG(cxs, fp_wrapped);
+    DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_wrapped);
 
     // (max, min) -> (min, 0)
     cxa.desired.store_min();
     cxb.desired.store_zero();
-    DO_TEST_MULTI_CMPXCHG(cxs, fp_wrapped);
+    DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_wrapped);
 
     // (min, 0) -> (0, 1)
     cxa.desired.store_zero();
     cxb.desired.inc();
-    DO_TEST_MULTI_CMPXCHG(cxs, fp_wrapped);
+    DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_wrapped);
 
     // (0, 0) -> (1, 1)
     cxa.desired.inc();
     cxb.desired = cxa.desired;
-    DO_TEST_MULTI_CMPXCHG(cxs, fp_wrapped);
+    DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_wrapped);
 }
 
 }  // namespace
