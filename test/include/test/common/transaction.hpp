@@ -4,6 +4,8 @@
 #include "generic_int.hpp"
 #include "name.hpp"
 
+#include <type_traits>
+
 
 /// @brief
 ///   Requires a semicolon be placed after calling this macro.
@@ -216,6 +218,8 @@
 #define ADD_FAILURE_TSX_SUCCESS(config, result)                                  \
     if (result.status != 0ul)                                                    \
     {                                                                            \
+        using result_t = patomic_transaction_result_t;                           \
+        static_assert(std::is_same<decltype(result), result_t>::value, "");      \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);         \
         auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);         \
         auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);    \
@@ -275,7 +279,7 @@
 ///
 /// @param cxs std::vector<test::generic_cmpxchg>
 /// @param fp_multi_cmpxchg int(std::vector<test::generic_cmpxchg>&)
-#define DO_TEST_MULTI_CMPXCHG(cxs, fp_multi_cmpxchg)      \
+#define DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_multi_cmpxchg)  \
     {                                                     \
         std::vector<test::generic_cmpxchg> cxs_old = cxs; \
                                                           \
@@ -324,6 +328,44 @@
             ASSERT_EQ(cx.desired, cx_old.desired);        \
         }                                                 \
     }                                                     \
+    REQUIRE_SEMICOLON()
+
+
+/// @brief
+///   Test a transactional operation wfb with a null flag and unset flag.
+#define DO_TEST_TSX(config, name)                       \
+    {                                                   \
+        SCOPED_TRACE("flag null");                      \
+        (config).flag_nullable = nullptr;               \
+        test_##name((config).width, 1u, fp_##name);     \
+    }                                                   \
+    {                                                   \
+        SCOPED_TRACE("flag unset");                     \
+        const patomic_transaction_flag_t flag {};       \
+        (config).flag_nullable = &flag;                 \
+        test_##name((config).width, 1u, fp_##name);     \
+    }                                                   \
+    static_assert(std::is_same<decltype(config),        \
+                  patomic_transaction_config_t>::value, \
+                  "don't use wfb version of config_t")
+
+
+/// @brief
+///   Test a transactional operation with a null flag and unset flag.
+#define DO_TEST_TSX_WFB(config, name)               \
+    {                                               \
+        SCOPED_TRACE("flag null");                  \
+        (config).flag_nullable = nullptr;           \
+        (config).fallback_flag_nullable = nullptr;  \
+        test_##name((config).width, 1u, fp_##name); \
+    }                                               \
+    {                                               \
+        SCOPED_TRACE("flag unset");                 \
+        const patomic_transaction_flag_t flag {};   \
+        (config).flag_nullable = &flag;             \
+        (config).fallback_flag_nullable = &flag;    \
+        test_##name((config).width, 1u, fp_##name); \
+    }                                               \
     REQUIRE_SEMICOLON()
 
 
