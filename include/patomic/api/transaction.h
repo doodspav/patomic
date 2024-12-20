@@ -17,7 +17,7 @@ extern "C" {
  *
  * @brief
  *   Writing to this flag when it has been provided to a transaction will cause
- *   the transaction to abort.
+ *   the transaction to abort. If this flag is set, the transaction will abort.
  *
  * @details
  *   Any modification by another thread to any memory in a cache line that is
@@ -95,7 +95,8 @@ typedef struct {
     /** @brief Number of attempts to make committing transaction. */
     unsigned long attempts;
 
-    /** @brief Read from at the start of each transaction attempt. */
+    /** @brief Read from at the start of each transaction attempt, which is
+     *         aborted if the value is non-zero. */
     const patomic_transaction_flag_t *flag_nullable;
 
 } patomic_transaction_config_t;
