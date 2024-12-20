@@ -14,11 +14,28 @@
 
 
 /// @brief
+///   Check that a status has the expected sub-values.
+#define ASSERT_TSX_STATUS_EQ(status, code, info, reason) \
+    ASSERT_EQ(                                           \
+        code,                                            \
+        patomic_transaction_status_exit_code(status)     \
+    );                                                   \
+    ASSERT_EQ(                                           \
+        info,                                            \
+        patomic_transaction_status_exit_info(status)     \
+    );                                                   \
+    ASSERT_EQ(                                           \
+        reason,                                          \
+        patomic_transaction_status_abort_reason(status)  \
+    )
+
+
+/// @brief
 ///   Test a transaction operation with zero attempts and zero width.
 /// @note
 ///   The parameter 'op' is any callable transaction operation, and the
 ///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_ZERO(op, ...) \
+#define ASSERT_TSX_ZERO(op, ...)                                \
     {                                                           \
         patomic_transaction_result_t result {};                 \
         patomic_transaction_config_t config {};                 \
@@ -27,17 +44,23 @@
                                                                 \
         config.attempts = 0;                                    \
         static_cast<void>(op(__VA_ARGS__, config, &result));    \
-        ASSERT_EQ(                                              \
+                                                                \
+        ASSERT_TSX_STATUS_EQ(                                   \
+            result.status,                                      \
             patomic_TABORT_EXPLICIT,                            \
-            patomic_transaction_status_exit_code(result.status) \
+            patomic_TINFO_ZERO_ATTEMPTS,                        \
+            0                                                   \
         );                                                      \
         ASSERT_EQ(result.attempts_made, 0);                     \
                                                                 \
         config.attempts = 5;                                    \
         static_cast<void>(op(__VA_ARGS__, config, &result));    \
-        ASSERT_EQ(                                              \
+                                                                \
+        ASSERT_TSX_STATUS_EQ(                                   \
+            result.status,                                      \
             patomic_TSUCCESS,                                   \
-            patomic_transaction_status_exit_code(result.status) \
+            patomic_TINFO_NONE,                                 \
+            0                                                   \
         );                                                      \
         ASSERT_EQ(result.attempts_made, 1);                     \
     }                                                           \
@@ -61,36 +84,49 @@
         config.attempts = 0;                                             \
         config.fallback_attempts = 0;                                    \
         static_cast<void>(op(__VA_ARGS__, config, &result));             \
-        ASSERT_EQ(                                                       \
+                                                                         \
+        ASSERT_TSX_STATUS_EQ(                                            \
+            result.status,                                               \
             patomic_TABORT_EXPLICIT,                                     \
-            patomic_transaction_status_exit_code(result.status)          \
+            patomic_TINFO_ZERO_ATTEMPTS,                                 \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 0);                              \
         ASSERT_EQ(                                                       \
+            result.fallback_status,                                      \
             patomic_TABORT_EXPLICIT,                                     \
-            patomic_transaction_status_exit_code(result.fallback_status) \
+            patomic_TINFO_ZERO_ATTEMPTS,                                 \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.fallback_attempts_made, 0);                     \
                                                                          \
         config.attempts = 0;                                             \
         config.fallback_attempts = 5;                                    \
         static_cast<void>(op(__VA_ARGS__, config, &result));             \
+                                                                         \
         ASSERT_EQ(                                                       \
+            result.status,                                               \
             patomic_TABORT_EXPLICIT,                                     \
-            patomic_transaction_status_exit_code(result.status)          \
+            patomic_TINFO_ZERO_ATTEMPTS,                                 \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 0);                              \
         ASSERT_EQ(                                                       \
+            result.fallback_status,                                      \
             patomic_TSUCCESS,                                            \
-            patomic_transaction_status_exit_code(result.fallback_status) \
+            patomic_TINFO_NONE,                                          \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.fallback_attempts_made, 1);                     \
                                                                          \
         config.attempts = 5;                                             \
         static_cast<void>(op(__VA_ARGS__, config, &result));             \
+                                                                         \
         ASSERT_EQ(                                                       \
+            result.status,                                               \
             patomic_TSUCCESS,                                            \
-            patomic_transaction_status_exit_code(result.status)          \
+            patomic_TINFO_NONE,                                          \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 1);                              \
     }                                                                    \
@@ -100,7 +136,7 @@
 /// @brief
 ///   Adds a test failure if the status exit code is not success.
 #define ADD_FAILURE_TSX_SUCCESS(config, result)                                  \
-    if (patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status)) \
+    if (result.status != 0ul)                                                    \
     {                                                                            \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);         \
         auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);         \
@@ -123,8 +159,7 @@
 ///   Returns from the current test function with a failure if the primary and
 ///   fallback status exit code is not success.
 #define ADD_FAILURE_TSX_SUCCESS_WFB(config, result)                                        \
-    if (patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status) &&         \
-        patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status))  \
+    if (result.status != 0ul && result.fallback_status != 0ul)                             \
     {                                                                                      \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);                   \
         auto code_wfb = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status);      \
