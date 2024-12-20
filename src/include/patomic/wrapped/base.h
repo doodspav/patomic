@@ -173,7 +173,7 @@
     if ((config).attempts == 0ul)                                     \
     {                                                                 \
         (result).status = PATOMIC_INTERNAL_TRANSACTION_STATUS_CREATE( \
-            patomic_TABORT_EXPLICIT, patomic_TINFO_NONE, 0            \
+            patomic_TABORT_EXPLICIT, patomic_TINFO_ZERO_ATTEMPTS, 0   \
         );                                                            \
         (result).attempts_made = 0ul;                                 \
         goto fallback;                                                \
@@ -215,7 +215,7 @@
     if ((config).fallback_attempts == 0ul)                                     \
     {                                                                          \
         (result).fallback_status = PATOMIC_INTERNAL_TRANSACTION_STATUS_CREATE( \
-            patomic_TABORT_EXPLICIT, patomic_TINFO_NONE, 0                     \
+            patomic_TABORT_EXPLICIT, patomic_TINFO_ZERO_ATTEMPTS, 0            \
         );                                                                     \
         (result).fallback_attempts_made = 0ul;                                 \
         goto cleanup;                                                          \
