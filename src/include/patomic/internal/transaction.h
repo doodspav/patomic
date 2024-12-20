@@ -20,8 +20,8 @@
  *   A non-negative 8bit integer value.
  */
 #define PATOMIC_INTERNAL_TRANSACTION_STATUS_CREATE(code, info, reason) \
-    ( (((unsigned long) (code)) & 0xFFul)           |                   \
-      ((((unsigned long) (info)) & 0xFFul) << 16ul) |                   \
+    ( (((unsigned long) (code)) & 0xFFul)           |                  \
+      ((((unsigned long) (info)) & 0xFFul) << 16ul) |                  \
       ((((unsigned long) (reason)) & 0xFFul) << 8ul) )
 
 

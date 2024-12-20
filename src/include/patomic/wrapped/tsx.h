@@ -38,6 +38,7 @@
     )                                                                \
     {                                                                \
         /* declarations */                                           \
+        unsigned char flag_value = 0;                                \
         patomic_transaction_result_t res = {0};                      \
         const patomic_transaction_flag_t flag = 0;                   \
         if (config.flag_nullable == NULL)                            \
@@ -62,11 +63,17 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
-                    (void *) obj, desired, config.width              \
-                );                                                   \
+                flag_value = *config.flag_nullable;                  \
+                if (flag_value == 0)                                 \
+                {                                                    \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
+                        (void *) obj, desired, config.width          \
+                    );                                               \
+                }                                                    \
                 tcommit();                                           \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(          \
+                    res.status, flag_value                           \
+                );                                                   \
                 goto cleanup;                                        \
             }                                                        \
         }                                                            \
@@ -111,6 +118,7 @@
     )                                                                \
     {                                                                \
         /* declarations */                                           \
+        unsigned char flag_value = 0;                                \
         patomic_transaction_result_t res = {0};                      \
         const patomic_transaction_flag_t flag = 0;                   \
         if (config.flag_nullable == NULL)                            \
@@ -135,11 +143,17 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
-                    ret, (const void *) obj, config.width            \
-                );                                                   \
+                flag_value = *config.flag_nullable;                  \
+                if (flag_value == 0)                                 \
+                {                                                    \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
+                        ret, (const void *) obj, config.width        \
+                    );                                               \
+                }                                                    \
                 tcommit();                                           \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(          \
+                    res.status, flag_value                           \
+                );                                                   \
                 goto cleanup;                                        \
             }                                                        \
         }                                                            \
@@ -185,6 +199,7 @@
     )                                                                \
     {                                                                \
         /* declarations */                                           \
+        unsigned char flag_value = 0;                                \
         patomic_transaction_result_t res = {0};                      \
         const patomic_transaction_flag_t flag = 0;                   \
         if (config.flag_nullable == NULL)                            \
@@ -210,14 +225,20 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
-                    ret, (const void *) obj, config.width            \
-                );                                                   \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
-                    (void *) obj, desired, config.width              \
-                );                                                   \
+                flag_value = *config.flag_nullable;                  \
+                if (flag_value == 0)                                 \
+                {                                                    \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
+                        ret, (const void *) obj, config.width        \
+                    );                                               \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
+                        (void *) obj, desired, config.width          \
+                    );                                               \
+                }                                                    \
                 tcommit();                                           \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(          \
+                    res.status, flag_value                           \
+                );                                                   \
                 goto cleanup;                                        \
             }                                                        \
         }                                                            \
@@ -250,104 +271,117 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_CMPXCHG_WEAK(                    \
-    fn_name, tbegin, tcommit                                           \
-)                                                                      \
-    static int                                                         \
-    fn_name(                                                           \
-        volatile void *const obj,                                      \
-        void *const expected,                                          \
-        const void *const desired,                                     \
-        patomic_transaction_config_wfb_t config,                       \
-        patomic_transaction_result_wfb_t *const result                 \
-    )                                                                  \
-    {                                                                  \
-        /* declarations */                                             \
-        int ok = 0;                                                    \
-        patomic_transaction_result_wfb_t res = {0};                    \
-        const patomic_transaction_flag_t flag = 0;                     \
-        if (config.flag_nullable == NULL)                              \
-        {                                                              \
-            config.flag_nullable = &flag;                              \
-        }                                                              \
-        if (config.fallback_flag_nullable == NULL)                     \
-        {                                                              \
-            config.fallback_flag_nullable = &flag;                     \
-        }                                                              \
-                                                                       \
-        /* assert early */                                             \
-        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                     \
-                                                                       \
-        /* check zero */                                               \
-        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                     \
-            config, res, fallback, cleanup                             \
-        );                                                             \
-                                                                       \
-        /* assertions */                                               \
-        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                        \
-        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                   \
-        PATOMIC_WRAPPED_DO_ASSERT(desired != NULL);                    \
-                                                                       \
-        /* operation */                                                \
-        while (config.attempts-- > 0ul)                                \
-        {                                                              \
-            ++res.attempts_made;                                       \
-            res.status = tbegin();                                     \
-            if (res.status == 0ul)                                     \
-            {                                                          \
-                int cmp;                                               \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);          \
-                PATOMIC_WRAPPED_DO_TSX_MEMCMP(                         \
-                    cmp, (const void *) obj, expected, config.width    \
-                );                                                     \
-                if (cmp == 0)                                          \
-                {                                                      \
-                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
-                        (void *) obj, desired, config.width            \
-                    );                                                 \
-                }                                                      \
-                tcommit();                                             \
-                if (cmp != 0)                                          \
-                {                                                      \
-                    goto fallback;                                     \
-                }                                                      \
-                ok = 1;                                                \
-                goto cleanup;                                          \
-            }                                                          \
-        }                                                              \
-                                                                       \
-        /* fallback */                                                 \
-    fallback:                                                          \
-                                                                       \
-        /* check zero */                                               \
-        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_FALLBACK(                \
-            config, res, cleanup                                       \
-        );                                                             \
-                                                                       \
-        /* assertions */                                               \
-        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                        \
-        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                   \
-                                                                       \
-        /* operation */                                                \
-        while (config.fallback_attempts-- > 0ul)                       \
-        {                                                              \
-            ++res.fallback_attempts_made;                              \
-            res.fallback_status = tbegin();                            \
-            if (res.fallback_status == 0ul)                            \
-            {                                                          \
-                PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                         \
-                    expected, (const void *) obj, config.width         \
-                );                                                     \
-                tcommit();                                             \
-                goto cleanup;                                          \
-            }                                                          \
-        }                                                              \
-                                                                       \
-        /* cleanup */                                                  \
-    cleanup:                                                           \
-        *result = res;                                                 \
-        return ok;                                                     \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_CMPXCHG_WEAK(                     \
+    fn_name, tbegin, tcommit                                            \
+)                                                                       \
+    static int                                                          \
+    fn_name(                                                            \
+        volatile void *const obj,                                       \
+        void *const expected,                                           \
+        const void *const desired,                                      \
+        patomic_transaction_config_wfb_t config,                        \
+        patomic_transaction_result_wfb_t *const result                  \
+    )                                                                   \
+    {                                                                   \
+        /* declarations */                                              \
+        int ok = 0;                                                     \
+        unsigned char flag_value = 0;                                   \
+        patomic_transaction_result_wfb_t res = {0};                     \
+        const patomic_transaction_flag_t flag = 0;                      \
+        if (config.flag_nullable == NULL)                               \
+        {                                                               \
+            config.flag_nullable = &flag;                               \
+        }                                                               \
+        if (config.fallback_flag_nullable == NULL)                      \
+        {                                                               \
+            config.fallback_flag_nullable = &flag;                      \
+        }                                                               \
+                                                                        \
+        /* assert early */                                              \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                      \
+                                                                        \
+        /* check zero */                                                \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                      \
+            config, res, fallback, cleanup                              \
+        );                                                              \
+                                                                        \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                    \
+        PATOMIC_WRAPPED_DO_ASSERT(desired != NULL);                     \
+                                                                        \
+        /* operation */                                                 \
+        while (config.attempts-- > 0ul)                                 \
+        {                                                               \
+            ++res.attempts_made;                                        \
+            res.status = tbegin();                                      \
+            if (res.status == 0ul)                                      \
+            {                                                           \
+                int cmp;                                                \
+                flag_value = *config.flag_nullable;                     \
+                if (flag_value == 0)                                    \
+                {                                                       \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCMP(                      \
+                        cmp, (const void *) obj, expected, config.width \
+                    );                                                  \
+                    if (cmp == 0)                                       \
+                    {                                                   \
+                        PATOMIC_WRAPPED_DO_TSX_MEMCPY(                  \
+                            (void *) obj, desired, config.width         \
+                        );                                              \
+                    }                                                   \
+                }                                                       \
+                tcommit();                                              \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(             \
+                    res.status, flag_value                              \
+                );                                                      \
+                if (flag_value != 0 || cmp != 0)                        \
+                {                                                       \
+                    goto fallback;                                      \
+                }                                                       \
+                ok = 1;                                                 \
+                goto cleanup;                                           \
+            }                                                           \
+        }                                                               \
+                                                                        \
+        /* fallback */                                                  \
+    fallback:                                                           \
+                                                                        \
+        /* check zero */                                                \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_FALLBACK(                 \
+            config, res, cleanup                                        \
+        );                                                              \
+                                                                        \
+        /* assertions */                                                \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
+        PATOMIC_WRAPPED_DO_ASSERT(expected != NULL);                    \
+                                                                        \
+        /* operation */                                                 \
+        while (config.fallback_attempts-- > 0ul)                        \
+        {                                                               \
+            ++res.fallback_attempts_made;                               \
+            res.fallback_status = tbegin();                             \
+            if (res.fallback_status == 0ul)                             \
+            {                                                           \
+                flag_value = *config.fallback_flag_nullable;            \
+                if (flag_value == 0)                                    \
+                {                                                       \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                      \
+                        expected, (const void *) obj, config.width      \
+                    );                                                  \
+                }                                                       \
+                tcommit();                                              \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(             \
+                    res.fallback_status, flag_value                     \
+                );                                                      \
+                goto cleanup;                                           \
+            }                                                           \
+        }                                                               \
+                                                                        \
+        /* cleanup */                                                   \
+    cleanup:                                                            \
+        *result = res;                                                  \
+        return ok;                                                      \
     }
 
 
@@ -373,57 +407,64 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST(                          \
-    fn_name, tbegin, tcommit                                             \
-)                                                                        \
-    static int                                                           \
-    fn_name(                                                             \
-        const volatile void *const obj,                                  \
-        const int offset,                                                \
-        patomic_transaction_config_t config,                             \
-        patomic_transaction_result_t *const result                       \
-    )                                                                    \
-    {                                                                    \
-        /* declarations */                                               \
-        int bit = 0;                                                     \
-        const unsigned char *const uc_obj = (const unsigned char *) obj; \
-        const size_t byte_offset = ((size_t) offset) / CHAR_BIT;         \
-        const int bit_offset = offset % ((int) CHAR_BIT);                \
-        patomic_transaction_result_t res = {0};                          \
-        const patomic_transaction_flag_t flag = 0;                       \
-        if (config.flag_nullable == NULL)                                \
-        {                                                                \
-            config.flag_nullable = &flag;                                \
-        }                                                                \
-                                                                         \
-        /* assert early */                                               \
-        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                       \
-                                                                         \
-        /* check zero */                                                 \
-        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);     \
-                                                                         \
-        /* assertions */                                                 \
-        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                          \
-        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.width);           \
-                                                                         \
-        /* operation */                                                  \
-        while (config.attempts-- > 0ul)                                  \
-        {                                                                \
-            ++res.attempts_made;                                         \
-            res.status = tbegin();                                       \
-            if (res.status == 0ul)                                       \
-            {                                                            \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);            \
-                bit = (int) ((uc_obj[byte_offset] >> bit_offset) & 1u);  \
-                tcommit();                                               \
-                goto cleanup;                                            \
-            }                                                            \
-        }                                                                \
-                                                                         \
-        /* cleanup */                                                    \
-    cleanup:                                                             \
-        *result = res;                                                   \
-        return bit;                                                      \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST(                             \
+    fn_name, tbegin, tcommit                                                \
+)                                                                           \
+    static int                                                              \
+    fn_name(                                                                \
+        const volatile void *const obj,                                     \
+        const int offset,                                                   \
+        patomic_transaction_config_t config,                                \
+        patomic_transaction_result_t *const result                          \
+    )                                                                       \
+    {                                                                       \
+        /* declarations */                                                  \
+        int bit = 0;                                                        \
+        unsigned char flag_value = 0;                                       \
+        const unsigned char *const uc_obj = (const unsigned char *) obj;    \
+        const size_t byte_offset = ((size_t) offset) / CHAR_BIT;            \
+        const int bit_offset = offset % ((int) CHAR_BIT);                   \
+        patomic_transaction_result_t res = {0};                             \
+        const patomic_transaction_flag_t flag = 0;                          \
+        if (config.flag_nullable == NULL)                                   \
+        {                                                                   \
+            config.flag_nullable = &flag;                                   \
+        }                                                                   \
+                                                                            \
+        /* assert early */                                                  \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                          \
+                                                                            \
+        /* check zero */                                                    \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);        \
+                                                                            \
+        /* assertions */                                                    \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.width);              \
+                                                                            \
+        /* operation */                                                     \
+        while (config.attempts-- > 0ul)                                     \
+        {                                                                   \
+            ++res.attempts_made;                                            \
+            res.status = tbegin();                                          \
+            if (res.status == 0ul)                                          \
+            {                                                               \
+                flag_value = *config.flag_nullable;                         \
+                if (flag_value == 0)                                        \
+                {                                                           \
+                    bit = (int) ((uc_obj[byte_offset] >> bit_offset) & 1u); \
+                }                                                           \
+                tcommit();                                                  \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(                 \
+                    res.status, flag_value                                  \
+                );                                                          \
+                goto cleanup;                                               \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        /* cleanup */                                                       \
+    cleanup:                                                                \
+        *result = res;                                                      \
+        return bit;                                                         \
     }
 
 
@@ -456,60 +497,67 @@
  *   is guaranteed to be less than CHAR_BIT.
  *
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_MODIFY(                  \
-    fn_name, tbegin, tcommit, do_bit_modify                             \
-)                                                                       \
-    static int                                                          \
-    fn_name(                                                            \
-        volatile void *const obj,                                       \
-        const int offset,                                               \
-        patomic_transaction_config_t config,                            \
-        patomic_transaction_result_t *const result                      \
-    )                                                                   \
-    {                                                                   \
-        /* declarations */                                              \
-        int bit = 0;                                                    \
-        unsigned char *const uc_obj = (unsigned char *) obj;            \
-        const size_t byte_offset = ((size_t) offset) / CHAR_BIT;        \
-        const int bit_offset = offset % ((int) CHAR_BIT);               \
-        patomic_transaction_result_t res = {0};                         \
-        const patomic_transaction_flag_t flag = 0;                      \
-        if (config.flag_nullable == NULL)                               \
-        {                                                               \
-            config.flag_nullable = &flag;                               \
-        }                                                               \
-                                                                        \
-        /* assert early */                                              \
-        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                      \
-                                                                        \
-        /* check zero */                                                \
-        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);    \
-                                                                        \
-        /* assertions */                                                \
-        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                         \
-        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.width);          \
-                                                                        \
-        /* operation */                                                 \
-        while (config.attempts-- > 0ul)                                 \
-        {                                                               \
-            ++res.attempts_made;                                        \
-            res.status = tbegin();                                      \
-            if (res.status == 0ul)                                      \
-            {                                                           \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);           \
-                bit = (int) ((uc_obj[byte_offset] >> bit_offset) & 1u); \
-                uc_obj[byte_offset] = do_bit_modify(                    \
-                    uc_obj[byte_offset], bit_offset                     \
-                );                                                      \
-                tcommit();                                              \
-                goto cleanup;                                           \
-            }                                                           \
-        }                                                               \
-                                                                        \
-        /* cleanup */                                                   \
-    cleanup:                                                            \
-        *result = res;                                                  \
-        return bit;                                                     \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_BIT_TEST_MODIFY(                      \
+    fn_name, tbegin, tcommit, do_bit_modify                                 \
+)                                                                           \
+    static int                                                              \
+    fn_name(                                                                \
+        volatile void *const obj,                                           \
+        const int offset,                                                   \
+        patomic_transaction_config_t config,                                \
+        patomic_transaction_result_t *const result                          \
+    )                                                                       \
+    {                                                                       \
+        /* declarations */                                                  \
+        int bit = 0;                                                        \
+        unsigned char flag_value = 0;                                       \
+        unsigned char *const uc_obj = (unsigned char *) obj;                \
+        const size_t byte_offset = ((size_t) offset) / CHAR_BIT;            \
+        const int bit_offset = offset % ((int) CHAR_BIT);                   \
+        patomic_transaction_result_t res = {0};                             \
+        const patomic_transaction_flag_t flag = 0;                          \
+        if (config.flag_nullable == NULL)                                   \
+        {                                                                   \
+            config.flag_nullable = &flag;                                   \
+        }                                                                   \
+                                                                            \
+        /* assert early */                                                  \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                          \
+                                                                            \
+        /* check zero */                                                    \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO(config, res, cleanup);        \
+                                                                            \
+        /* assertions */                                                    \
+        PATOMIC_WRAPPED_DO_ASSERT(obj != NULL);                             \
+        PATOMIC_WRAPPED_DO_ASSERT(byte_offset < config.width);              \
+                                                                            \
+        /* operation */                                                     \
+        while (config.attempts-- > 0ul)                                     \
+        {                                                                   \
+            ++res.attempts_made;                                            \
+            res.status = tbegin();                                          \
+            if (res.status == 0ul)                                          \
+            {                                                               \
+                flag_value = *config.flag_nullable;                         \
+                if (flag_value == 0)                                        \
+                {                                                           \
+                    bit = (int) ((uc_obj[byte_offset] >> bit_offset) & 1u); \
+                    uc_obj[byte_offset] = do_bit_modify(                    \
+                        uc_obj[byte_offset], bit_offset                     \
+                    );                                                      \
+                }                                                           \
+                tcommit();                                                  \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(                 \
+                    res.status, flag_value                                  \
+                );                                                          \
+                goto cleanup;                                               \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        /* cleanup */                                                       \
+    cleanup:                                                                \
+        *result = res;                                                      \
+        return bit;                                                         \
     }
 
 
@@ -655,6 +703,7 @@
     )                                                                    \
     {                                                                    \
         /* declarations */                                               \
+        unsigned char flag_value = 0;                                    \
         unsigned char *const uc_obj = (unsigned char *) obj;             \
         const unsigned char *const uc_arg = (const unsigned char *) arg; \
         patomic_transaction_result_t res = {0};                          \
@@ -682,12 +731,18 @@
             res.status = tbegin();                                       \
             if (res.status == 0ul)                                       \
             {                                                            \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);            \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                           \
-                    ret, (const void *) obj, config.width                \
-                );                                                       \
-                do_op(uc_obj, uc_arg, config.width);                     \
+                flag_value = *config.flag_nullable;                      \
+                if (flag_value == 0)                                     \
+                {                                                        \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
+                        ret, (const void *) obj, config.width            \
+                    );                                                   \
+                    do_op(uc_obj, uc_arg, config.width);                 \
+                }                                                        \
                 tcommit();                                               \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(              \
+                    res.status, flag_value                               \
+                );                                                       \
                 goto cleanup;                                            \
             }                                                            \
         }                                                                \
@@ -737,6 +792,7 @@
     )                                                                \
     {                                                                \
         /* declarations */                                           \
+        unsigned char flag_value = 0;                                \
         unsigned char *const uc_obj = (unsigned char *) obj;         \
         patomic_transaction_result_t res = {0};                      \
         const patomic_transaction_flag_t flag = 0;                   \
@@ -762,12 +818,18 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
-                    ret, (const void *) obj, config.width            \
-                );                                                   \
-                do_op(uc_obj, config.width);                         \
+                flag_value = *config.flag_nullable;                  \
+                if (flag_value == 0)                                 \
+                {                                                    \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
+                        ret, (const void *) obj, config.width        \
+                    );                                               \
+                    do_op(uc_obj, config.width);                     \
+                }                                                    \
                 tcommit();                                           \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(          \
+                    res.status, flag_value                           \
+                );                                                   \
                 goto cleanup;                                        \
             }                                                        \
         }                                                            \
@@ -817,6 +879,7 @@
     )                                                                    \
     {                                                                    \
         /* declarations */                                               \
+        unsigned char flag_value = 0;                                    \
         unsigned char *const uc_obj = (unsigned char *) obj;             \
         const unsigned char *const uc_arg = (const unsigned char *) arg; \
         patomic_transaction_result_t res = {0};                          \
@@ -843,9 +906,15 @@
             res.status = tbegin();                                       \
             if (res.status == 0ul)                                       \
             {                                                            \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);            \
-                do_op(uc_obj, uc_arg, config.width);                     \
+                flag_value = *config.flag_nullable;                      \
+                if (flag_value == 0)                                     \
+                {                                                        \
+                    do_op(uc_obj, uc_arg, config.width);                 \
+                }                                                        \
                 tcommit();                                               \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(              \
+                    res.status, flag_value                               \
+                );                                                       \
                 goto cleanup;                                            \
             }                                                            \
         }                                                                \
@@ -894,6 +963,7 @@
     )                                                                \
     {                                                                \
         /* declarations */                                           \
+        unsigned char flag_value = 0;                                \
         unsigned char *const uc_obj = (unsigned char *) obj;         \
         patomic_transaction_result_t res = {0};                      \
         const patomic_transaction_flag_t flag = 0;                   \
@@ -918,9 +988,15 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                do_op(uc_obj, config.width);                         \
+                flag_value = *config.flag_nullable;                  \
+                if (flag_value == 0)                                 \
+                {                                                    \
+                    do_op(uc_obj, config.width);                     \
+                }                                                    \
                 tcommit();                                           \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(          \
+                    res.status, flag_value                           \
+                );                                                   \
                 goto cleanup;                                        \
             }                                                        \
         }                                                            \
@@ -1660,117 +1736,130 @@
  *   A callable with the signature and semantics of
  *   patomic_opsig_transaction_tcommit_t.
  */
-#define PATOMIC_WRAPPED_TSX_DEFINE_OP_DOUBLE_CMPXCHG(                         \
-    fn_name, tbegin, tcommit                                                  \
-)                                                                             \
-    static int                                                                \
-    fn_name(                                                                  \
-        const patomic_transaction_cmpxchg_t cxa,                              \
-        const patomic_transaction_cmpxchg_t cxb,                              \
-        patomic_transaction_config_wfb_t config,                              \
-        patomic_transaction_result_wfb_t *const result                        \
-    )                                                                         \
-    {                                                                         \
-        /* declarations */                                                    \
-        int ok = 0;                                                           \
-        patomic_transaction_result_wfb_t res = {0};                           \
-        const patomic_transaction_flag_t flag = 0;                            \
-        if (config.flag_nullable == NULL)                                     \
-        {                                                                     \
-            config.flag_nullable = &flag;                                     \
-        }                                                                     \
-        if (config.fallback_flag_nullable == NULL)                            \
-        {                                                                     \
-            config.fallback_flag_nullable = &flag;                            \
-        }                                                                     \
-                                                                              \
-        /* assert early */                                                    \
-        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                            \
-                                                                              \
-        /* check zero */                                                      \
-        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                            \
-            config, res, fallback, cleanup                                    \
-        );                                                                    \
-                                                                              \
-        /* assertions */                                                      \
-        PATOMIC_WRAPPED_DO_ASSERT(cxa.obj != NULL);                           \
-        PATOMIC_WRAPPED_DO_ASSERT(cxa.expected != NULL);                      \
-        PATOMIC_WRAPPED_DO_ASSERT(cxa.desired != NULL);                       \
-        PATOMIC_WRAPPED_DO_ASSERT(cxb.obj != NULL);                           \
-        PATOMIC_WRAPPED_DO_ASSERT(cxb.expected != NULL);                      \
-        PATOMIC_WRAPPED_DO_ASSERT(cxb.desired != NULL);                       \
-                                                                              \
-        /* operation */                                                       \
-        while (config.attempts-- > 0ul)                                       \
-        {                                                                     \
-            ++res.attempts_made;                                              \
-            res.status = tbegin();                                            \
-            if (res.status == 0ul)                                            \
-            {                                                                 \
-                int cmp_a, cmp_b;                                             \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);                 \
-                PATOMIC_WRAPPED_DO_TSX_MEMCMP(                                \
-                    cmp_a, (const void *) cxa.obj, cxa.expected, config.width \
-                );                                                            \
-                PATOMIC_WRAPPED_DO_TSX_MEMCMP(                                \
-                    cmp_b, (const void *) cxb.obj, cxb.expected, config.width \
-                );                                                            \
-                if (cmp_a == 0 && cmp_b == 0)                                 \
-                {                                                             \
-                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                            \
-                        (void *) cxa.obj, cxa.desired, config.width           \
-                    );                                                        \
-                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                            \
-                        (void *) cxb.obj, cxb.desired, config.width           \
-                    );                                                        \
-                }                                                             \
-                tcommit();                                                    \
-                if (!(cmp_a == 0 && cmp_b == 0))                              \
-                {                                                             \
-                    goto fallback;                                            \
-                }                                                             \
-                ok = 1;                                                       \
-                goto cleanup;                                                 \
-            }                                                                 \
-        }                                                                     \
-                                                                              \
-        /* fallback */                                                        \
-    fallback:                                                                 \
-                                                                              \
-        /* check zero */                                                      \
-        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_FALLBACK(                       \
-            config, res, cleanup                                              \
-        );                                                                    \
-                                                                              \
-        /* assertions */                                                      \
-        PATOMIC_WRAPPED_DO_ASSERT(cxa.obj != NULL);                           \
-        PATOMIC_WRAPPED_DO_ASSERT(cxa.expected != NULL);                      \
-        PATOMIC_WRAPPED_DO_ASSERT(cxb.obj != NULL);                           \
-        PATOMIC_WRAPPED_DO_ASSERT(cxb.expected != NULL);                      \
-                                                                              \
-        /* operation */                                                       \
-        while (config.fallback_attempts-- > 0ul)                              \
-        {                                                                     \
-            ++res.fallback_attempts_made;                                     \
-            res.fallback_status = tbegin();                                   \
-            if (res.fallback_status == 0ul)                                   \
-            {                                                                 \
-                PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable);        \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                                \
-                    cxa.expected, (const void *) cxa.obj, config.width        \
-                );                                                            \
-                PATOMIC_WRAPPED_DO_TSX_MEMCPY(                                \
-                    cxb.expected, (const void *) cxb.obj, config.width        \
-                );                                                            \
-                tcommit();                                                    \
-                goto cleanup;                                                 \
-            }                                                                 \
-        }                                                                     \
-                                                                              \
-        /* cleanup */                                                         \
-    cleanup:                                                                  \
-        *result = res;                                                        \
-        return ok;                                                            \
+#define PATOMIC_WRAPPED_TSX_DEFINE_OP_DOUBLE_CMPXCHG(                             \
+    fn_name, tbegin, tcommit                                                      \
+)                                                                                 \
+    static int                                                                    \
+    fn_name(                                                                      \
+        const patomic_transaction_cmpxchg_t cxa,                                  \
+        const patomic_transaction_cmpxchg_t cxb,                                  \
+        patomic_transaction_config_wfb_t config,                                  \
+        patomic_transaction_result_wfb_t *const result                            \
+    )                                                                             \
+    {                                                                             \
+        /* declarations */                                                        \
+        int ok = 0;                                                               \
+        unsigned char value = 0;                                                  \
+        patomic_transaction_result_wfb_t res = {0};                               \
+        const patomic_transaction_flag_t flag = 0;                                \
+        if (config.flag_nullable == NULL)                                         \
+        {                                                                         \
+            config.flag_nullable = &flag;                                         \
+        }                                                                         \
+        if (config.fallback_flag_nullable == NULL)                                \
+        {                                                                         \
+            config.fallback_flag_nullable = &flag;                                \
+        }                                                                         \
+                                                                                  \
+        /* assert early */                                                        \
+        PATOMIC_WRAPPED_DO_ASSERT(result != NULL);                                \
+                                                                                  \
+        /* check zero */                                                          \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_WFB(                                \
+            config, res, fallback, cleanup                                        \
+        );                                                                        \
+                                                                                  \
+        /* assertions */                                                          \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.obj != NULL);                               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.expected != NULL);                          \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.desired != NULL);                           \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.obj != NULL);                               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.expected != NULL);                          \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.desired != NULL);                           \
+                                                                                  \
+        /* operation */                                                           \
+        while (config.attempts-- > 0ul)                                           \
+        {                                                                         \
+            ++res.attempts_made;                                                  \
+            res.status = tbegin();                                                \
+            if (res.status == 0ul)                                                \
+            {                                                                     \
+                int cmp_a, cmp_b;                                                 \
+                flag_value = *config.flag_nullable;                               \
+                if (flag_value == 0)                                              \
+                {                                                                 \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCMP(                                \
+                        cmp_a, (const void *) cxa.obj, cxa.expected, config.width \
+                    );                                                            \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCMP(                                \
+                        cmp_b, (const void *) cxb.obj, cxb.expected, config.width \
+                    );                                                            \
+                    if (cmp_a == 0 && cmp_b == 0)                                 \
+                    {                                                             \
+                        PATOMIC_WRAPPED_DO_TSX_MEMCPY(                            \
+                            (void *) cxa.obj, cxa.desired, config.width           \
+                        );                                                        \
+                        PATOMIC_WRAPPED_DO_TSX_MEMCPY(                            \
+                            (void *) cxb.obj, cxb.desired, config.width           \
+                        );                                                        \
+                    }                                                             \
+                }                                                                 \
+                tcommit();                                                        \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(                       \
+                    res.status, flag_value                                        \
+                );                                                                \
+                if (flag_value != 0 || !(cmp_a == 0 && cmp_b == 0))               \
+                {                                                                 \
+                    goto fallback;                                                \
+                }                                                                 \
+                ok = 1;                                                           \
+                goto cleanup;                                                     \
+            }                                                                     \
+        }                                                                         \
+                                                                                  \
+        /* fallback */                                                            \
+    fallback:                                                                     \
+                                                                                  \
+        /* check zero */                                                          \
+        PATOMIC_WRAPPED_TSX_CHECK_CONFIG_ZERO_FALLBACK(                           \
+            config, res, cleanup                                                  \
+        );                                                                        \
+                                                                                  \
+        /* assertions */                                                          \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.obj != NULL);                               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxa.expected != NULL);                          \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.obj != NULL);                               \
+        PATOMIC_WRAPPED_DO_ASSERT(cxb.expected != NULL);                          \
+                                                                                  \
+        /* operation */                                                           \
+        while (config.fallback_attempts-- > 0ul)                                  \
+        {                                                                         \
+            ++res.fallback_attempts_made;                                         \
+            res.fallback_status = tbegin();                                       \
+            if (res.fallback_status == 0ul)                                       \
+            {                                                                     \
+                flag_value = *config.fallback_flag_nullable;                      \
+                if (flag_value == 0)                                              \
+                {                                                                 \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                                \
+                        cxa.expected, (const void *) cxa.obj, config.width        \
+                    );                                                            \
+                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                                \
+                        cxb.expected, (const void *) cxb.obj, config.width        \
+                    );                                                            \
+                }                                                                 \
+                tcommit();                                                        \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(                       \
+                    res.fallback_status, flag_value                               \
+                );                                                                \
+                goto cleanup;                                                     \
+            }                                                                     \
+        }                                                                         \
+                                                                                  \
+        /* cleanup */                                                             \
+    cleanup:                                                                      \
+        *result = res;                                                            \
+        return ok;                                                                \
     }
 
 
@@ -1810,6 +1899,7 @@
         /* declarations */                                             \
         size_t i;                                                      \
         int ok = 0;                                                    \
+        unsigned char flag_value = 0;                                  \
         patomic_transaction_result_wfb_t res = {0};                    \
         const patomic_transaction_flag_t flag = 0;                     \
         if (config.flag_nullable == NULL)                              \
@@ -1845,29 +1935,35 @@
             if (res.status == 0ul)                                     \
             {                                                          \
                 size_t cmp = 0;                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);          \
-                for (i = 0; i < cxs_len && cmp == 0; ++i)              \
+                flag_value = *config.flag_nullable;                    \
+                if (flag_value == 0)                                   \
                 {                                                      \
-                    PATOMIC_WRAPPED_DO_TSX_MEMCMP(                     \
-                        cmp,                                           \
-                        (const void *) cxs_buf[i].obj,                 \
-                        cxs_buf[i].expected,                           \
-                        config.width                                   \
-                    );                                                 \
-                }                                                      \
-                if (cmp == 0)                                          \
-                {                                                      \
-                    for (i = 0; i < cxs_len; ++i)                      \
+                    for (i = 0; i < cxs_len && cmp == 0; ++i)          \
                     {                                                  \
-                        PATOMIC_WRAPPED_DO_TSX_MEMCPY(                 \
-                            (void *) cxs_buf[i].obj,                   \
-                            cxs_buf[i].desired,                        \
+                        PATOMIC_WRAPPED_DO_TSX_MEMCMP(                 \
+                            cmp,                                       \
+                            (const void *) cxs_buf[i].obj,             \
+                            cxs_buf[i].expected,                       \
                             config.width                               \
                         );                                             \
                     }                                                  \
+                    if (cmp == 0)                                      \
+                    {                                                  \
+                        for (i = 0; i < cxs_len; ++i)                  \
+                        {                                              \
+                            PATOMIC_WRAPPED_DO_TSX_MEMCPY(             \
+                                (void *) cxs_buf[i].obj,               \
+                                cxs_buf[i].desired,                    \
+                                config.width                           \
+                            );                                         \
+                        }                                              \
+                    }                                                  \
                 }                                                      \
                 tcommit();                                             \
-                if (cmp != 0)                                          \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(            \
+                    res.status, flag_value                             \
+                );                                                     \
+                if (flag_value != 0 || cmp != 0)                       \
                 {                                                      \
                     goto fallback;                                     \
                 }                                                      \
@@ -1898,16 +1994,22 @@
             res.fallback_status = tbegin();                            \
             if (res.fallback_status == 0ul)                            \
             {                                                          \
-                PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable); \
-                for (i = 0; i < cxs_len; ++i)                          \
+                flag_value = *config.fallback_flag_nullable;           \
+                if (flag_value == 0)                                   \
                 {                                                      \
-                    PATOMIC_WRAPPED_DO_TSX_MEMCPY(                     \
-                        cxs_buf[i].expected,                           \
-                        (const void *) cxs_buf[i].obj,                 \
-                        config.width                                   \
-                    );                                                 \
+                    for (i = 0; i < cxs_len; ++i)                      \
+                    {                                                  \
+                        PATOMIC_WRAPPED_DO_TSX_MEMCPY(                 \
+                            cxs_buf[i].expected,                       \
+                            (const void *) cxs_buf[i].obj,             \
+                            config.width                               \
+                        );                                             \
+                    }                                                  \
                 }                                                      \
                 tcommit();                                             \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(            \
+                    res.fallback_status, flag_value                    \
+                );                                                     \
                 goto cleanup;                                          \
             }                                                          \
         }                                                              \
@@ -1953,6 +2055,7 @@
     )                                                                \
     {                                                                \
         /* declarations */                                           \
+        unsigned char flag_value = 0;                                \
         patomic_transaction_result_t res = {0};                      \
         const patomic_transaction_flag_t flag = 0;                   \
         if (config.flag_nullable == NULL)                            \
@@ -1976,9 +2079,15 @@
             res.status = tbegin();                                   \
             if (res.status == 0ul)                                   \
             {                                                        \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);        \
-                fn(ctx);                                             \
+                flag_value = *config.flag_nullable;                  \
+                if (flag_value == 0)                                 \
+                {                                                    \
+                    fn(ctx);                                         \
+                }                                                    \
                 tcommit();                                           \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(          \
+                    res.status, flag_value                           \
+                );                                                   \
                 goto cleanup;                                        \
             }                                                        \
         }                                                            \
@@ -2025,6 +2134,7 @@
     )                                                                        \
     {                                                                        \
         /* declarations */                                                   \
+        unsigned char flag_value = 0;                                        \
         patomic_transaction_result_wfb_t res = {0};                          \
         const patomic_transaction_flag_t flag = 0;                           \
         if (config.flag_nullable == NULL)                                    \
@@ -2054,9 +2164,19 @@
             res.status = tbegin();                                           \
             if (res.status == 0ul)                                           \
             {                                                                \
-                PATOMIC_IGNORE_UNUSED(*config.flag_nullable);                \
-                fn(ctx);                                                     \
+                flag_value = *config.flag_nullable;                          \
+                if (flag_value == 0)                                         \
+                {                                                            \
+                    fn(ctx);                                                 \
+                }                                                            \
                 tcommit();                                                   \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(                  \
+                    res.status, flag_value                                   \
+                );                                                           \
+                if (flag_value != 0)                                         \
+                {                                                            \
+                    goto fallback;                                           \
+                }                                                            \
                 goto cleanup;                                                \
             }                                                                \
         }                                                                    \
@@ -2083,9 +2203,15 @@
             res.fallback_status = tbegin();                                  \
             if (res.fallback_status == 0ul)                                  \
             {                                                                \
-                PATOMIC_IGNORE_UNUSED(*config.fallback_flag_nullable);       \
-                fallback_fn(fallback_ctx);                                   \
+                flag_value = *config.fallback_flag_nullable;                 \
+                if (flag_value == 0)                                         \
+                {                                                            \
+                    fallback_fn(fallback_ctx);                               \
+                }                                                            \
                 tcommit();                                                   \
+                PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(                  \
+                    res.fallback_status, flag_value                          \
+                );                                                           \
                 goto cleanup;                                                \
             }                                                                \
         }                                                                    \

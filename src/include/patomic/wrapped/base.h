@@ -232,4 +232,23 @@
     do {} while (0)
 
 
+/**
+ * @addtogroup wrapped.base
+ *
+ * @brief
+ *   Update status to appropriate value if flag is set.
+ */
+#define PATOMIC_WRAPPED_TSX_UPDATE_STATUS_FOR_FLAG(            \
+    status, flag_value                                         \
+)                                                              \
+    if ((flag_value) != 0)                                     \
+    {                                                          \
+        (status) = PATOMIC_INTERNAL_TRANSACTION_STATUS_CREATE( \
+            patomic_TABORT_EXPLICIT, patomic_TINFO_FLAG_SET, 0 \
+        );                                                     \
+    }                                                          \
+    /* require semicolon */                                    \
+    do {} while (0)
+
+
 #endif  /* PATOMIC_WRAPPED_BASE_H */
