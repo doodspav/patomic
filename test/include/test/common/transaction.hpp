@@ -143,6 +143,75 @@
 
 
 /// @brief
+///   Test a transaction operation with flag set.
+/// @warning
+///   All pointer ellipsis parameters must be non-null.
+/// @note
+///   The parameter 'op' is any callable transaction operation, and the
+///   ellipsis is every parameter except for config and result.
+#define ASSERT_TSX_FLAG_SET(op, ...)                         \
+    {                                                        \
+        const patomic_transaction_flag_t flag = 1;           \
+        patomic_transaction_result_t result {};              \
+        patomic_transaction_config_t config {};              \
+                                                             \
+        config.width = 1;                                    \
+        config.attempts = 1000u;                             \
+        config.flag_nullable = &flag;                        \
+                                                             \
+        static_cast<void>(op(__VA_ARGS__, config, &result)); \
+                                                             \
+        ASSERT_TSX_STATUS_EQ(                                \
+            result.status,                                   \
+            patomic_TABORT_EXPLICIT,                         \
+            patomic_TINFO_FLAG_SET,                          \
+            0                                                \
+        );                                                   \
+        ASSERT_GT(result.attempts_made, 0);                  \
+    }                                                        \
+    REQUIRE_SEMICOLON()
+
+
+/// @brief
+///   Test a transaction wfb operation with flag and fallback flag set.
+/// @warning
+///   All pointer ellipsis parameters must be non-null.
+/// @note
+///   The parameter 'op' is any callable transaction operation, and the
+///   ellipsis is every parameter except for config and result.
+#define ASSERT_TSX_FLAG_SET_WFB(op, ...)                     \
+    {                                                        \
+        const patomic_transaction_flag_t flag = 1;           \
+        patomic_transaction_result_wfb_t result {};          \
+        patomic_transaction_config_wfb_t config {};          \
+                                                             \
+        config.width = 1;                                    \
+        config.attempts = 1000;                              \
+        config.fallback_attempts = 1000;                     \
+        config.flag_nullable = &flag;                        \
+        config.fallback_flag_nullable = &flag;               \
+                                                             \
+        static_cast<void>(op(__VA_ARGS__, config, &result)); \
+                                                             \
+        ASSERT_TSX_STATUS_EQ(                                \
+            result.status,                                   \
+            patomic_TABORT_EXPLICIT,                         \
+            patomic_TINFO_FLAG_SET,                          \
+            0                                                \
+        );                                                   \
+        ASSERT_GT(result.attempts_made, 0);                  \
+        ASSERT_TSX_STATUS_EQ(                                \
+            result.fallback_status,                          \
+            patomic_TABORT_EXPLICIT,                         \
+            patomic_TINFO_FLAG_SET,                          \
+            0                                                \
+        );                                                   \
+        ASSERT_GT(result.fallback_attempts_made, 0);         \
+    }                                                        \
+    REQUIRE_SEMICOLON()
+
+
+/// @brief
 ///   Adds a test failure if the status exit code is not success.
 #define ADD_FAILURE_TSX_SUCCESS(config, result)                                  \
     if (result.status != 0ul)                                                    \
