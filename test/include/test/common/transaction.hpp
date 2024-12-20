@@ -44,9 +44,9 @@
 /// @brief
 ///   Test a transaction operation with zero attempts and zero width.
 /// @note
-///   The parameter 'op' is any callable transaction operation, and the
-///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_ZERO(op, ...)                                \
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_ZERO(op)                                     \
     {                                                           \
         patomic_transaction_result_t result {};                 \
         patomic_transaction_config_t config {};                 \
@@ -54,7 +54,9 @@
         config.flag_nullable = nullptr;                         \
                                                                 \
         config.attempts = 0;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));    \
+        ::test::_detail::call_patomic_op(                       \
+            op, nullptr, config, &result                        \
+        );                                                      \
                                                                 \
         ASSERT_TSX_STATUS_EQ(                                   \
             result.status,                                      \
@@ -65,7 +67,9 @@
         ASSERT_EQ(result.attempts_made, 0);                     \
                                                                 \
         config.attempts = 5;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));    \
+        ::test::_detail::call_patomic_op(                       \
+            op, nullptr, config, &result                        \
+        );                                                      \
                                                                 \
         ASSERT_TSX_STATUS_EQ(                                   \
             result.status,                                      \
@@ -82,9 +86,9 @@
 ///   Test a transaction wfb operation with zero attempts, zero fallback
 ///   attempts, and zero width.
 /// @note
-///   The parameter 'op' is any callable transaction operation, and the
-///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_ZERO_WFB(op, ...)                                     \
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_ZERO_WFB(op)                                          \
     {                                                                    \
         patomic_transaction_result_wfb_t result {};                      \
         patomic_transaction_config_wfb_t config {};                      \
@@ -94,7 +98,9 @@
                                                                          \
         config.attempts = 0;                                             \
         config.fallback_attempts = 0;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));             \
+        ::test::_detail::call_patomic_op(                                \
+            op, nullptr, config, &result                                 \
+        );                                                               \
                                                                          \
         ASSERT_TSX_STATUS_EQ(                                            \
             result.status,                                               \
@@ -113,7 +119,9 @@
                                                                          \
         config.attempts = 0;                                             \
         config.fallback_attempts = 5;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));             \
+        ::test::_detail::call_patomic_op(                                \
+            op, nullptr, config, &result                                 \
+        );                                                               \
                                                                          \
         ASSERT_TSX_STATUS_EQ(                                            \
             result.status,                                               \
@@ -131,7 +139,9 @@
         ASSERT_EQ(result.fallback_attempts_made, 1);                     \
                                                                          \
         config.attempts = 5;                                             \
-        static_cast<void>(op(__VA_ARGS__, config, &result));             \
+        ::test::_detail::call_patomic_op(                                \
+            op, nullptr, config, &result                                 \
+        );                                                               \
                                                                          \
         ASSERT_TSX_STATUS_EQ(                                            \
             result.status,                                               \
@@ -146,13 +156,12 @@
 
 /// @brief
 ///   Test a transaction operation with flag set.
-/// @warning
-///   All pointer ellipsis parameters must be non-null.
 /// @note
-///   The parameter 'op' is any callable transaction operation, and the
-///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_FLAG_SET(op, ...)                         \
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_FLAG_SET(op)                              \
     {                                                        \
+        unsigned char uc {};                                 \
         const patomic_transaction_flag_t flag = 1;           \
         patomic_transaction_result_t result {};              \
         patomic_transaction_config_t config {};              \
@@ -161,7 +170,9 @@
         config.attempts = 1000u;                             \
         config.flag_nullable = &flag;                        \
                                                              \
-        static_cast<void>(op(__VA_ARGS__, config, &result)); \
+        ::test::_detail::call_patomic_op(                    \
+            op, &uc, config, &result                         \
+        );                                                   \
                                                              \
         ASSERT_TSX_STATUS_EQ(                                \
             result.status,                                   \
@@ -176,13 +187,12 @@
 
 /// @brief
 ///   Test a transaction wfb operation with flag and fallback flag set.
-/// @warning
-///   All pointer ellipsis parameters must be non-null.
 /// @note
-///   The parameter 'op' is any callable transaction operation, and the
-///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_FLAG_SET_WFB(op, ...)                     \
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_FLAG_SET_WFB(op)                          \
     {                                                        \
+        unsigned char uc {};                                 \
         const patomic_transaction_flag_t flag = 1;           \
         patomic_transaction_result_wfb_t result {};          \
         patomic_transaction_config_wfb_t config {};          \
@@ -193,7 +203,9 @@
         config.flag_nullable = &flag;                        \
         config.fallback_flag_nullable = &flag;               \
                                                              \
-        static_cast<void>(op(__VA_ARGS__, config, &result)); \
+        ::test::_detail::call_patomic_op(                    \
+            op, &uc, config, &result                         \
+        );                                                   \
                                                              \
         ASSERT_TSX_STATUS_EQ(                                \
             result.status,                                   \
@@ -333,7 +345,7 @@
 
 /// @brief
 ///   Test a transactional operation wfb with a null flag and unset flag.
-#define DO_TEST_TSX(config, name)                       \
+#define TEST_TSX(config, name)                          \
     {                                                   \
         SCOPED_TRACE("flag null");                      \
         (config).flag_nullable = nullptr;               \
@@ -352,7 +364,7 @@
 
 /// @brief
 ///   Test a transactional operation with a null flag and unset flag.
-#define DO_TEST_TSX_WFB(config, name)               \
+#define TEST_TSX_WFB(config, name)                  \
     {                                               \
         SCOPED_TRACE("flag null");                  \
         (config).flag_nullable = nullptr;           \
@@ -371,6 +383,19 @@
 
 namespace test
 {
+
+
+namespace _detail
+{
+
+/// @brief
+///   Calls the given op function pointer with all pointer params having the
+///   given value. The return value is discarded.
+template <class F, class C, class R>
+void
+call_patomic_op(F f, void *ptr, const C& config, R *result) noexcept;
+
+}  // namespace _detail
 
 
 /// @brief
