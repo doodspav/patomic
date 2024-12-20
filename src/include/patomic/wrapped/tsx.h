@@ -1749,7 +1749,7 @@
     {                                                                             \
         /* declarations */                                                        \
         int ok = 0;                                                               \
-        unsigned char value = 0;                                                  \
+        unsigned char flag_value = 0;                                             \
         patomic_transaction_result_wfb_t res = {0};                               \
         const patomic_transaction_flag_t flag = 0;                                \
         if (config.flag_nullable == NULL)                                         \
