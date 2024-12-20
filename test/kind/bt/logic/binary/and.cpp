@@ -11,7 +11,7 @@ namespace
 {
 
 void
-test_bin_fetch_and(
+test_fetch_and(
     std::size_t width,
     std::size_t align,
     const std::function<void(
@@ -97,7 +97,7 @@ test_bin_fetch_and(
 }
 
 void
-test_bin_and(
+test_and(
     std::size_t width,
     std::size_t align,
     const std::function<void(
@@ -113,7 +113,7 @@ test_bin_and(
     };
 
     // defer to fetch variant
-    return test_bin_fetch_and(width, align, fetch_and);
+    return test_fetch_and(width, align, fetch_and);
 }
 
 }  // namespace
@@ -139,7 +139,7 @@ TEST_P(BtLogicImplicit, fp_and)
     };
 
     // test
-    test_bin_and(p.width, m_align.recommended, fp_and);
+    test_and(p.width, m_align.recommended, fp_and);
 }
 
 /// @brief Check that the non-atomic logic of implicit fetch_and works correctly.
@@ -155,7 +155,7 @@ TEST_P(BtLogicImplicit, fp_fetch_and)
     };
 
     // test
-    test_bin_fetch_and(p.width, m_align.recommended, fp_fetch_and);
+    test_fetch_and(p.width, m_align.recommended, fp_fetch_and);
 }
 
 
@@ -172,7 +172,7 @@ TEST_P(BtLogicExplicit, fp_and)
     };
 
     // test
-    test_bin_and(p.width, m_align.recommended, fp_and);
+    test_and(p.width, m_align.recommended, fp_and);
 }
 
 /// @brief Check that the non-atomic logic of explicit fetch_and works correctly.
@@ -188,7 +188,7 @@ TEST_P(BtLogicExplicit, fp_fetch_and)
     };
 
     // test
-    test_bin_fetch_and(p.width, m_align.recommended, fp_fetch_and);
+    test_fetch_and(p.width, m_align.recommended, fp_fetch_and);
 }
 
 
@@ -200,7 +200,10 @@ TEST_P(BtLogicTransaction, fp_and)
     SKIP_NULL_OP_FP_AND(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_and, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_and);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.binary_ops.fp_and);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -217,7 +220,7 @@ TEST_P(BtLogicTransaction, fp_and)
         };
 
         // test
-        test_bin_and(width, 1u, fp_and);
+        TEST_TSX(m_config, and);
     }
 }
 
@@ -229,7 +232,10 @@ TEST_P(BtLogicTransaction, fp_fetch_and)
     SKIP_NULL_OP_FP_FETCH_AND(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_and, nullptr, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_and);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.binary_ops.fp_fetch_and);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -246,6 +252,6 @@ TEST_P(BtLogicTransaction, fp_fetch_and)
         };
 
         // test
-        test_bin_fetch_and(width, 1u, fp_fetch_and);
+        TEST_TSX(m_config, fetch_and);
     }
 }

@@ -66,7 +66,10 @@ TEST_P(BtLogicTransaction, fp_generic_wfb)
     SKIP_NULL_OP_FP_GENERIC_WFB(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_generic_wfb, nullptr, nullptr, nullptr, nullptr);
+    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_generic_wfb);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET_WFB(m_ops.special_ops.fp_generic_wfb);
 
     // make sure width is non-zero
     m_config_wfb.width = 1;

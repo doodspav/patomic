@@ -79,7 +79,10 @@ TEST_P(BtLogicTransaction, fp_double_cmpxchg)
     SKIP_NULL_OP_FP_DOUBLE_CMPXCHG(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_double_cmpxchg, {}, {});
+    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_double_cmpxchg);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET_WFB(m_ops.special_ops.fp_double_cmpxchg);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -98,6 +101,6 @@ TEST_P(BtLogicTransaction, fp_double_cmpxchg)
         };
 
         // test
-        test_double_cmpxchg(width, 1u, fp_double_cmpxchg);
+        TEST_TSX_WFB(m_config_wfb, double_cmpxchg);
     }
 }

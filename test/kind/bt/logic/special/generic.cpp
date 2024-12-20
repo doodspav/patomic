@@ -42,7 +42,10 @@ TEST_P(BtLogicTransaction, fp_generic)
     SKIP_NULL_OP_FP_GENERIC(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.special_ops.fp_generic, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.special_ops.fp_generic);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.special_ops.fp_generic);
 
     // make sure width is non-zero
     m_config.width = 1;

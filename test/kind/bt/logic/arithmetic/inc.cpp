@@ -152,7 +152,10 @@ TEST_P(BtLogicTransaction, fp_inc)
     SKIP_NULL_OP_FP_INC(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_inc, nullptr);
+    ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_inc);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.arithmetic_ops.fp_inc);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -169,7 +172,7 @@ TEST_P(BtLogicTransaction, fp_inc)
         };
 
         // test
-        test_inc(width, 1u, fp_inc);
+        TEST_TSX(m_config, inc);
     }
 }
 
@@ -181,7 +184,10 @@ TEST_P(BtLogicTransaction, fp_fetch_inc)
     SKIP_NULL_OP_FP_FETCH_INC(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_fetch_inc, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.arithmetic_ops.fp_fetch_inc);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.arithmetic_ops.fp_fetch_inc);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -198,6 +204,6 @@ TEST_P(BtLogicTransaction, fp_fetch_inc)
         };
 
         // test
-        test_fetch_inc(width, 1u, fp_fetch_inc);
+        TEST_TSX(m_config, fetch_inc);
     }
 }
