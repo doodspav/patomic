@@ -92,7 +92,7 @@
             0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 0);                              \
-        ASSERT_EQ(                                                       \
+        ASSERT_TSX_STATUS_EQ(                                            \
             result.fallback_status,                                      \
             patomic_TABORT_EXPLICIT,                                     \
             patomic_TINFO_ZERO_ATTEMPTS,                                 \
@@ -104,14 +104,14 @@
         config.fallback_attempts = 5;                                    \
         static_cast<void>(op(__VA_ARGS__, config, &result));             \
                                                                          \
-        ASSERT_EQ(                                                       \
+        ASSERT_TSX_STATUS_EQ(                                            \
             result.status,                                               \
             patomic_TABORT_EXPLICIT,                                     \
             patomic_TINFO_ZERO_ATTEMPTS,                                 \
             0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 0);                              \
-        ASSERT_EQ(                                                       \
+        ASSERT_TSX_STATUS_EQ(                                            \
             result.fallback_status,                                      \
             patomic_TSUCCESS,                                            \
             patomic_TINFO_NONE,                                          \
@@ -122,7 +122,7 @@
         config.attempts = 5;                                             \
         static_cast<void>(op(__VA_ARGS__, config, &result));             \
                                                                          \
-        ASSERT_EQ(                                                       \
+        ASSERT_TSX_STATUS_EQ(                                            \
             result.status,                                               \
             patomic_TSUCCESS,                                            \
             patomic_TINFO_NONE,                                          \
