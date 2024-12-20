@@ -27,7 +27,16 @@
     ASSERT_EQ(                                           \
         reason,                                          \
         patomic_transaction_status_abort_reason(status)  \
-    )
+    )                                                    \
+    if (code == patomic_TSUCCESS)                        \
+    {                                                    \
+        ASSERT_EQ(status, 0ul);                          \
+    }                                                    \
+    else                                                 \
+    {                                                    \
+        ASSERT_NE(status, 0ul);                          \
+    }                                                    \
+    REQUIRE_SEMICOLON()
 
 
 /// @brief
