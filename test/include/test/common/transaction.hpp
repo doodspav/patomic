@@ -27,7 +27,7 @@
     ASSERT_EQ(                                           \
         reason,                                          \
         patomic_transaction_status_abort_reason(status)  \
-    )                                                    \
+    );                                                   \
     if (code == patomic_TSUCCESS)                        \
     {                                                    \
         ASSERT_EQ(status, 0ul);                          \
