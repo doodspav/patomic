@@ -353,51 +353,6 @@ PATOMIC_EXPORT unsigned char
 patomic_transaction_status_abort_reason(unsigned long status);
 
 
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Provides the recommended limits for transactions. The limits are generated
- *   by tests run internally with progressively higher limits.
- *
- * @details
- *   - "rmw" models cmpxchg's success path (load, compare, store)               \n
- *   - "load" models cmpxchg's failure path (load)                              \n
- *   - the tests used to generate these values are run at least once per program
- *     execution                                                                \n
- *   - tests may be run multiple times until they succeed internally, with the
- *     number of times being unspecified                                        \n
- *   - implementations should cache the values
- *
- * @note
- *   The tests used to generate the values for this type are likely run under
- *   sterile conditions with no memory contention. They represent the best
- *   possible outcome, which may not be achievable in real world scenarios.
- */
-typedef struct {
-
-    /** @brief Test transaction performs the equivalent of a successful
-     *         fp_cmpxchg_weak with an increasing byte width. This value is
-     *         the maximum byte width where the test transaction eventually
-     *         succeeded. */
-    unsigned long max_rmw_memory;
-
-    /** @brief Test transaction performs the equivalent of a successful fp_load
-     *         with an increasing byte width. This value is the maximum byte
-     *         width where the test transaction eventually succeeded. */
-    unsigned long max_load_memory;
-
-    /** @brief The number of attempts taken for the max_rmw_memory test to
-     *         succeed. */
-    unsigned long min_rmw_attempts;
-
-    /** @brief The number of attempts taken for the max_load_memory test to
-     *         succeed. */
-    unsigned long min_load_attempts;
-
-} patomic_transaction_recommended_t;
-
-
 #ifdef __cplusplus
 }  /* extern "C" */
 #endif

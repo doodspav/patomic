@@ -60,9 +60,6 @@ typedef struct {
      *         and raw transaction primitives. */
     patomic_ops_transaction_t ops;
 
-    /** @brief Recommended time and space bounds for atomic operations. */
-    patomic_transaction_recommended_t recommended;
-
 } patomic_transaction_t;
 
 
