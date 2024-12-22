@@ -79,7 +79,8 @@ typedef struct {
  * @warning
  *   This value is only required to be valid for platforms for which this
  *   library supports operations. If used on a platform where no operations are
- *   supported, then the value may be invalid.
+ *   supported, then the value may not represent the platform's cache line
+ *   size.
  *
  * @warning
  *   Changing this value is NOT an ABI break, with no major version bump needed.
@@ -103,7 +104,8 @@ typedef struct {
  * @warning
  *   This value is only required to be valid for platforms for which this
  *   library supports operations. If used on a platform where no operations are
- *   supported, then the value may be invalid.
+ *   supported, then the value may not represent the platform's cache line
+ *   size.
  *
  * @note
  *   The value will not return a value larger than its unstable macro
