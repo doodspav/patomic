@@ -115,6 +115,5 @@ TEST_P(BtLogicExplicit, fp_cmpxchg_strong)
 TEST_P(BtLogicTransaction, fp_cmpxchg_strong)
 {
     // check pre-conditions
-    const auto& p = GetParam();
     ASSERT_EQ(m_ops.xchg_ops.fp_cmpxchg_strong, nullptr);
 }
