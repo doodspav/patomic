@@ -776,8 +776,8 @@ patomic_impl_create_explicit_std(
 #endif  /* PATOMIC_HAS_ATOMIC && PATOMIC_HAS_STDATOMIC_H && PATOMIC_HAS_IR_TWOS_COMPL */
 
 
-static unsigned long tbegin() { return 0ul; }
-static void tcommit() {}
+static unsigned long tbegin(void) { return 0ul; }
+static void tcommit(void) {}
 
 #define IMPL_DEFINED_IS_LE() 1
 
