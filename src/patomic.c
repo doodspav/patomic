@@ -65,6 +65,9 @@ patomic_create(
     patomic_t *end   = objs;
     size_t i;
 
+    /* check memory order is valid */
+    patomic_assert_always(PATOMIC_IS_VALID_ORDER(order));
+
     /* fill array with implementations */
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
