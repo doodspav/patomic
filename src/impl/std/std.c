@@ -5,15 +5,15 @@
 #include <patomic/macros/ignore_unused.h>
 
 
-#if PATOMIC_HAS_ATOMIC && PATOMIC_HAS_STDATOMIC_H && PATOMIC_HAS_IR_TWOS_COMPL
-
-
 #include <patomic/stdlib/assert.h>
 #include <patomic/stdlib/stdint.h>
 
 #include <patomic/wrapped/cmpxchg.h>
 #include <patomic/wrapped/direct.h>
 #include <patomic/wrapped/tsx.h>
+
+
+#if PATOMIC_HAS_ATOMIC && PATOMIC_HAS_STDATOMIC_H && PATOMIC_HAS_IR_TWOS_COMPL
 
 #include <stdatomic.h>
 #include <stddef.h>
