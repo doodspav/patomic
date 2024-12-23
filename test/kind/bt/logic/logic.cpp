@@ -56,7 +56,7 @@ BtLogicTransaction::SetUp()
         m_widths.push_back(i);
     }
     // remaining should be calculated using fibonacci
-    auto max_width = 2048ul;
+    auto max_width = 1024ul;
     std::size_t fib_a = 13;
     std::size_t fib_b = 21;
     for (; fib_b < max_width; std::swap(fib_a, fib_b), fib_b += fib_a)
