@@ -1935,7 +1935,7 @@
             res.status = tbegin();                                     \
             if (res.status == 0ul)                                     \
             {                                                          \
-                size_t cmp = 0;                                        \
+                int cmp = 0;                                           \
                 flag_value = *config.flag_nullable;                    \
                 if (flag_value == 0)                                   \
                 {                                                      \
