@@ -2253,7 +2253,7 @@
     static patomic_ops_transaction_xchg_t                         \
     patomic_ops_xchg_create_##name(void)                          \
     {                                                             \
-        patomic_ops_transaction_xchg_t pao;                       \
+        patomic_ops_transaction_xchg_t pao = {0};                 \
         pao.fp_exchange = patomic_opimpl_exchange_##name;         \
         pao.fp_cmpxchg_weak = patomic_opimpl_cmpxchg_weak_##name; \
         pao.fp_cmpxchg_strong = NULL;                             \
@@ -2298,7 +2298,7 @@
     static patomic_ops_transaction_bitwise_t                      \
     patomic_ops_bitwise_create_##name(void)                       \
     {                                                             \
-        patomic_ops_transaction_bitwise_t pao;                    \
+        patomic_ops_transaction_bitwise_t pao = {0};              \
         pao.fp_test = patomic_opimpl_bit_test_##name;             \
         pao.fp_test_compl = patomic_opimpl_bit_test_compl_##name; \
         pao.fp_test_set = patomic_opimpl_bit_test_set_##name;     \
@@ -2356,7 +2356,7 @@
     static patomic_ops_transaction_binary_t                 \
     patomic_ops_binary_create_##name(void)                  \
     {                                                       \
-        patomic_ops_transaction_binary_t pao;               \
+        patomic_ops_transaction_binary_t pao = {0};         \
         pao.fp_or  = patomic_opimpl_void_or_##name;         \
         pao.fp_xor = patomic_opimpl_void_xor_##name;        \
         pao.fp_and = patomic_opimpl_void_and_##name;        \
@@ -2424,7 +2424,7 @@
     static patomic_ops_transaction_arithmetic_t             \
     patomic_ops_arithmetic_create_##name(void)              \
     {                                                       \
-        patomic_ops_transaction_arithmetic_t pao;           \
+        patomic_ops_transaction_arithmetic_t pao = {0};     \
         pao.fp_add = patomic_opimpl_void_add_##name;        \
         pao.fp_sub = patomic_opimpl_void_sub_##name;        \
         pao.fp_inc = patomic_opimpl_void_inc_##name;        \
@@ -2476,7 +2476,7 @@
     static patomic_ops_transaction_special_t                          \
     patomic_ops_special_create_##name(void)                           \
     {                                                                 \
-        patomic_ops_transaction_special_t pao;                        \
+        patomic_ops_transaction_special_t pao = {0};                  \
         pao.fp_double_cmpxchg = patomic_opimpl_double_cmpxchg_##name; \
         pao.fp_multi_cmpxchg = patomic_opimpl_multi_cmpxchg_##name;   \
         pao.fp_generic = patomic_opimpl_generic_##name;               \
@@ -2531,7 +2531,7 @@
     static patomic_ops_transaction_t                                 \
     patomic_ops_create_##name(void)                                  \
     {                                                                \
-        patomic_ops_transaction_t pao;                               \
+        patomic_ops_transaction_t pao = {0};                         \
         pao.fp_store = patomic_opimpl_store_##name;                  \
         pao.fp_load = patomic_opimpl_load_##name;                    \
         pao.xchg_ops = patomic_ops_xchg_create_##name();             \
