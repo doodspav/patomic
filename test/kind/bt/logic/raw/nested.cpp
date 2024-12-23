@@ -165,7 +165,7 @@ TEST_P(BtLogicTransaction, raw_nested_tbegin_tcommit_tdepth)
     // check pre-conditions
     const auto& p = GetParam();
     SKIP_NULL_OP_FP_TBEGIN_TCOMMIT(p.id, m_ops);
-    SKIP_NULL_OP_FP_TTESTY(p.id, m_ops);
+    SKIP_NULL_OP_FP_TDEPTH(p.id, m_ops);
 
     // alias but do not wrap operations
     auto fp_tbegin = m_ops.raw_ops.fp_tbegin;

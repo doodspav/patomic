@@ -77,6 +77,12 @@ typedef struct {
  *   target platform.
  *
  * @warning
+ *   This value is only required to be valid for platforms for which this
+ *   library supports operations. If used on a platform where no operations are
+ *   supported, then the value may not represent the platform's cache line
+ *   size.
+ *
+ * @warning
  *   Changing this value is NOT an ABI break, with no major version bump needed.
  *   The benefit is that the value can be updated frequently to more closely
  *   match the true value on a wider range of platforms as they become known.
@@ -94,6 +100,12 @@ typedef struct {
  * @brief
  *   Returns the runtime upper bound of the cache line size for the target
  *   platform; may provide a more accurate value than the corresponding macro.
+ *
+ * @warning
+ *   This value is only required to be valid for platforms for which this
+ *   library supports operations. If used on a platform where no operations are
+ *   supported, then the value may not represent the platform's cache line
+ *   size.
  *
  * @note
  *   The value will not return a value larger than its unstable macro

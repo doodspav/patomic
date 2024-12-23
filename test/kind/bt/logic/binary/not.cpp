@@ -11,7 +11,7 @@ namespace
 {
 
 void
-test_bin_fetch_not(
+test_fetch_not(
     std::size_t width,
     std::size_t align,
     const std::function<void(
@@ -66,7 +66,7 @@ test_bin_fetch_not(
 }
 
 void
-test_bin_not(
+test_not(
     std::size_t width,
     std::size_t align,
     const std::function<void(
@@ -81,7 +81,7 @@ test_bin_not(
     };
 
     // defer to fetch variant
-    return test_bin_fetch_not(width, align, fetch_not);
+    return test_fetch_not(width, align, fetch_not);
 }
 
 }  // namespace
@@ -106,7 +106,7 @@ TEST_P(BtLogicImplicit, fp_not)
     };
 
     // test
-    test_bin_not(p.width, m_align.recommended, fp_not);
+    test_not(p.width, m_align.recommended, fp_not);
 }
 
 /// @brief Check that the non-atomic logic of implicit fetch_not works correctly.
@@ -122,7 +122,7 @@ TEST_P(BtLogicImplicit, fp_fetch_not)
     };
 
     // test
-    test_bin_fetch_not(p.width, m_align.recommended, fp_fetch_not);
+    test_fetch_not(p.width, m_align.recommended, fp_fetch_not);
 }
 
 
@@ -139,7 +139,7 @@ TEST_P(BtLogicExplicit, fp_not)
     };
 
     // test
-    test_bin_not(p.width, m_align.recommended, fp_not);
+    test_not(p.width, m_align.recommended, fp_not);
 }
 
 /// @brief Check that the non-atomic logic of explicit fetch_not works correctly.
@@ -155,7 +155,7 @@ TEST_P(BtLogicExplicit, fp_fetch_not)
     };
 
     // test
-    test_bin_fetch_not(p.width, m_align.recommended, fp_fetch_not);
+    test_fetch_not(p.width, m_align.recommended, fp_fetch_not);
 }
 
 
@@ -167,7 +167,10 @@ TEST_P(BtLogicTransaction, fp_not)
     SKIP_NULL_OP_FP_NOT(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_not, nullptr);
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_not);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.binary_ops.fp_not);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -184,7 +187,7 @@ TEST_P(BtLogicTransaction, fp_not)
         };
 
         // test
-        test_bin_not(width, 1u, fp_not);
+        TEST_TSX(m_config, not);
     }
 }
 
@@ -196,7 +199,10 @@ TEST_P(BtLogicTransaction, fp_fetch_not)
     SKIP_NULL_OP_FP_FETCH_NOT(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_not, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_not);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.binary_ops.fp_fetch_not);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -213,6 +219,6 @@ TEST_P(BtLogicTransaction, fp_fetch_not)
         };
 
         // test
-        test_bin_fetch_not(width, 1u, fp_fetch_not);
+        TEST_TSX(m_config, fetch_not);
     }
 }

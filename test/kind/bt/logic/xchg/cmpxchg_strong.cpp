@@ -115,28 +115,5 @@ TEST_P(BtLogicExplicit, fp_cmpxchg_strong)
 TEST_P(BtLogicTransaction, fp_cmpxchg_strong)
 {
     // check pre-conditions
-    const auto& p = GetParam();
-    SKIP_NULL_OP_FP_CMPXCHG_STRONG(p.id, m_ops);
-
-    // test zero
-    ASSERT_TSX_ZERO_WFB(m_ops.xchg_ops.fp_cmpxchg_strong, nullptr, nullptr, nullptr);
-
-    // go through all widths
-    for (std::size_t width : m_widths)
-    {
-        // setup
-        SCOPED_TRACE(width);
-        m_config_wfb.width = width;
-
-        // wrap operation
-        const auto fp_cmpxchg_strong = [&](void *object, void *expected, const void *desired) -> int {
-            patomic_transaction_result_wfb_t result {};
-            int ok = m_ops.xchg_ops.fp_cmpxchg_strong(object, expected, desired, m_config_wfb, &result);
-            ADD_FAILURE_TSX_SUCCESS_WFB(m_config_wfb, result);
-            return ok;
-        };
-
-        // test
-        test_cmpxchg_strong(width, 1u, fp_cmpxchg_strong);
-    }
+    ASSERT_EQ(m_ops.xchg_ops.fp_cmpxchg_strong, nullptr);
 }

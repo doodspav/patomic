@@ -3,13 +3,6 @@
 
 #include "base.h"
 
-#include <patomic/macros/static_assert.h>
-
-#include <patomic/api/memory_order.h>
-
-#include <limits.h>
-#include <stddef.h>
-
 
 /**
  * @addtogroup wrapped.direct

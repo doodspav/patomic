@@ -11,7 +11,7 @@ namespace
 {
 
 void
-test_bin_fetch_or(
+test_fetch_or(
     std::size_t width,
     std::size_t align,
     const std::function<void(
@@ -34,70 +34,67 @@ test_bin_fetch_or(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
-        for (std::size_t j = 0; j < object.bit_width(); ++j)
-        {
-            // set up params
-            object.inv_at(i);
-            object_old = object;
-            argument.inv_at(j);
-            argument_old = argument;
+        // set up params
+        object.inv_at(i);
+        object_old = object;
 
-            // set up expected
-            object_exp = object;
-            if (i != j)
-            {
-                object_exp.inv_at(j);
-            }
+        // set up expected
+        object_exp = object;
 
-            // test
-            fp_fetch_or(object, argument, ret);
-            ASSERT_EQ(object, object_exp);
-            ASSERT_EQ(argument, argument_old);
-            ASSERT_EQ(ret, object_old);
+        // test
+        fp_fetch_or(object, argument, ret);
+        ASSERT_EQ(object, object_exp);
+        ASSERT_EQ(argument, argument_old);
+        ASSERT_EQ(ret, object_old);
 
-            // reset
-            argument.inv_at(j);
-            object = argument;
-        }
+        // test backwards
+        object = object_old;
+        fp_fetch_or(argument, object, ret);
+        ASSERT_EQ(argument, object_exp);
+        ASSERT_EQ(object, object_old);
+        ASSERT_EQ(ret, argument_old);
+
+        // reset
+        argument = argument_old;
+        object = argument;
     }
 
     // start with all bits set
     object.inv();
     argument.inv();
+    argument_old = argument;
 
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
-        for (std::size_t j = 0; j < object.bit_width(); ++j)
-        {
-            // set up params
-            object.inv_at(i);
-            object_old = object;
-            argument.inv_at(j);
-            argument_old = argument;
+        // set up params
+        object.inv_at(i);
+        object_old = object;
 
-            // set up expected
-            object_exp = object;
-            if (i != j)
-            {
-                object_exp.inv_at(i);
-            }
+        // set up expected
+        object_exp = argument;
 
-            // test
-            fp_fetch_or(object, argument, ret);
-            ASSERT_EQ(object, object_exp);
-            ASSERT_EQ(argument, argument_old);
-            ASSERT_EQ(ret, object_old);
+        // test
+        fp_fetch_or(object, argument, ret);
+        ASSERT_EQ(object, object_exp);
+        ASSERT_EQ(argument, argument_old);
+        ASSERT_EQ(ret, object_old);
 
-            // reset
-            argument.inv_at(j);
-            object = argument;
-        }
+        // test backwards
+        object = object_old;
+        fp_fetch_or(argument, object, ret);
+        ASSERT_EQ(argument, object_exp);
+        ASSERT_EQ(object, object_old);
+        ASSERT_EQ(ret, argument_old);
+
+        // reset
+        argument = argument_old;
+        object = argument;
     }
 }
 
 void
-test_bin_or(
+test_or(
     std::size_t width,
     std::size_t align,
     const std::function<void(
@@ -113,7 +110,7 @@ test_bin_or(
     };
 
     // defer to fetch variant
-    return test_bin_fetch_or(width, align, fetch_or);
+    return test_fetch_or(width, align, fetch_or);
 }
 
 }  // namespace
@@ -139,7 +136,7 @@ TEST_P(BtLogicImplicit, fp_or)
     };
 
     // test
-    test_bin_or(p.width, m_align.recommended, fp_or);
+    test_or(p.width, m_align.recommended, fp_or);
 }
 
 /// @brief Check that the non-atomic logic of implicit fetch_or works correctly.
@@ -155,7 +152,7 @@ TEST_P(BtLogicImplicit, fp_fetch_or)
     };
 
     // test
-    test_bin_fetch_or(p.width, m_align.recommended, fp_fetch_or);
+    test_fetch_or(p.width, m_align.recommended, fp_fetch_or);
 }
 
 
@@ -172,7 +169,7 @@ TEST_P(BtLogicExplicit, fp_or)
     };
 
     // test
-    test_bin_or(p.width, m_align.recommended, fp_or);
+    test_or(p.width, m_align.recommended, fp_or);
 }
 
 /// @brief Check that the non-atomic logic of explicit fetch_or works correctly.
@@ -188,7 +185,7 @@ TEST_P(BtLogicExplicit, fp_fetch_or)
     };
 
     // test
-    test_bin_fetch_or(p.width, m_align.recommended, fp_fetch_or);
+    test_fetch_or(p.width, m_align.recommended, fp_fetch_or);
 }
 
 
@@ -200,7 +197,10 @@ TEST_P(BtLogicTransaction, fp_or)
     SKIP_NULL_OP_FP_OR(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_or, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_or);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.binary_ops.fp_or);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -217,7 +217,7 @@ TEST_P(BtLogicTransaction, fp_or)
         };
 
         // test
-        test_bin_or(width, 1u, fp_or);
+        TEST_TSX(m_config, or);
     }
 }
 
@@ -229,7 +229,10 @@ TEST_P(BtLogicTransaction, fp_fetch_or)
     SKIP_NULL_OP_FP_FETCH_OR(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_or, nullptr, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.binary_ops.fp_fetch_or);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.binary_ops.fp_fetch_or);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -246,6 +249,6 @@ TEST_P(BtLogicTransaction, fp_fetch_or)
         };
 
         // test
-        test_bin_fetch_or(width, 1u, fp_fetch_or);
+        TEST_TSX(m_config, fetch_or);
     }
 }

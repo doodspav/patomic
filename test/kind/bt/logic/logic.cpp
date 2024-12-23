@@ -44,19 +44,9 @@ BtLogicTransaction::SetUp()
 
     // initialize base members
     m_ops = pat.ops;
-    m_recommended = pat.recommended;
-
-    // configure generous attempts
-    auto make_generous = [](unsigned long attempts) noexcept -> unsigned long {
-        const unsigned long extra_attempts = 1000ul + (attempts / 10ul);
-        return std::max(attempts, attempts + extra_attempts);
-    };
-    m_config.attempts = make_generous(std::max(
-        m_recommended.min_rmw_attempts,
-        m_recommended.min_load_attempts
-    ));
-    m_config_wfb.attempts = make_generous(m_recommended.min_rmw_attempts);
-    m_config_wfb.fallback_attempts = make_generous(m_recommended.min_load_attempts);
+    m_config.attempts = 10'000ul;
+    m_config_wfb.attempts = 10'000ul;
+    m_config_wfb.fallback_attempts = 10'000ul;
 
     // calculate widths
     m_widths.reserve(16);
@@ -66,16 +56,14 @@ BtLogicTransaction::SetUp()
         m_widths.push_back(i);
     }
     // remaining should be calculated using fibonacci
-    auto max_width = std::max(
-        m_recommended.max_load_memory,
-        m_recommended.max_rmw_memory
-    );
+    auto max_width = 1024ul;
     std::size_t fib_a = 13;
     std::size_t fib_b = 21;
     for (; fib_b < max_width; std::swap(fib_a, fib_b), fib_b += fib_a)
     {
         m_widths.push_back(fib_b);
     }
+    m_widths.push_back(max_width);
 }
 
 

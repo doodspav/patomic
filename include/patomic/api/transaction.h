@@ -17,7 +17,7 @@ extern "C" {
  *
  * @brief
  *   Writing to this flag when it has been provided to a transaction will cause
- *   the transaction to abort.
+ *   the transaction to abort. If this flag is set, the transaction will abort.
  *
  * @details
  *   Any modification by another thread to any memory in a cache line that is
@@ -95,7 +95,8 @@ typedef struct {
     /** @brief Number of attempts to make committing transaction. */
     unsigned long attempts;
 
-    /** @brief Read from at the start of each transaction attempt. */
+    /** @brief Read from at the start of each transaction attempt, which is
+     *         aborted if the value is non-zero. */
     const patomic_transaction_flag_t *flag_nullable;
 
 } patomic_transaction_config_t;
@@ -127,10 +128,12 @@ typedef struct {
     /** @brief Number of attempts to make committing fallback transaction. */
     unsigned long fallback_attempts;
 
-    /** @brief Read from at the start of each transaction attempt. */
+    /** @brief Read from at the start of each transaction attempt, which is
+     *         aborted if the value is non-zero. */
     const patomic_transaction_flag_t *flag_nullable;
 
-    /** @brief Read from at the start of each fallback transaction attempt. */
+    /** @brief Read from at the start of each fallback transaction attempt,
+     *         which is aborted if the value is non-zero. */
     const patomic_transaction_flag_t *fallback_flag_nullable;
 
 } patomic_transaction_config_wfb_t;
@@ -233,7 +236,7 @@ typedef enum {
  * @addtogroup transaction
  *
  * @brief
- *   A set of constants providing additional transaction exit information to
+ *   A set of constants providing additional transaction abort information to
  *   supplement what is provided by the exit code.
  *   The exit information always has 8 significant bits and is non-negative.
  *
@@ -247,8 +250,21 @@ typedef enum {
  */
 typedef enum {
 
+    /** @brief No extra information is available.
+     *  @note  This will always be the case if the transaction succeeds. */
+    patomic_TINFO_NONE = 0
+
+    /** @brief The transaction explicitly aborted because attempts or fallback
+     *         attempts was set to zero.
+     *  @note  This is set by this library rather than by an implementation. */
+    ,patomic_TINFO_ZERO_ATTEMPTS = (1 << 0)
+
+    /** @brief The transaction explicitly aborted because the flag was set.
+     *  @note  This is set by this library rather than by an implementation. */
+    ,patomic_TINFO_FLAG_SET = (1 << 1)
+
     /** @brief The transaction might not fail if retried. */
-    patomic_TINFO_RETRY = (1 << 0)
+    ,patomic_TINFO_RETRY = (1 << 0)
 
     /** @brief The transaction was aborted from an inner nested transaction. */
     ,patomic_TINFO_NESTED = (1 << 1)
@@ -286,19 +302,13 @@ typedef enum {
  * @addtogroup transaction
  *
  * @brief
- *   Obtains the abort reason from the status of an explicitly aborted
- *   transaction. If the transaction was not explicitly aborted, the abort
- *   reason will be 0.
+ *   Obtains the abort reason from the status of a transaction.
  *
  * @details
  *   This is bits [8:15] of status.
  */
-#define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status)             \
-    ((unsigned char) ((PATOMIC_TRANSACTION_STATUS_EXIT_CODE(status) \
-                      == patomic_TABORT_EXPLICIT)                   \
-        ? (((unsigned long) (status)) >> 8ul) & 0xFFul              \
-        : 0ul                                                       \
-    ))
+#define PATOMIC_TRANSACTION_STATUS_ABORT_REASON(status) \
+    ((unsigned char) ((((unsigned long) (status)) >> 8ul) & 0xFFul))
 
 
 /**
@@ -333,9 +343,7 @@ patomic_transaction_status_exit_info(unsigned long status);
  * @addtogroup transaction
  *
  * @brief
- *   Obtains the abort reason from the status of an explicitly aborted
- *   transaction. If the transaction was not explicitly aborted, the abort
- *   reason will be 0.
+ *   Obtains the abort reason from the status of a transaction.
  *
  * @note
  *   The value returned by this function is identical to the
@@ -343,51 +351,6 @@ patomic_transaction_status_exit_info(unsigned long status);
  */
 PATOMIC_EXPORT unsigned char
 patomic_transaction_status_abort_reason(unsigned long status);
-
-
-/**
- * @addtogroup transaction
- *
- * @brief
- *   Provides the recommended limits for transactions. The limits are generated
- *   by tests run internally with progressively higher limits.
- *
- * @details
- *   - "rmw" models cmpxchg's success path (load, compare, store)               \n
- *   - "load" models cmpxchg's failure path (load)                              \n
- *   - the tests used to generate these values are run at least once per program
- *     execution                                                                \n
- *   - tests may be run multiple times until they succeed internally, with the
- *     number of times being unspecified                                        \n
- *   - implementations should cache the values
- *
- * @note
- *   The tests used to generate the values for this type are likely run under
- *   sterile conditions with no memory contention. They represent the best
- *   possible outcome, which may not be achievable in real world scenarios.
- */
-typedef struct {
-
-    /** @brief Test transaction performs the equivalent of a successful
-     *         fp_cmpxchg_weak with an increasing byte width. This value is
-     *         the maximum byte width where the test transaction eventually
-     *         succeeded. */
-    unsigned long max_rmw_memory;
-
-    /** @brief Test transaction performs the equivalent of a successful fp_load
-     *         with an increasing byte width. This value is the maximum byte
-     *         width where the test transaction eventually succeeded. */
-    unsigned long max_load_memory;
-
-    /** @brief The number of attempts taken for the max_rmw_memory test to
-     *         succeed. */
-    unsigned long min_rmw_attempts;
-
-    /** @brief The number of attempts taken for the max_load_memory test to
-     *         succeed. */
-    unsigned long min_load_attempts;
-
-} patomic_transaction_recommended_t;
 
 
 #ifdef __cplusplus

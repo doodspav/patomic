@@ -107,7 +107,7 @@ test_multi_cmpxchg(
             }
 
             // test with only len object
-            DO_TEST_MULTI_CMPXCHG(cxs_copy, fp_wrapped);
+            DO_TEST_TSX_MULTI_CMPXCHG(cxs_copy, fp_wrapped);
         }
     }
 }
@@ -128,7 +128,10 @@ TEST_P(BtLogicTransaction, fp_multi_cmpxchg)
     SKIP_NULL_OP_FP_MULTI_CMPXCHG(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_multi_cmpxchg, {}, {});
+    ASSERT_TSX_ZERO_WFB(m_ops.special_ops.fp_multi_cmpxchg);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET_WFB(m_ops.special_ops.fp_multi_cmpxchg);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -146,6 +149,6 @@ TEST_P(BtLogicTransaction, fp_multi_cmpxchg)
         };
 
         // test
-        test_multi_cmpxchg(width, 1u, fp_multi_cmpxchg);
+        TEST_TSX_WFB(m_config_wfb, multi_cmpxchg);
     }
 }

@@ -3,4 +3,5 @@ target_sources(${target_name} PRIVATE
     base.h
     cmpxchg.h
     direct.h
+    tsx.h
 )

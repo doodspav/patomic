@@ -4,6 +4,11 @@
 #include "generic_int.hpp"
 #include "name.hpp"
 
+#include <patomic/api/transaction.h>
+#include <patomic/api/ops/transaction.h>
+
+#include <type_traits>
+
 
 /// @brief
 ///   Requires a semicolon be placed after calling this macro.
@@ -14,11 +19,37 @@
 
 
 /// @brief
+///   Check that a status has the expected sub-values.
+#define ASSERT_TSX_STATUS_EQ(status, code, info, reason) \
+    ASSERT_EQ(                                           \
+        code,                                            \
+        patomic_transaction_status_exit_code(status)     \
+    );                                                   \
+    ASSERT_EQ(                                           \
+        info,                                            \
+        patomic_transaction_status_exit_info(status)     \
+    );                                                   \
+    ASSERT_EQ(                                           \
+        reason,                                          \
+        patomic_transaction_status_abort_reason(status)  \
+    );                                                   \
+    if (code == patomic_TSUCCESS)                        \
+    {                                                    \
+        ASSERT_EQ(status, 0ul);                          \
+    }                                                    \
+    else                                                 \
+    {                                                    \
+        ASSERT_NE(status, 0ul);                          \
+    }                                                    \
+    REQUIRE_SEMICOLON()
+
+
+/// @brief
 ///   Test a transaction operation with zero attempts and zero width.
 /// @note
-///   The parameter 'op' is any callable transaction operation, and the
-///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_ZERO(op, ...) \
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_ZERO(op)                                     \
     {                                                           \
         patomic_transaction_result_t result {};                 \
         patomic_transaction_config_t config {};                 \
@@ -26,18 +57,28 @@
         config.flag_nullable = nullptr;                         \
                                                                 \
         config.attempts = 0;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));    \
-        ASSERT_EQ(                                              \
+        ::test::_detail::call_patomic_op(                       \
+            op, nullptr, config, &result                        \
+        );                                                      \
+                                                                \
+        ASSERT_TSX_STATUS_EQ(                                   \
+            result.status,                                      \
             patomic_TABORT_EXPLICIT,                            \
-            patomic_transaction_status_exit_code(result.status) \
+            patomic_TINFO_ZERO_ATTEMPTS,                        \
+            0                                                   \
         );                                                      \
         ASSERT_EQ(result.attempts_made, 0);                     \
                                                                 \
         config.attempts = 5;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));    \
-        ASSERT_EQ(                                              \
+        ::test::_detail::call_patomic_op(                       \
+            op, nullptr, config, &result                        \
+        );                                                      \
+                                                                \
+        ASSERT_TSX_STATUS_EQ(                                   \
+            result.status,                                      \
             patomic_TSUCCESS,                                   \
-            patomic_transaction_status_exit_code(result.status) \
+            patomic_TINFO_NONE,                                 \
+            0                                                   \
         );                                                      \
         ASSERT_EQ(result.attempts_made, 1);                     \
     }                                                           \
@@ -48,9 +89,9 @@
 ///   Test a transaction wfb operation with zero attempts, zero fallback
 ///   attempts, and zero width.
 /// @note
-///   The parameter 'op' is any callable transaction operation, and the
-///   ellipsis is every parameter except for config and result.
-#define ASSERT_TSX_ZERO_WFB(op, ...)                                     \
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_ZERO_WFB(op)                                          \
     {                                                                    \
         patomic_transaction_result_wfb_t result {};                      \
         patomic_transaction_config_wfb_t config {};                      \
@@ -60,37 +101,56 @@
                                                                          \
         config.attempts = 0;                                             \
         config.fallback_attempts = 0;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));             \
-        ASSERT_EQ(                                                       \
+        ::test::_detail::call_patomic_op(                                \
+            op, nullptr, config, &result                                 \
+        );                                                               \
+                                                                         \
+        ASSERT_TSX_STATUS_EQ(                                            \
+            result.status,                                               \
             patomic_TABORT_EXPLICIT,                                     \
-            patomic_transaction_status_exit_code(result.status)          \
+            patomic_TINFO_ZERO_ATTEMPTS,                                 \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 0);                              \
-        ASSERT_EQ(                                                       \
+        ASSERT_TSX_STATUS_EQ(                                            \
+            result.fallback_status,                                      \
             patomic_TABORT_EXPLICIT,                                     \
-            patomic_transaction_status_exit_code(result.fallback_status) \
+            patomic_TINFO_ZERO_ATTEMPTS,                                 \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.fallback_attempts_made, 0);                     \
                                                                          \
         config.attempts = 0;                                             \
         config.fallback_attempts = 5;                                    \
-        static_cast<void>(op(__VA_ARGS__, config, &result));             \
-        ASSERT_EQ(                                                       \
+        ::test::_detail::call_patomic_op(                                \
+            op, nullptr, config, &result                                 \
+        );                                                               \
+                                                                         \
+        ASSERT_TSX_STATUS_EQ(                                            \
+            result.status,                                               \
             patomic_TABORT_EXPLICIT,                                     \
-            patomic_transaction_status_exit_code(result.status)          \
+            patomic_TINFO_ZERO_ATTEMPTS,                                 \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 0);                              \
-        ASSERT_EQ(                                                       \
+        ASSERT_TSX_STATUS_EQ(                                            \
+            result.fallback_status,                                      \
             patomic_TSUCCESS,                                            \
-            patomic_transaction_status_exit_code(result.fallback_status) \
+            patomic_TINFO_NONE,                                          \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.fallback_attempts_made, 1);                     \
                                                                          \
         config.attempts = 5;                                             \
-        static_cast<void>(op(__VA_ARGS__, config, &result));             \
-        ASSERT_EQ(                                                       \
+        ::test::_detail::call_patomic_op(                                \
+            op, nullptr, config, &result                                 \
+        );                                                               \
+                                                                         \
+        ASSERT_TSX_STATUS_EQ(                                            \
+            result.status,                                               \
             patomic_TSUCCESS,                                            \
-            patomic_transaction_status_exit_code(result.status)          \
+            patomic_TINFO_NONE,                                          \
+            0                                                            \
         );                                                               \
         ASSERT_EQ(result.attempts_made, 1);                              \
     }                                                                    \
@@ -98,10 +158,83 @@
 
 
 /// @brief
+///   Test a transaction operation with flag set.
+/// @note
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_FLAG_SET(op)                              \
+    {                                                        \
+        unsigned char uc {};                                 \
+        const patomic_transaction_flag_t flag = 1;           \
+        patomic_transaction_result_t result {};              \
+        patomic_transaction_config_t config {};              \
+                                                             \
+        config.width = 1;                                    \
+        config.attempts = 1000u;                             \
+        config.flag_nullable = &flag;                        \
+                                                             \
+        ::test::_detail::call_patomic_op(                    \
+            op, &uc, config, &result                         \
+        );                                                   \
+                                                             \
+        ASSERT_TSX_STATUS_EQ(                                \
+            result.status,                                   \
+            patomic_TABORT_EXPLICIT,                         \
+            patomic_TINFO_FLAG_SET,                          \
+            0                                                \
+        );                                                   \
+        ASSERT_GT(result.attempts_made, 0);                  \
+    }                                                        \
+    REQUIRE_SEMICOLON()
+
+
+/// @brief
+///   Test a transaction wfb operation with flag and fallback flag set.
+/// @note
+///   The parameter 'op' is any function pointer representing a transaction
+///   operation provided by patomic.
+#define ASSERT_TSX_FLAG_SET_WFB(op)                          \
+    {                                                        \
+        unsigned char uc {};                                 \
+        const patomic_transaction_flag_t flag = 1;           \
+        patomic_transaction_result_wfb_t result {};          \
+        patomic_transaction_config_wfb_t config {};          \
+                                                             \
+        config.width = 1;                                    \
+        config.attempts = 1000;                              \
+        config.fallback_attempts = 1000;                     \
+        config.flag_nullable = &flag;                        \
+        config.fallback_flag_nullable = &flag;               \
+                                                             \
+        ::test::_detail::call_patomic_op(                    \
+            op, &uc, config, &result                         \
+        );                                                   \
+                                                             \
+        ASSERT_TSX_STATUS_EQ(                                \
+            result.status,                                   \
+            patomic_TABORT_EXPLICIT,                         \
+            patomic_TINFO_FLAG_SET,                          \
+            0                                                \
+        );                                                   \
+        ASSERT_GT(result.attempts_made, 0);                  \
+        ASSERT_TSX_STATUS_EQ(                                \
+            result.fallback_status,                          \
+            patomic_TABORT_EXPLICIT,                         \
+            patomic_TINFO_FLAG_SET,                          \
+            0                                                \
+        );                                                   \
+        ASSERT_GT(result.fallback_attempts_made, 0);         \
+    }                                                        \
+    REQUIRE_SEMICOLON()
+
+
+/// @brief
 ///   Adds a test failure if the status exit code is not success.
 #define ADD_FAILURE_TSX_SUCCESS(config, result)                                  \
-    if (patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status)) \
+    if (result.status != 0ul)                                                    \
     {                                                                            \
+        using result_t = patomic_transaction_result_t;                           \
+        static_assert(std::is_same<decltype(result), result_t>::value, "");      \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);         \
         auto info = PATOMIC_TRANSACTION_STATUS_EXIT_INFO(result.status);         \
         auto reason = PATOMIC_TRANSACTION_STATUS_ABORT_REASON(result.status);    \
@@ -123,8 +256,7 @@
 ///   Returns from the current test function with a failure if the primary and
 ///   fallback status exit code is not success.
 #define ADD_FAILURE_TSX_SUCCESS_WFB(config, result)                                        \
-    if (patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status) &&         \
-        patomic_TSUCCESS != PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status))  \
+    if (result.status != 0ul && result.fallback_status != 0ul)                             \
     {                                                                                      \
         auto code = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.status);                   \
         auto code_wfb = PATOMIC_TRANSACTION_STATUS_EXIT_CODE(result.fallback_status);      \
@@ -162,7 +294,7 @@
 ///
 /// @param cxs std::vector<test::generic_cmpxchg>
 /// @param fp_multi_cmpxchg int(std::vector<test::generic_cmpxchg>&)
-#define DO_TEST_MULTI_CMPXCHG(cxs, fp_multi_cmpxchg)      \
+#define DO_TEST_TSX_MULTI_CMPXCHG(cxs, fp_multi_cmpxchg)  \
     {                                                     \
         std::vector<test::generic_cmpxchg> cxs_old = cxs; \
                                                           \
@@ -214,8 +346,93 @@
     REQUIRE_SEMICOLON()
 
 
+/// @brief
+///   Test a transactional operation wfb with a null flag and unset flag.
+#define TEST_TSX(config, name)                          \
+    {                                                   \
+        SCOPED_TRACE("flag null");                      \
+        (config).flag_nullable = nullptr;               \
+        test_##name((config).width, 1u, fp_##name);     \
+    }                                                   \
+    {                                                   \
+        SCOPED_TRACE("flag unset");                     \
+        const patomic_transaction_flag_t flag {};       \
+        (config).flag_nullable = &flag;                 \
+        test_##name((config).width, 1u, fp_##name);     \
+    }                                                   \
+    static_assert(std::is_same<decltype(config),        \
+                  patomic_transaction_config_t>::value, \
+                  "don't use wfb version of config_t")
+
+
+/// @brief
+///   Test a transactional operation with a null flag and unset flag.
+#define TEST_TSX_WFB(config, name)                  \
+    {                                               \
+        SCOPED_TRACE("flag null");                  \
+        (config).flag_nullable = nullptr;           \
+        (config).fallback_flag_nullable = nullptr;  \
+        test_##name((config).width, 1u, fp_##name); \
+    }                                               \
+    {                                               \
+        SCOPED_TRACE("flag unset");                 \
+        const patomic_transaction_flag_t flag {};   \
+        (config).flag_nullable = &flag;             \
+        (config).fallback_flag_nullable = &flag;    \
+        test_##name((config).width, 1u, fp_##name); \
+    }                                               \
+    REQUIRE_SEMICOLON()
+
+
 namespace test
 {
+
+
+namespace _detail
+{
+
+
+/// @brief
+///   Calls the given op function pointer with all pointer params having the
+///   given value. The return value is discarded.
+
+#define DECL_OVERLOAD_CALL_PATOMIC_OP(fp_type)      \
+    void                                            \
+    call_patomic_op(                                \
+        const fp_type fp,                           \
+        void *const ptr,                            \
+        const patomic_transaction_config_t& config, \
+        patomic_transaction_result_t *const result  \
+    ) noexcept
+
+#define DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(fp_type)      \
+    void                                                \
+    call_patomic_op(                                    \
+        const fp_type fp,                               \
+        void *const ptr,                                \
+        const patomic_transaction_config_wfb_t& config, \
+        patomic_transaction_result_wfb_t *const result  \
+    ) noexcept
+
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_store_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_load_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_exchange_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_cmpxchg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_test_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_test_modify_t);
+
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_fetch_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_fetch_noarg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_void_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_void_noarg_t);
+
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_double_cmpxchg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_multi_cmpxchg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_generic_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_generic_wfb_t);
+
+
+}  // namespace _detail
 
 
 /// @brief

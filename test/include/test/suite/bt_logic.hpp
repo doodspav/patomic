@@ -80,7 +80,6 @@ protected:
     // helper members
     std::vector<std::size_t> m_widths {};
     patomic_ops_transaction_t m_ops {};
-    patomic_transaction_recommended_t m_recommended {};
     patomic_transaction_config_t m_config {};
     patomic_transaction_config_wfb_t m_config_wfb {};
 };

@@ -36,14 +36,22 @@ extern "C" {
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -82,14 +90,22 @@ typedef void (* patomic_opsig_transaction_store_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -133,14 +149,22 @@ typedef void (* patomic_opsig_transaction_load_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -197,24 +221,39 @@ typedef void (* patomic_opsig_transaction_exchange_t) (
  *
  * @note
  *   If config.attempts == 0, the primary transaction will not be attempted.
- *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
- *   to 0. The parameter "desired" may be passed a default value of 0 or NULL.
- *   Execution will pass to the fallback transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and attempts_made to 0.
+ *   The parameter "desired" will not be accessed and may be passed a default
+ *   value of 0 or NULL. Execution will pass to the fallback transaction.
  *
  * @note
  *   If config.fallback_attempts == 0 and execution passes to the fallback
  *   transaction, the fallback transaction will not be attempted. The
- *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
- *   fallback_attempts_made to 0. If config.attempts also == 0, then parameters
- *   (except for "config" and "result") may be passed a default value of 0 or
+ *   fallback_status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and fallback_attempts_made to 0.
+ *   If config.attempts also == 0, then parameters (except for "config" and
+ *   "result") will not be accessed and may be passed a default value of 0 or
  *   NULL.
  *
  * @note
  *   If config.width == 0, the primary or fallback transaction (whichever is
  *   about to be executed when the check takes place) will not be attempted.
- *   The status or fallback_status will be set to TSUCCESS and attempts_made or
- *   fallback_attempts_made will be set to 1. Parameters (except for "config"
- *   and "result") may be passed a default value of 0 or NULL.
+ *   The status or fallback_status will be set to TSUCCESS, attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters will not be accessed
+ *   in the same manner as with zero attempts or fallback_attempts.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every primary transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and execution passes to the fallback transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET,
+ *   .reason=0 }.
+ *
+ * @note
+ *   The value of config.fallback_flag_nullable (when non-null) is read from at
+ *   the start of every fallback transaction attempt. If its value is non-zero,
+ *   the transaction is aborted and not retried. The fallback_status will be
+ *   set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.width == 0 only takes place after either
@@ -266,14 +305,22 @@ typedef int (* patomic_opsig_transaction_cmpxchg_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -319,14 +366,22 @@ typedef int (* patomic_opsig_transaction_test_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -373,14 +428,22 @@ typedef int (* patomic_opsig_transaction_test_modify_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -424,14 +487,22 @@ typedef void (* patomic_opsig_transaction_fetch_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -474,14 +545,22 @@ typedef void (* patomic_opsig_transaction_fetch_noarg_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -520,14 +599,22 @@ typedef void (* patomic_opsig_transaction_void_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -575,25 +662,40 @@ typedef void (* patomic_opsig_transaction_void_noarg_t) (
  *
  * @note
  *   If config.attempts == 0, the primary transaction will not be attempted.
- *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
- *   to 0. The "desired" member of parameters "cxa" and "cxb" may be passed a
- *   default value of 0 or NULL. Execution will pass to the fallback
- *   transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and attempts_made to 0.
+ *   The "desired" member of parameters "cxa" and "cxb" will not be accessed
+ *   and may be passed a default value of 0 or NULL. Execution will pass to the
+ *   fallback transaction.
  *
  * @note
  *   If config.fallback_attempts == 0 and execution passes to the fallback
  *   transaction, the fallback transaction will not be attempted. The
- *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
- *   fallback_attempts_made to 0. If config.attempts also == 0, then parameters
- *   (except for "config" and "result") may be passed a default value of 0 or
+ *   fallback_status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and fallback_attempts_made to 0.
+ *   If config.attempts also == 0, then parameters (except for "config" and
+ *   "result") will not be accessed, and may be passed a default value of 0 or
  *   NULL.
  *
  * @note
  *   If config.width == 0, the primary or fallback transaction (whichever is
  *   about to be executed when the check takes place) will not be attempted.
- *   The status or fallback_status will be set to TSUCCESS and attempts_made or
- *   fallback_attempts_made will be set to 1. Parameters (except for "config"
- *   and "result") may be passed a default value of 0 or NULL.
+ *   The status or fallback_status will be set to TSUCCESS, attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters will not be accessed
+ *   in the same manner as with zero attempts or fallback_attempts.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every primary transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and execution passes to the fallback transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET,
+ *   .reason=0 }.
+ *
+ * @note
+ *   The value of config.fallback_flag_nullable (when non-null) is read from at
+ *   the start of every fallback transaction attempt. If its value is non-zero,
+ *   the transaction is aborted and not retried. The fallback_status will be
+ *   set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.width == 0 only takes place after either
@@ -648,25 +750,40 @@ typedef int (* patomic_opsig_transaction_double_cmpxchg_t) (
  *
  * @note
  *   If config.attempts == 0, the primary transaction will not be attempted.
- *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
- *   to 0. The "desired" member of all elements of parameter "cxs_buf" may be
- *   passed a default value of 0 or NULL. Execution will pass to the fallback
- *   transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and attempts_made to 0.
+ *   The "desired" member of all elements of parameter "cxs_buf" will not be
+ *   accessed and may be passed a default value of 0 or NULL. Execution will
+ *   pass to the fallback transaction.
  *
  * @note
  *   If config.fallback_attempts == 0 and execution passes to the fallback
  *   transaction, the fallback transaction will not be attempted. The
- *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
- *   fallback_attempts_made to 0. If config.attempts also == 0, then parameters
- *   (except for "config" and "result") may be passed a default value of 0 or
+ *   fallback_status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and fallback_attempts_made to 0.
+ *   If config.attempts also == 0, then parameters (except for "config" and
+ *   "result") will not be accessed and may be passed a default value of 0 or
  *   NULL.
  *
  * @note
  *   If config.width == 0, the primary or fallback transaction (whichever is
  *   about to be executed when the check takes place) will not be attempted.
- *   The status or fallback_status will be set to TSUCCESS and attempts_made or
- *   fallback_attempts_made will be set to 1. Parameters (except for "config"
- *   and "result") may be passed a default value of 0 or NULL.
+ *   The status or fallback_status will be set to TSUCCESS, attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters will not be accessed
+ *   in the same manner as with zero attempts or fallback_attempts.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every primary transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and execution passes to the fallback transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET,
+ *   .reason=0 }.
+ *
+ * @note
+ *   The value of config.fallback_flag_nullable (when non-null) is read from at
+ *   the start of every fallback transaction attempt. If its value is non-zero,
+ *   the transaction is aborted and not retried. The fallback_status will be
+ *   set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.width == 0 only takes place after either
@@ -714,14 +831,23 @@ typedef int (* patomic_opsig_transaction_multi_cmpxchg_t) (
  *
  * @note
  *   If config.attempts == 0, the transaction will not be attempted. The status
- *   will be set to TABORT_EXPLICIT with reason 0, and attempts_made to 0.
- *   Parameters (except for "config" and "result") may be passed a default value
- *   of 0 or NULL.
+ *   will be set to { .code=TABORT_EXPLICIT, .info=TINFO_ZERO_ATTEMPTS,
+ *   .reason=0 }, and attempts_made to 0.
+ *   Parameters (except for "config" and "result") will not be accessed and may
+ *   be passed a default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the transaction will not be attempted. The status
  *   will be set to TSUCCESS, and attempts_made to 1. Parameters (except for
- *   "config" and "result") may be passed a default value of 0 or NULL.
+ *   "config" and "result") will not be accessed and may be passed a default
+ *   value of 0 or NULL. This is still checked even though the width is not
+ *   used in this operation.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and not retried. The status will be set to
+ *   { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.attempts == 0 takes precedence over the check for
@@ -772,25 +898,40 @@ typedef void (* patomic_opsig_transaction_generic_t) (
  *
  * @note
  *   If config.attempts == 0, the primary transaction will not be attempted.
- *   The status will be set to TABORT_EXPLICIT with reason 0, and attempts_made
- *   to 0. Parameters "fn" and "ctx" may be passed a default value of 0 or NULL.
- *   Execution will pass to the fallback transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and attempts_made to 0.
+ *   Parameter "fn" will not be accessed and may be passed a default value of 0
+ *   or NULL. Execution will pass to the fallback transaction.
  *
  * @note
  *   If config.fallback_attempts == 0 and execution passes to the fallback
  *   transaction, the fallback transaction will not be attempted. The
- *   fallback_status will be set to TABORT_EXPLICIT with reason 0, and
- *   fallback_attempts_made to 0. Parameters "fallback_fn" and "fallback_ctx"
- *   may be passed a default value of 0 or NULL. If config.attempts also == 0,
- *   then parameters (except for "config" and "result") may be passed a default
- *   value of 0 or NULL.
+ *   fallback_status will be set to { .code=TABORT_EXPLICIT,
+ *   .info=TINFO_ZERO_ATTEMPTS, .reason=0 }, and fallback_attempts_made to 0.
+ *   Parameter "fallback_fn" will not be accessed and may be passed a default
+ *   value of 0 or NULL. If config.attempts also == 0, then parameters (except
+ *   for "config" and "result") will not be accessed, and may be passed a 
+ *   default value of 0 or NULL.
  *
  * @note
  *   If config.width == 0, the primary or fallback transaction (whichever is
  *   about to be executed when the check takes place) will not be attempted.
- *   The status or fallback_status will be set to TSUCCESS and attempts_made or
- *   fallback_attempts_made will be set to 1. Parameters (except for "config"
- *   and "result") may be passed a default value of 0 or NULL.
+ *   The status or fallback_status will be set to TSUCCESS, attempts_made or
+ *   fallback_attempts_made will be set to 1. Parameters will not be accessed
+ *   in the same manner as with zero attempts or fallback_attempts.
+ *
+ * @note
+ *   The value of config.flag_nullable (when non-null) is read from at the
+ *   start of every primary transaction attempt. If its value is non-zero, the
+ *   transaction is aborted and execution passes to the fallback transaction.
+ *   The status will be set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET,
+ *   .reason=0 }.
+ *
+ * @note
+ *   The value of config.fallback_flag_nullable (when non-null) is read from at
+ *   the start of every fallback transaction attempt. If its value is non-zero,
+ *   the transaction is aborted and not retried. The fallback_status will be
+ *   set to { .code=TABORT_EXPLICIT, .info=TINFO_FLAG_SET, .reason=0 }.
  *
  * @note
  *   The check for config.width == 0 only takes place after either
@@ -897,7 +1038,7 @@ typedef void (* patomic_opsig_transaction_flag_clear_t) (
  *   patomic_transaction_status_* functions or the
  *   PATOMIC_TRANSACTION_STATUS_* macros.
  */
-typedef unsigned int (* patomic_opsig_transaction_tbegin_t) (
+typedef unsigned long (* patomic_opsig_transaction_tbegin_t) (
     void
 );
 

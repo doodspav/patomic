@@ -9,7 +9,7 @@ namespace
 {
 
 void
-test_bit_test(
+test_test(
     std::size_t width,
     std::size_t align,
     const std::function<int(
@@ -80,7 +80,7 @@ TEST_P(BtLogicImplicitLoad, fp_test)
     };
 
     // test
-    test_bit_test(p.width, m_align.recommended, fp_test);
+    test_test(p.width, m_align.recommended, fp_test);
 }
 
 
@@ -97,7 +97,7 @@ TEST_P(BtLogicExplicitLoad, fp_test)
     };
 
     // test
-    test_bit_test(p.width, m_align.recommended, fp_test);
+    test_test(p.width, m_align.recommended, fp_test);
 }
 
 
@@ -109,7 +109,10 @@ TEST_P(BtLogicTransaction, fp_test)
     SKIP_NULL_OP_FP_TESTY(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test, nullptr, 0);
+    ASSERT_TSX_ZERO(m_ops.bitwise_ops.fp_test);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.bitwise_ops.fp_test);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -127,6 +130,6 @@ TEST_P(BtLogicTransaction, fp_test)
         };
 
         // test
-        test_bit_test(width, 1u, fp_test);
+        TEST_TSX(m_config, test);
     }
 }

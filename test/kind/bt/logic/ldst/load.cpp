@@ -105,7 +105,10 @@ TEST_P(BtLogicTransaction, fp_load)
     SKIP_NULL_OP_FP_LOAD(p.id, m_ops);
 
     // test zero
-    ASSERT_TSX_ZERO(m_ops.fp_load, nullptr, nullptr);
+    ASSERT_TSX_ZERO(m_ops.fp_load);
+
+    // test flag set
+    ASSERT_TSX_FLAG_SET(m_ops.fp_load);
 
     // go through all widths
     for (std::size_t width : m_widths)
@@ -122,6 +125,6 @@ TEST_P(BtLogicTransaction, fp_load)
         };
 
         // test
-        test_load(width, 1u, fp_load);
+        TEST_TSX(m_config, load);
     }
 }
