@@ -34,65 +34,62 @@ test_fetch_or(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
-        for (std::size_t j = 0; j < object.bit_width(); ++j)
-        {
-            // set up params
-            object.inv_at(i);
-            object_old = object;
-            argument.inv_at(j);
-            argument_old = argument;
+        // set up params
+        object.inv_at(i);
+        object_old = object;
 
-            // set up expected
-            object_exp = object;
-            if (i != j)
-            {
-                object_exp.inv_at(j);
-            }
+        // set up expected
+        object_exp = object;
 
-            // test
-            fp_fetch_or(object, argument, ret);
-            ASSERT_EQ(object, object_exp);
-            ASSERT_EQ(argument, argument_old);
-            ASSERT_EQ(ret, object_old);
+        // test
+        fp_fetch_or(object, argument, ret);
+        ASSERT_EQ(object, object_exp);
+        ASSERT_EQ(argument, argument_old);
+        ASSERT_EQ(ret, object_old);
 
-            // reset
-            argument.inv_at(j);
-            object = argument;
-        }
+        // test backwards
+        object = object_old;
+        fp_fetch_or(argument, object, ret);
+        ASSERT_EQ(argument, object_exp);
+        ASSERT_EQ(object, object_old);
+        ASSERT_EQ(ret, argument_old);
+
+        // reset
+        argument = argument_old;
+        object = argument;
     }
 
     // start with all bits set
     object.inv();
     argument.inv();
+    argument_old = argument;
 
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
-        for (std::size_t j = 0; j < object.bit_width(); ++j)
-        {
-            // set up params
-            object.inv_at(i);
-            object_old = object;
-            argument.inv_at(j);
-            argument_old = argument;
+        // set up params
+        object.inv_at(i);
+        object_old = object;
 
-            // set up expected
-            object_exp = object;
-            if (i != j)
-            {
-                object_exp.inv_at(i);
-            }
+        // set up expected
+        object_exp = argument;
 
-            // test
-            fp_fetch_or(object, argument, ret);
-            ASSERT_EQ(object, object_exp);
-            ASSERT_EQ(argument, argument_old);
-            ASSERT_EQ(ret, object_old);
+        // test
+        fp_fetch_or(object, argument, ret);
+        ASSERT_EQ(object, object_exp);
+        ASSERT_EQ(argument, argument_old);
+        ASSERT_EQ(ret, object_old);
 
-            // reset
-            argument.inv_at(j);
-            object = argument;
-        }
+        // test backwards
+        object = object_old;
+        fp_fetch_or(argument, object, ret);
+        ASSERT_EQ(argument, object_exp);
+        ASSERT_EQ(object, object_old);
+        ASSERT_EQ(ret, argument_old);
+
+        // reset
+        argument = argument_old;
+        object = argument;
     }
 }
 
