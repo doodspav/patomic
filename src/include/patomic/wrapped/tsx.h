@@ -67,7 +67,7 @@
                 if (flag_value == 0)                                 \
                 {                                                    \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
-                        (void *) obj, desired, config.width          \
+                        obj, desired, config.width                   \
                     );                                               \
                 }                                                    \
                 tcommit();                                           \
@@ -147,7 +147,7 @@
                 if (flag_value == 0)                                 \
                 {                                                    \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
-                        ret, (const void *) obj, config.width        \
+                        ret, obj, config.width                       \
                     );                                               \
                 }                                                    \
                 tcommit();                                           \
@@ -229,10 +229,10 @@
                 if (flag_value == 0)                                 \
                 {                                                    \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
-                        ret, (const void *) obj, config.width        \
+                        ret, obj, config.width                       \
                     );                                               \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
-                        (void *) obj, desired, config.width          \
+                        obj, desired, config.width                   \
                     );                                               \
                 }                                                    \
                 tcommit();                                           \
@@ -317,17 +317,17 @@
             res.status = tbegin();                                      \
             if (res.status == 0ul)                                      \
             {                                                           \
-                int cmp;                                                \
+                int cmp = 0;                                            \
                 flag_value = *config.flag_nullable;                     \
                 if (flag_value == 0)                                    \
                 {                                                       \
                     PATOMIC_WRAPPED_DO_TSX_MEMCMP(                      \
-                        cmp, (const void *) obj, expected, config.width \
+                        cmp, obj, expected, config.width                \
                     );                                                  \
                     if (cmp == 0)                                       \
                     {                                                   \
                         PATOMIC_WRAPPED_DO_TSX_MEMCPY(                  \
-                            (void *) obj, desired, config.width         \
+                            obj, desired, config.width                  \
                         );                                              \
                     }                                                   \
                 }                                                       \
@@ -367,7 +367,7 @@
                 if (flag_value == 0)                                    \
                 {                                                       \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                      \
-                        expected, (const void *) obj, config.width      \
+                        expected, obj, config.width                     \
                     );                                                  \
                 }                                                       \
                 tcommit();                                              \
@@ -735,7 +735,7 @@
                 if (flag_value == 0)                                     \
                 {                                                        \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                       \
-                        ret, (const void *) obj, config.width            \
+                        ret, obj, config.width                           \
                     );                                                   \
                     do_op(uc_obj, uc_arg, config.width);                 \
                 }                                                        \
@@ -822,7 +822,7 @@
                 if (flag_value == 0)                                 \
                 {                                                    \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                   \
-                        ret, (const void *) obj, config.width        \
+                        ret, obj, config.width                       \
                     );                                               \
                     do_op(uc_obj, config.width);                     \
                 }                                                    \
@@ -1784,23 +1784,24 @@
             res.status = tbegin();                                                \
             if (res.status == 0ul)                                                \
             {                                                                     \
-                int cmp_a, cmp_b;                                                 \
+                int cmp_a = 0;                                                    \
+                int cmp_b = 0;                                                    \
                 flag_value = *config.flag_nullable;                               \
                 if (flag_value == 0)                                              \
                 {                                                                 \
                     PATOMIC_WRAPPED_DO_TSX_MEMCMP(                                \
-                        cmp_a, (const void *) cxa.obj, cxa.expected, config.width \
+                        cmp_a, cxa.obj, cxa.expected, config.width                \
                     );                                                            \
                     PATOMIC_WRAPPED_DO_TSX_MEMCMP(                                \
-                        cmp_b, (const void *) cxb.obj, cxb.expected, config.width \
+                        cmp_b, cxb.obj, cxb.expected, config.width                \
                     );                                                            \
                     if (cmp_a == 0 && cmp_b == 0)                                 \
                     {                                                             \
                         PATOMIC_WRAPPED_DO_TSX_MEMCPY(                            \
-                            (void *) cxa.obj, cxa.desired, config.width           \
+                            cxa.obj, cxa.desired, config.width                    \
                         );                                                        \
                         PATOMIC_WRAPPED_DO_TSX_MEMCPY(                            \
-                            (void *) cxb.obj, cxb.desired, config.width           \
+                            cxb.obj, cxb.desired, config.width                    \
                         );                                                        \
                     }                                                             \
                 }                                                                 \
@@ -1842,10 +1843,10 @@
                 if (flag_value == 0)                                              \
                 {                                                                 \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                                \
-                        cxa.expected, (const void *) cxa.obj, config.width        \
+                        cxa.expected, cxa.obj, config.width                       \
                     );                                                            \
                     PATOMIC_WRAPPED_DO_TSX_MEMCPY(                                \
-                        cxb.expected, (const void *) cxb.obj, config.width        \
+                        cxb.expected, cxb.obj, config.width                       \
                     );                                                            \
                 }                                                                 \
                 tcommit();                                                        \
@@ -1942,7 +1943,7 @@
                     {                                                  \
                         PATOMIC_WRAPPED_DO_TSX_MEMCMP(                 \
                             cmp,                                       \
-                            (const void *) cxs_buf[i].obj,             \
+                            cxs_buf[i].obj,                            \
                             cxs_buf[i].expected,                       \
                             config.width                               \
                         );                                             \
@@ -1952,7 +1953,7 @@
                         for (i = 0; i < cxs_len; ++i)                  \
                         {                                              \
                             PATOMIC_WRAPPED_DO_TSX_MEMCPY(             \
-                                (void *) cxs_buf[i].obj,               \
+                                cxs_buf[i].obj,                        \
                                 cxs_buf[i].desired,                    \
                                 config.width                           \
                             );                                         \
@@ -2001,7 +2002,7 @@
                     {                                                  \
                         PATOMIC_WRAPPED_DO_TSX_MEMCPY(                 \
                             cxs_buf[i].expected,                       \
-                            (const void *) cxs_buf[i].obj,             \
+                            cxs_buf[i].obj,                            \
                             config.width                               \
                         );                                             \
                     }                                                  \

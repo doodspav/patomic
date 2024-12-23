@@ -108,15 +108,15 @@
  *   Necessary because on some platforms memcpy uses instructions which will
  *   cause a transaction to abort.
  */
-#define PATOMIC_WRAPPED_DO_TSX_MEMCPY(dest, src, count)                    \
-    do {                                                                   \
-        volatile unsigned char *const uc_dest = (unsigned char *) (dest);  \
-        const unsigned char *const uc_src = (const unsigned char *) (src); \
-        for (size_t i = 0; i < ((size_t) (count)); ++i)                    \
-        {                                                                  \
-            uc_dest[i] = uc_src[i];                                        \
-        }                                                                  \
-    }                                                                      \
+#define PATOMIC_WRAPPED_DO_TSX_MEMCPY(dest, src, count)                                      \
+    do {                                                                                     \
+        volatile unsigned char *const uc_dest = (volatile unsigned char *) (dest);           \
+        const volatile unsigned char *const uc_src = (const volatile unsigned char *) (src); \
+        for (size_t i = 0; i < ((size_t) (count)); ++i)                                      \
+        {                                                                                    \
+            uc_dest[i] = uc_src[i];                                                          \
+        }                                                                                    \
+    }                                                                                        \
     while (0)
 
 
@@ -134,9 +134,9 @@
 #define PATOMIC_WRAPPED_DO_TSX_MEMCMP(res, lhs, rhs, count) \
     do {                                                    \
         const volatile unsigned char *const uc_lhs =        \
-            (const unsigned char *) (lhs);                  \
+            (const volatile unsigned char *) (lhs);         \
         const volatile unsigned char *const uc_rhs =        \
-            (const unsigned char *) (rhs);                  \
+            (const volatile unsigned char *) (rhs);         \
         size_t i;                                           \
         (res) = 0;                                          \
         for (i = 0; i < ((size_t) (count)); ++i)            \
