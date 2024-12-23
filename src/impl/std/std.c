@@ -13,6 +13,7 @@
 
 #include <patomic/wrapped/cmpxchg.h>
 #include <patomic/wrapped/direct.h>
+#include <patomic/wrapped/tsx.h>
 
 #include <stdatomic.h>
 #include <stddef.h>
@@ -775,6 +776,29 @@ patomic_impl_create_explicit_std(
 #endif  /* PATOMIC_HAS_ATOMIC && PATOMIC_HAS_STDATOMIC_H && PATOMIC_HAS_IR_TWOS_COMPL */
 
 
+static unsigned long tbegin() { return 0ul; }
+static void tcommit() {}
+
+#define IMPL_DEFINED_IS_LE() 1
+
+PATOMIC_WRAPPED_TSX_DEFINE_OPS_CREATE(
+    tsx, tbegin, tcommit
+)
+
+static int ftest(const patomic_transaction_flag_t *flag) {
+    return *flag != 0;
+}
+
+static int ftest_set(patomic_transaction_flag_t *flag) {
+    const int old = *flag != 0;
+    *flag = 1;
+    return old;
+}
+
+static void fclear(patomic_transaction_flag_t *flag) {
+    *flag = 0;
+}
+
 patomic_transaction_t
 patomic_impl_create_transaction_std(
     const unsigned int options
@@ -782,6 +806,12 @@ patomic_impl_create_transaction_std(
 {
     /* zero all fields */
     patomic_transaction_t impl = {0};
+
+    /* initialize fields */
+    impl.ops = patomic_ops_create_tsx();
+    impl.ops.flag_ops.fp_test = ftest;
+    impl.ops.flag_ops.fp_test_set = ftest_set;
+    impl.ops.flag_ops.fp_clear = fclear;
 
     /* ignore parameters */
     PATOMIC_IGNORE_UNUSED(options);
