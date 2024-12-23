@@ -4,6 +4,9 @@
 #include "generic_int.hpp"
 #include "name.hpp"
 
+#include <patomic/api/transaction.h>
+#include <patomic/api/ops/transaction.h>
+
 #include <type_traits>
 
 
@@ -388,12 +391,46 @@ namespace test
 namespace _detail
 {
 
+
 /// @brief
 ///   Calls the given op function pointer with all pointer params having the
 ///   given value. The return value is discarded.
-template <class F, class C, class R>
-void
-call_patomic_op(F f, void *ptr, const C& config, R *result) noexcept;
+
+#define DECL_OVERLOAD_CALL_PATOMIC_OP(fp_type)      \
+    void                                            \
+    call_patomic_op(                                \
+        const fp_type fp,                           \
+        void *const ptr,                            \
+        const patomic_transaction_config_t& config, \
+        patomic_transaction_result_t *const result  \
+    ) noexcept
+
+#define DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(fp_type)      \
+    void                                                \
+    call_patomic_op(                                    \
+        const fp_type fp,                               \
+        void *const ptr,                                \
+        const patomic_transaction_config_wfb_t& config, \
+        patomic_transaction_result_wfb_t *const result  \
+    ) noexcept
+
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_store_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_load_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_exchange_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_cmpxchg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_test_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_test_modify_t);
+
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_fetch_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_fetch_noarg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_void_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_void_noarg_t);
+
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_double_cmpxchg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_multi_cmpxchg_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP(patomic_opsig_transaction_generic_t);
+DECL_OVERLOAD_CALL_PATOMIC_OP_WFB(patomic_opsig_transaction_generic_wfb_t);
+
 
 }  // namespace _detail
 
