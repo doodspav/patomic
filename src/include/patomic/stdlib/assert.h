@@ -1,3 +1,6 @@
+/* Copyright (c) doodspav. */
+/* SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception */
+
 #ifdef PATOMIC_STDLIB_ASSERT_H
     #undef PATOMIC_STDLIB_ASSERT_H
     #undef patomic_assert

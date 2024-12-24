@@ -1,3 +1,6 @@
+// Copyright (c) doodspav.
+// SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
 #include <test/common/align.hpp>
 #include <test/common/generic_int.hpp>
 #include <test/common/math.hpp>
