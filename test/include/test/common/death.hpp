@@ -2,7 +2,9 @@
 #define PATOMIC_TEST_COMMON_DEATH_HPP
 
 // necessary because otherwise <gmock/gmock.h> header causes compilation failure
-#pragma GCC system_header
+#ifdef __GNUC__
+    #pragma GCC system_header
+#endif
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
