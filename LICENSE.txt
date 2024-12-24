@@ -1,5 +1,5 @@
-The patomic library is under the GNU Lesser General Public License v3.0 with
-linking exception:
+The patomic library is under the GNU Lesser General Public License v3.0 or
+later with linking exception:
 
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

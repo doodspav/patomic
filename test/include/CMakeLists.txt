@@ -1,5 +1,5 @@
 # Copyright (c) doodspav.
-# SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
 
 # create interface target that is automatically linked to all tests
 add_library(${test_target_name}-include INTERFACE)
