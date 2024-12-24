@@ -13,6 +13,12 @@ create_bt(
 )
 
 create_bt(
+    NAME BtDeathNullParams
+    SOURCE
+        null_params.cpp
+)
+
+create_bt(
     NAME BtDeathUnalignedObject
     SOURCE
         unaligned_object.cpp
