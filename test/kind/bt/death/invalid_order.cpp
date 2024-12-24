@@ -145,7 +145,7 @@ TEST_F(BtDeathInvalidOrder, explicit_fail)
         for (auto order : test::supported_orders())
         {
 
-            if (!PATOMIC_IS_VALID_FAIL_ORDER(param.order, order))
+            if (!patomic_is_valid_fail_order(param.order, order))
             {
                 invalid_orders.push_back(order);
             }
