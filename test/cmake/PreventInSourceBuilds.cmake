@@ -1,5 +1,5 @@
 # Copyright (c) doodspav.
-# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+# SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
 
 # in-source build guard
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
