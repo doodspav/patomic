@@ -35,6 +35,8 @@ KilledByAbort();
 /// @brief
 ///   Assert that calling the given function pointer with the given params will
 ///   die, but only perform the test if the function pointer is non-null.
+/// @note
+///   Neither "\\d" nor "\\s" worked in testing.
 #define ASSERT_DEATH_IF_NON_NULL(fp, ...)            \
     if (fp != nullptr)                               \
     {                                                \
