@@ -167,7 +167,7 @@ apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
 
----- Linking Exception to the GNU Lesser General Public License v3.0 ----
+---- Linking Exception to the GNU Lesser General Public License v3 ----
 
 As a special exception to the GNU Lesser General Public License version 3
 ("LGPL3"), the copyright holders of this Library give you permission to convey
