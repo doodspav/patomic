@@ -1,8 +1,11 @@
 #ifndef PATOMIC_TEST_COMMON_DEATH_HPP
 #define PATOMIC_TEST_COMMON_DEATH_HPP
 
-#include <gtest/gtest.h>
+// necessary because otherwise <gmock/gmock.h> header causes compilation failure
+#pragma GCC system_header
+
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 
 namespace test
