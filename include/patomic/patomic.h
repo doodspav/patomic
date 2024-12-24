@@ -33,7 +33,8 @@ extern "C" {
  *   Width in bytes of type to support.
  *
  * @param order
- *   Memory order to implicitly use for all atomic operations.
+ *   Memory order to implicitly use for all atomic operations. This must be a
+ *   valid memory order.
  *
  * @param options
  *   One or more patomic_option_t flags combined. Passed on to each internal

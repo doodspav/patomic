@@ -1,6 +1,12 @@
 #ifndef PATOMIC_TEST_COMMON_DEATH_HPP
 #define PATOMIC_TEST_COMMON_DEATH_HPP
 
+// necessary because otherwise <gmock/gmock.h> header causes compilation failure
+#ifdef __GNUC__
+    #pragma GCC system_header
+#endif
+
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 
@@ -29,6 +35,21 @@ using KilledByAbortPredicateType = testing::KilledBySignal;
 ///   Predicate is callable with the signature bool()(int).
 KilledByAbortPredicateType
 KilledByAbort();
+
+
+/// @brief
+///   Assert that calling the given function pointer with the given params will
+///   die, but only perform the test if the function pointer is non-null.
+/// @note
+///   Neither "\\d" nor "\\s" worked in testing.
+#define ASSERT_DEATH_IF_NON_NULL(fp, ...)            \
+    if (fp != nullptr)                               \
+    {                                                \
+        ASSERT_DEATH({                               \
+            static_cast<void>(fp(__VA_ARGS__));      \
+        }, R"(.+:[0-9]+:.+Assertion `.+` failed.)"); \
+    }                                                \
+    do {} while (0)
 
 
 }  // namespace test

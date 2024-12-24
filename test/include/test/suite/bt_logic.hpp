@@ -9,7 +9,7 @@
 
 
 /// @brief
-///   Test fixture for implicit logic operations with all memory orders.
+///   Test fixture for implicit operations with all memory orders.
 class BtLogicImplicit : public testing::TestWithParam<test::ParamsImplicit>
 {
 public:
@@ -26,19 +26,19 @@ protected:
 
 
 /// @brief
-///   Test fixture for implicit logic operations with store memory orders.
+///   Test fixture for implicit operations with store memory orders.
 class BtLogicImplicitStore : public BtLogicImplicit
 {};
 
 
 /// @brief
-///   Test fixture for implicit logic operations with load memory orders.
+///   Test fixture for implicit operations with load memory orders.
 class BtLogicImplicitLoad : public BtLogicImplicit
 {};
 
 
 /// @brief
-///   Test fixture for explicit logic operations with all memory orders.
+///   Test fixture for explicit operations with all memory orders.
 class BtLogicExplicit : public testing::TestWithParam<test::ParamsExplicit>
 {
 public:
@@ -55,19 +55,19 @@ protected:
 
 
 /// @brief
-///   Test fixture for explicit logic operations with store memory orders.
+///   Test fixture for explicit operations with store memory orders.
 class BtLogicExplicitStore : public BtLogicExplicit
 {};
 
 
 /// @brief
-///   Test fixture for explicit logic operations with load memory orders.
+///   Test fixture for explicit operations with load memory orders.
 class BtLogicExplicitLoad : public BtLogicExplicit
 {};
 
 
 /// @brief
-///   Test fixture for transaction logic operations.
+///   Test fixture for transaction operations.
 class BtLogicTransaction : public testing::TestWithParam<test::ParamsTransaction>
 {
 public:

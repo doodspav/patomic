@@ -65,6 +65,9 @@ patomic_create(
     patomic_t *end   = objs;
     size_t i;
 
+    /* check memory order is valid */
+    patomic_assert_always(PATOMIC_IS_VALID_ORDER(order));
+
     /* fill array with implementations */
     for (i = 0; i < PATOMIC_IMPL_REGISTER_SIZE; ++i)
     {
@@ -76,6 +79,19 @@ patomic_create(
 
             /* check that alignment values are valid */
             assert_valid_alignment(end->align);
+
+            /* check that store operations are null for a non-store memory order */
+            if (!PATOMIC_IS_VALID_STORE_ORDER(order))
+            {
+                patomic_assert_always(end->ops.fp_store == NULL);
+            }
+
+            /* check that load operations are null for a non-load memory order */
+            if (!PATOMIC_IS_VALID_LOAD_ORDER(order))
+            {
+                patomic_assert_always(end->ops.fp_load == NULL);
+                patomic_assert_always(end->ops.bitwise_ops.fp_test == NULL);
+            }
 
             /* only add to array if some operation is supported */
             if (opcats != patomic_internal_feature_check_any(&end->ops, opcats))
