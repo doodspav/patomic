@@ -1,8 +1,8 @@
 #ifndef PATOMIC_TEST_COMMON_DEATH_HPP
 #define PATOMIC_TEST_COMMON_DEATH_HPP
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 
 namespace test
