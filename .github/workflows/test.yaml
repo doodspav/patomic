@@ -53,7 +53,7 @@ jobs:
             preset: patomic-ci-native-unix-gcc
             architecture: x86_64
 
-    uses: ./.github/workflows/_reusable-test-native.yml
+    uses: ./.github/workflows/_reusable-test-native.yaml
     with:
       os: ${{ matrix.os }}
       preset: ${{ matrix.preset }}
@@ -132,7 +132,7 @@ jobs:
           - architecture: x86_32
             triple: i686-linux-gnu
             skip_llvm: true  # fixme: supported but not sure how (GHI #25)
-    uses: ./.github/workflows/_reusable-test-qemu.yml
+    uses: ./.github/workflows/_reusable-test-qemu.yaml
     with:
       triple: ${{ matrix.triple }}
       architecture: ${{ matrix.architecture }}
