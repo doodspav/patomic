@@ -34,13 +34,13 @@ KilledByAbort();
 /// @brief
 ///   Assert that calling the given function pointer with the given params will
 ///   die, but only perform the test if the function pointer is non-null.
-#define ASSERT_DEATH_IF_NON_NULL(fp, ...)       \
-    if (fp != nullptr)                          \
-    {                                           \
-        ASSERT_DEATH({                          \
-            static_cast<void>(fp(__VA_ARGS__)); \
-        }, ".*");                               \
-    }                                           \
+#define ASSERT_DEATH_IF_NON_NULL(fp, ...)                      \
+    if (fp != nullptr)                                         \
+    {                                                          \
+        ASSERT_DEATH({                                         \
+            static_cast<void>(fp(__VA_ARGS__));                \
+        }, ".+:\\d+:\\n\\t.+\\n\\tAssertion `.+` failed.\\n"); \
+    }                                                          \
     do {} while (0)
 
 
