@@ -23,41 +23,6 @@
     do {} while (0)
 
 
-namespace
-{
-
-/// @brief Function to create cartesian product of all supported ids, options,
-///        and widths, as well as the orders passed in as a parameter.
-std::vector<test::ParamsImplicit>
-create_params(const std::vector<patomic_memory_order_t>& orders)
-{
-    // setup
-    std::vector<test::ParamsImplicit> params;
-
-    // create cartesian product
-    for (patomic_id_t id : test::supported_ids())
-    {
-        for (std::size_t width : test::supported_widths())
-        {
-            for (patomic_memory_order_t order : orders)
-            {
-                for (unsigned int options : test::supported_options())
-                {
-                    params.emplace_back(
-                        std::make_tuple(id, width, order, options)
-                    );
-                }
-            }
-        }
-    }
-
-    // return
-    return params;
-}
-
-}  // namespace
-
-
 /// @brief Test fixture.
 class BtDeathInvalidOrder : public testing::Test
 {};
@@ -74,7 +39,7 @@ TEST_F(BtDeathInvalidOrder, implicit)
     };
 
     // go through all params
-    const auto params = create_params(invalid_orders);
+    const auto params = test::ParamsImplicit::combinations_with(invalid_orders);
     for (const auto& param : params)
     {
         // add trace
@@ -105,7 +70,7 @@ TEST_F(BtDeathInvalidOrder, explicit_any)
     };
 
     // go through all params
-    const auto params = create_params(invalid_orders);
+    const auto params = test::ParamsImplicit::combinations_with(invalid_orders);
     for (const auto& param : params)
     {
         // add trace
@@ -172,7 +137,7 @@ TEST_F(BtDeathInvalidOrder, explicit_any)
 TEST_F(BtDeathInvalidOrder, explicit_fail)
 {
     // go through all params
-    const auto params = create_params(test::supported_orders());
+    const auto params = test::ParamsImplicit::combinations_with(test::supported_orders());
     for (const auto& param : params)
     {
         // invalid orders to test
@@ -228,7 +193,7 @@ TEST_F(BtDeathInvalidOrder, explicit_store)
     }
 
     // go through all params
-    const auto params = create_params(invalid_orders);
+    const auto params = test::ParamsImplicit::combinations_with(invalid_orders);
     for (const auto& param : params)
     {
         // add trace
@@ -267,7 +232,7 @@ TEST_F(BtDeathInvalidOrder, explicit_load)
     }
 
     // go through all params
-    const auto params = create_params(invalid_orders);
+    const auto params = test::ParamsImplicit::combinations_with(invalid_orders);
     for (const auto& param : params)
     {
         // add trace

@@ -96,6 +96,13 @@ ParamsImplicit::combinations()
 
 
 std::vector<ParamsImplicit>
+ParamsImplicit::combinations_with(const std::vector<patomic_memory_order_t>& orders)
+{
+    return combinations_imp_exp<ParamsImplicit>(orders);
+}
+
+
+std::vector<ParamsImplicit>
 ParamsImplicit::combinations_store()
 {
     return combinations_imp_exp<ParamsImplicit>(supported_orders_store());

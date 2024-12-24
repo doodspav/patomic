@@ -58,6 +58,11 @@ struct ParamsImplicit
     combinations();
 
     /// @brief
+    ///   Create all combinations of params for tests with given memory orders.
+    static std::vector<ParamsImplicit>
+    combinations_with(const std::vector<patomic_memory_order_t>& orders);
+
+    /// @brief
     ///   Create all combinations of params for tests with only memory orders
     ///   which are valid for store operations.
     static std::vector<ParamsImplicit>
