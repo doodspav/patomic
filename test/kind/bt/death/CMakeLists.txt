@@ -11,3 +11,9 @@ create_bt(
     SOURCE
         invalid_order.cpp
 )
+
+create_bt(
+    NAME BtDeathUnalignedObject
+    SOURCE
+        unaligned_object.cpp
+)

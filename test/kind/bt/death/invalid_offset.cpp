@@ -1,22 +1,10 @@
 #include <patomic/patomic.h>
 
+#include <test/common/death.hpp>
 #include <test/common/generic_int.hpp>
 #include <test/common/params.hpp>
 
 #include <gtest/gtest.h>
-
-
-/// @brief Assert that calling the given function pointer with the given params
-///        will die, but only perform the test if the function pointer is not
-///        null.
-#define ASSERT_DEATH_IF_NON_NULL(fp, ...)       \
-    if (fp != nullptr)                          \
-    {                                           \
-        ASSERT_DEATH({                          \
-            static_cast<void>(fp(__VA_ARGS__)); \
-        }, ".*");                               \
-    }                                           \
-    do {} while (0)
 
 
 /// @brief Test fixture.
@@ -66,7 +54,10 @@ TEST_F(BtDeathInvalidOffset, exceeds_bit_width)
         ASSERT_DEATH_IF_NON_NULL(pai.ops.bitwise_ops.fp_test_reset, pi, offset);
 
         // explicit
-        ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test, pe, offset, param.order);
+        if (patomic_is_valid_load_order(param.order))
+        {
+            ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test, pe, offset, param.order);
+        }
         ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test_compl, pe, offset, param.order);
         ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test_set, pe, offset, param.order);
         ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test_reset, pe, offset, param.order);
@@ -116,7 +107,10 @@ TEST_F(BtDeathInvalidOffset, negative)
         ASSERT_DEATH_IF_NON_NULL(pai.ops.bitwise_ops.fp_test_reset, pi, offset);
 
         // explicit
-        ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test, pe, offset, param.order);
+        if (patomic_is_valid_load_order(param.order))
+        {
+            ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test, pe, offset, param.order);
+        }
         ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test_compl, pe, offset, param.order);
         ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test_set, pe, offset, param.order);
         ASSERT_DEATH_IF_NON_NULL(pae.ops.bitwise_ops.fp_test_reset, pe, offset, param.order);

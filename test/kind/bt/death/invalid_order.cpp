@@ -1,5 +1,6 @@
 #include <patomic/patomic.h>
 
+#include <test/common/death.hpp>
 #include <test/common/generic_int.hpp>
 #include <test/common/name.hpp>
 #include <test/common/params.hpp>
@@ -8,19 +9,6 @@
 #include <gtest/gtest.h>
 
 #include <vector>
-
-
-/// @brief Assert that calling the given function pointer with the given params
-///        will die, but only perform the test if the function pointer is not
-///        null.
-#define ASSERT_DEATH_IF_NON_NULL(fp, ...)       \
-    if (fp != nullptr)                          \
-    {                                           \
-        ASSERT_DEATH({                          \
-            static_cast<void>(fp(__VA_ARGS__)); \
-        }, ".*");                               \
-    }                                           \
-    do {} while (0)
 
 
 /// @brief Test fixture.

@@ -31,6 +31,19 @@ KilledByAbortPredicateType
 KilledByAbort();
 
 
+/// @brief
+///   Assert that calling the given function pointer with the given params will
+///   die, but only perform the test if the function pointer is non-null.
+#define ASSERT_DEATH_IF_NON_NULL(fp, ...)       \
+    if (fp != nullptr)                          \
+    {                                           \
+        ASSERT_DEATH({                          \
+            static_cast<void>(fp(__VA_ARGS__)); \
+        }, ".*");                               \
+    }                                           \
+    do {} while (0)
+
+
 }  // namespace test
 
 #endif  // PATOMIC_TEST_COMMON_DEATH_HPP
