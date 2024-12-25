@@ -431,14 +431,14 @@ assert(ret == 1);
 
 The biggest pitfall is not reading the documentation. These are some others:
 
-#### 1.
+##### 1.
 
 Non-transaction atomic operations all operate on unsigned integer objects.
 
 This means that passing a signed integer object will only work on platforms 
 where both signed and unsigned objects have the same representation.
 
-#### 2.
+##### 2.
 
 Where multiple integer types have the same width, non-transaction atomic
 operations for that width will use the highest ranking unsigned integer type.
@@ -446,7 +446,7 @@ operations for that width will use the highest ranking unsigned integer type.
 This could cause issues on platforms where multiple integer types have the same
 width but different representations (e.g. one has trap bits).
 
-#### 3.
+##### 3.
 
 Atomic transaction operations all operate on bytes (`unsigned char`) rather 
 than objects.
@@ -454,8 +454,7 @@ than objects.
 This could cause issues when trying to use them on integer types that have
 padding or trap bits.
 
-
-#### 4.
+##### 4.
 
 Atomic transaction operations might never succeed.
 
