@@ -18,6 +18,9 @@ jobs:
 
       - name: Check files
         run: |
+          # hmm
+          echo "begin"
+          
           # file extensions to exclude
           exclude_ext=("json")
           
@@ -30,6 +33,8 @@ jobs:
           
           # keep count of how many files were successfully checked
           checked_count=0
+          
+          echo "breakpoint check"
           
           # go through all files
           for file in $(git ls-files); do
