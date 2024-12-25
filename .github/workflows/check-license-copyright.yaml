@@ -22,7 +22,7 @@ jobs:
           exclude_ext=("json")
           
           # file names to exclude
-          exclude_name=("LICENSE.txt" "README.md")
+          exclude_name=("LICENSE.txt" "README.md" "CHANGELOG.md")
           
           # required comments
           copyright_txt="Copyright (c) doodspav."
