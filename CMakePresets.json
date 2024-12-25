@@ -1,0 +1,261 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "_patomic-ci-base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "BUILD_TESTING": true,
+        "CMAKE_C_STANDARD": "11",
+        "CMAKE_C_STANDARD_REQUIRED": true,
+        "CMAKE_C_EXTENSIONS": false,
+        "CMAKE_CXX_STANDARD": "14",
+        "CMAKE_CXX_STANDARD_REQUIRED": true,
+        "CMAKE_CXX_EXTENSIONS": false
+      }
+    },
+    {
+      "name": "_patomic-ci-qemu-base",
+      "hidden": true,
+      "toolchainFile": "ci/toolchain/qemu-linux-gnu.cmake",
+      "inherits": [
+        "_patomic-ci-base"
+      ]
+    },
+
+    {
+      "name": "_patomic-ci-native-compiler-clang",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "_patomic-ci-native-compiler-gcc",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "_patomic-ci-native-compiler-msvc",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl"
+      }
+    },
+
+    {
+      "name": "_patomic-ci-flags-ansi-gnu",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wno-unused-function -Wno-atomic-alignment -Wno-unused-local-typedef",
+        "CMAKE_C_STANDARD": "90"
+      }
+    },
+    {
+      "name": "_patomic-ci-flags-coverage-clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
+        "CMAKE_CXX_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fprofile-instr-generate -fcoverage-mapping"
+      }
+    },
+    {
+      "name": "_patomic-ci-flags-coverage-gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "--coverage",
+        "CMAKE_CXX_FLAGS_INIT": "--coverage",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "--coverage",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "--coverage"
+      }
+    },
+    {
+      "name": "_patomic-ci-flags-sanitize-gnu",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-fsanitize=address,undefined -fsanitize-recover=all -fno-omit-frame-pointer",
+        "CMAKE_CXX_FLAGS_INIT": "-fsanitize=address,undefined -fsanitize-recover=all -fno-omit-frame-pointer '-DPATOMIC_HAS_ASAN=1' '-DPATOMIC_HAS_UBSAN=1'",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-fsanitize=address,undefined -fsanitize-recover=all",
+        "CMAKE_SHARED_LINKER_FLAGS_INIT": "-fsanitize=address,undefined -fsanitize-recover=all"
+      }
+    },
+    {
+      "name": "_patomic-ci-flags-warning-clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-Weverything -Werror -Wpedantic -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-unused-function -Wno-atomic-alignment -Wno-poison-system-directories -Wno-reserved-identifier -Wno-documentation-unknown-command -Wno-unused-local-typedef -Wno-tautological-value-range-compare -Wno-cast-qual",
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wno-c++17-attribute-extensions"
+      }
+    },
+    {
+      "name": "_patomic-ci-flags-warning-gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic -Wshadow -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wstrict-prototypes -Wmisleading-indentation -Wduplicated-branches -Wlogical-op -Wdeclaration-after-statement -Wno-unused-function -Wno-unused-local-typedefs",
+        "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror -Wpedantic"
+      }
+    },
+    {
+      "name": "_patomic-ci-flags-warning-msvc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS_INIT": "/permissive- /volatile:iso /Wall /WX /wd4464 /wd4132 /wd4820 /wd4127 /wd5045 /wd4710 /wd4711 /wd4668 /wd4146",
+        "CMAKE_CXX_FLAGS_INIT": "/permissive- /volatile:iso /W4 /WX"
+      }
+    },
+
+    {
+      "name": "patomic-ci-native-win32-msvc-warning",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-msvc",
+        "_patomic-ci-flags-warning-msvc"
+      ],
+      "architecture": "Win32"
+    },
+    {
+      "name": "patomic-ci-native-win64-msvc-warning",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-msvc",
+        "_patomic-ci-flags-warning-msvc"
+      ],
+      "architecture": "x64"
+    },
+
+    {
+      "name": "patomic-ci-native-unix-clang-ansi",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-clang",
+        "_patomic-ci-flags-ansi-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-native-unix-clang-coverage",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-clang",
+        "_patomic-ci-flags-coverage-clang"
+      ]
+    },
+    {
+      "name": "patomic-ci-native-unix-clang-sanitize",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-clang",
+        "_patomic-ci-flags-sanitize-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-native-unix-clang-warning",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-clang",
+        "_patomic-ci-flags-warning-clang"
+      ]
+    },
+
+    {
+      "name": "patomic-ci-native-unix-gcc-ansi",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-gcc",
+        "_patomic-ci-flags-ansi-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-native-unix-gcc-coverage",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-gcc",
+        "_patomic-ci-flags-coverage-gcc"
+      ]
+    },
+    {
+      "name": "patomic-ci-native-unix-gcc-sanitize",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-gcc",
+        "_patomic-ci-flags-sanitize-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-native-unix-gcc-warning",
+      "inherits": [
+        "_patomic-ci-base",
+        "_patomic-ci-native-compiler-gcc",
+        "_patomic-ci-flags-warning-gcc"
+      ]
+    },
+
+    {
+      "name": "patomic-ci-qemu-ubuntu-clang-ansi",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-ansi-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-clang-coverage",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-coverage-clang"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-clang-sanitize",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-sanitize-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-clang-warning",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-warning-clang"
+      ]
+    },
+
+    {
+      "name": "patomic-ci-qemu-ubuntu-gcc-ansi",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-ansi-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-gcc-coverage",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-coverage-gcc"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-gcc-sanitize",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-sanitize-gnu"
+      ]
+    },
+    {
+      "name": "patomic-ci-qemu-ubuntu-gcc-warning",
+      "inherits": [
+        "_patomic-ci-qemu-base",
+        "_patomic-ci-flags-warning-gcc"
+      ]
+    }
+  ]
+}

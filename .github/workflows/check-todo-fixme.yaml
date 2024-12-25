@@ -1,0 +1,156 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
+name: Check todo and fixme
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Get Open Issues
+        id: get-open-issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // get repository details
+            const [owner, repo] = "${{ github.repository }}".split("/");
+            
+            // make graphql query
+            const graphql = `query listOpenIssues($repository: String!, $owner: String!, $cursor: String) {
+              repository(name: $repository, owner: $owner) {
+                issues(first: 100, states: OPEN, after: $cursor) {
+                  nodes {
+                    number
+                  }
+                  pageInfo {
+                    endCursor
+                    hasNextPage
+                  }
+                }
+              }
+            }`;
+            
+            // get information from graphql api
+            let cursor;
+            let openIssueNumbers = [];
+            do {
+              const response = await github.graphql(graphql, { repository: repo, owner: owner, cursor });
+              response.repository.issues.nodes.forEach(({ number }) => openIssueNumbers.push(number));
+              cursor = response.repository.issues.pageInfo.endCursor;
+            } while (cursor);
+            
+            // save data as json by returning
+            console.log(openIssueNumbers);
+            return openIssueNumbers;
+
+      - name: Scan Files for Fixme and Todo
+        id: scan-files
+        env:
+          BASE_PATH: './patomic'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // dependencies
+            const fs = require('fs');
+            const path = require('path');
+            
+            // get issue id if line contains todo or fixme
+            // return: null | { issueId: null } | { issueId: 'number' }
+            function parseLine(line) {
+              const regex = /(fixme|todo)/i;
+              const issueIdRegex = /ghi\s#(\d+)/i;
+              if (regex.test(line)) {
+                const match = line.match(issueIdRegex);
+                const issueId = match ? match[1] : null;
+                return { issueId };
+              } else {
+                return null;
+              }
+            }
+            
+            // list all files in directory (except excluded ones)
+            // return: [ path1, path2, ... ]
+            const excludedDirs = ['.git'];
+            const excludedFiles = ['check-todo-fixme.yaml'];
+            function listFiles(dir) {
+              let result = [];
+              fs.readdirSync(dir).forEach(file => {
+                // base set up
+                let fullPath = path.join(dir, file);
+                let stat = fs.statSync(fullPath);
+                // path is a directory
+                if (stat && stat.isDirectory()) {
+                  if (!excludedDirs.includes(file)) {
+                    result = result.concat(listFiles(fullPath));
+                  }
+                // path is a file
+                } else if (!excludedFiles.includes(file)) {
+                  result.push(fullPath)
+                }
+              });
+              return result;
+            }
+            
+            // parse all lines in all files
+            // return: [ { filePath: <path>, lineNum: <num>, issueId: <id> }, ... ]
+            function parseAll(dir) {
+              const files = listFiles(dir);
+              const items = []
+              files.forEach(file => {
+                const content = fs.readFileSync(file, 'utf-8');
+                const lines = content.split('\n');
+                lines.forEach((line, index) => {
+                  const item = parseLine(line);
+                  if (item) {
+                    item.filePath = file;
+                    item.lineNum = index + 1;
+                    items.push(item);
+                  }
+                });
+              });
+              return items;
+            }
+            
+            // save data as json by returning
+            const ret = parseAll('${{ env.BASE_PATH }}');
+            console.log(ret);
+            return ret;
+
+      - name: Check Issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // get outputs
+            const openIssueIds = ${{ steps.get-open-issues.outputs.result }};
+            const parsedItems = ${{ steps.scan-files.outputs.result }};
+
+            // go through all parsed items
+            let errorCount = 0;
+            parsedItems.forEach(item => {
+              const filePath = item.filePath.replace('patomic/', '');
+              if (item.issueId === null) {
+                ++errorCount;
+                const msg = "No GitHub issue mentioned in todo/fixme comment (must match pattern '/ghi\\s#(\\d+)/i').";
+                console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
+              } else if (!openIssueIds.includes(parseInt(item.issueId))) {
+                ++errorCount;
+                const msg = `GitHub issue #${item.issueId} does not correspond to an open issue number for GitHub repository ${{ github.repository }} (maybe it was resolved and closed).`
+                console.error(`::error file=${filePath},line=${item.lineNum}::${msg}`);
+              }
+            });
+
+            // fail if error was printed
+            if (errorCount > 0) {
+              process.exit(1);
+            }

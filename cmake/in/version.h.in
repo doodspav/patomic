@@ -1,0 +1,155 @@
+/* Copyright (c) doodspav. */
+/* SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception */
+
+#ifndef PATOMIC_GENERATED_API_VERSION_H
+#define PATOMIC_GENERATED_API_VERSION_H
+
+#include <patomic/api/export.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The full version string the library was built as.
+ *
+ * @note
+ *   The format of this string depends on how the library is built. It will
+ *   always be a valid Semantic Version string.
+ */
+#define PATOMIC_VERSION_STRING "@patomic_VERSION@"
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The major version the library was built as.
+ */
+#define PATOMIC_VERSION_MAJOR @patomic_VERSION_MAJOR@
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The minor version the library was built as.
+ */
+#define PATOMIC_VERSION_MINOR @patomic_VERSION_MINOR@
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   The patch version the library was built as.
+ */
+#define PATOMIC_VERSION_PATCH @patomic_VERSION_PATCH@
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   If the library is semver compatible with the requested version.
+ *
+ * @warning
+ *   The special case of major version 0 is not accounted for. Under semver
+ *   rules, minor and patch version differences are incompatible when the major
+ *   version is 0, however this macro may consider them compatible.
+ */
+#define PATOMIC_VERSION_COMPATIBLE_WITH(major, minor, patch) \
+    ( (major) == PATOMIC_VERSION_MAJOR &&                    \
+      (minor) <= PATOMIC_VERSION_MINOR &&                    \
+      ((minor) < PATOMIC_VERSION_MINOR || (patch) <= PATOMIC_VERSION_PATCH) )
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the full version string the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_STRING macro value.
+ *
+ * @note
+ *   The format of this string depends on how the library is built. It will
+ *   always be a valid Semantic Version string.
+ *
+ * @returns
+ *   The full version string the library was built as.
+ */
+PATOMIC_EXPORT const char *
+patomic_version_string(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the major version the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_MAJOR macro value.
+ *
+ * @returns
+ *   The major version the library was built as.
+ */
+PATOMIC_EXPORT int
+patomic_version_major(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the minor version the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_MINOR macro value.
+ *
+ * @returns
+ *   The minor version the library was built as.
+ */
+PATOMIC_EXPORT int
+patomic_version_minor(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Provides the patch version the library was built as. This value is
+ *   identical to the PATOMIC_VERSION_PATCH macro value.
+ *
+ * @returns
+ *   The patch version the library was built as.
+ */
+PATOMIC_EXPORT int
+patomic_version_patch(void);
+
+
+/**
+ * @addtogroup version
+ *
+ * @brief
+ *   Checks if the version the library was built as is compatible with the
+ *   requested version, using Semantic Versioning. This value is identical to
+ *   the PATOMIC_VERSION_COMPATIBLE_WITH macro value.
+ *
+ * @warning
+ *   The special case of major version 0 is not accounted for. Under semver
+ *   rules, minor and patch version differences are incompatible when the major
+ *   version is 0, however this function may consider them compatible.
+ *
+ * @returns
+ *   If the library is compatible returns 1, otherwise returns 0.
+ */
+PATOMIC_EXPORT int
+patomic_version_compatible_with(int major, int minor, int patch);
+
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
+
+#endif  /* PATOMIC_GENERATED_API_VERSION_H */

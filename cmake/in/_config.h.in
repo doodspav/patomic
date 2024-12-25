@@ -1,0 +1,533 @@
+/* Copyright (c) doodspav. */
+/* SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception */
+
+#ifndef PATOMIC_GENERATED_CONFIG_H
+#define PATOMIC_GENERATED_CONFIG_H
+
+
+#ifndef PATOMIC_HAS_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__' is available as a keyword.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_EXTN @COMPILER_HAS_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'restrict' is available as a keyword.
+     *
+     * @note
+     *   Usually required: C99.
+     */
+    #define PATOMIC_HAS_RESTRICT @COMPILER_HAS_RESTRICT@
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__restrict' is available as a keyword.
+     *
+     * @note
+     *   Usually required: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_RESTRICT @COMPILER_HAS_MS_RESTRICT@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_RESTRICT
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__restrict__' is available as a keyword.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_RESTRICT @COMPILER_HAS_GNU_RESTRICT@
+#endif
+
+
+#ifndef PATOMIC_HAS_ATOMIC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Atomic' is available as a keyword.
+     *
+     * @note
+     *   Usually required: C11.
+     */
+    #define PATOMIC_HAS_ATOMIC @COMPILER_HAS_ATOMIC@
+#endif
+
+
+#ifndef PATOMIC_HAS_STDATOMIC_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdatomic.h> header is available.
+     *
+     * @note
+     *   Usually required: C11.
+     */
+    #define PATOMIC_HAS_STDATOMIC_H @COMPILER_HAS_STDATOMIC_H@
+#endif
+
+
+#ifndef PATOMIC_HAS_STDINT_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_STDINT_H @COMPILER_HAS_STDINT_H@
+#endif
+
+
+#ifndef PATOMIC_HAS_WCHAR_H
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_H @COMPILER_HAS_WCHAR_H@
+#endif
+
+
+#ifndef PATOMIC_HAS_LONG_LONG
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'long long' is available as a type.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_LONG_LONG @COMPILER_HAS_LONG_LONG@
+#endif
+
+
+#ifndef PATOMIC_HAS_LONG_LONG_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ long long' is available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_LONG_LONG_EXTN @COMPILER_HAS_LONG_LONG_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_INT128
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__int128' is available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_INT128 @COMPILER_HAS_MS_INT128@
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_INT128_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __int128' is available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_INT128_EXTN @COMPILER_HAS_MS_INT128_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_STDINT_INTPTR
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available and makes 'intptr_t' available as a
+     *   type.
+     *
+     * @note
+     *   Usually requires: C99 (but the type is optional even then).
+     */
+    #define PATOMIC_HAS_STDINT_INTPTR @COMPILER_HAS_STDINT_INTPTR@
+#endif
+
+
+#ifndef PATOMIC_HAS_STDINT_INTPTR_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stdint.h> header is available and makes '__extension__ intptr_t'
+     *   available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_STDINT_INTPTR_EXTN @COMPILER_HAS_STDINT_INTPTR_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_STDDEF_INTPTR
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stddef.h> header is available and makes 'intptr_t' available as a
+     *   type.
+     *
+     * @note
+     *   Usually requires: old compilers not supporting <stdint.h> (pre-C99).
+     *   Microsoft puts intptr_t here in old versions of msvc.
+     */
+    #define PATOMIC_HAS_STDDEF_INTPTR @COMPILER_HAS_STDDEF_INTPTR@
+#endif
+
+
+#ifndef PATOMIC_HAS_STDDEF_INTPTR_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <stddef.h> header is available and makes '__extension__ intptr_t'
+     *   available as a type.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_STDDEF_INTPTR_EXTN @COMPILER_HAS_STDDEF_INTPTR_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_FUNC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__func__' is available as a variable.
+     *
+     * @note
+     *   Usually requires: C99.
+     */
+    #define PATOMIC_HAS_FUNC @COMPILER_HAS_FUNC@
+#endif
+
+
+#ifndef PATOMIC_HAS_FUNC_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __func__' is available as a variable.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_FUNC_EXTN @COMPILER_HAS_FUNC_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_FUNCTION
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__FUNCTION__' is available as a variable.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_FUNCTION @COMPILER_HAS_GNU_FUNCTION@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_FUNCTION_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __FUNCTION__' is available as a variable.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_FUNCTION_EXTN @COMPILER_HAS_GNU_FUNCTION_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_PRETTY_FUNCTION
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__PRETTY_FUNCTION__' is available as a variable.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_PRETTY_FUNCTION @COMPILER_HAS_GNU_PRETTY_FUNCTION@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_PRETTY_FUNCTION_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __PRETTY_FUNCTION__' is available as a variable.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_PRETTY_FUNCTION_EXTN @COMPILER_HAS_GNU_PRETTY_FUNCTION_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_NORETURN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Noreturn' is available as a function attribute.
+     *
+     * @note
+     *   Usually requires: C11.
+     */
+    #define PATOMIC_HAS_NORETURN @COMPILER_HAS_NORETURN@
+#endif
+
+
+#ifndef PATOMIC_HAS_NORETURN_ATTR
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__attribute__((noreturn))' is available as a function attribute.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_NORETURN_ATTR @COMPILER_HAS_NORETURN_ATTR@
+#endif
+
+
+#ifndef PATOMIC_HAS_NORETURN_DSPC
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__declspec(noreturn)' is available as a function attribute.
+     *
+     * @note
+     *   Usually requires: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_NORETURN_DSPC @COMPILER_HAS_NORETURN_DSPC@
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_ASSUME
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__assume(int)' is available as a function.
+     *
+     * @note
+     *   Usually requires: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_ASSUME @COMPILER_HAS_MS_ASSUME@
+#endif
+
+
+#ifndef PATOMIC_HAS_BUILTIN_UNREACHABLE
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__builtin_unreachable(void)' is available as a function.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_BUILTIN_UNREACHABLE @COMPILER_HAS_BUILTIN_UNREACHABLE@
+#endif
+
+
+#ifndef PATOMIC_HAS_WCHAR_FWIDE
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available and makes 'fwide(FILE*, int)' available
+     *   as a function.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_FWIDE @COMPILER_HAS_WCHAR_FWIDE@
+#endif
+
+
+#ifndef PATOMIC_HAS_WCHAR_FWPRINTF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   <wchar.h> header is available and makes
+     *   'fwprintf(FILE*, const wchar_t*, ...)' available as a function.
+     *
+     * @note
+     *   Usually requires: C95.
+     */
+    #define PATOMIC_HAS_WCHAR_FWPRINTF @COMPILER_HAS_WCHAR_FWPRINTF@
+#endif
+
+
+#ifndef PATOMIC_HAS_C23_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   'alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: C23.
+     */
+    #define PATOMIC_HAS_C23_ALIGNOF @COMPILER_HAS_C23_ALIGNOF@
+#endif
+
+
+#ifndef PATOMIC_HAS_C23_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_C23_ALIGNOF_EXTN @COMPILER_HAS_C23_ALIGNOF_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_C11_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '_Alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: C11.
+     */
+    #define PATOMIC_HAS_C11_ALIGNOF @COMPILER_HAS_C11_ALIGNOF@
+#endif
+
+
+#ifndef PATOMIC_HAS_C11_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ _Alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually requires: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_C11_ALIGNOF_EXTN @COMPILER_HAS_C11_ALIGNOF_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: Microsoft compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_ALIGNOF @COMPILER_HAS_MS_ALIGNOF@
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __alignof(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_ALIGNOF_EXTN @COMPILER_HAS_MS_ALIGNOF_EXTN@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_ALIGNOF
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__alignof__(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_ALIGNOF @COMPILER_HAS_GNU_ALIGNOF@
+#endif
+
+
+#ifndef PATOMIC_HAS_GNU_ALIGNOF_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __alignof__(T)' is available as a function.
+     *
+     * @note
+     *   Usually required: GNU compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_GNU_ALIGNOF_EXTN @COMPILER_HAS_GNU_ALIGNOF_EXTN@
+#endif
+
+
+#endif  /* PATOMIC_GENERATED_CONFIG_H */

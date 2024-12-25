@@ -1,3 +1,6 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
 # Prerequisites
 *.d
 
@@ -50,3 +53,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# CMake
+CMakeUserPresets.json
