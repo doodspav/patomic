@@ -58,9 +58,10 @@ jobs:
                 echo "file: $file"
           
                 echo "bp5"
+                echo "count: $checked_count"
           
                 # increment count
-                ((checked_count++))
+                checked_count=$((checked_count + 1))
           
                 echo "bp6"
           
