@@ -21,7 +21,7 @@ jobs:
       - name: Check files
         run: |
           git ls-files -z     |
-          grep -vzE '\.jsn$' |
+          grep -vzE '\.json$' |
           parallel -0 '
             printf "%s\n" "Copyright (c) doodspav." "SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception" |
             parallel -Istring "
