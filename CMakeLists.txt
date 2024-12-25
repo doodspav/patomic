@@ -14,7 +14,7 @@ set(package_name "patomic")
 # create base project
 project(
     patomic
-    VERSION 0.5.1
+    VERSION 1.0.0
     DESCRIPTION "Portable C90 Atomics Library"
     HOMEPAGE_URL "https://github.com/doodspav/patomic"
     LANGUAGES C
