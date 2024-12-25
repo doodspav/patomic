@@ -1,3 +1,5 @@
+Copyright (c) doodspav.
+
 The patomic library is under the GNU Lesser General Public License v3.0 or
 later with linking exception:
 
