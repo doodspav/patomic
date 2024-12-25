@@ -1,3 +1,6 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
 # this variable is set by project() in CMake 3.21+
 string(
     COMPARE EQUAL

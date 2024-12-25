@@ -1,3 +1,6 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
 # ---- Options Summary ----
 
 # The follow options MUST ALL be set, either as cache or environment variables.

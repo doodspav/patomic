@@ -1,3 +1,6 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
 # ---- Gather Sources ----
 
 # create dummy target so that sources have absolute paths

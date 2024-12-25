@@ -1,0 +1,79 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
+name: Check license and copyright
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+
+      - name: Check files
+        run: |
+          # file extensions to exclude
+          exclude_ext=("json")
+          
+          # file names to exclude
+          exclude_name=("LICENSE.txt" "README.md" "CHANGELOG.md")
+          
+          # required comments
+          copyright_txt="Copyright (c) doodspav."
+          license_txt="SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception"
+          
+          # keep count of how many files were successfully checked
+          checked_count=0
+          
+          # go through all files
+          for file in $(git ls-files); do
+          
+            # extract extension (anything after the final dot)
+            ext="${file##*.}"
+          
+            # extract base name (anything after the final forward slash)
+            name="${file##*/}"
+          
+            # check if the file extension is not excluded
+            if [[ ! " ${exclude_ext[*]} " =~ " ${ext} " ]]; then
+          
+              # check if the file base name is not excluded
+              if [[ ! " ${exclude_name[*]} " =~ " ${name} " ]]; then
+          
+                # increment count
+                checked_count=$((checked_count + 1))
+          
+                # check if copyright is present
+                if ! head -n 1 "$file" | grep -Fq "$copyright_txt"; then
+                  echo "Missing copyright comment in file: $file"
+                  echo "::error file=$file::Missing copyright comment"
+                  exit 1
+                fi
+            
+                # check if license comment is present
+                if ! head -n 2 "$file" | grep -Fq "$license_txt"; then
+                  echo "Missing license comment in file: $file"
+                  echo "::error file=$file::Missing license comment"
+                  exit 1
+                fi
+            
+                # log success
+                echo "file ok: $file"
+          
+              fi
+            fi
+          done
+          
+          # check we actually checked files
+          if [[ $checked_count -eq 0 ]]; then
+            echo "No files were checked"
+            echo "::error::No files were checked"
+            exit 1
+          fi
+          echo "✅ All files contain copyright and license comments."

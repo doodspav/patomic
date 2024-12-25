@@ -1,3 +1,6 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
 name: Check todo and fixme
 
 on:
@@ -79,7 +82,7 @@ jobs:
             // list all files in directory (except excluded ones)
             // return: [ path1, path2, ... ]
             const excludedDirs = ['.git'];
-            const excludedFiles = ['check-todo-fixme.yml'];
+            const excludedFiles = ['check-todo-fixme.yaml'];
             function listFiles(dir) {
               let result = [];
               fs.readdirSync(dir).forEach(file => {

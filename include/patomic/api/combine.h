@@ -1,3 +1,6 @@
+/* Copyright (c) doodspav. */
+/* SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception */
+
 #ifndef PATOMIC_API_COMBINE_H
 #define PATOMIC_API_COMBINE_H
 

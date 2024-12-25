@@ -1,7 +1,10 @@
+/* Copyright (c) doodspav. */
+/* SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception */
+
 #ifndef PATOMIC_STDLIB_SORT_H
 #define PATOMIC_STDLIB_SORT_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 
 /**
