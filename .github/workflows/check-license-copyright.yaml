@@ -19,10 +19,10 @@ jobs:
       - name: Check files
         run: |
           # file extensions to exclude
-          exclude_ext("json")
+          exclude_ext=("json")
           
           # file names to exclude
-          exclude_name("LICENSE.txt" "README.md")
+          exclude_name=("LICENSE.txt" "README.md")
           
           # required comments
           copyright_txt="Copyright (c) doodspav."
