@@ -4,7 +4,7 @@
 #ifndef PATOMIC_STDLIB_SORT_H
 #define PATOMIC_STDLIB_SORT_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 
 /**

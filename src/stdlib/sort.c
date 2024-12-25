@@ -3,6 +3,8 @@
 
 #include <patomic/stdlib/sort.h>
 
+#include <stdlib.h>
+
 
 void
 patomic_array_sort(
