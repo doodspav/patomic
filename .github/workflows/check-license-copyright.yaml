@@ -1,0 +1,30 @@
+# Copyright (c) doodspav.
+# SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception
+
+name: Check license and copyright
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout patomic
+        uses: actions/checkout@v4
+        with:
+          path: patomic
+
+      - name: Check files
+        run: |
+          git ls-files -z     |
+          grep -vzE '\.jsn$' |
+          parallel -0 '
+            printf "%s\n" "Copyright (c) doodspav." "SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception" |
+            parallel -Istring "
+              ( <{} head -n2 | grep -Fq -- \"string\" ) || printf \"::error file=%s::Missing required line: %s\" {} string
+            "
+          '
