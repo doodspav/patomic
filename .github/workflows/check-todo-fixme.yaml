@@ -82,7 +82,7 @@ jobs:
             // list all files in directory (except excluded ones)
             // return: [ path1, path2, ... ]
             const excludedDirs = ['.git'];
-            const excludedFiles = ['check-todo-fixme.yml'];
+            const excludedFiles = ['check-todo-fixme.yaml'];
             function listFiles(dir) {
               let result = [];
               fs.readdirSync(dir).forEach(file => {
