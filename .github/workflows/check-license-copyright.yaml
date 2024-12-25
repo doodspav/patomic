@@ -19,7 +19,7 @@ jobs:
       - name: Check files
         run: |
           # hmm
-          echo "begin"
+          echo "bp1"
           
           # file extensions to exclude
           exclude_ext=("json")
@@ -34,10 +34,12 @@ jobs:
           # keep count of how many files were successfully checked
           checked_count=0
           
-          echo "breakpoint check"
+          echo "bp2"
           
           # go through all files
           for file in $(git ls-files); do
+          
+            echo "bp3"
           
             # extract extension (anything after the final dot)
             ext="${file##*.}"
@@ -48,11 +50,19 @@ jobs:
             # check if the file extension is not excluded
             if [[ ! " ${exclude_ext[*]} " =~ " ${ext} " ]]; then
           
+              echo "bp4"
+          
               # check if the file base name is not excluded
               if [[ ! " ${exclude_name[*]} " =~ " ${name} " ]]; then
           
+                echo "file: $file"
+          
+                echo "bp5"
+          
                 # increment count
                 ((checked_count++))
+          
+                echo "bp6"
           
                 # check if copyright is present
                 if ! head -n 1 "$file" | grep -Fq "$copyright_txt"; then
@@ -60,6 +70,8 @@ jobs:
                   echo "::error file=$file::Missing copyright comment"
                   exit 1
                 fi
+          
+                echo "bp7"
             
                 # check if license comment is present
                 if ! head -n 2 "$file" | grep -Fq "$license_txt"; then
@@ -67,6 +79,8 @@ jobs:
                   echo "::error file=$file::Missing license comment"
                   exit 1
                 fi
+                
+                echo "bp8"
             
                 # log success
                 echo "file ok: $file"
