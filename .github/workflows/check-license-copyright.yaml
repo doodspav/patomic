@@ -51,12 +51,14 @@ jobs:
           
                 # check if copyright is present
                 if ! head -n 1 "$file" | grep -Fq "$copyright_txt"; then
+                  echo "Missing copyright comment in file: $file"
                   echo "::error file=$file::Missing copyright comment"
                   exit 1
                 fi
             
                 # check if license comment is present
                 if ! head -n 2 "$file" | grep -Fq "$license_txt"; then
+                  echo "Missing license comment in file: $file"
                   echo "::error file=$file::Missing license comment"
                   exit 1
                 fi
@@ -70,6 +72,7 @@ jobs:
           
           # check we actually checked files
           if [[ $checked_count -eq 0 ]]; then
+            echo "No files were checked"
             echo "::error::No files were checked"
             exit 1
           fi
