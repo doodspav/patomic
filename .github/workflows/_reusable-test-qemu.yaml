@@ -65,7 +65,7 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         compiler:
           - clang
