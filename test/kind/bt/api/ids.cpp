@@ -21,7 +21,8 @@ class BtApiIds : public testing::Test
 public:
     const std::map<patomic_id_t, patomic_kind_t> impls_id_to_kind {
         { patomic_id_NULL, patomic_kind_UNKN },
-        { patomic_id_STDC, patomic_kind_BLTN}
+        { patomic_id_STDC, patomic_kind_BLTN },
+        { patomic_id_MSVC, patomic_kind_ASM }
     };
 
     const std::vector<patomic_id_t> ids {
@@ -233,11 +234,12 @@ TEST_F(BtApiIds, get_ids_ignores_invalid_kinds)
     ASSERT_FALSE(kinds.empty());
     const auto invalid_kind = kinds.back() << 1;
     EXPECT_EQ(kinds.end(), std::find(kinds.begin(), kinds.end(), invalid_kind));
-    const auto stdc_kind = impls_id_to_kind.at(patomic_id_STDC);
+    constexpr auto valid_nonnull_id = patomic_id_STDC;
+    const auto valid_kind = impls_id_to_kind.at(valid_nonnull_id);
 
     // test
     EXPECT_EQ(patomic_id_NULL, patomic_get_ids(invalid_kind));
-    EXPECT_EQ(patomic_id_STDC, patomic_get_ids(invalid_kind | stdc_kind));
+    EXPECT_EQ(valid_nonnull_id, patomic_get_ids(invalid_kind | valid_kind));
 }
 
 /// @brief The corresponding kind is returned for each valid id.

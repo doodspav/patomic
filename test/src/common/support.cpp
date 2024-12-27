@@ -66,7 +66,8 @@ supported_ids()
 {
     return {
         patomic_id_NULL,
-        patomic_id_STDC
+        patomic_id_STDC,
+        patomic_id_MSVC
     };
 }
 
