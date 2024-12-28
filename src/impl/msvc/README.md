@@ -33,9 +33,9 @@ Other:
 - `_ReadWriteBarrier`
 - `_WriteBarrier`
 
-# Visual Studio .NET 2003
+# Visual Studio .NET 2003 (_MSC_VER == 1310)
 
-TODO
+Nothing.
 
 # Visual Studio 2005
 
