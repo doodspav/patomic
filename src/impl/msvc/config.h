@@ -26,8 +26,12 @@
     /** @brief __iso_volatile intrinsics supported. */
     #define PATOMIC_IMPL_MSVC_HAS_ISO_VOLATILE_LDST 1
 
-    /** @brief __ldrexd intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_LDREXD 1
+    #if !defined(_M_ARM64)
+
+        /** @brief __ldrexd intrinsic supported. */
+        #define PATOMIC_IMPL_MSVC_HAS_LDREXD 1
+
+    #endif
 
     /** @brief __dmb(0xb) intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_MEMORY_BARRIER_DMB 1
