@@ -1,8 +1,8 @@
 /* Copyright (c) doodspav. */
 /* SPDX-License-Identifier: LGPL-3.0-or-later WITH LGPL-3.0-linking-exception */
 
-#ifndef PATOMIC_IMPL_MSVC_CONFIG_H
-#define PATOMIC_IMPL_MSVC_CONFIG_H
+#ifndef PATOMIC_IMPL_MSVC_OPS_CONFIG_H
+#define PATOMIC_IMPL_MSVC_OPS_CONFIG_H
 
 #if _MSC_VER >= 1923
 
@@ -224,4 +224,4 @@
 
 #endif  /* ^^ _MSC_VER >= 1923 */
 
-#endif  /* PATOMIC_IMPL_MSVC_CONFIG_H */
+#endif  /* PATOMIC_IMPL_MSVC_OPS_CONFIG_H */
