@@ -5,4 +5,5 @@
 target_sources(${target_name} PRIVATE
     config.h
     m128.h
+    macros.h
 )
