@@ -4,9 +4,6 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_XCHG_H
 #define PATOMIC_IMPL_MSVC_OPS_XCHG_H
 
-#define __int64 long long
-#define _M_ARM64
-#define _MSC_VER 2000
 #ifdef _MSC_VER
 
 #include "base.h"
