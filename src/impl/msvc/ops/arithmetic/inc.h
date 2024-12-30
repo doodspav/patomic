@@ -4,12 +4,6 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_ARITHMETIC_INC_H
 #define PATOMIC_IMPL_MSVC_OPS_ARITHMETIC_INC_H
 
-#define _MSC_VER 2000
-#define _M_ARM64
-#define __int64 long long
-#include "../xchg/cmpxchg.h"
-#include "add.h"
-
 #ifdef _MSC_VER
 
 #include "../base.h"
