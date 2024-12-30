@@ -30,6 +30,67 @@
     while (0)
 
 
+/**
+ * Defines patomic_opimpl_{void, fetch}_neg_8_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
+    char, char, patomic_opimpl_void_neg_8_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_8, do_make_desired_neg
+)
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
+    char, char, patomic_opimpl_fetch_neg_8_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_8, do_make_desired_neg
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
+    char, char, patomic_opimpl_void_neg_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8, do_make_desired_neg
+)
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
+    char, char, patomic_opimpl_fetch_neg_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8, do_make_desired_neg
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
+        char, char, patomic_opimpl_void_neg_8_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_8, do_make_desired_neg
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
+        char, char, patomic_opimpl_fetch_neg_8_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_8, do_make_desired_neg
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
+        char, char, patomic_opimpl_void_neg_8_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8, do_make_desired_neg
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
+        char, char, patomic_opimpl_fetch_neg_8_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8, do_make_desired_neg
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
+        char, char, patomic_opimpl_void_neg_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8, do_make_desired_neg
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
+        char, char, patomic_opimpl_fetch_neg_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8, do_make_desired_neg
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 */
+
+
 #endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_ARITHMETIC_NEG_H */
