@@ -195,6 +195,78 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 */
 
 
+/**
+ * Defines patomic_opimpl_cmpxchg_64_<order> (possibly as NULL) with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
+
+__int64 _InterlockedCompareExchange64(__int64 volatile *, __int64, __int64);
+#pragma intrinsic(_InterlockedCompareExchange64)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    __int64 _InterlockedCompareExchange64_nf(__int64 volatile *, __int64, __int64);
+    #pragma intrinsic(_InterlockedCompareExchange64_nf)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    __int64 _InterlockedCompareExchange64_acq(__int64 volatile *, __int64, __int64);
+    __int64 _InterlockedCompareExchange64_rel(__int64 volatile *, __int64, __int64);
+    #pragma intrinsic(_InterlockedCompareExchange64_acq)
+    #pragma intrinsic(_InterlockedCompareExchange64_rel)
+#endif
+
+#define do_cmpxchg_explicit_64(type, obj, exp, des, succ, fail, ok) \
+    do_cmpxchg_explicit_n(64, type, obj, exp, des, succ, fail, ok)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+    __int64, __int64, patomic_opimpl_cmpxchg_64_explicit,
+    SHOW_P, HIDE, order, do_cmpxchg_explicit_64
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+    __int64, __int64, patomic_opimpl_cmpxchg_64_seq_cst,
+    HIDE_P, SHOW, patomic_SEQ_CST, do_cmpxchg_explicit_64
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+        __int64, __int64, patomic_opimpl_cmpxchg_64_acquire,
+        HIDE_P, SHOW, patomic_ACQUIRE, do_cmpxchg_explicit_64
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+        __int64, __int64, patomic_opimpl_cmpxchg_64_release,
+        HIDE_P, SHOW, patomic_RELEASE, do_cmpxchg_explicit_64
+    )
+#else
+    #define patomic_opimpl_cmpxchg_64_acquire patomic_opimpl_cmpxchg_64_seq_cst
+    #define patomic_opimpl_cmpxchg_64_release patomic_opimpl_cmpxchg_64_seq_cst
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+        __int64, __int64, patomic_opimpl_cmpxchg_64_relaxed,
+        HIDE_P, SHOW, patomic_RELAXED, do_cmpxchg_explicit_64
+    )
+#else
+    #define patomic_opimpl_cmpxchg_64_relaxed patomic_opimpl_cmpxchg_64_acquire
+#endif
+
+#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 vv */
+
+#define patomic_opimpl_cmpxchg_64_explicit NULL
+#define patomic_opimpl_cmpxchg_64_relaxed NULL
+#define patomic_opimpl_cmpxchg_64_acquire NULL
+#define patomic_opimpl_cmpxchg_64_release NULL
+#define patomic_opimpl_cmpxchg_64_seq_cst NULL
+
+#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 */
+
+
 #endif  /* ^^ defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_XCHG_H */
