@@ -5,4 +5,5 @@
 target_sources(${target_name} PRIVATE
     compl.h
     reset.h
+    set.h
 )
