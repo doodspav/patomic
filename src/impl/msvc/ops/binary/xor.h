@@ -48,7 +48,7 @@
 
 #define do_make_desired_xor(type, exp, arg, des)                      \
     do {                                                              \
-        des = (type) (((unsigned type) exp) | ((unsigned type) arg)); \
+        des = (type) (((unsigned type) exp) ^ ((unsigned type) arg)); \
     }                                                                 \
     while (0)
 
