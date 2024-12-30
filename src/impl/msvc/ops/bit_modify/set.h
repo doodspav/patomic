@@ -23,7 +23,7 @@
  *   but msvc won't care and I would be surprised if this broke anything.
  *   It shouldn't be affected by CET or equivalent pointer checks.
  */
-#define do_bit_test_reset_explicit(type, obj, offset, order, res)            \
+#define do_bit_test_set_explicit(type, obj, offset, order, res)              \
     do {                                                                     \
         const patomic_intptr_unsigned_t addr =                               \
             (patomic_intptr_unsigned_t) obj;                                 \
@@ -58,6 +58,25 @@
         }                                                                    \
     }                                                                        \
     while (0)
+
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_SET_32
+
+
+unsigned char _interlockedbittestandset(long *, long);
+#pragma intrinsic(_interlockedbittestandset)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    unsigned char _interlockedbittestandset_nf(long *, long);
+    #pragma intrinsic(_interlockedbittestandset_nf)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    unsigned char _interlockedbittestandset_acq(long *, long);
+    unsigned char _interlockedbittestandset_rel(long *, long);
+    #pragma intrinsic(_interlockedbittestandset_acq)
+    #pragma intrinsic(_interlockedbittestandset_rel)
+#endif
 
 
 /**
