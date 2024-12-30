@@ -16,6 +16,39 @@
 #include <stddef.h>
 
 
+#define do_cmpxchg_explicit_n(n, type, obj, exp, des, succ, fail, ok)         \
+    do {                                                                      \
+        type res;                                                             \
+        switch (succ)                                                         \
+        {                                                                     \
+            case patomic_RELAXED:                                             \
+      VIS_IL_NF((res = _InterlockedCompareExchange##n##_nf(obj, des, exp));)  \
+      VIS_IL_NF(break;)                                                       \
+            case patomic_CONSUME:                                             \
+            case patomic_ACQUIRE:                                             \
+     VIS_IL_ACQ((res = _InterlockedCompareExchange##n##_acq(obj, des, exp));) \
+     VIS_IL_ACQ(break;)                                                       \
+            case patomic_RELEASE:                                             \
+     VIS_IL_REL((res = _InterlockedCompareExchange##n##_rel(obj, des, exp));) \
+     VIS_IL_REL(break;)                                                       \
+            case patomic_ACQ_REL:                                             \
+            case patomic_SEQ_CST:                                             \
+            default:                                                          \
+                res = _InterlockedCompareExchange##n(obj, des, exp);          \
+        }                                                                     \
+        if (res == exp)                                                       \
+        {                                                                     \
+            ok = 1;                                                           \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            exp = res;                                                        \
+            ok = 0;                                                           \
+        }                                                                     \
+    }                                                                         \
+    while (0)
+
+
 /**
  * Defines patomic_opimpl_cmpxchg_8_<order> (possibly as NULL) with order:
  * - relaxed
@@ -41,37 +74,8 @@ char _InterlockedCompareExchange8(char volatile *, char, char);
     #pragma intrinsic(_InterlockedCompareExchange8_rel)
 #endif
 
-#define do_cmpxchg_explicit_8(type, obj, exp, des, succ, fail, ok)        \
-    do {                                                                  \
-        type res;                                                         \
-        switch (succ)                                                     \
-        {                                                                 \
-            case patomic_RELAXED:                                         \
-      VIS_IL_NF((res = _InterlockedCompareExchange8_nf(obj, des, exp));)  \
-      VIS_IL_NF(break;)                                                   \
-            case patomic_CONSUME:                                         \
-            case patomic_ACQUIRE:                                         \
-     VIS_IL_ACQ((res = _InterlockedCompareExchange8_acq(obj, des, exp));) \
-     VIS_IL_ACQ(break;)                                                   \
-            case patomic_RELEASE:                                         \
-     VIS_IL_REL((res = _InterlockedCompareExchange8_rel(obj, des, exp));) \
-     VIS_IL_REL(break;)                                                   \
-            case patomic_ACQ_REL:                                         \
-            case patomic_SEQ_CST:                                         \
-            default:                                                      \
-                res = _InterlockedCompareExchange8(obj, des, exp);        \
-        }                                                                 \
-        if (res == exp)                                                   \
-        {                                                                 \
-            ok = 1;                                                       \
-        }                                                                 \
-        else                                                              \
-        {                                                                 \
-            exp = res;                                                    \
-            ok = 0;                                                       \
-        }                                                                 \
-    }                                                                     \
-    while (0)
+#define do_cmpxchg_explicit_8(type, obj, exp, des, succ, fail, ok) \
+    do_cmpxchg_explicit_n(8, type, obj, exp, des, succ, fail, ok)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     char, char, patomic_opimpl_cmpxchg_8_explicit,
