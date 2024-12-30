@@ -8,8 +8,6 @@
 
 #include "../base.h"
 
-#include <patomic/macros/ignore_unused.h>
-
 #include <patomic/wrapped/cmpxchg.h>
 
 #include <patomic/api/ops.h>
