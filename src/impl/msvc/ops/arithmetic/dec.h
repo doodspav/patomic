@@ -49,7 +49,7 @@
 
 #define do_fetch_dec_sub_explicit_n(n, type, obj, order, res)   \
     do {                                                        \
-        const type arg = (type) 1;                              \
+        type arg = (type) 1;                                    \
         do_fetch_sub_explicit_n(n, type, obj, arg, order, res); \
     }                                                           \
     while (0)
@@ -78,591 +78,591 @@
 
 
 /**
- * Defines patomic_opimpl_{void, fetch}_inc_8_<order> with order:
+ * Defines patomic_opimpl_{void, fetch}_dec_8_<order> with order:
  * - relaxed
  * - acquire
  * - release
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_8 || \
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_8 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8
 
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_8
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_8
 
-char _InterlockedIncrement8(char volatile *);
-#pragma intrinsic(_InterlockedIncrement8)
+char _InterlockedDecrement8(char volatile *);
+#pragma intrinsic(_InterlockedDecrement8)
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    char _InterlockedIncrement8_nf(char volatile *);
-    #pragma intrinsic(_InterlockedIncrement8_nf)
+    char _InterlockedDecrement8_nf(char volatile *);
+    #pragma intrinsic(_InterlockedDecrement8_nf)
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    char _InterlockedIncrement8_acq(char volatile *);
-    char _InterlockedIncrement8_rel(char volatile *);
-    #pragma intrinsic(_InterlockedIncrement8_acq)
-    #pragma intrinsic(_InterlockedIncrement8_rel)
+    char _InterlockedDecrement8_acq(char volatile *);
+    char _InterlockedDecrement8_rel(char volatile *);
+    #pragma intrinsic(_InterlockedDecrement8_acq)
+    #pragma intrinsic(_InterlockedDecrement8_rel)
 #endif
 
-#define do_void_inc_explicit_8(type, obj, order) \
-    do_void_inc_raw_explicit_n(8, type, obj, order)
+#define do_void_dec_explicit_8(type, obj, order) \
+    do_void_dec_raw_explicit_n(8, type, obj, order)
 
-#define do_fetch_inc_explicit_8(type, obj, order, res) \
-    do_fetch_inc_raw_explicit_n(8, type, obj, order, res)
+#define do_fetch_dec_explicit_8(type, obj, order, res) \
+    do_fetch_dec_raw_explicit_n(8, type, obj, order, res)
 
 #else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8 */
 
-#define do_void_inc_explicit_8(type, obj, order) \
-    do_void_inc_add_explicit_n(8, type, obj, order)
+#define do_void_dec_explicit_8(type, obj, order) \
+    do_void_dec_sub_explicit_n(8, type, obj, order)
 
-#define do_fetch_inc_explicit_8(type, obj, order, res) \
-    do_fetch_inc_add_explicit_n(8, type, obj, order, res)
+#define do_fetch_dec_explicit_8(type, obj, order, res) \
+    do_fetch_dec_sub_explicit_n(8, type, obj, order, res)
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_8 */
-
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    char, char, patomic_opimpl_void_inc_8_explicit,
-    SHOW_P, order, do_void_inc_explicit_8
-)
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    char, char, patomic_opimpl_fetch_inc_8_explicit,
-    SHOW_P, order, do_fetch_inc_explicit_8
-)
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_8 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    char, char, patomic_opimpl_void_inc_8_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_void_inc_explicit_8
+    char, char, patomic_opimpl_void_dec_8_explicit,
+    SHOW_P, order, do_void_dec_explicit_8
 )
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    char, char, patomic_opimpl_fetch_inc_8_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_fetch_inc_explicit_8
+    char, char, patomic_opimpl_fetch_dec_8_explicit,
+    SHOW_P, order, do_fetch_dec_explicit_8
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
+    char, char, patomic_opimpl_void_dec_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_void_dec_explicit_8
+)
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
+    char, char, patomic_opimpl_fetch_dec_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_fetch_dec_explicit_8
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        char, char, patomic_opimpl_void_inc_8_acquire,
-        HIDE_P, patomic_ACQUIRE, do_void_inc_explicit_8
+        char, char, patomic_opimpl_void_dec_8_acquire,
+        HIDE_P, patomic_ACQUIRE, do_void_dec_explicit_8
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        char, char, patomic_opimpl_fetch_inc_8_acquire,
-        HIDE_P, patomic_ACQUIRE, do_fetch_inc_explicit_8
+        char, char, patomic_opimpl_fetch_dec_8_acquire,
+        HIDE_P, patomic_ACQUIRE, do_fetch_dec_explicit_8
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        char, char, patomic_opimpl_void_inc_8_release,
-        HIDE_P, patomic_RELEASE, do_void_inc_explicit_8
+        char, char, patomic_opimpl_void_dec_8_release,
+        HIDE_P, patomic_RELEASE, do_void_dec_explicit_8
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        char, char, patomic_opimpl_fetch_inc_8_release,
-        HIDE_P, patomic_RELEASE, do_fetch_inc_explicit_8
+        char, char, patomic_opimpl_fetch_dec_8_release,
+        HIDE_P, patomic_RELEASE, do_fetch_dec_explicit_8
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        char, char, patomic_opimpl_void_inc_8_relaxed,
-        HIDE_P, patomic_RELAXED, do_void_inc_explicit_8
+        char, char, patomic_opimpl_void_dec_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_void_dec_explicit_8
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        char, char, patomic_opimpl_fetch_inc_8_relaxed,
-        HIDE_P, patomic_RELAXED, do_fetch_inc_explicit_8
+        char, char, patomic_opimpl_fetch_dec_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_fetch_dec_explicit_8
     )
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    char, char, patomic_opimpl_void_inc_8_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_8, do_make_desired_inc
+    char, char, patomic_opimpl_void_dec_8_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_8, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    char, char, patomic_opimpl_fetch_inc_8_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_8, do_make_desired_inc
+    char, char, patomic_opimpl_fetch_dec_8_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_8, do_make_desired_dec
 )
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    char, char, patomic_opimpl_void_inc_8_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8, do_make_desired_inc
+    char, char, patomic_opimpl_void_dec_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    char, char, patomic_opimpl_fetch_inc_8_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8, do_make_desired_inc
+    char, char, patomic_opimpl_fetch_dec_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8, do_make_desired_dec
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        char, char, patomic_opimpl_void_inc_8_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_8, do_make_desired_inc
+        char, char, patomic_opimpl_void_dec_8_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_8, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        char, char, patomic_opimpl_fetch_inc_8_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_8, do_make_desired_inc
+        char, char, patomic_opimpl_fetch_dec_8_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_8, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        char, char, patomic_opimpl_void_inc_8_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8, do_make_desired_inc
+        char, char, patomic_opimpl_void_dec_8_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        char, char, patomic_opimpl_fetch_inc_8_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8, do_make_desired_inc
+        char, char, patomic_opimpl_fetch_dec_8_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8, do_make_desired_dec
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        char, char, patomic_opimpl_void_inc_8_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8, do_make_desired_inc
+        char, char, patomic_opimpl_void_dec_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        char, char, patomic_opimpl_fetch_inc_8_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8, do_make_desired_inc
+        char, char, patomic_opimpl_fetch_dec_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8, do_make_desired_dec
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_8 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{DECREMENT, EXCHANGE_ADD}_8 */
 
 
 /**
- * Defines patomic_opimpl_{void, fetch}_inc_16_<order> with order:
+ * Defines patomic_opimpl_{void, fetch}_dec_16_<order> with order:
  * - relaxed
  * - acquire
  * - release
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16 || \
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_16 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16
 
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_16
 
-short _InterlockedIncrement16(short volatile *);
-#pragma intrinsic(_InterlockedIncrement16)
+short _InterlockedDecrement16(short volatile *);
+#pragma intrinsic(_InterlockedDecrement16)
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    short _InterlockedIncrement16_nf(short volatile *);
-    #pragma intrinsic(_InterlockedIncrement16_nf)
+    short _InterlockedDecrement16_nf(short volatile *);
+    #pragma intrinsic(_InterlockedDecrement16_nf)
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    short _InterlockedIncrement16_acq(short volatile *);
-    short _InterlockedIncrement16_rel(short volatile *);
-    #pragma intrinsic(_InterlockedIncrement16_acq)
-    #pragma intrinsic(_InterlockedIncrement16_rel)
+    short _InterlockedDecrement16_acq(short volatile *);
+    short _InterlockedDecrement16_rel(short volatile *);
+    #pragma intrinsic(_InterlockedDecrement16_acq)
+    #pragma intrinsic(_InterlockedDecrement16_rel)
 #endif
 
-#define do_void_inc_explicit_16(type, obj, order) \
-    do_void_inc_raw_explicit_n(16, type, obj, order)
+#define do_void_dec_explicit_16(type, obj, order) \
+    do_void_dec_raw_explicit_n(16, type, obj, order)
 
-#define do_fetch_inc_explicit_16(type, obj, order, res) \
-    do_fetch_inc_raw_explicit_n(16, type, obj, order, res)
+#define do_fetch_dec_explicit_16(type, obj, order, res) \
+    do_fetch_dec_raw_explicit_n(16, type, obj, order, res)
 
 #else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16 */
 
-#define do_void_inc_explicit_16(type, obj, order) \
-    do_void_inc_add_explicit_n(16, type, obj, order)
+#define do_void_dec_explicit_16(type, obj, order) \
+    do_void_dec_sub_explicit_n(16, type, obj, order)
 
-#define do_fetch_inc_explicit_16(type, obj, order, res) \
-    do_fetch_inc_add_explicit_n(16, type, obj, order, res)
+#define do_fetch_dec_explicit_16(type, obj, order, res) \
+    do_fetch_dec_sub_explicit_n(16, type, obj, order, res)
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16 */
-
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    short, short, patomic_opimpl_void_inc_16_explicit,
-    SHOW_P, order, do_void_inc_explicit_16
-)
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    short, short, patomic_opimpl_fetch_inc_16_explicit,
-    SHOW_P, order, do_fetch_inc_explicit_16
-)
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_16 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    short, short, patomic_opimpl_void_inc_16_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_void_inc_explicit_16
+    short, short, patomic_opimpl_void_dec_16_explicit,
+    SHOW_P, order, do_void_dec_explicit_16
 )
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    short, short, patomic_opimpl_fetch_inc_16_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_fetch_inc_explicit_16
+    short, short, patomic_opimpl_fetch_dec_16_explicit,
+    SHOW_P, order, do_fetch_dec_explicit_16
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
+    short, short, patomic_opimpl_void_dec_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_void_dec_explicit_16
+)
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
+    short, short, patomic_opimpl_fetch_dec_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_fetch_dec_explicit_16
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        short, short, patomic_opimpl_void_inc_16_acquire,
-        HIDE_P, patomic_ACQUIRE, do_void_inc_explicit_16
+        short, short, patomic_opimpl_void_dec_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_void_dec_explicit_16
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        short, short, patomic_opimpl_fetch_inc_16_acquire,
-        HIDE_P, patomic_ACQUIRE, do_fetch_inc_explicit_16
+        short, short, patomic_opimpl_fetch_dec_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_fetch_dec_explicit_16
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        short, short, patomic_opimpl_void_inc_16_release,
-        HIDE_P, patomic_RELEASE, do_void_inc_explicit_16
+        short, short, patomic_opimpl_void_dec_16_release,
+        HIDE_P, patomic_RELEASE, do_void_dec_explicit_16
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        short, short, patomic_opimpl_fetch_inc_16_release,
-        HIDE_P, patomic_RELEASE, do_fetch_inc_explicit_16
+        short, short, patomic_opimpl_fetch_dec_16_release,
+        HIDE_P, patomic_RELEASE, do_fetch_dec_explicit_16
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        short, short, patomic_opimpl_void_inc_16_relaxed,
-        HIDE_P, patomic_RELAXED, do_void_inc_explicit_16
+        short, short, patomic_opimpl_void_dec_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_void_dec_explicit_16
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        short, short, patomic_opimpl_fetch_inc_16_relaxed,
-        HIDE_P, patomic_RELAXED, do_fetch_inc_explicit_16
+        short, short, patomic_opimpl_fetch_dec_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_fetch_dec_explicit_16
     )
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    short, short, patomic_opimpl_void_inc_16_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_16, do_make_desired_inc
+    short, short, patomic_opimpl_void_dec_16_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_16, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    short, short, patomic_opimpl_fetch_inc_16_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_16, do_make_desired_inc
+    short, short, patomic_opimpl_fetch_dec_16_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_16, do_make_desired_dec
 )
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    short, short, patomic_opimpl_void_inc_16_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16, do_make_desired_inc
+    short, short, patomic_opimpl_void_dec_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    short, short, patomic_opimpl_fetch_inc_16_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16, do_make_desired_inc
+    short, short, patomic_opimpl_fetch_dec_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16, do_make_desired_dec
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        short, short, patomic_opimpl_void_inc_16_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_16, do_make_desired_inc
+        short, short, patomic_opimpl_void_dec_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_16, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        short, short, patomic_opimpl_fetch_inc_16_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_16, do_make_desired_inc
+        short, short, patomic_opimpl_fetch_dec_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_16, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        short, short, patomic_opimpl_void_inc_16_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16, do_make_desired_inc
+        short, short, patomic_opimpl_void_dec_16_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        short, short, patomic_opimpl_fetch_inc_16_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16, do_make_desired_inc
+        short, short, patomic_opimpl_fetch_dec_16_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16, do_make_desired_dec
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        short, short, patomic_opimpl_void_inc_16_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16, do_make_desired_inc
+        short, short, patomic_opimpl_void_dec_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        short, short, patomic_opimpl_fetch_inc_16_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16, do_make_desired_inc
+        short, short, patomic_opimpl_fetch_dec_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16, do_make_desired_dec
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_16 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{DECREMENT, EXCHANGE_ADD}_16 */
 
 
 /**
- * Defines patomic_opimpl_{void, fetch}_inc_32_<order> with order:
+ * Defines patomic_opimpl_{void, fetch}_dec_32_<order> with order:
  * - relaxed
  * - acquire
  * - release
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 || \
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_32 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32
 
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_32
 
-long _InterlockedIncrement(long volatile *);
-#pragma intrinsic(_InterlockedIncrement)
-#define _InterlockedIncrement32 _InterlockedIncrement
+long _InterlockedDecrement(long volatile *);
+#pragma intrinsic(_InterlockedDecrement)
+#define _InterlockedDecrement32 _InterlockedDecrement
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    long _InterlockedIncrement_nf(long volatile *);
-    #pragma intrinsic(_InterlockedIncrement_nf)
-    #define _InterlockedIncrement32_nf _InterlockedIncrement_nf
+    long _InterlockedDecrement_nf(long volatile *);
+    #pragma intrinsic(_InterlockedDecrement_nf)
+    #define _InterlockedDecrement32_nf _InterlockedDecrement_nf
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    long _InterlockedIncrement_acq(long volatile *);
-    long _InterlockedIncrement_rel(long volatile *);
-    #pragma intrinsic(_InterlockedIncrement_acq)
-    #pragma intrinsic(_InterlockedIncrement_rel)
-    #define _InterlockedIncrement32_acq _InterlockedIncrement_acq
-    #define _InterlockedIncrement32_rel _InterlockedIncrement_rel
+    long _InterlockedDecrement_acq(long volatile *);
+    long _InterlockedDecrement_rel(long volatile *);
+    #pragma intrinsic(_InterlockedDecrement_acq)
+    #pragma intrinsic(_InterlockedDecrement_rel)
+    #define _InterlockedDecrement32_acq _InterlockedDecrement_acq
+    #define _InterlockedDecrement32_rel _InterlockedDecrement_rel
 #endif
 
-#define do_void_inc_explicit_32(type, obj, order) \
-    do_void_inc_raw_explicit_n(32, type, obj, order)
+#define do_void_dec_explicit_32(type, obj, order) \
+    do_void_dec_raw_explicit_n(32, type, obj, order)
 
-#define do_fetch_inc_explicit_32(type, obj, order, res) \
-    do_fetch_inc_raw_explicit_n(32, type, obj, order, res)
+#define do_fetch_dec_explicit_32(type, obj, order, res) \
+    do_fetch_dec_raw_explicit_n(32, type, obj, order, res)
 
 #else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32 */
 
-#define do_void_inc_explicit_32(type, obj, order) \
-    do_void_inc_add_explicit_n(32, type, obj, order)
+#define do_void_dec_explicit_32(type, obj, order) \
+    do_void_dec_sub_explicit_n(32, type, obj, order)
 
-#define do_fetch_inc_explicit_32(type, obj, order, res) \
-    do_fetch_inc_add_explicit_n(32, type, obj, order, res)
+#define do_fetch_dec_explicit_32(type, obj, order, res) \
+    do_fetch_dec_sub_explicit_n(32, type, obj, order, res)
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 */
-
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    long, long, patomic_opimpl_void_inc_32_explicit,
-    SHOW_P, order, do_void_inc_explicit_32
-)
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    long, long, patomic_opimpl_fetch_inc_32_explicit,
-    SHOW_P, order, do_fetch_inc_explicit_32
-)
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_32 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    long, long, patomic_opimpl_void_inc_32_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_void_inc_explicit_32
+    long, long, patomic_opimpl_void_dec_32_explicit,
+    SHOW_P, order, do_void_dec_explicit_32
 )
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    long, long, patomic_opimpl_fetch_inc_32_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_fetch_inc_explicit_32
+    long, long, patomic_opimpl_fetch_dec_32_explicit,
+    SHOW_P, order, do_fetch_dec_explicit_32
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
+    long, long, patomic_opimpl_void_dec_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_void_dec_explicit_32
+)
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
+    long, long, patomic_opimpl_fetch_dec_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_fetch_dec_explicit_32
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        long, long, patomic_opimpl_void_inc_32_acquire,
-        HIDE_P, patomic_ACQUIRE, do_void_inc_explicit_32
+        long, long, patomic_opimpl_void_dec_32_acquire,
+        HIDE_P, patomic_ACQUIRE, do_void_dec_explicit_32
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        long, long, patomic_opimpl_fetch_inc_32_acquire,
-        HIDE_P, patomic_ACQUIRE, do_fetch_inc_explicit_32
+        long, long, patomic_opimpl_fetch_dec_32_acquire,
+        HIDE_P, patomic_ACQUIRE, do_fetch_dec_explicit_32
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        long, long, patomic_opimpl_void_inc_32_release,
-        HIDE_P, patomic_RELEASE, do_void_inc_explicit_32
+        long, long, patomic_opimpl_void_dec_32_release,
+        HIDE_P, patomic_RELEASE, do_void_dec_explicit_32
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        long, long, patomic_opimpl_fetch_inc_32_release,
-        HIDE_P, patomic_RELEASE, do_fetch_inc_explicit_32
+        long, long, patomic_opimpl_fetch_dec_32_release,
+        HIDE_P, patomic_RELEASE, do_fetch_dec_explicit_32
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        long, long, patomic_opimpl_void_inc_32_relaxed,
-        HIDE_P, patomic_RELAXED, do_void_inc_explicit_32
+        long, long, patomic_opimpl_void_dec_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_void_dec_explicit_32
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        long, long, patomic_opimpl_fetch_inc_32_relaxed,
-        HIDE_P, patomic_RELAXED, do_fetch_inc_explicit_32
+        long, long, patomic_opimpl_fetch_dec_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_fetch_dec_explicit_32
     )
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    long, long, patomic_opimpl_void_inc_32_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_32, do_make_desired_inc
+    long, long, patomic_opimpl_void_dec_32_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_32, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    long, long, patomic_opimpl_fetch_inc_32_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_32, do_make_desired_inc
+    long, long, patomic_opimpl_fetch_dec_32_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_32, do_make_desired_dec
 )
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    long, long, patomic_opimpl_void_inc_32_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_32, do_make_desired_inc
+    long, long, patomic_opimpl_void_dec_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_32, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    long, long, patomic_opimpl_fetch_inc_32_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_32, do_make_desired_inc
+    long, long, patomic_opimpl_fetch_dec_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_32, do_make_desired_dec
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        long, long, patomic_opimpl_void_inc_32_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_32, do_make_desired_inc
+        long, long, patomic_opimpl_void_dec_32_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_32, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        long, long, patomic_opimpl_fetch_inc_32_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_32, do_make_desired_inc
+        long, long, patomic_opimpl_fetch_dec_32_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_32, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        long, long, patomic_opimpl_void_inc_32_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_32, do_make_desired_inc
+        long, long, patomic_opimpl_void_dec_32_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_32, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        long, long, patomic_opimpl_fetch_inc_32_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_32, do_make_desired_inc
+        long, long, patomic_opimpl_fetch_dec_32_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_32, do_make_desired_dec
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        long, long, patomic_opimpl_void_inc_32_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_32, do_make_desired_inc
+        long, long, patomic_opimpl_void_dec_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_32, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        long, long, patomic_opimpl_fetch_inc_32_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_32, do_make_desired_inc
+        long, long, patomic_opimpl_fetch_dec_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_32, do_make_desired_dec
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_32 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{DECREMENT, EXCHANGE_ADD}_32 */
 
 
 /**
- * Defines patomic_opimpl_{void, fetch}_inc_64_<order> with order:
+ * Defines patomic_opimpl_{void, fetch}_dec_64_<order> with order:
  * - relaxed
  * - acquire
  * - release
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_64 || \
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_64 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64
 
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_64
+#if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_64
 
-__int64 _InterlockedIncrement64(__int64 volatile *);
-#pragma intrinsic(_InterlockedIncrement64)
+__int64 _InterlockedDecrement64(__int64 volatile *);
+#pragma intrinsic(_InterlockedDecrement64)
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    __int64 _InterlockedIncrement64_nf(__int64 volatile *);
-    #pragma intrinsic(_InterlockedIncrement64_nf)
+    __int64 _InterlockedDecrement64_nf(__int64 volatile *);
+    #pragma intrinsic(_InterlockedDecrement64_nf)
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    __int64 _InterlockedIncrement64_acq(__int64 volatile *);
-    __int64 _InterlockedIncrement64_rel(__int64 volatile *);
-    #pragma intrinsic(_InterlockedIncrement64_acq)
-    #pragma intrinsic(_InterlockedIncrement64_rel)
+    __int64 _InterlockedDecrement64_acq(__int64 volatile *);
+    __int64 _InterlockedDecrement64_rel(__int64 volatile *);
+    #pragma intrinsic(_InterlockedDecrement64_acq)
+    #pragma intrinsic(_InterlockedDecrement64_rel)
 #endif
 
-#define do_void_inc_explicit_64(type, obj, order) \
-    do_void_inc_raw_explicit_n(64, type, obj, order)
+#define do_void_dec_explicit_64(type, obj, order) \
+    do_void_dec_raw_explicit_n(64, type, obj, order)
 
-#define do_fetch_inc_explicit_64(type, obj, order, res) \
-    do_fetch_inc_raw_explicit_n(64, type, obj, order, res)
+#define do_fetch_dec_explicit_64(type, obj, order, res) \
+    do_fetch_dec_raw_explicit_n(64, type, obj, order, res)
 
 #else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64 */
 
-#define do_void_inc_explicit_64(type, obj, order) \
-    do_void_inc_add_explicit_n(64, type, obj, order)
+#define do_void_dec_explicit_64(type, obj, order) \
+    do_void_dec_sub_explicit_n(64, type, obj, order)
 
-#define do_fetch_inc_explicit_64(type, obj, order, res) \
-    do_fetch_inc_add_explicit_n(64, type, obj, order, res)
+#define do_fetch_dec_explicit_64(type, obj, order, res) \
+    do_fetch_dec_sub_explicit_n(64, type, obj, order, res)
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_64 */
-
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    __int64, __int64, patomic_opimpl_void_inc_64_explicit,
-    SHOW_P, order, do_void_inc_explicit_64
-)
-PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    __int64, __int64, patomic_opimpl_fetch_inc_64_explicit,
-    SHOW_P, order, do_fetch_inc_explicit_64
-)
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_64 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-    __int64, __int64, patomic_opimpl_void_inc_64_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_void_inc_explicit_64
+    __int64, __int64, patomic_opimpl_void_dec_64_explicit,
+    SHOW_P, order, do_void_dec_explicit_64
 )
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-    __int64, __int64, patomic_opimpl_fetch_inc_64_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_fetch_inc_explicit_64
+    __int64, __int64, patomic_opimpl_fetch_dec_64_explicit,
+    SHOW_P, order, do_fetch_dec_explicit_64
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
+    __int64, __int64, patomic_opimpl_void_dec_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_void_dec_explicit_64
+)
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
+    __int64, __int64, patomic_opimpl_fetch_dec_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_fetch_dec_explicit_64
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        __int64, __int64, patomic_opimpl_void_inc_64_acquire,
-        HIDE_P, patomic_ACQUIRE, do_void_inc_explicit_64
+        __int64, __int64, patomic_opimpl_void_dec_64_acquire,
+        HIDE_P, patomic_ACQUIRE, do_void_dec_explicit_64
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        __int64, __int64, patomic_opimpl_fetch_inc_64_acquire,
-        HIDE_P, patomic_ACQUIRE, do_fetch_inc_explicit_64
+        __int64, __int64, patomic_opimpl_fetch_dec_64_acquire,
+        HIDE_P, patomic_ACQUIRE, do_fetch_dec_explicit_64
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        __int64, __int64, patomic_opimpl_void_inc_64_release,
-        HIDE_P, patomic_RELEASE, do_void_inc_explicit_64
+        __int64, __int64, patomic_opimpl_void_dec_64_release,
+        HIDE_P, patomic_RELEASE, do_void_dec_explicit_64
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        __int64, __int64, patomic_opimpl_fetch_inc_64_release,
-        HIDE_P, patomic_RELEASE, do_fetch_inc_explicit_64
+        __int64, __int64, patomic_opimpl_fetch_dec_64_release,
+        HIDE_P, patomic_RELEASE, do_fetch_dec_explicit_64
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
-        __int64, __int64, patomic_opimpl_void_inc_64_relaxed,
-        HIDE_P, patomic_RELAXED, do_void_inc_explicit_64
+        __int64, __int64, patomic_opimpl_void_dec_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_void_dec_explicit_64
     )
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
-        __int64, __int64, patomic_opimpl_fetch_inc_64_relaxed,
-        HIDE_P, patomic_RELAXED, do_fetch_inc_explicit_64
+        __int64, __int64, patomic_opimpl_fetch_dec_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_fetch_dec_explicit_64
     )
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    __int64, __int64, patomic_opimpl_void_inc_64_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_64, do_make_desired_inc
+    __int64, __int64, patomic_opimpl_void_dec_64_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_64, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    __int64, __int64, patomic_opimpl_fetch_inc_64_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_64, do_make_desired_inc
+    __int64, __int64, patomic_opimpl_fetch_dec_64_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_64, do_make_desired_dec
 )
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    __int64, __int64, patomic_opimpl_void_inc_64_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_64, do_make_desired_inc
+    __int64, __int64, patomic_opimpl_void_dec_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_64, do_make_desired_dec
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    __int64, __int64, patomic_opimpl_fetch_inc_64_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_64, do_make_desired_inc
+    __int64, __int64, patomic_opimpl_fetch_dec_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_64, do_make_desired_dec
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        __int64, __int64, patomic_opimpl_void_inc_64_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_64, do_make_desired_inc
+        __int64, __int64, patomic_opimpl_void_dec_64_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_64, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        __int64, __int64, patomic_opimpl_fetch_inc_64_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_64, do_make_desired_inc
+        __int64, __int64, patomic_opimpl_fetch_dec_64_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_64, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        __int64, __int64, patomic_opimpl_void_inc_64_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_64, do_make_desired_inc
+        __int64, __int64, patomic_opimpl_void_dec_64_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_64, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        __int64, __int64, patomic_opimpl_fetch_inc_64_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_64, do_make_desired_inc
+        __int64, __int64, patomic_opimpl_fetch_dec_64_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_64, do_make_desired_dec
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        __int64, __int64, patomic_opimpl_void_inc_64_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_64, do_make_desired_inc
+        __int64, __int64, patomic_opimpl_void_dec_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_64, do_make_desired_dec
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        __int64, __int64, patomic_opimpl_fetch_inc_64_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_64, do_make_desired_inc
+        __int64, __int64, patomic_opimpl_fetch_dec_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_64, do_make_desired_dec
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_64 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{DECREMENT, EXCHANGE_ADD}_64 */
 
 
 /**
- * Defines patomic_opimpl_{void, fetch}_inc_128_<order> with order:
+ * Defines patomic_opimpl_{void, fetch}_dec_128_<order> with order:
  * - relaxed
  * - acquire
  * - release
@@ -672,50 +672,50 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_inc_128_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_128, do_make_desired_inc_128
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_dec_128_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_128, do_make_desired_dec_128
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_inc_128_explicit,
-    SHOW_P, order, do_cmpxchg_explicit_128, do_make_desired_inc_128
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_dec_128_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_128, do_make_desired_dec_128
 )
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_inc_128_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128, do_make_desired_inc_128
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_dec_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128, do_make_desired_dec_128
 )
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_inc_128_seq_cst,
-    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128, do_make_desired_inc_128
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_dec_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128, do_make_desired_dec_128
 )
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_inc_128_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128, do_make_desired_inc_128
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_dec_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128, do_make_desired_dec_128
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_inc_128_acquire,
-        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128, do_make_desired_inc_128
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_dec_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128, do_make_desired_dec_128
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_inc_128_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128, do_make_desired_inc_128
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_dec_128_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128, do_make_desired_dec_128
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_inc_128_release,
-        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128, do_make_desired_inc_128
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_dec_128_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128, do_make_desired_dec_128
     )
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
-        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_inc_128_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128, do_make_desired_inc_128
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_dec_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128, do_make_desired_dec_128
     )
     PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
-        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_inc_128_relaxed,
-        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128, do_make_desired_inc_128
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_dec_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128, do_make_desired_dec_128
     )
 #endif
 
