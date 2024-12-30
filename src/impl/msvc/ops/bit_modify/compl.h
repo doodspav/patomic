@@ -30,27 +30,23 @@
     }                                                     \
     while (0)
 
-#ifndef do_get_bit
-    #define do_get_bit(type, exp, offset, bit)                 \
-        do {                                                   \
-            const unsigned type mask =                         \
-                (unsigned type) ((unsigned type) 1 << offset); \
-            bit = (((unsigned type) exp) & mask) != 0;         \
-        }                                                      \
-        while (0)
-#endif
+#define do_get_bit(type, exp, offset, bit)                 \
+    do {                                                   \
+        const unsigned type mask =                         \
+            (unsigned type) ((unsigned type) 1 << offset); \
+        bit = (((unsigned type) exp) & mask) != 0;         \
+    }                                                      \
+    while (0)
 
-#ifndef do_get_bit_128
-    #define do_get_bit_128(type, exp, offset, bit)           \
-        do {                                                 \
-            type mask = {0};                                 \
-            mask.low = 1;                                    \
-            mask = patomic_msvc128_shift_left(mask, offset); \
-            mask = patomic_msvc128_and(mask, exp);           \
-            bit = (mask.low != 0 || mask.high != 0);         \
-        }                                                    \
-        while (0)
-#endif
+#define do_get_bit_128(type, exp, offset, bit)           \
+    do {                                                 \
+        type mask = {0};                                 \
+        mask.low = 1;                                    \
+        mask = patomic_msvc128_shift_left(mask, offset); \
+        mask = patomic_msvc128_and(mask, exp);           \
+        bit = (mask.low != 0 || mask.high != 0);         \
+    }                                                    \
+    while (0)
 
 
 /**
