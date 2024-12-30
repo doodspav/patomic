@@ -4,11 +4,6 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_EXCHANGE_H
 #define PATOMIC_IMPL_MSVC_OPS_EXCHANGE_H
 
-#define _MSC_VER 2000
-#define _M_ARM64
-#define __int64 long long
-#include "cmpxchg.h"
-
 #ifdef _MSC_VER
 
 #include "base.h"
