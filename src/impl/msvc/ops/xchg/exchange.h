@@ -6,14 +6,12 @@
 
 #ifdef _MSC_VER
 
-#include "base.h"
+#include "../base.h"
 
 #include <patomic/wrapped/cmpxchg.h>
 #include <patomic/wrapped/direct.h>
 
 #include <patomic/api/ops.h>
-
-#include <stddef.h>
 
 
 #define do_exchange_explicit_n(                                   \
