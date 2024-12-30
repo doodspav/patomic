@@ -18,7 +18,7 @@
 
 #define do_fetch_sub_explicit_n(n, type, obj, arg, order, res)       \
     /* negate arg */                                                 \
-    arg = (type) (~((unsigned type) arg) + 1u);                      \
+    arg = (type) (~((unsigned type) arg) + ((unsigned type) 1u));    \
     /* perform fetch_add */                                          \
     do {                                                             \
         switch (order)                                               \
