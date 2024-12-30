@@ -4,6 +4,11 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_EXCHANGE_H
 #define PATOMIC_IMPL_MSVC_OPS_EXCHANGE_H
 
+#define _MSC_VER 2000
+#define _M_ARM64
+#define __int64 long long
+#include "cmpxchg.h"
+
 #ifdef _MSC_VER
 
 #include "base.h"
@@ -399,6 +404,47 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
 #endif
 
 #endif /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64 */
+
+
+/**
+ * Defines patomic_opimpl_exchange_128_<order> (possibly as NULL) with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_exchange_128_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_128
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_exchange_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_exchange_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_exchange_128_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_exchange_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
 
 
 #endif  /* defined(_MSC_VER) */
