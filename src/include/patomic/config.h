@@ -200,6 +200,34 @@
 #endif
 
 
+#ifndef PATOMIC_HAS_MS_INT64
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__int64' is available as a type.
+     *
+     * @note
+     *   Usually requires: MS compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_INT64 0
+#endif
+
+
+#ifndef PATOMIC_HAS_MS_INT64_EXTN
+    /**
+     * @addtogroup config.safe
+     *
+     * @brief
+     *   '__extension__ __int64' is available as a type.
+     *
+     * @note
+     *   Usually requires: MS compatible(-ish) compiler.
+     */
+    #define PATOMIC_HAS_MS_INT64_EXTN 0
+#endif
+
+
 #ifndef PATOMIC_HAS_STDINT_INTPTR
     /**
      * @addtogroup config.safe
