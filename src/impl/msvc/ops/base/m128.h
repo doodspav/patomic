@@ -4,8 +4,6 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_BASE_M128_H
 #define PATOMIC_IMPL_MSVC_OPS_BASE_M128_H
 
-#define _MSC_VER
-#define __int64 long long
 #ifdef _MSC_VER
 
 #include <patomic/macros/static_assert.h>
