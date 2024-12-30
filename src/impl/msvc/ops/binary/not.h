@@ -11,7 +11,6 @@
 #include <patomic/macros/ignore_unused.h>
 
 #include <patomic/wrapped/cmpxchg.h>
-#include <patomic/wrapped/direct.h>
 
 #include <patomic/api/ops.h>
 

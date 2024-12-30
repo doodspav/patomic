@@ -649,7 +649,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_XOR_128 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
 
 
 #endif  /* defined(_MSC_VER) */
