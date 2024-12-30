@@ -17,7 +17,7 @@
 
 
 #define do_cmpxchg_explicit_n(                                                \
-    n, type, obj, exp, des, succ, fail, ok, do_cmp_eq                         \
+    n, type, obj, exp, des, succ, fail, ok                                    \
 )                                                                             \
     do {                                                                      \
         type res;                                                             \
@@ -77,7 +77,7 @@ char _InterlockedCompareExchange8(char volatile *, char, char);
 #endif
 
 #define do_cmpxchg_explicit_8(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(8, type, obj, exp, des, succ, fail, ok, CMP_EQ)
+    do_cmpxchg_explicit_n(8, type, obj, exp, des, succ, fail, ok)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     char, char, patomic_opimpl_cmpxchg_8_explicit,
@@ -149,7 +149,7 @@ short _InterlockedCompareExchange16(short volatile *, short, short);
 #endif
 
 #define do_cmpxchg_explicit_16(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(16, type, obj, exp, des, succ, fail, ok, CMP_EQ)
+    do_cmpxchg_explicit_n(16, type, obj, exp, des, succ, fail, ok)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     short, short, patomic_opimpl_cmpxchg_16_explicit,
@@ -225,7 +225,7 @@ long _InterlockedCompareExchange(long volatile *, long, long);
 #endif
 
 #define do_cmpxchg_explicit_32(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(32, type, obj, exp, des, succ, fail, ok, CMP_EQ)
+    do_cmpxchg_explicit_n(32, type, obj, exp, des, succ, fail, ok)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     long, long, patomic_opimpl_cmpxchg_32_explicit,
@@ -297,7 +297,7 @@ __int64 _InterlockedCompareExchange64(__int64 volatile *, __int64, __int64);
 #endif
 
 #define do_cmpxchg_explicit_64(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(64, type, obj, exp, des, succ, fail, ok, CMP_EQ)
+    do_cmpxchg_explicit_n(64, type, obj, exp, des, succ, fail, ok)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     __int64, __int64, patomic_opimpl_cmpxchg_64_explicit,

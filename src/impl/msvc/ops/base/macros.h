@@ -24,11 +24,4 @@
 #endif
 
 
-#define CMP_EQ(a, b) \
-    ((a) == (b))
-
-#define CMP_EQ_128(a, b) \
-    ((a).low == (b).low && (a).high == (b).high)
-
-
 #endif  /* PATOMIC_IMPL_MSVC_OPS_BASE_MACROS_H */
