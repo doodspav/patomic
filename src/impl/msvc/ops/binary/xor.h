@@ -191,6 +191,137 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
 #endif  /* PATOMIC_IMPL_MSVC_HAS_IL_XOR_8 */
 
 
+/**
+ * Defines patomic_opimpl_{void, fetch}_xor_16_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_XOR_16
+
+short _InterlockedXor16(short volatile *, short);
+#pragma intrinsic(_InterlockedXor16)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    short _InterlockedXor16_nf(short volatile *, short);
+    #pragma intrinsic(_InterlockedXor16_nf)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    short _InterlockedXor16_acq(short volatile *, short);
+    short _InterlockedXor16_rel(short volatile *, short);
+    #pragma intrinsic(_InterlockedXor16_acq)
+    #pragma intrinsic(_InterlockedXor16_rel)
+#endif
+
+#define do_void_xor_explicit_16(type, obj, arg, order) \
+    do_void_xor_explicit_n(16, type, obj, arg, order)
+
+#define do_fetch_xor_explicit_16(type, obj, arg, order, res) \
+    do_fetch_xor_explicit_n(16, type, obj, arg, order, res)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(
+    short, short, patomic_opimpl_void_xor_16_explicit,
+    SHOW_P, order, do_void_xor_explicit_16
+)
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
+    short, short, patomic_opimpl_fetch_xor_16_explicit,
+    SHOW_P, order, do_fetch_xor_explicit_16
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(
+    short, short, patomic_opimpl_void_xor_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_void_xor_explicit_16
+)
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
+    short, short, patomic_opimpl_fetch_xor_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_fetch_xor_explicit_16
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(
+        short, short, patomic_opimpl_void_xor_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_void_xor_explicit_16
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
+        short, short, patomic_opimpl_fetch_xor_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_fetch_xor_explicit_16
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(
+        short, short, patomic_opimpl_void_xor_16_release,
+        HIDE_P, patomic_RELEASE, do_void_xor_explicit_16
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
+        short, short, patomic_opimpl_fetch_xor_16_release,
+        HIDE_P, patomic_RELEASE, do_fetch_xor_explicit_16
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(
+        short, short, patomic_opimpl_void_xor_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_void_xor_explicit_16
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
+        short, short, patomic_opimpl_fetch_xor_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_fetch_xor_explicit_16
+    )
+#endif
+
+#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+    short, short, patomic_opimpl_void_xor_16_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_16, do_make_desired_xor
+)
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+    short, short, patomic_opimpl_fetch_xor_16_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_16, do_make_desired_xor
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+    short, short, patomic_opimpl_void_xor_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16, do_make_desired_xor
+)
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+    short, short, patomic_opimpl_fetch_xor_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16, do_make_desired_xor
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+        short, short, patomic_opimpl_void_xor_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_16, do_make_desired_xor
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+        short, short, patomic_opimpl_fetch_xor_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_16, do_make_desired_xor
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+        short, short, patomic_opimpl_void_xor_16_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16, do_make_desired_xor
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+        short, short, patomic_opimpl_fetch_xor_16_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16, do_make_desired_xor
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+        short, short, patomic_opimpl_void_xor_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16, do_make_desired_xor
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+        short, short, patomic_opimpl_fetch_xor_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16, do_make_desired_xor
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_XOR_16 */
+
 
 
 #endif  /* defined(_MSC_VER) */
