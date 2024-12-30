@@ -6,5 +6,5 @@ add_subdirectory(base)
 
 # add directory files to target
 target_sources(${target_name} PRIVATE
-    xchg.h
+    cmpxchg.h
 )
