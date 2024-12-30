@@ -5,7 +5,6 @@
 #define PATOMIC_IMPL_MSVC_OPS_BASE_MACROS_H
 
 #include "config.h"
-#include "m128.h"
 
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL

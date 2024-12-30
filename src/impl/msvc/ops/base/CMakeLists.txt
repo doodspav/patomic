@@ -4,6 +4,6 @@
 # add directory files to target
 target_sources(${target_name} PRIVATE
     config.h
-    m128.h
     macros.h
+    msvc128.h
 )

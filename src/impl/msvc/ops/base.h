@@ -5,7 +5,7 @@
 #define PATOMIC_IMPL_MSVC_OPS_BASE_H
 
 #include "base/config.h"
-#include "base/m128.h"
 #include "base/macros.h"
+#include "base/msvc128.h"
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_BASE_H */
