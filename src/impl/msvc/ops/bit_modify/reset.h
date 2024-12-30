@@ -117,7 +117,159 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
 #endif
 
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_RESET_32
+/**
+ * Defines patomic_opimpl_bit_test_reset_16_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    short, short, patomic_opimpl_bit_test_reset_16_explicit,
+    SHOW_P, order, do_bit_test_reset_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    short, short, patomic_opimpl_bit_test_reset_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_reset_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        short, short, patomic_opimpl_bit_test_reset_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_reset_explicit
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        short, short, patomic_opimpl_bit_test_reset_16_release,
+        HIDE_P, patomic_RELEASE, do_bit_test_reset_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        short, short, patomic_opimpl_bit_test_reset_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_reset_explicit
+    )
+#endif
+
+
+/**
+ * Defines patomic_opimpl_bit_test_reset_32_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    long, long, patomic_opimpl_bit_test_reset_32_explicit,
+    SHOW_P, order, do_bit_test_reset_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    long, long, patomic_opimpl_bit_test_reset_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_reset_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        long, long, patomic_opimpl_bit_test_reset_32_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_reset_explicit
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        long, long, patomic_opimpl_bit_test_reset_32_release,
+        HIDE_P, patomic_RELEASE, do_bit_test_reset_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        long, long, patomic_opimpl_bit_test_reset_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_reset_explicit
+    )
+#endif
+
+
+/**
+ * Defines patomic_opimpl_bit_test_reset_64_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    __int64, __int64, patomic_opimpl_bit_test_reset_64_explicit,
+    SHOW_P, order, do_bit_test_reset_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    __int64, __int64, patomic_opimpl_bit_test_reset_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_reset_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        __int64, __int64, patomic_opimpl_bit_test_reset_64_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_reset_explicit
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        __int64, __int64, patomic_opimpl_bit_test_reset_64_release,
+        HIDE_P, patomic_RELEASE, do_bit_test_reset_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        __int64, __int64, patomic_opimpl_bit_test_reset_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_reset_explicit
+    )
+#endif
+
+
+/**
+ * Defines patomic_opimpl_bit_test_reset_128_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_explicit,
+    SHOW_P, order, do_bit_test_reset_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_reset_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_reset_explicit
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_release,
+        HIDE_P, patomic_RELEASE, do_bit_test_reset_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_reset_explicit
+    )
+#endif
+
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_RESET_32 */
 
 
 #endif  /* defined(_MSC_VER) */
