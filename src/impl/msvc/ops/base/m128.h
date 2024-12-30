@@ -87,6 +87,75 @@ patomic_msvc128_add(
 }
 
 
+/**
+ * @addtogroup impl.msvc
+ *
+ * @brief
+ *   Implement or operator for patomic_msvc128_t.
+ */
+static patomic_msvc128_t
+patomic_msvc128_or(
+    const patomic_msvc128_t lhs,
+    const patomic_msvc128_t rhs
+)
+{
+    patomic_msvc128_t res = {0};
+    res.low = (__int64) (
+        ((unsigned __int64) lhs.low) | ((unsigned __int64) rhs.low)
+    );
+    res.high = (__int64) (
+        ((unsigned __int64) lhs.high) | ((unsigned __int64) rhs.high)
+    );
+    return res;
+}
+
+
+/**
+ * @addtogroup impl.msvc
+ *
+ * @brief
+ *   Implement xor operator for patomic_msvc128_t.
+ */
+static patomic_msvc128_t
+patomic_msvc128_xor(
+    const patomic_msvc128_t lhs,
+    const patomic_msvc128_t rhs
+)
+{
+    patomic_msvc128_t res = {0};
+    res.low = (__int64) (
+        ((unsigned __int64) lhs.low) ^ ((unsigned __int64) rhs.low)
+    );
+    res.high = (__int64) (
+        ((unsigned __int64) lhs.high) ^ ((unsigned __int64) rhs.high)
+    );
+    return res;
+}
+
+
+/**
+ * @addtogroup impl.msvc
+ *
+ * @brief
+ *   Implement and operator for patomic_msvc128_t.
+ */
+static patomic_msvc128_t
+patomic_msvc128_and(
+    const patomic_msvc128_t lhs,
+    const patomic_msvc128_t rhs
+)
+{
+    patomic_msvc128_t res = {0};
+    res.low = (__int64) (
+        ((unsigned __int64) lhs.low) & ((unsigned __int64) rhs.low)
+    );
+    res.high = (__int64) (
+        ((unsigned __int64) lhs.high) & ((unsigned __int64) rhs.high)
+    );
+    return res;
+}
+
+
 #endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_BASE_M128_H */
