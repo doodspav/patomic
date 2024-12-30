@@ -5,4 +5,5 @@
 target_sources(${target_name} PRIVATE
     add.h
     sub.h
+    inc.h
 )
