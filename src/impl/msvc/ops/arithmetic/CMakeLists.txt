@@ -7,4 +7,5 @@ target_sources(${target_name} PRIVATE
     sub.h
     inc.h
     dec.h
+    neg.h
 )
