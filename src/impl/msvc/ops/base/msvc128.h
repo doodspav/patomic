@@ -91,6 +91,32 @@ patomic_msvc128_add(
  * @addtogroup impl.msvc
  *
  * @brief
+ *   Implement subtraction operator for patomic_msvc128_t.
+ */
+static patomic_msvc128_t
+patomic_msvc128_sub(
+    const patomic_msvc128_t lhs,
+    const patomic_msvc128_t rhs
+)
+{
+    const unsigned __int64 lhs_low = (unsigned __int64) lhs.low;
+    const unsigned __int64 lhs_high = (unsigned __int64) lhs.high;
+    const unsigned __int64 rhs_low = (unsigned __int64) rhs.low;
+    const unsigned __int64 rhs_high = (unsigned __int64) rhs.high;
+    patomic_msvc128_t res = {0};
+
+    res.low = (__int64) (lhs_low - rhs_low);
+    unsigned __int64 borrow = (lhs_low < rhs_low) ? 1 : 0;
+    res.high = (__int64) (lhs_high - rhs_high - borrow);
+
+    return res;
+}
+
+
+/**
+ * @addtogroup impl.msvc
+ *
+ * @brief
  *   Implement or operator for patomic_msvc128_t.
  */
 static patomic_msvc128_t
