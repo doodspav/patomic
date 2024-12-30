@@ -53,7 +53,7 @@
     #if defined (_M_ARM) || defined (_M_ARM64)
 
         /** @brief _InterlockedAdd intrinsic supported. */
-        #define PATOMIC_IMPL_MSVC_HAS_IL_ADD 1
+        #define PATOMIC_IMPL_MSVC_HAS_IL_ADD_32 1
 
         /** @brief _InterlockedAdd64 intrinsic supported. */
         #define PATOMIC_IMPL_MSVC_HAS_IL_ADD_64 1
@@ -62,14 +62,14 @@
 
     /* and */
 
-    /** @brief _InterlockedAnd intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_AND 1
-
     /** @brief _InterlockedAnd8 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_AND_8 1
 
     /** @brief _InterlockedAnd16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_AND_16 1
+
+    /** @brief _InterlockedAnd intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_AND_32 1
 
     #if !defined(_M_IX86)
 
@@ -81,10 +81,10 @@
     /* bit test */
 
     /** @brief _interlockedbittestreset intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_RESET 1
+    #define PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_RESET_32 1
 
     /** @brief _interlockedbittestset intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_SET 1
+    #define PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_SET_32 1
 
     #if defined(_M_X64) || defined(_M_ARM64)
 
@@ -98,14 +98,14 @@
 
     /* compare exchange */
 
-    /** @brief _InterlockedCompareExchange intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE 1
-
     /** @brief _InterlockedCompareExchange8 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 1
 
     /** @brief _InterlockedCompareExchange16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 1
+
+    /** @brief _InterlockedCompareExchange intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32 1
 
     /** @brief _InterlockedCompareExchange64 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 1
@@ -119,11 +119,11 @@
 
     /* decrement */
 
-    /** @brief _InterlockedDecrement intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT 1
-
     /** @brief _InterlockedDecrement16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_16 1
+
+    /** @brief _InterlockedDecrement intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_32 1
 
     #if !defined(_M_IX86)
 
@@ -134,14 +134,14 @@
 
     /* exchange */
 
-    /** @brief _InterlockedExchange intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE 1
-
     /** @brief _InterlockedExchange8 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8 1
 
     /** @brief _InterlockedExchange16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16 1
+
+    /** @brief _InterlockedExchange intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32 1
 
     #if !defined(_M_IX86)
 
@@ -152,14 +152,14 @@
 
     /* exchange add */
 
-    /** @brief _InterlockedExchangeAdd intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD 1
-
     /** @brief _InterlockedExchangeAdd8 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8 1
 
     /** @brief _InterlockedExchangeAdd16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16 1
+
+    /** @brief _InterlockedExchangeAdd intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32 1
 
     #if !defined(_M_IX86)
 
@@ -170,11 +170,11 @@
 
     /* increment */
 
-    /** @brief _InterlockedIncrement intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT 1
-
     /** @brief _InterlockedIncrement16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16 1
+
+    /** @brief _InterlockedIncrement intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 1
 
     #if !defined(_M_IX86)
 
@@ -185,14 +185,14 @@
 
     /* or */
 
-    /** @brief _InterlockedOr intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_OR 1
-
     /** @brief _InterlockedOr8 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_OR_8 1
 
     /** @brief _InterlockedOr16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_OR_16 1
+
+    /** @brief _InterlockedOr intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_OR_32 1
 
     #if !defined(_M_IX86)
 
@@ -203,14 +203,14 @@
 
     /* xor */
 
-    /** @brief _InterlockedXor intrinsic supported. */
-    #define PATOMIC_IMPL_MSVC_HAS_IL_XOR 1
-
     /** @brief _InterlockedXor8 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_XOR_8 1
 
     /** @brief _InterlockedXor16 intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_IL_XOR_16 1
+
+    /** @brief _InterlockedXor intrinsic supported. */
+    #define PATOMIC_IMPL_MSVC_HAS_IL_XOR_32 1
 
     #if !defined(_M_IX86)
 
