@@ -343,6 +343,107 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 */
 
 
+/**
+ * Defines patomic_opimpl_cmpxchg_128_<order> (possibly as NULL) with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+
+unsigned char _InterlockedCompareExchange128(__int64 volatile *, __int64, __int64, __int64 *);
+#pragma intrinsic(_InterlockedCompareExchange128)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    unsigned char _InterlockedCompareExchange128_nf(__int64 volatile *, __int64, __int64, __int64 *);
+    #pragma intrinsic(_InterlockedCompareExchange128_nf)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    unsigned char _InterlockedCompareExchange128_acq(__int64 volatile *, __int64, __int64, __int64 *);
+    unsigned char _InterlockedCompareExchange128_rel(__int64 volatile *, __int64, __int64, __int64 *);
+    #pragma intrinsic(_InterlockedCompareExchange128_acq)
+    #pragma intrinsic(_InterlockedCompareExchange128_rel)
+#endif
+
+#define do_cmpxchg_explicit_128(type, obj, exp, des, succ, fail, ok)                           \
+    do {                                                                                       \
+        unsigned char res;                                                                     \
+        switch (succ)                                                                          \
+        {                                                                                      \
+            case patomic_RELAXED:                                                              \
+      VIS_IL_NF((res = _InterlockedCompareExchange128_nf(                                      \
+                    (volatile __int64 *) obj, des.high, des.low, (__int64 *) &exp              \
+                ));)                                                                           \
+      VIS_IL_NF(break;)                                                                        \
+            case patomic_CONSUME:                                                              \
+            case patomic_ACQUIRE:                                                              \
+     VIS_IL_ACQ((res = _InterlockedCompareExchange128_acq(                                     \
+                (volatile __int64 *) obj, des.high, des.low, (__int64 *) &exp                  \
+            ));)                                                                               \
+     VIS_IL_ACQ(break;)                                                                        \
+            case patomic_RELEASE:                                                              \
+     VIS_IL_REL((res = _InterlockedCompareExchange128_rel(                                     \
+                (volatile __int64 *) obj, des.high, des.low, (__int64 *) &exp                  \
+            ));)                                                                               \
+     VIS_IL_REL(break;)                                                                        \
+            case patomic_ACQ_REL:                                                              \
+            case patomic_SEQ_CST:                                                              \
+            default:                                                                           \
+                res = _InterlockedCompareExchange128(                                          \
+                    (volatile __int64 *) obj, des.high, des.low, (__int64 *) &exp              \
+                );                                                                             \
+        }                                                                                      \
+        ok = (int) res;                                                                        \
+    }                                                                                          \
+    while (0)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_cmpxchg_128_explicit,
+    SHOW_P, HIDE, order, do_cmpxchg_explicit_128
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_cmpxchg_128_seq_cst,
+    HIDE_P, SHOW, patomic_SEQ_CST, do_cmpxchg_explicit_128
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_cmpxchg_128_acquire,
+        HIDE_P, SHOW, patomic_ACQUIRE, do_cmpxchg_explicit_128
+    )
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_cmpxchg_128_release,
+        HIDE_P, SHOW, patomic_RELEASE, do_cmpxchg_explicit_128
+    )
+#else
+    #define patomic_opimpl_cmpxchg_128_acquire patomic_opimpl_cmpxchg_128_seq_cst
+    #define patomic_opimpl_cmpxchg_128_release patomic_opimpl_cmpxchg_128_seq_cst
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_cmpxchg_128_relaxed,
+        HIDE_P, SHOW, patomic_RELAXED, do_cmpxchg_explicit_128
+    )
+#else
+    #define patomic_opimpl_cmpxchg_128_relaxed patomic_opimpl_cmpxchg_128_acquire
+#endif
+
+#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 vv */
+
+#define patomic_opimpl_cmpxchg_128_explicit NULL
+#define patomic_opimpl_cmpxchg_128_relaxed NULL
+#define patomic_opimpl_cmpxchg_128_acquire NULL
+#define patomic_opimpl_cmpxchg_128_release NULL
+#define patomic_opimpl_cmpxchg_128_seq_cst NULL
+
+#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+
+
 #endif  /* ^^ defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_XCHG_H */
