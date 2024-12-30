@@ -8,9 +8,11 @@
 
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    #define VIS_IL_ACQ_REL(expr) expr
+    #define VIS_IL_ACQ(expr) expr
+    #define VIS_IL_REL(expr) expr
 #else
-    #define VIS_IL_ACQ_REL(expr)
+    #define VIS_IL_ACQ(expr)
+    #define VIS_IL_REL(expr)
 #endif
 
 
