@@ -222,6 +222,6 @@
 #endif
 
 
-#endif  /* ^^ _MSC_VER >= 1923 */
+#endif  /* _MSC_VER >= 1923 */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_BASE_CONFIG_H */

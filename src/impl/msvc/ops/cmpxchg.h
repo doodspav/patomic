@@ -111,7 +111,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     #define patomic_opimpl_cmpxchg_8_relaxed patomic_opimpl_cmpxchg_8_acquire
 #endif
 
-#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 vv */
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 */
 
 #define patomic_opimpl_cmpxchg_8_explicit NULL
 #define patomic_opimpl_cmpxchg_8_relaxed NULL
@@ -119,7 +119,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #define patomic_opimpl_cmpxchg_8_release NULL
 #define patomic_opimpl_cmpxchg_8_seq_cst NULL
 
-#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 */
 
 
 /**
@@ -183,7 +183,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     #define patomic_opimpl_cmpxchg_16_relaxed patomic_opimpl_cmpxchg_16_acquire
 #endif
 
-#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 vv */
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 */
 
 #define patomic_opimpl_cmpxchg_16_explicit NULL
 #define patomic_opimpl_cmpxchg_16_relaxed NULL
@@ -191,7 +191,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #define patomic_opimpl_cmpxchg_16_release NULL
 #define patomic_opimpl_cmpxchg_16_seq_cst NULL
 
-#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 */
 
 
 /**
@@ -259,7 +259,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     #define patomic_opimpl_cmpxchg_32_relaxed patomic_opimpl_cmpxchg_32_acquire
 #endif
 
-#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32 vv */
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32 */
 
 #define patomic_opimpl_cmpxchg_32_explicit NULL
 #define patomic_opimpl_cmpxchg_32_relaxed NULL
@@ -267,7 +267,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #define patomic_opimpl_cmpxchg_32_release NULL
 #define patomic_opimpl_cmpxchg_32_seq_cst NULL
 
-#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32 */
 
 
 /**
@@ -331,7 +331,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     #define patomic_opimpl_cmpxchg_64_relaxed patomic_opimpl_cmpxchg_64_acquire
 #endif
 
-#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 vv */
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 */
 
 #define patomic_opimpl_cmpxchg_64_explicit NULL
 #define patomic_opimpl_cmpxchg_64_relaxed NULL
@@ -339,7 +339,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #define patomic_opimpl_cmpxchg_64_release NULL
 #define patomic_opimpl_cmpxchg_64_seq_cst NULL
 
-#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 */
 
 
 /**
@@ -432,7 +432,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     #define patomic_opimpl_cmpxchg_128_relaxed patomic_opimpl_cmpxchg_128_acquire
 #endif
 
-#else  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 vv */
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
 
 #define patomic_opimpl_cmpxchg_128_explicit NULL
 #define patomic_opimpl_cmpxchg_128_relaxed NULL
@@ -440,9 +440,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 #define patomic_opimpl_cmpxchg_128_release NULL
 #define patomic_opimpl_cmpxchg_128_seq_cst NULL
 
-#endif  /* ^^ PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
 
 
-#endif  /* ^^ defined(_MSC_VER) */
+#endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_CMPXCHG_H */

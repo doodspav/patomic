@@ -87,6 +87,6 @@ patomic_msvc128_add(
 }
 
 
-#endif  /* ^^ defined(_MSC_VER) */
+#endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_BASE_M128_H */
