@@ -4,6 +4,7 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_XCHG_H
 #define PATOMIC_IMPL_MSVC_OPS_XCHG_H
 
+#define __int64 long long
 #define _M_ARM64
 #define _MSC_VER 2000
 #ifdef _MSC_VER
@@ -18,7 +19,9 @@
 #include <stddef.h>
 
 
-#define do_cmpxchg_explicit_n(n, type, obj, exp, des, succ, fail, ok)         \
+#define do_cmpxchg_explicit_n(                                                \
+    n, type, obj, exp, des, succ, fail, ok, do_cmp_eq                         \
+)                                                                             \
     do {                                                                      \
         type res;                                                             \
         switch (succ)                                                         \
@@ -77,7 +80,7 @@ char _InterlockedCompareExchange8(char volatile *, char, char);
 #endif
 
 #define do_cmpxchg_explicit_8(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(8, type, obj, exp, des, succ, fail, ok)
+    do_cmpxchg_explicit_n(8, type, obj, exp, des, succ, fail, ok, CMP_EQ)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     char, char, patomic_opimpl_cmpxchg_8_explicit,
@@ -149,7 +152,7 @@ short _InterlockedCompareExchange16(short volatile *, short, short);
 #endif
 
 #define do_cmpxchg_explicit_16(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(16, type, obj, exp, des, succ, fail, ok)
+    do_cmpxchg_explicit_n(16, type, obj, exp, des, succ, fail, ok, CMP_EQ)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     short, short, patomic_opimpl_cmpxchg_16_explicit,
@@ -221,7 +224,7 @@ __int64 _InterlockedCompareExchange64(__int64 volatile *, __int64, __int64);
 #endif
 
 #define do_cmpxchg_explicit_64(type, obj, exp, des, succ, fail, ok) \
-    do_cmpxchg_explicit_n(64, type, obj, exp, des, succ, fail, ok)
+    do_cmpxchg_explicit_n(64, type, obj, exp, des, succ, fail, ok, CMP_EQ)
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
     __int64, __int64, patomic_opimpl_cmpxchg_64_explicit,
