@@ -51,7 +51,7 @@
 
 
 /**
- * Defines patomic_opimpl_cmpxchg_8_<order> (possibly as NULL) with order:
+ * Defines patomic_opimpl_cmpxchg_8_<order> with order:
  * - relaxed
  * - acquire
  * - release
@@ -110,7 +110,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 
 
 /**
- * Defines patomic_opimpl_cmpxchg_16_<order> (possibly as NULL) with order:
+ * Defines patomic_opimpl_cmpxchg_16_<order> with order:
  * - relaxed
  * - acquire
  * - release
@@ -169,7 +169,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 
 
 /**
- * Defines patomic_opimpl_cmpxchg_32_<order> (possibly as NULL) with order:
+ * Defines patomic_opimpl_cmpxchg_32_<order> with order:
  * - relaxed
  * - acquire
  * - release
@@ -232,7 +232,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 
 
 /**
- * Defines patomic_opimpl_cmpxchg_64_<order> (possibly as NULL) with order:
+ * Defines patomic_opimpl_cmpxchg_64_<order> with order:
  * - relaxed
  * - acquire
  * - release
@@ -291,7 +291,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
 
 
 /**
- * Defines patomic_opimpl_cmpxchg_128_<order> (possibly as NULL) with order:
+ * Defines patomic_opimpl_cmpxchg_128_<order> with order:
  * - relaxed
  * - acquire
  * - release
