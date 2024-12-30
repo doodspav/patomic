@@ -4,7 +4,7 @@
 #ifndef PATOMIC_IMPL_MSVC_OPS_BIT_MODIFY_COMPL_H
 #define PATOMIC_IMPL_MSVC_OPS_BIT_MODIFY_COMPL_H
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
 
 #include "../base.h"
 
