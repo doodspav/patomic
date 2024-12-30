@@ -591,6 +591,66 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
 #endif  /* PATOMIC_IMPL_MSVC_HAS_IL_XOR_64 */
 
 
+/**
+ * Defines patomic_opimpl_{void, fetch}_xor_128_<order> with order:
+ * - relaxed
+ * - acquire
+ * - release
+ * - seq_cst
+ * - explicit
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_xor_128_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_128, do_make_desired_xor_128
+)
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_xor_128_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_128, do_make_desired_xor_128
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_xor_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128, do_make_desired_xor_128
+)
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_xor_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128, do_make_desired_xor_128
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_xor_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128, do_make_desired_xor_128
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_xor_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_cmpxchg_explicit_128, do_make_desired_xor_128
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_xor_128_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128, do_make_desired_xor_128
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_xor_128_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128, do_make_desired_xor_128
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_xor_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128, do_make_desired_xor_128
+    )
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_fetch_xor_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128, do_make_desired_xor_128
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_XOR_128 */
+
 
 #endif  /* defined(_MSC_VER) */
 
