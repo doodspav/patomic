@@ -5,7 +5,7 @@
 add_subdirectory(arithmetic)
 add_subdirectory(base)
 add_subdirectory(binary)
-add_subdirectory(bit_modify)
+add_subdirectory(bitwise)
 add_subdirectory(xchg)
 
 # add directory files to target
