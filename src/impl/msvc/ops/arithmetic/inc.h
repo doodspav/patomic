@@ -50,7 +50,7 @@
 #define do_fetch_inc_add_explicit_n(n, type, obj, order, res)   \
     do {                                                        \
         const type arg = (type) 1;                              \
-        do_fetch_inc_explicit_n(n, type, obj, order, res); \
+        do_fetch_add_explicit_n(n, type, obj, arg, order, res); \
     }                                                           \
     while (0)
 
@@ -85,28 +85,41 @@
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_8 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8
 
-char _InterlockedIncrement8(char volatile *, char);
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_8
+
+char _InterlockedIncrement8(char volatile *);
 #pragma intrinsic(_InterlockedIncrement8)
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    char _InterlockedIncrement8_nf(char volatile *, char);
+    char _InterlockedIncrement8_nf(char volatile *);
     #pragma intrinsic(_InterlockedIncrement8_nf)
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    char _InterlockedIncrement8_acq(char volatile *, char);
-    char _InterlockedIncrement8_rel(char volatile *, char);
+    char _InterlockedIncrement8_acq(char volatile *);
+    char _InterlockedIncrement8_rel(char volatile *);
     #pragma intrinsic(_InterlockedIncrement8_acq)
     #pragma intrinsic(_InterlockedIncrement8_rel)
 #endif
 
 #define do_void_inc_explicit_8(type, obj, order) \
-    do_void_inc_explicit_n(8, type, obj, order)
+    do_void_inc_raw_explicit_n(8, type, obj, order)
 
 #define do_fetch_inc_explicit_8(type, obj, order, res) \
-    do_fetch_inc_explicit_n(8, type, obj, order, res)
+    do_fetch_inc_raw_explicit_n(8, type, obj, order, res)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8 */
+
+#define do_void_inc_explicit_8(type, obj, order) \
+    do_void_inc_add_explicit_n(8, type, obj, order)
+
+#define do_fetch_inc_explicit_8(type, obj, order, res) \
+    do_fetch_inc_add_explicit_n(8, type, obj, order, res)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_8 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
     char, char, patomic_opimpl_void_inc_8_explicit,
@@ -206,7 +219,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_8 */
 
 
 /**
@@ -217,28 +230,41 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16
 
-short _InterlockedIncrement16(short volatile *, short);
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16
+
+short _InterlockedIncrement16(short volatile *);
 #pragma intrinsic(_InterlockedIncrement16)
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    short _InterlockedIncrement16_nf(short volatile *, short);
+    short _InterlockedIncrement16_nf(short volatile *);
     #pragma intrinsic(_InterlockedIncrement16_nf)
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    short _InterlockedIncrement16_acq(short volatile *, short);
-    short _InterlockedIncrement16_rel(short volatile *, short);
+    short _InterlockedIncrement16_acq(short volatile *);
+    short _InterlockedIncrement16_rel(short volatile *);
     #pragma intrinsic(_InterlockedIncrement16_acq)
     #pragma intrinsic(_InterlockedIncrement16_rel)
 #endif
 
 #define do_void_inc_explicit_16(type, obj, order) \
-    do_void_inc_explicit_n(16, type, obj, order)
+    do_void_inc_raw_explicit_n(16, type, obj, order)
 
 #define do_fetch_inc_explicit_16(type, obj, order, res) \
-    do_fetch_inc_explicit_n(16, type, obj, order, res)
+    do_fetch_inc_raw_explicit_n(16, type, obj, order, res)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16 */
+
+#define do_void_inc_explicit_16(type, obj, order) \
+    do_void_inc_add_explicit_n(16, type, obj, order)
+
+#define do_fetch_inc_explicit_16(type, obj, order, res) \
+    do_fetch_inc_add_explicit_n(16, type, obj, order, res)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_16 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
     short, short, patomic_opimpl_void_inc_16_explicit,
@@ -338,7 +364,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_16 */
 
 
 /**
@@ -349,21 +375,24 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32
 
-long _InterlockedIncrement(long volatile *, long);
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
+
+long _InterlockedIncrement(long volatile *);
 #pragma intrinsic(_InterlockedIncrement)
 #define _InterlockedIncrement32 _InterlockedIncrement
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    long _InterlockedIncrement_nf(long volatile *, long);
+    long _InterlockedIncrement_nf(long volatile *);
     #pragma intrinsic(_InterlockedIncrement_nf)
     #define _InterlockedIncrement32_nf _InterlockedIncrement_nf
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    long _InterlockedIncrement_acq(long volatile *, long);
-    long _InterlockedIncrement_rel(long volatile *, long);
+    long _InterlockedIncrement_acq(long volatile *);
+    long _InterlockedIncrement_rel(long volatile *);
     #pragma intrinsic(_InterlockedIncrement_acq)
     #pragma intrinsic(_InterlockedIncrement_rel)
     #define _InterlockedIncrement32_acq _InterlockedIncrement_acq
@@ -371,10 +400,20 @@ long _InterlockedIncrement(long volatile *, long);
 #endif
 
 #define do_void_inc_explicit_32(type, obj, order) \
-    do_void_inc_explicit_n(32, type, obj, order)
+    do_void_inc_raw_explicit_n(32, type, obj, order)
 
 #define do_fetch_inc_explicit_32(type, obj, order, res) \
-    do_fetch_inc_explicit_n(32, type, obj, order, res)
+    do_fetch_inc_raw_explicit_n(32, type, obj, order, res)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32 */
+
+#define do_void_inc_explicit_32(type, obj, order) \
+    do_void_inc_add_explicit_n(32, type, obj, order)
+
+#define do_fetch_inc_explicit_32(type, obj, order, res) \
+    do_fetch_inc_add_explicit_n(32, type, obj, order, res)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
     long, long, patomic_opimpl_void_inc_32_explicit,
@@ -474,7 +513,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_32 */
 
 
 /**
@@ -485,28 +524,41 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_64 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64
 
-__int64 _InterlockedIncrement64(__int64 volatile *, __int64);
+#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_64
+
+__int64 _InterlockedIncrement64(__int64 volatile *);
 #pragma intrinsic(_InterlockedIncrement64)
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
-    __int64 _InterlockedIncrement64_nf(__int64 volatile *, __int64);
+    __int64 _InterlockedIncrement64_nf(__int64 volatile *);
     #pragma intrinsic(_InterlockedIncrement64_nf)
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
-    __int64 _InterlockedIncrement64_acq(__int64 volatile *, __int64);
-    __int64 _InterlockedIncrement64_rel(__int64 volatile *, __int64);
+    __int64 _InterlockedIncrement64_acq(__int64 volatile *);
+    __int64 _InterlockedIncrement64_rel(__int64 volatile *);
     #pragma intrinsic(_InterlockedIncrement64_acq)
     #pragma intrinsic(_InterlockedIncrement64_rel)
 #endif
 
 #define do_void_inc_explicit_64(type, obj, order) \
-    do_void_inc_explicit_n(64, type, obj, order)
+    do_void_inc_raw_explicit_n(64, type, obj, order)
 
 #define do_fetch_inc_explicit_64(type, obj, order, res) \
-    do_fetch_inc_explicit_n(64, type, obj, order, res)
+    do_fetch_inc_raw_explicit_n(64, type, obj, order, res)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64 */
+
+#define do_void_inc_explicit_64(type, obj, order) \
+    do_void_inc_add_explicit_n(64, type, obj, order)
+
+#define do_fetch_inc_explicit_64(type, obj, order, res) \
+    do_fetch_inc_add_explicit_n(64, type, obj, order, res)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_64 */
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID_NOARG(
     __int64, __int64, patomic_opimpl_void_inc_64_explicit,
@@ -606,7 +658,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64 */
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{INCREMENT, EXCHANGE_ADD}_64 */
 
 
 /**
