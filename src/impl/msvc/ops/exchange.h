@@ -88,9 +88,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         char, char, patomic_opimpl_exchange_8_release,
         HIDE_P, patomic_RELEASE, do_exchange_explicit_8
     )
-#else
-    #define patomic_opimpl_exchange_8_acquire patomic_opimpl_exchange_8_seq_cst
-    #define patomic_opimpl_exchange_8_release patomic_opimpl_exchange_8_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -98,8 +95,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         char, char, patomic_opimpl_exchange_8_relaxed,
         HIDE_P, patomic_RELAXED, do_exchange_explicit_8
     )
-#else
-    #define patomic_opimpl_exchange_8_relaxed patomic_opimpl_exchange_8_acquire
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
@@ -123,9 +118,6 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         char, char, patomic_opimpl_exchange_8_release,
         HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8
     )
-#else
-    #define patomic_opimpl_exchange_8_acquire patomic_opimpl_exchange_8_seq_cst
-    #define patomic_opimpl_exchange_8_release patomic_opimpl_exchange_8_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -133,17 +125,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         char, char, patomic_opimpl_exchange_8_relaxed,
         HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8
     )
-#else
-    #define patomic_opimpl_exchange_8_relaxed patomic_opimpl_exchange_8_acquire
 #endif
-
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8 */
-
-#define patomic_opimpl_exchange_8_explicit NULL
-#define patomic_opimpl_exchange_8_relaxed NULL
-#define patomic_opimpl_exchange_8_acquire NULL
-#define patomic_opimpl_exchange_8_release NULL
-#define patomic_opimpl_exchange_8_seq_cst NULL
 
 #endif /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8 */
 
@@ -195,9 +177,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         short, short, patomic_opimpl_exchange_16_release,
         HIDE_P, patomic_RELEASE, do_exchange_explicit_16
     )
-#else
-    #define patomic_opimpl_exchange_16_acquire patomic_opimpl_exchange_16_seq_cst
-    #define patomic_opimpl_exchange_16_release patomic_opimpl_exchange_16_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -205,8 +184,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         short, short, patomic_opimpl_exchange_16_relaxed,
         HIDE_P, patomic_RELAXED, do_exchange_explicit_16
     )
-#else
-    #define patomic_opimpl_exchange_16_relaxed patomic_opimpl_exchange_16_acquire
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
@@ -230,9 +207,6 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         short, short, patomic_opimpl_exchange_16_release,
         HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16
     )
-#else
-    #define patomic_opimpl_exchange_16_acquire patomic_opimpl_exchange_16_seq_cst
-    #define patomic_opimpl_exchange_16_release patomic_opimpl_exchange_16_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -240,17 +214,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         short, short, patomic_opimpl_exchange_16_relaxed,
         HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16
     )
-#else
-    #define patomic_opimpl_exchange_16_relaxed patomic_opimpl_exchange_16_acquire
 #endif
-
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16 */
-
-#define patomic_opimpl_exchange_16_explicit NULL
-#define patomic_opimpl_exchange_16_relaxed NULL
-#define patomic_opimpl_exchange_16_acquire NULL
-#define patomic_opimpl_exchange_16_release NULL
-#define patomic_opimpl_exchange_16_seq_cst NULL
 
 #endif /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16 */
 
@@ -306,9 +270,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         long, long, patomic_opimpl_exchange_32_release,
         HIDE_P, patomic_RELEASE, do_exchange_explicit_32
     )
-#else
-    #define patomic_opimpl_exchange_32_acquire patomic_opimpl_exchange_32_seq_cst
-    #define patomic_opimpl_exchange_32_release patomic_opimpl_exchange_32_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -316,8 +277,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         long, long, patomic_opimpl_exchange_32_relaxed,
         HIDE_P, patomic_RELAXED, do_exchange_explicit_32
     )
-#else
-    #define patomic_opimpl_exchange_32_relaxed patomic_opimpl_exchange_32_acquire
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
@@ -341,9 +300,6 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         long, long, patomic_opimpl_exchange_32_release,
         HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_32
     )
-#else
-    #define patomic_opimpl_exchange_32_acquire patomic_opimpl_exchange_32_seq_cst
-    #define patomic_opimpl_exchange_32_release patomic_opimpl_exchange_32_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -351,17 +307,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         long, long, patomic_opimpl_exchange_32_relaxed,
         HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_32
     )
-#else
-    #define patomic_opimpl_exchange_32_relaxed patomic_opimpl_exchange_32_acquire
 #endif
-
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32 */
-
-#define patomic_opimpl_exchange_32_explicit NULL
-#define patomic_opimpl_exchange_32_relaxed NULL
-#define patomic_opimpl_exchange_32_acquire NULL
-#define patomic_opimpl_exchange_32_release NULL
-#define patomic_opimpl_exchange_32_seq_cst NULL
 
 #endif /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32 */
 
@@ -413,9 +359,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         __int64, __int64, patomic_opimpl_exchange_64_release,
         HIDE_P, patomic_RELEASE, do_exchange_explicit_64
     )
-#else
-    #define patomic_opimpl_exchange_64_acquire patomic_opimpl_exchange_64_seq_cst
-    #define patomic_opimpl_exchange_64_release patomic_opimpl_exchange_64_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -423,8 +366,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_EXCHANGE(
         __int64, __int64, patomic_opimpl_exchange_64_relaxed,
         HIDE_P, patomic_RELAXED, do_exchange_explicit_64
     )
-#else
-    #define patomic_opimpl_exchange_64_relaxed patomic_opimpl_exchange_64_acquire
 #endif
 
 #elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
@@ -448,9 +389,6 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         __int64, __int64, patomic_opimpl_exchange_64_release,
         HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_64
     )
-#else
-    #define patomic_opimpl_exchange_64_acquire patomic_opimpl_exchange_64_seq_cst
-    #define patomic_opimpl_exchange_64_release patomic_opimpl_exchange_64_seq_cst
 #endif
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_NF
@@ -458,17 +396,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_EXCHANGE(
         __int64, __int64, patomic_opimpl_exchange_64_relaxed,
         HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_64
     )
-#else
-    #define patomic_opimpl_exchange_64_relaxed patomic_opimpl_exchange_64_acquire
 #endif
-
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64 */
-
-#define patomic_opimpl_exchange_64_explicit NULL
-#define patomic_opimpl_exchange_64_relaxed NULL
-#define patomic_opimpl_exchange_64_acquire NULL
-#define patomic_opimpl_exchange_64_release NULL
-#define patomic_opimpl_exchange_64_seq_cst NULL
 
 #endif /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64 */
 
