@@ -195,6 +195,8 @@ void _ReadWriteBarrier(void);
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_8 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_8 1
+
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_8
 
 #define do_store_explicit_8(type, obj, des, order) \
@@ -236,7 +238,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
+#elif defined(do_cmpxchg_explicit_8)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_8 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
     __int8, __int8, patomic_opimpl_store_8_explicit,
@@ -276,6 +280,8 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_16 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_16 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_16
 
@@ -318,7 +324,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
+#elif defined(do_cmpxchg_explicit_16)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_16 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
     __int16, __int16, patomic_opimpl_store_16_explicit,
@@ -358,6 +366,8 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_32 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_32 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_32
 
@@ -400,7 +410,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
+#elif defined(do_cmpxchg_explicit_32)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_32 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
     __int32, __int32, patomic_opimpl_store_32_explicit,
@@ -440,6 +452,8 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 || \
     PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_64 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_STORE_64
 
@@ -482,7 +496,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
+#elif defined(do_cmpxchg_explicit_64)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_64 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
     __int64, __int64, patomic_opimpl_store_64_explicit,
@@ -520,7 +536,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
  *
  * There is no acquire variant.
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+#if defined(do_cmpxchg_explicit_128)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_STORE_128 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
     __int128, __int128, patomic_opimpl_store_128_explicit,
@@ -546,7 +564,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+#endif  /* defined(do_cmpxchg_explicit_128) */
 
 
 #endif  /* defined(_MSC_VER) */

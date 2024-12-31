@@ -137,6 +137,8 @@ void _ReadWriteBarrier(void);
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_8
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_8
+
 #define do_load_explicit_8(type, obj, order, res) \
     do_load_explicit_n(8, type, obj, order, res)
 
@@ -177,6 +179,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(
  * There is no release variant.
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_16
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_16
 
 #define do_load_explicit_16(type, obj, order, res) \
     do_load_explicit_n(16, type, obj, order, res)
@@ -219,6 +223,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_32
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_32
+
 #define do_load_explicit_32(type, obj, order, res) \
     do_load_explicit_n(32, type, obj, order, res)
 
@@ -259,6 +265,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(
  * There is no release variant.
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_64
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_64
 
 #define do_load_explicit_64(type, obj, order, res) \
     do_load_explicit_n(64, type, obj, order, res)
