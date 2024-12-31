@@ -104,6 +104,7 @@
                 succ, fail,                                                   \
                 ok                                                            \
             );                                                                \
+        }                                                                     \
         while (!ok);                                                          \
     }
 
