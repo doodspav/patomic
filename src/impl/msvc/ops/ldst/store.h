@@ -53,27 +53,27 @@ void __dmb(unsigned int);
     #define PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 1
 #endif
 
-#define do_store_explicit_n(n, type, obj, des, order) \
-    do {                                              \
-        switch (order)                                \
-        {                                             \
-            case patomic_RELAXED:                     \
-                do_volatile_store_##n(obj, des);      \
-                break;                                \
-            case patomic_RELEASE:                     \
-                __dmb(0xB);                           \
-                do_volatile_store_##n(obj, des);      \
-                break;                                \
-            case patomic_CONSUME:                     \
-            case patomic_ACQUIRE:                     \
-            case patomic_ACQ_REL:                     \
-            case patomic_SEQ_CST:                     \
-            default:                                  \
-                __dmb(0xB);                           \
-                do_volatile_store_##n(obj, des);      \
-                __dmb(0xB);                           \
-        }                                             \
-    }                                                 \
+#define do_store_raw_explicit_n(n, type, obj, des, order) \
+    do {                                                  \
+        switch (order)                                    \
+        {                                                 \
+            case patomic_RELAXED:                         \
+                do_volatile_store_##n(obj, des);          \
+                break;                                    \
+            case patomic_RELEASE:                         \
+                __dmb(0xB);                               \
+                do_volatile_store_##n(obj, des);          \
+                break;                                    \
+            case patomic_CONSUME:                         \
+            case patomic_ACQUIRE:                         \
+            case patomic_ACQ_REL:                         \
+            case patomic_SEQ_CST:                         \
+            default:                                      \
+                __dmb(0xB);                               \
+                do_volatile_store_##n(obj, des);          \
+                __dmb(0xB);                               \
+        }                                                 \
+    }                                                     \
     while (0)
 
 #endif  /* PATOMIC_IMPL_MSVC_HAS_MEMORY_BARRIER_DMB */
@@ -97,32 +97,32 @@ void _ReadWriteBarrier(void);
     #define PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 1
 #endif
 
-#define do_store_explicit_n(n, type, obj, des, order) \
-    do {                                              \
-        /* intentionally uninitialized */             \
-        volatile long guard;                          \
-        switch (order)                                \
-        {                                             \
-            case patomic_RELAXED:                     \
-                do_volatile_store_##n(obj, des);      \
-                break;                                \
-            case patomic_RELEASE:                     \
-                _ReadWriteBarrier();                  \
-                do_volatile_store_##n(obj, des);      \
-                break;                                \
-            case patomic_CONSUME:                     \
-            case patomic_ACQUIRE:                     \
-            case patomic_ACQ_REL:                     \
-            case patomic_SEQ_CST:                     \
-            default:                                  \
-                _ReadWriteBarrier();                  \
-                do_volatile_store_##n(obj, des);      \
-                PATOMIC_IGNORE_UNUSED(                \
-                    _InterlockedIncrement(&guard)     \
-                );                                    \
-        }                                             \
-        PATOMIC_IGNORE_UNUSED(guard);                 \
-    }                                                 \
+#define do_store_raw_explicit_n(n, type, obj, des, order) \
+    do {                                                  \
+        /* intentionally uninitialized */                 \
+        volatile long guard;                              \
+        switch (order)                                    \
+        {                                                 \
+            case patomic_RELAXED:                         \
+                do_volatile_store_##n(obj, des);          \
+                break;                                    \
+            case patomic_RELEASE:                         \
+                _ReadWriteBarrier();                      \
+                do_volatile_store_##n(obj, des);          \
+                break;                                    \
+            case patomic_CONSUME:                         \
+            case patomic_ACQUIRE:                         \
+            case patomic_ACQ_REL:                         \
+            case patomic_SEQ_CST:                         \
+            default:                                      \
+                _ReadWriteBarrier();                      \
+                do_volatile_store_##n(obj, des);          \
+                PATOMIC_IGNORE_UNUSED(                    \
+                    _InterlockedIncrement(&guard)         \
+                );                                        \
+        }                                                 \
+        PATOMIC_IGNORE_UNUSED(guard);                     \
+    }                                                     \
     while (0)
 
 #endif  /* PATOMIC_IMPL_MSVC_HAS_COMPILER_READ_WRITE_BARRIER */
