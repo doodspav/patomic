@@ -33,7 +33,7 @@
 
     #endif
 
-    /** @brief __dmb(0xb) intrinsic supported. */
+    /** @brief __dmb intrinsic supported. */
     #define PATOMIC_IMPL_MSVC_HAS_MEMORY_BARRIER_DMB 1
 
     /** @brief _acq and _rel _Interlocked variants supported. */
