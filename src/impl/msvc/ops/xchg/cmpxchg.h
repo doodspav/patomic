@@ -58,6 +58,8 @@
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_8 1
+
 char _InterlockedCompareExchange8(char volatile *, char, char);
 #pragma intrinsic(_InterlockedCompareExchange8)
 
@@ -117,6 +119,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_16 1
+
 short _InterlockedCompareExchange16(short volatile *, short, short);
 #pragma intrinsic(_InterlockedCompareExchange16)
 
@@ -175,6 +179,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_32 1
 
 long _InterlockedCompareExchange(long volatile *, long, long);
 #pragma intrinsic(_InterlockedCompareExchange)
@@ -239,6 +245,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_64 1
+
 __int64 _InterlockedCompareExchange64(__int64 volatile *, __int64, __int64);
 #pragma intrinsic(_InterlockedCompareExchange64)
 
@@ -297,6 +305,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_1288 1
 
 unsigned char _InterlockedCompareExchange128(__int64 volatile *, __int64, __int64, __int64 *);
 #pragma intrinsic(_InterlockedCompareExchange128)
