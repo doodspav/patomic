@@ -183,6 +183,88 @@ void _ReadWriteBarrier(void);
 #endif  /* defined(_M_IX86) || defined(_M_X64) */
 
 
+/**
+ * Defines patomic_opimpl_store_8_<order> with order:
+ * - relaxed
+ * - release
+ * - seq_cst
+ * - explicit
+ *
+ * There is no acquire variant.
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_8 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_8
+
+#define do_store_explicit_8(type, obj, des, order) \
+    do_store_raw_explicit_n(8, type, obj, des, order)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8 */
+
+#define do_store_explicit_8(type, obj, des, order)          \
+    do {                                                    \
+        type res;                                           \
+        do_exchange_explicit_8(type, obj, des, order, res); \
+        PATOMIC_IGNORE_UNUSED(res);                         \
+    }                                                       \
+    while (0)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_STORE_8 */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int8, __int8, patomic_opimpl_store_8_explicit,
+    SHOW_P, order, do_store_explicit_8
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int8, __int8, patomic_opimpl_store_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_store_explicit_8
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int8, __int8, patomic_opimpl_store_8_release,
+        HIDE_P, patomic_RELEASE, do_store_explicit_8
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int8, __int8, patomic_opimpl_store_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_store_explicit_8
+    )
+#endif
+
+#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int8, __int8, patomic_opimpl_store_8_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_8
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int8, __int8, patomic_opimpl_store_8_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_8
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int8, __int8, patomic_opimpl_store_8_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_8
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int8, __int8, patomic_opimpl_store_8_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_8
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{STORE, EXCHANGE}_8 */
+
+
 #endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_LDST_STORE_H */
