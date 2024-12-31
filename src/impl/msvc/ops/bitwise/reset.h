@@ -238,13 +238,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
  * - release
  * - seq_cst
  * - explicit
- *
- * @note
- *   Only define when cmpxchg128 is available even thought we don't rely on it,
- *   because we won't use it unless other 128bit operations exist too. This is
- *   mostly for consistency.
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
     patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_explicit,
@@ -273,8 +267,6 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
         HIDE_P, patomic_RELAXED, do_bit_test_reset_explicit
     )
 #endif
-
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
 
 
 #endif  /* PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_RESET_32 */
