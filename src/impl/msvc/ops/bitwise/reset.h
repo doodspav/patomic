@@ -88,6 +88,8 @@ unsigned char _interlockedbittestandreset(long *, long);
  * - explicit
  */
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_8 1
+
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
     char, char, patomic_opimpl_bit_test_reset_8_explicit,
     SHOW_P, order, do_bit_test_reset_explicit
@@ -125,6 +127,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
  * - seq_cst
  * - explicit
  */
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_16 1
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
     short, short, patomic_opimpl_bit_test_reset_16_explicit,
@@ -164,6 +168,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
  * - explicit
  */
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_32 1
+
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
     long, long, patomic_opimpl_bit_test_reset_32_explicit,
     SHOW_P, order, do_bit_test_reset_explicit
@@ -202,6 +208,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
  * - explicit
  */
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_64 1
+
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
     __int64, __int64, patomic_opimpl_bit_test_reset_64_explicit,
     SHOW_P, order, do_bit_test_reset_explicit
@@ -239,6 +247,8 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
  * - seq_cst
  * - explicit
  */
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_128 1
 
 PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST_MODIFY(
     patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_reset_128_explicit,
