@@ -81,11 +81,7 @@ void __dmb(unsigned int);
 
 
 #if defined(_M_IX86) || defined(_M_X64)
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
 #if PATOMIC_IMPL_MSVC_HAS_COMPILER_READ_WRITE_BARRIER
-
-long _InterlockedIncrement(long volatile *);
-#pragma intrinsic(_InterlockedIncrement)
 
 void _ReadWriteBarrier(void);
 #pragma intrinsic(_ReadWriteBarrier)
@@ -93,8 +89,70 @@ void _ReadWriteBarrier(void);
 #define PATOMIC_IMPL_MSVC_HAS_IL_STORE_8 1
 #define PATOMIC_IMPL_MSVC_HAS_IL_STORE_16 1
 #define PATOMIC_IMPL_MSVC_HAS_IL_STORE_32 1
-#if defined(_M_X64)
-    #define PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 1
+#define PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 1
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_8
+    char _InterlockedExchange8(char volatile *, char);
+    #pragma intrinsic(_InterlockedExchange8)
+    #define do_store_seq_cst_8(obj, des) \
+        PATOMIC_IGNORE_UNUSED(_InterlockedExchange8(obj, des))
+#elif PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
+    long _InterlockedIncrement(long volatile *);
+    #pragma intrinsic(_InterlockedIncrement)
+    #define do_store_seq_cst_8(obj, des) \
+        _ReadWriteBarrier();             \
+        do_volatile_store_8(obj, des);   \
+        PATOMIC_IGNORE_UNUSED(_InterlockedIncrement(&guard))
+#else
+    #undef PATOMIC_IMPL_MSVC_HAS_IL_STORE_8
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16
+    short _InterlockedExchange16(short volatile *, short);
+    #pragma intrinsic(_InterlockedExchange16)
+    #define do_store_seq_cst_16(obj, des) \
+        PATOMIC_IGNORE_UNUSED(_InterlockedExchange16(obj, des))
+#elif PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
+    long _InterlockedIncrement(long volatile *);
+    #pragma intrinsic(_InterlockedIncrement)
+    #define do_store_seq_cst_16(obj, des) \
+        _ReadWriteBarrier();              \
+        do_volatile_store_16(obj, des);   \
+        PATOMIC_IGNORE_UNUSED(_InterlockedIncrement(&guard))
+#else
+    #undef PATOMIC_IMPL_MSVC_HAS_IL_STORE_16
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32
+    long _InterlockedExchange(long volatile *, long);
+    #pragma intrinsic(_InterlockedExchange)
+    #define do_store_seq_cst_32(obj, des) \
+        PATOMIC_IGNORE_UNUSED(_InterlockedExchange(obj, des))
+#elif PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
+    long _InterlockedIncrement(long volatile *);
+    #pragma intrinsic(_InterlockedIncrement)
+    #define do_store_seq_cst_32(obj, des) \
+        _ReadWriteBarrier();              \
+        do_volatile_store_32(obj, des);   \
+        PATOMIC_IGNORE_UNUSED(_InterlockedIncrement(&guard))
+#else
+    #undef PATOMIC_IMPL_MSVC_HAS_IL_STORE_32
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64
+    __int64 _InterlockedExchange64(__int64 volatile *, __int64);
+    #pragma intrinsic(_InterlockedExchange64)
+    #define do_store_seq_cst_64(obj, des) \
+        PATOMIC_IGNORE_UNUSED(_InterlockedExchange64(obj, des))
+#elif PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
+    long _InterlockedIncrement(long volatile *);
+    #pragma intrinsic(_InterlockedIncrement)
+    #define do_store_seq_cst_64(obj, des) \
+        _ReadWriteBarrier();              \
+        do_volatile_store_64(obj, des);   \
+        PATOMIC_IGNORE_UNUSED(_InterlockedIncrement(&guard))
+#else
+    #undef PATOMIC_IMPL_MSVC_HAS_IL_STORE_64
 #endif
 
 #define do_store_raw_explicit_n(n, type, obj, des, order) \
@@ -115,18 +173,13 @@ void _ReadWriteBarrier(void);
             case patomic_ACQ_REL:                         \
             case patomic_SEQ_CST:                         \
             default:                                      \
-                _ReadWriteBarrier();                      \
-                do_volatile_store_##n(obj, des);          \
-                PATOMIC_IGNORE_UNUSED(                    \
-                    _InterlockedIncrement(&guard)         \
-                );                                        \
+                do_store_seq_cst_##n(obj, des);           \
         }                                                 \
         PATOMIC_IGNORE_UNUSED(guard);                     \
     }                                                     \
     while (0)
 
 #endif  /* PATOMIC_IMPL_MSVC_HAS_COMPILER_READ_WRITE_BARRIER */
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 */
 #endif  /* defined(_M_IX86) || defined(_M_X64) */
 
 
