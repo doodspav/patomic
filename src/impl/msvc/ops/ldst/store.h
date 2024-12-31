@@ -511,6 +511,44 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
 #endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{STORE, EXCHANGE}_64 */
 
 
+/**
+ * Defines patomic_opimpl_store_128_<order> with order:
+ * - relaxed
+ * - release
+ * - seq_cst
+ * - explicit
+ *
+ * There is no acquire variant.
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int128, __int128, patomic_opimpl_store_128_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_128
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int128, __int128, patomic_opimpl_store_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int128, __int128, patomic_opimpl_store_128_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_128
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int128, __int128, patomic_opimpl_store_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_128
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+
+
 #endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_LDST_STORE_H */
