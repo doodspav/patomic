@@ -265,6 +265,252 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
 #endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{STORE, EXCHANGE}_8 */
 
 
+/**
+ * Defines patomic_opimpl_store_16_<order> with order:
+ * - relaxed
+ * - release
+ * - seq_cst
+ * - explicit
+ *
+ * There is no acquire variant.
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_16 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_16
+
+#define do_store_explicit_16(type, obj, des, order) \
+    do_store_raw_explicit_n(16, type, obj, des, order)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_16 */
+
+#define do_store_explicit_16(type, obj, des, order)          \
+    do {                                                     \
+        type res;                                            \
+        do_exchange_explicit_16(type, obj, des, order, res); \
+        PATOMIC_IGNORE_UNUSED(res);                          \
+    }                                                        \
+    while (0)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_STORE_16 */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int16, __int16, patomic_opimpl_store_16_explicit,
+    SHOW_P, order, do_store_explicit_16
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int16, __int16, patomic_opimpl_store_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_store_explicit_16
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int16, __int16, patomic_opimpl_store_16_release,
+        HIDE_P, patomic_RELEASE, do_store_explicit_16
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int16, __int16, patomic_opimpl_store_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_store_explicit_16
+    )
+#endif
+
+#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int16, __int16, patomic_opimpl_store_16_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_16
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int16, __int16, patomic_opimpl_store_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_16
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int16, __int16, patomic_opimpl_store_16_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_16
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int16, __int16, patomic_opimpl_store_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_16
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{STORE, EXCHANGE}_16 */
+
+
+/**
+ * Defines patomic_opimpl_store_32_<order> with order:
+ * - relaxed
+ * - release
+ * - seq_cst
+ * - explicit
+ *
+ * There is no acquire variant.
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_32 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_32
+
+#define do_store_explicit_32(type, obj, des, order) \
+    do_store_raw_explicit_n(32, type, obj, des, order)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_32 */
+
+#define do_store_explicit_32(type, obj, des, order)          \
+    do {                                                     \
+        type res;                                            \
+        do_exchange_explicit_32(type, obj, des, order, res); \
+        PATOMIC_IGNORE_UNUSED(res);                          \
+    }                                                        \
+    while (0)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_STORE_32 */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int32, __int32, patomic_opimpl_store_32_explicit,
+    SHOW_P, order, do_store_explicit_32
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int32, __int32, patomic_opimpl_store_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_store_explicit_32
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int32, __int32, patomic_opimpl_store_32_release,
+        HIDE_P, patomic_RELEASE, do_store_explicit_32
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int32, __int32, patomic_opimpl_store_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_store_explicit_32
+    )
+#endif
+
+#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int32, __int32, patomic_opimpl_store_32_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_32
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int32, __int32, patomic_opimpl_store_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_32
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int32, __int32, patomic_opimpl_store_32_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_32
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int32, __int32, patomic_opimpl_store_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_32
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{STORE, EXCHANGE}_32 */
+
+
+/**
+ * Defines patomic_opimpl_store_64_<order> with order:
+ * - relaxed
+ * - release
+ * - seq_cst
+ * - explicit
+ *
+ * There is no acquire variant.
+ */
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 || \
+    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_STORE_64
+
+#define do_store_explicit_64(type, obj, des, order) \
+    do_store_raw_explicit_n(64, type, obj, des, order)
+
+#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_64 */
+
+#define do_store_explicit_64(type, obj, des, order)          \
+    do {                                                     \
+        type res;                                            \
+        do_exchange_explicit_64(type, obj, des, order, res); \
+        PATOMIC_IGNORE_UNUSED(res);                          \
+    }                                                        \
+    while (0)
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_STORE_64 */
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int64, __int64, patomic_opimpl_store_64_explicit,
+    SHOW_P, order, do_store_explicit_64
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+    __int64, __int64, patomic_opimpl_store_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_store_explicit_64
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int64, __int64, patomic_opimpl_store_64_release,
+        HIDE_P, patomic_RELEASE, do_store_explicit_64
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_STORE(
+        __int64, __int64, patomic_opimpl_store_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_store_explicit_64
+    )
+#endif
+
+#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int64, __int64, patomic_opimpl_store_64_explicit,
+    SHOW_P, order, do_cmpxchg_explicit_64
+)
+
+PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+    __int64, __int64, patomic_opimpl_store_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_64
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int64, __int64, patomic_opimpl_store_64_release,
+        HIDE_P, patomic_RELEASE, do_cmpxchg_explicit_64
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
+        __int64, __int64, patomic_opimpl_store_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_cmpxchg_explicit_64
+    )
+#endif
+
+#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_{STORE, EXCHANGE}_64 */
+
+
 #endif  /* defined(_MSC_VER) */
 
 #endif  /* PATOMIC_IMPL_MSVC_OPS_LDST_STORE_H */
