@@ -85,11 +85,7 @@ void __dmb(unsigned int);
 
 
 #if defined(_M_IX86) || defined(_M_X64)
-#if PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32
 #if PATOMIC_IMPL_MSVC_HAS_COMPILER_READ_WRITE_BARRIER
-
-long _InterlockedIncrement(long volatile *);
-#pragma intrinsic(_InterlockedIncrement)
 
 void _ReadWriteBarrier(void);
 #pragma intrinsic(_ReadWriteBarrier)
@@ -104,7 +100,7 @@ void _ReadWriteBarrier(void);
 #define do_load_explicit_n(n, type, obj, order, res) \
     do {                                             \
         /* intentionally uninitialized */            \
-        volatile long _guard;                        \
+        volatile long guard;                         \
         switch (order)                               \
         {                                            \
             case patomic_RELAXED:                    \
@@ -121,15 +117,12 @@ void _ReadWriteBarrier(void);
             default:                                 \
                 _ReadWriteBarrier();                 \
                 res = do_volatile_load_##n(obj);     \
-                PATOMIC_IGNORE_UNUSED(               \
-                    _InterlockedIncrement(&_guard)   \
-                );                                   \
+                _ReadWriteBarrier();                 \
         }                                            \
     }                                                \
     while (0)
 
 #endif  /* PATOMIC_IMPL_MSVC_HAS_COMPILER_READ_WRITE_BARRIER */
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_INCREMENT_32 */
 #endif  /* defined(_M_IX86) || defined(_M_X64) */
 
 
