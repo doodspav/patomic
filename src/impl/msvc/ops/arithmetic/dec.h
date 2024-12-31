@@ -47,11 +47,11 @@
     }                                                          \
     while (0)
 
-#define do_fetch_dec_sub_explicit_n(n, type, obj, order, res)   \
-    do {                                                        \
-        type arg = (type) 1;                                    \
-        do_fetch_sub_explicit_n(n, type, obj, arg, order, res); \
-    }                                                           \
+#define do_fetch_dec_sub_explicit_n(n, type, obj, order, res)  \
+    do {                                                       \
+        type arg = (type) 1;                                   \
+        do_fetch_sub_explicit_##n(type, obj, arg, order, res); \
+    }                                                          \
     while (0)
 
 #define do_void_dec_sub_explicit_n(n, type, obj, order)        \
@@ -86,7 +86,9 @@
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_8 || \
-    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8
+    defined(do_fetch_sub_explicit_8)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_8 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_8
 
@@ -111,7 +113,7 @@ char _InterlockedDecrement8(char volatile *);
 #define do_fetch_dec_explicit_8(type, obj, order, res) \
     do_fetch_dec_raw_explicit_n(8, type, obj, order, res)
 
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8 */
+#else  /* defined(do_fetch_sub_explicit_8) */
 
 #define do_void_dec_explicit_8(type, obj, order) \
     do_void_dec_sub_explicit_n(8, type, obj, order)
@@ -169,7 +171,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
+#elif defined(do_cmpxchg_explicit_8)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_8 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
     char, char, patomic_opimpl_void_dec_8_explicit,
@@ -231,7 +235,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_16 || \
-    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16
+    defined(do_fetch_sub_explicit_16)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_16 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_16
 
@@ -256,7 +262,7 @@ short _InterlockedDecrement16(short volatile *);
 #define do_fetch_dec_explicit_16(type, obj, order, res) \
     do_fetch_dec_raw_explicit_n(16, type, obj, order, res)
 
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16 */
+#else  /* defined(do_fetch_sub_explicit_16) */
 
 #define do_void_dec_explicit_16(type, obj, order) \
     do_void_dec_sub_explicit_n(16, type, obj, order)
@@ -314,7 +320,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
+#elif defined(do_cmpxchg_explicit_16)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_16 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
     short, short, patomic_opimpl_void_dec_16_explicit,
@@ -376,7 +384,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_32 || \
-    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32
+    defined(do_fetch_sub_explicit_32)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_32 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_32
 
@@ -405,7 +415,7 @@ long _InterlockedDecrement(long volatile *);
 #define do_fetch_dec_explicit_32(type, obj, order, res) \
     do_fetch_dec_raw_explicit_n(32, type, obj, order, res)
 
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32 */
+#else  /* defined(do_fetch_sub_explicit_32) */
 
 #define do_void_dec_explicit_32(type, obj, order) \
     do_void_dec_sub_explicit_n(32, type, obj, order)
@@ -463,7 +473,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
+#elif defined(do_cmpxchg_explicit_32)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_32 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
     long, long, patomic_opimpl_void_dec_32_explicit,
@@ -525,7 +537,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_64 || \
-    PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64
+    defined(do_fetch_sub_explicit_64)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_64 1
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_DECREMENT_64
 
@@ -550,7 +564,7 @@ __int64 _InterlockedDecrement64(__int64 volatile *);
 #define do_fetch_dec_explicit_64(type, obj, order, res) \
     do_fetch_dec_raw_explicit_n(64, type, obj, order, res)
 
-#else  /* PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64 */
+#else  /* defined(do_fetch_sub_explicit_64) */
 
 #define do_void_dec_explicit_64(type, obj, order) \
     do_void_dec_sub_explicit_n(64, type, obj, order)
@@ -608,7 +622,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
+#elif defined(do_cmpxchg_explicit_64)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_64 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
     __int64, __int64, patomic_opimpl_void_dec_64_explicit,
@@ -669,7 +685,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+#if defined(do_cmpxchg_explicit_128)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_DEC_128 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID_NOARG(
     patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_dec_128_explicit,
@@ -719,7 +737,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH_NOARG(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+#endif  /* defined(do_cmpxchg_explicit_128) */
 
 
 #endif  /* defined(_MSC_VER) */

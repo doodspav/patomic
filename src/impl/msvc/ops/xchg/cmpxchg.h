@@ -306,7 +306,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_CMPXCHG(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
 
-#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_1288 1
+#define PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_128 1
 
 unsigned char _InterlockedCompareExchange128(__int64 volatile *, __int64, __int64, __int64 *);
 #pragma intrinsic(_InterlockedCompareExchange128)

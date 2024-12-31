@@ -72,6 +72,8 @@
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_8
 
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_8 1
+
 char _InterlockedExchangeAdd8(char volatile *, char);
 #pragma intrinsic(_InterlockedExchangeAdd8)
 
@@ -141,7 +143,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
+#elif defined(do_cmpxchg_explicit_8)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_8 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
     char, char, patomic_opimpl_void_sub_8_explicit,
@@ -203,6 +207,8 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_16
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_16 1
 
 short _InterlockedExchangeAdd16(short volatile *, short);
 #pragma intrinsic(_InterlockedExchangeAdd16)
@@ -273,7 +279,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
+#elif defined(do_cmpxchg_explicit_16)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_16 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
     short, short, patomic_opimpl_void_sub_16_explicit,
@@ -335,6 +343,8 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_32
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_32 1
 
 long _InterlockedExchangeAdd(long volatile *, long);
 #pragma intrinsic(_InterlockedExchangeAdd)
@@ -409,7 +419,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
+#elif defined(do_cmpxchg_explicit_32)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_32 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
     long, long, patomic_opimpl_void_sub_32_explicit,
@@ -471,6 +483,8 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
  * - explicit
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_EXCHANGE_ADD_64
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_64 1
 
 __int64 _InterlockedExchangeAdd64(__int64 volatile *, __int64);
 #pragma intrinsic(_InterlockedExchangeAdd64)
@@ -541,7 +555,9 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_FETCH(
     )
 #endif
 
-#elif PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
+#elif defined(do_cmpxchg_explicit_64)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_64 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
     __int64, __int64, patomic_opimpl_void_sub_64_explicit,
@@ -602,7 +618,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+#if defined(do_cmpxchg_explicit_128)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_SUB_128 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_VOID(
     patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_void_sub_128_explicit,
@@ -652,7 +670,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_FETCH(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+#endif  /* defined(do_cmpxchg_explicit_128) */
 
 
 #endif  /* defined(_MSC_VER) */
