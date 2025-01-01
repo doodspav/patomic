@@ -40,16 +40,21 @@
 
 
 /* necessary because these are never implemented or defined */
-#define patomic_opimpl_load_8_release   NULL
-#define patomic_opimpl_load_16_release  NULL
-#define patomic_opimpl_load_32_release  NULL
-#define patomic_opimpl_load_64_release  NULL
-#define patomic_opimpl_load_128_release NULL
 #define patomic_opimpl_store_8_acquire   NULL
 #define patomic_opimpl_store_16_acquire  NULL
 #define patomic_opimpl_store_32_acquire  NULL
 #define patomic_opimpl_store_64_acquire  NULL
 #define patomic_opimpl_store_128_acquire NULL
+#define patomic_opimpl_load_8_release   NULL
+#define patomic_opimpl_load_16_release  NULL
+#define patomic_opimpl_load_32_release  NULL
+#define patomic_opimpl_load_64_release  NULL
+#define patomic_opimpl_load_128_release NULL
+#define patomic_opimpl_bit_test_8_release   NULL
+#define patomic_opimpl_bit_test_16_release  NULL
+#define patomic_opimpl_bit_test_32_release  NULL
+#define patomic_opimpl_bit_test_64_release  NULL
+#define patomic_opimpl_bit_test_128_release NULL
 
 
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
