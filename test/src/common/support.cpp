@@ -24,7 +24,10 @@ supported_widths()
         sizeof(short),
         sizeof(int),
         sizeof(long),
-        sizeof(long long)
+        sizeof(long long),
+
+        // msvc implementation
+        1, 2, 4, 8, 16
     };
     return { widths.begin(), widths.end() };
 }
