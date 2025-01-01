@@ -95,8 +95,7 @@ void _ReadWriteBarrier(void);
 
 #define do_load_explicit_n(n, type, obj, order, res) \
     do {                                             \
-        /* intentionally uninitialized */            \
-        volatile long guard;                         \
+        volatile long guard = 0l;                    \
         switch (order)                               \
         {                                            \
             case patomic_RELAXED:                    \
@@ -112,6 +111,7 @@ void _ReadWriteBarrier(void);
                 res = do_volatile_load_##n(obj);     \
                 _ReadWriteBarrier();                 \
         }                                            \
+        PATOMIC_IGNORE_UNUSED(guard);                \
     }                                                \
     while (0)
 

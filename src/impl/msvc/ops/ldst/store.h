@@ -157,8 +157,7 @@ void _ReadWriteBarrier(void);
 
 #define do_store_raw_explicit_n(n, type, obj, des, order) \
     do {                                                  \
-        /* intentionally uninitialized */                 \
-        volatile long guard;                              \
+        volatile long guard = 0l;                         \
         switch (order)                                    \
         {                                                 \
             case patomic_RELAXED:                         \
@@ -541,12 +540,12 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
 #define PATOMIC_IMPL_MSVC_HAS_OP_STORE_128 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
-    __int128, __int128, patomic_opimpl_store_128_explicit,
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_store_128_explicit,
     SHOW_P, order, do_cmpxchg_explicit_128
 )
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_STORE(
-    __int128, __int128, patomic_opimpl_store_128_seq_cst,
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_store_128_seq_cst,
     HIDE_P, patomic_SEQ_CST, do_cmpxchg_explicit_128
 )
 
