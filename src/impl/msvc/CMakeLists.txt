@@ -8,4 +8,5 @@ add_subdirectory(ops)
 target_sources(${target_name} PRIVATE
     msvc.h
     msvc.c
+    ops.h
 )
