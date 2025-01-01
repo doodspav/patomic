@@ -57,7 +57,9 @@
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8
+#if defined(do_cmpxchg_explicit_8)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_8 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     char, char, patomic_opimpl_bit_test_compl_8_explicit,
@@ -92,7 +94,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_8 */
+#endif  /* defined(do_cmpxchg_explicit_8) */
 
 
 /**
@@ -103,7 +105,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16
+#if defined(do_cmpxchg_explicit_16)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_16 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     short, short, patomic_opimpl_bit_test_compl_16_explicit,
@@ -138,7 +142,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_16 */
+#endif  /* defined(do_cmpxchg_explicit_16) */
 
 
 /**
@@ -149,7 +153,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32
+#if defined(do_cmpxchg_explicit_32)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_32 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     long, long, patomic_opimpl_bit_test_compl_32_explicit,
@@ -184,7 +190,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_32 */
+#endif  /* defined(do_cmpxchg_explicit_32) */
 
 
 /**
@@ -195,7 +201,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64
+#if defined(do_cmpxchg_explicit_64)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_64 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     __int64, __int64, patomic_opimpl_bit_test_compl_64_explicit,
@@ -230,7 +238,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_64 */
+#endif  /* defined(do_cmpxchg_explicit_64) */
 
 
 /**
@@ -241,7 +249,9 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
  * - seq_cst
  * - explicit
  */
-#if PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128
+#if defined(do_cmpxchg_explicit_128)
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_128 1
 
 PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_compl_128_explicit,
@@ -276,7 +286,7 @@ PATOMIC_WRAPPED_CMPXCHG_DEFINE_OP_BIT_TEST_MODIFY(
     )
 #endif
 
-#endif  /* PATOMIC_IMPL_MSVC_HAS_IL_COMPARE_EXCHANGE_128 */
+#endif  /* defined(do_cmpxchg_explicit_128) */
 
 
 #endif  /* defined(_MSC_VER) */
