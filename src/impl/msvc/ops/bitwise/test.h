@@ -131,6 +131,153 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
 #endif
 
 
+/**
+ * Defines patomic_opimpl_bit_test_16_<order> with order:
+ * - relaxed
+ * - acquire
+ * - seq_cst
+ * - explicit
+ *
+ * There is no release variant.
+ */
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_16 1
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    __int16, __int16, patomic_opimpl_bit_test_16_explicit,
+    SHOW_P, order, do_bit_test_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    __int16, __int16, patomic_opimpl_bit_test_16_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        __int16, __int16, patomic_opimpl_bit_test_16_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        __int16, __int16, patomic_opimpl_bit_test_16_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_explicit
+    )
+#endif
+
+
+/**
+ * Defines patomic_opimpl_bit_test_32_<order> with order:
+ * - relaxed
+ * - acquire
+ * - seq_cst
+ * - explicit
+ *
+ * There is no release variant.
+ */
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_32 1
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    __int32, __int32, patomic_opimpl_bit_test_32_explicit,
+    SHOW_P, order, do_bit_test_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    __int32, __int32, patomic_opimpl_bit_test_32_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        __int32, __int32, patomic_opimpl_bit_test_32_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        __int32, __int32, patomic_opimpl_bit_test_32_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_explicit
+    )
+#endif
+
+
+/**
+ * Defines patomic_opimpl_bit_test_64_<order> with order:
+ * - relaxed
+ * - acquire
+ * - seq_cst
+ * - explicit
+ *
+ * There is no release variant.
+ */
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_64 1
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    __int64, __int64, patomic_opimpl_bit_test_64_explicit,
+    SHOW_P, order, do_bit_test_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    __int64, __int64, patomic_opimpl_bit_test_64_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        __int64, __int64, patomic_opimpl_bit_test_64_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        __int64, __int64, patomic_opimpl_bit_test_64_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_explicit
+    )
+#endif
+
+
+/**
+ * Defines patomic_opimpl_bit_test_128_<order> with order:
+ * - relaxed
+ * - acquire
+ * - seq_cst
+ * - explicit
+ *
+ * There is no release variant.
+ */
+
+#define PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_128 1
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_128_explicit,
+    SHOW_P, order, do_bit_test_explicit
+)
+
+PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+    patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_128_seq_cst,
+    HIDE_P, patomic_SEQ_CST, do_bit_test_explicit
+)
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_128_acquire,
+        HIDE_P, patomic_ACQUIRE, do_bit_test_explicit
+    )
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    PATOMIC_WRAPPED_DIRECT_DEFINE_OP_BIT_TEST(
+        patomic_msvc128_t, patomic_msvc128_t, patomic_opimpl_bit_test_128_relaxed,
+        HIDE_P, patomic_RELAXED, do_bit_test_explicit
+    )
+#endif
+
 
 #endif  /* defined(do_bit_test_explicit) */
 
