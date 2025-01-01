@@ -70,7 +70,6 @@ void __dmb(unsigned int);
             case patomic_ACQ_REL:                    \
             case patomic_SEQ_CST:                    \
             default:                                 \
-                _ReadWriteBarrier();                 \
                 res = do_volatile_load_##n(obj);     \
                 __dmb(0xB);                          \
         }                                            \
