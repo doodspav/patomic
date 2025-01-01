@@ -39,6 +39,19 @@
 #include "ops/arithmetic/neg.h"
 
 
+/* necessary because these are never implemented or defined */
+#define patomic_opimpl_load_8_release   NULL
+#define patomic_opimpl_load_16_release  NULL
+#define patomic_opimpl_load_32_release  NULL
+#define patomic_opimpl_load_64_release  NULL
+#define patomic_opimpl_load_128_release NULL
+#define patomic_opimpl_store_8_acquire   NULL
+#define patomic_opimpl_store_16_acquire  NULL
+#define patomic_opimpl_store_32_acquire  NULL
+#define patomic_opimpl_store_64_acquire  NULL
+#define patomic_opimpl_store_128_acquire NULL
+
+
 #if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
     #define VIS_FP_ACQ(expr) expr
     #define VIS_FP_REL(expr) expr
