@@ -192,6 +192,17 @@ patomic_impl_create_msvc(
             DO_SWITCH(byte_width, impl, seq_cst)
     }
 
+    /* take care of load/store operations */
+    if (!PATOMIC_IS_VALID_STORE_ORDER(order))
+    {
+        impl.ops.fp_store = NULL;
+    }
+    if (!PATOMIC_IS_VALID_LOAD_ORDER(order))
+    {
+        impl.ops.fp_load = NULL;
+        impl.ops.bitwise_ops.fp_test = NULL;
+    }
+
     /* return */
     return impl;
 }
