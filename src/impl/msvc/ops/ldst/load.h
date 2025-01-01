@@ -66,14 +66,10 @@ void __dmb(unsigned int);
                 break;                               \
             case patomic_CONSUME:                    \
             case patomic_ACQUIRE:                    \
-                res = do_volatile_load_##n(obj);     \
-                __dmb(0xB);                          \
-                break;                               \
             case patomic_RELEASE:                    \
             case patomic_ACQ_REL:                    \
             case patomic_SEQ_CST:                    \
             default:                                 \
-                __dmb(0xB);                          \
                 res = do_volatile_load_##n(obj);     \
                 __dmb(0xB);                          \
         }                                            \
@@ -108,9 +104,6 @@ void _ReadWriteBarrier(void);
                 break;                               \
             case patomic_CONSUME:                    \
             case patomic_ACQUIRE:                    \
-                res = do_volatile_load_##n(obj);     \
-                _ReadWriteBarrier();                 \
-                break;                               \
             case patomic_RELEASE:                    \
             case patomic_ACQ_REL:                    \
             case patomic_SEQ_CST:                    \
@@ -137,7 +130,7 @@ void _ReadWriteBarrier(void);
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_8
 
-#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_8
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_8 1
 
 #define do_load_explicit_8(type, obj, order, res) \
     do_load_explicit_n(8, type, obj, order, res)
@@ -180,7 +173,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_16
 
-#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_16
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_16 1
 
 #define do_load_explicit_16(type, obj, order, res) \
     do_load_explicit_n(16, type, obj, order, res)
@@ -223,7 +216,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_32
 
-#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_32
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_32 1
 
 #define do_load_explicit_32(type, obj, order, res) \
     do_load_explicit_n(32, type, obj, order, res)
@@ -266,7 +259,7 @@ PATOMIC_WRAPPED_DIRECT_DEFINE_OP_LOAD(
  */
 #if PATOMIC_IMPL_MSVC_HAS_IL_LOAD_64
 
-#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_64
+#define PATOMIC_IMPL_MSVC_HAS_OP_LOAD_64 1
 
 #define do_load_explicit_64(type, obj, order, res) \
     do_load_explicit_n(64, type, obj, order, res)
