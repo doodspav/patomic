@@ -6,6 +6,8 @@
 
 #ifdef _MSC_VER
 
+#include <stddef.h>
+
 
 /* DO NOT CHANGE ORDER WITHOUT CHECKING DEPENDENCIES */
 
@@ -37,208 +39,533 @@
 #include "ops/arithmetic/neg.h"
 
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_STORE_8
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_8 1
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+    #define VIS_FP_ACQ(expr) expr
+    #define VIS_FP_REL(expr) expr
+#else
+    #define VIS_FP_ACQ(expr)
+    #define VIS_FP_REL(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_8
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_8 1
-#endif
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_8       || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_8
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_8 1
-#endif
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_OR_8  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_XOR_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_AND_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NOT_8
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_8 1
-#endif
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_SUB_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_INC_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_DEC_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NEG_8             
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_8 1
-#endif
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_8    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_8    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_8 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_8  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_8
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_8 1
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+    #define VIS_FP_NF(expr) expr
+#else
+    #define VIS_FP_NF(expr)
 #endif
 
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_STORE_16
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_16 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_8
+    #define VIS_FP_LOAD_8(expr) expr
+#else
+    #define VIS_FP_LOAD_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_16
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_16 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_STORE_8
+    #define VIS_FP_STORE_8(expr) expr
+#else
+    #define VIS_FP_STORE_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_16       || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_16
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_16 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_8
+    #define VIS_FP_COMPARE_EXCHANGE_8(expr) expr
+#else
+    #define VIS_FP_COMPARE_EXCHANGE_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_OR_16  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_XOR_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_AND_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NOT_16
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_16 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_8
+    #define VIS_FP_EXCHANGE_8(expr) expr
+#else
+    #define VIS_FP_EXCHANGE_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_SUB_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_INC_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_DEC_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NEG_16
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_16 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_8
+    #define VIS_FP_BIT_TEST_8(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_16    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_16    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_16 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_16  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_16
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_16 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_8
+    #define VIS_FP_BIT_TEST_COMPL_8(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_COMPL_8(expr)
 #endif
 
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_STORE_32
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_32 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_8
+    #define VIS_FP_BIT_TEST_RESET_8(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_RESET_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_32
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_32 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_8
+    #define VIS_FP_BIT_TEST_SET_8(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_SET_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_32       || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_32
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_32 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_OR_8
+    #define VIS_FP_OR_8(expr) expr
+#else
+    #define VIS_FP_OR_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_OR_32  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_XOR_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_AND_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NOT_32
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_32 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_XOR_8
+    #define VIS_FP_XOR_8(expr) expr
+#else
+    #define VIS_FP_XOR_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_SUB_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_INC_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_DEC_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NEG_32
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_32 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_AND_8
+    #define VIS_FP_AND_8(expr) expr
+#else
+    #define VIS_FP_AND_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_32    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_32    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_32 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_32  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_32
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_32 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_NOT_8
+    #define VIS_FP_NOT_8(expr) expr
+#else
+    #define VIS_FP_NOT_8(expr)
 #endif
 
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_STORE_64
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_64 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_8
+    #define VIS_FP_ADD_8(expr) expr
+#else
+    #define VIS_FP_ADD_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_64
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_64 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_SUB_8
+    #define VIS_FP_SUB_8(expr) expr
+#else
+    #define VIS_FP_SUB_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_64       || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_64
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_64 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_INC_8
+    #define VIS_FP_INC_8(expr) expr
+#else
+    #define VIS_FP_INC_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_OR_64  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_XOR_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_AND_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NOT_64
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_64 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_DEC_8
+    #define VIS_FP_DEC_8(expr) expr
+#else
+    #define VIS_FP_DEC_8(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_SUB_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_INC_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_DEC_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NEG_64
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_64 1
-#endif
-
-#if PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_64    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_64    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_64 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_64  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_64
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_64 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_NEG_8
+    #define VIS_FP_NEG_8(expr) expr
+#else
+    #define VIS_FP_NEG_8(expr)
 #endif
 
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_STORE_128
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_128 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_16
+    #define VIS_FP_LOAD_16(expr) expr
+#else
+    #define VIS_FP_LOAD_16(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_128
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_128 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_STORE_16
+    #define VIS_FP_STORE_16(expr) expr
+#else
+    #define VIS_FP_STORE_16(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_128       || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_128
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_128 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_16
+    #define VIS_FP_COMPARE_EXCHANGE_16(expr) expr
+#else
+    #define VIS_FP_COMPARE_EXCHANGE_16(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_OR_128  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_XOR_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_AND_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NOT_128
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_128 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_16
+    #define VIS_FP_EXCHANGE_16(expr) expr
+#else
+    #define VIS_FP_EXCHANGE_16(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_SUB_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_INC_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_DEC_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_NEG_128
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_128 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_16
+    #define VIS_FP_BIT_TEST_16(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_16(expr)
 #endif
 
-#if PATOMIC_IMPL_MSVC_HAS_OP_ANY_LDST_128    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_XCHG_128    || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BITWISE_128 || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_BINARY_128  || \
-    PATOMIC_IMPL_MSVC_HAS_OP_ANY_ARITHMETIC_128
-#define PATOMIC_IMPL_MSVC_HAS_OP_ANY_128 1
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_16
+    #define VIS_FP_BIT_TEST_COMPL_16(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_COMPL_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_16
+    #define VIS_FP_BIT_TEST_RESET_16(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_RESET_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_16
+    #define VIS_FP_BIT_TEST_SET_16(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_SET_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_OR_16
+    #define VIS_FP_OR_16(expr) expr
+#else
+    #define VIS_FP_OR_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_XOR_16
+    #define VIS_FP_XOR_16(expr) expr
+#else
+    #define VIS_FP_XOR_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_AND_16
+    #define VIS_FP_AND_16(expr) expr
+#else
+    #define VIS_FP_AND_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NOT_16
+    #define VIS_FP_NOT_16(expr) expr
+#else
+    #define VIS_FP_NOT_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_16
+    #define VIS_FP_ADD_16(expr) expr
+#else
+    #define VIS_FP_ADD_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_SUB_16
+    #define VIS_FP_SUB_16(expr) expr
+#else
+    #define VIS_FP_SUB_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_INC_16
+    #define VIS_FP_INC_16(expr) expr
+#else
+    #define VIS_FP_INC_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_DEC_16
+    #define VIS_FP_DEC_16(expr) expr
+#else
+    #define VIS_FP_DEC_16(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NEG_16
+    #define VIS_FP_NEG_16(expr) expr
+#else
+    #define VIS_FP_NEG_16(expr)
+#endif
+
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_32
+    #define VIS_FP_LOAD_32(expr) expr
+#else
+    #define VIS_FP_LOAD_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_STORE_32
+    #define VIS_FP_STORE_32(expr) expr
+#else
+    #define VIS_FP_STORE_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_32
+    #define VIS_FP_COMPARE_EXCHANGE_32(expr) expr
+#else
+    #define VIS_FP_COMPARE_EXCHANGE_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_32
+    #define VIS_FP_EXCHANGE_32(expr) expr
+#else
+    #define VIS_FP_EXCHANGE_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_32
+    #define VIS_FP_BIT_TEST_32(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_32
+    #define VIS_FP_BIT_TEST_COMPL_32(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_COMPL_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_32
+    #define VIS_FP_BIT_TEST_RESET_32(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_RESET_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_32
+    #define VIS_FP_BIT_TEST_SET_32(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_SET_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_OR_32
+    #define VIS_FP_OR_32(expr) expr
+#else
+    #define VIS_FP_OR_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_XOR_32
+    #define VIS_FP_XOR_32(expr) expr
+#else
+    #define VIS_FP_XOR_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_AND_32
+    #define VIS_FP_AND_32(expr) expr
+#else
+    #define VIS_FP_AND_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NOT_32
+    #define VIS_FP_NOT_32(expr) expr
+#else
+    #define VIS_FP_NOT_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_32
+    #define VIS_FP_ADD_32(expr) expr
+#else
+    #define VIS_FP_ADD_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_SUB_32
+    #define VIS_FP_SUB_32(expr) expr
+#else
+    #define VIS_FP_SUB_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_INC_32
+    #define VIS_FP_INC_32(expr) expr
+#else
+    #define VIS_FP_INC_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_DEC_32
+    #define VIS_FP_DEC_32(expr) expr
+#else
+    #define VIS_FP_DEC_32(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NEG_32
+    #define VIS_FP_NEG_32(expr) expr
+#else
+    #define VIS_FP_NEG_32(expr)
+#endif
+
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_64
+    #define VIS_FP_LOAD_64(expr) expr
+#else
+    #define VIS_FP_LOAD_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_STORE_64
+    #define VIS_FP_STORE_64(expr) expr
+#else
+    #define VIS_FP_STORE_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_64
+    #define VIS_FP_COMPARE_EXCHANGE_64(expr) expr
+#else
+    #define VIS_FP_COMPARE_EXCHANGE_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_64
+    #define VIS_FP_EXCHANGE_64(expr) expr
+#else
+    #define VIS_FP_EXCHANGE_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_64
+    #define VIS_FP_BIT_TEST_64(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_64
+    #define VIS_FP_BIT_TEST_COMPL_64(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_COMPL_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_64
+    #define VIS_FP_BIT_TEST_RESET_64(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_RESET_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_64
+    #define VIS_FP_BIT_TEST_SET_64(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_SET_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_OR_64
+    #define VIS_FP_OR_64(expr) expr
+#else
+    #define VIS_FP_OR_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_XOR_64
+    #define VIS_FP_XOR_64(expr) expr
+#else
+    #define VIS_FP_XOR_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_AND_64
+    #define VIS_FP_AND_64(expr) expr
+#else
+    #define VIS_FP_AND_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NOT_64
+    #define VIS_FP_NOT_64(expr) expr
+#else
+    #define VIS_FP_NOT_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_64
+    #define VIS_FP_ADD_64(expr) expr
+#else
+    #define VIS_FP_ADD_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_SUB_64
+    #define VIS_FP_SUB_64(expr) expr
+#else
+    #define VIS_FP_SUB_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_INC_64
+    #define VIS_FP_INC_64(expr) expr
+#else
+    #define VIS_FP_INC_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_DEC_64
+    #define VIS_FP_DEC_64(expr) expr
+#else
+    #define VIS_FP_DEC_64(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NEG_64
+    #define VIS_FP_NEG_64(expr) expr
+#else
+    #define VIS_FP_NEG_64(expr)
+#endif
+
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_LOAD_128
+    #define VIS_FP_LOAD_128(expr) expr
+#else
+    #define VIS_FP_LOAD_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_STORE_128
+    #define VIS_FP_STORE_128(expr) expr
+#else
+    #define VIS_FP_STORE_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_COMPARE_EXCHANGE_128
+    #define VIS_FP_COMPARE_EXCHANGE_128(expr) expr
+#else
+    #define VIS_FP_COMPARE_EXCHANGE_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_EXCHANGE_128
+    #define VIS_FP_EXCHANGE_128(expr) expr
+#else
+    #define VIS_FP_EXCHANGE_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_128
+    #define VIS_FP_BIT_TEST_128(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_COMPL_128
+    #define VIS_FP_BIT_TEST_COMPL_128(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_COMPL_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_RESET_128
+    #define VIS_FP_BIT_TEST_RESET_128(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_RESET_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_BIT_TEST_SET_128
+    #define VIS_FP_BIT_TEST_SET_128(expr) expr
+#else
+    #define VIS_FP_BIT_TEST_SET_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_OR_128
+    #define VIS_FP_OR_128(expr) expr
+#else
+    #define VIS_FP_OR_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_XOR_128
+    #define VIS_FP_XOR_128(expr) expr
+#else
+    #define VIS_FP_XOR_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_AND_128
+    #define VIS_FP_AND_128(expr) expr
+#else
+    #define VIS_FP_AND_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NOT_128
+    #define VIS_FP_NOT_128(expr) expr
+#else
+    #define VIS_FP_NOT_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_ADD_128
+    #define VIS_FP_ADD_128(expr) expr
+#else
+    #define VIS_FP_ADD_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_SUB_128
+    #define VIS_FP_SUB_128(expr) expr
+#else
+    #define VIS_FP_SUB_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_INC_128
+    #define VIS_FP_INC_128(expr) expr
+#else
+    #define VIS_FP_INC_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_DEC_128
+    #define VIS_FP_DEC_128(expr) expr
+#else
+    #define VIS_FP_DEC_128(expr)
+#endif
+
+#if PATOMIC_IMPL_MSVC_HAS_OP_NEG_128
+    #define VIS_FP_NEG_128(expr) expr
+#else
+    #define VIS_FP_NEG_128(expr)
 #endif
 
 
