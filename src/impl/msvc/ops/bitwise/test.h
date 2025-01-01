@@ -26,8 +26,8 @@
  *   It shouldn't be affected by CET or equivalent pointer checks.
  *
  * @warning
- *   The value of 'n' represents the width of the internal operation, not the
- *   width of supported inputs.
+ *   The value of 'n' represents the bit width of the internal operation, not
+ *   the width of supported inputs.
  */
 #define do_bit_test_explicit_n(n, type, obj, offset, order, res)           \
     do {                                                                   \
@@ -37,7 +37,7 @@
             (patomic_intptr_unsigned_t) obj;                               \
                                                                            \
         /* declarations */                                                 \
-        patomic_intptr_unsigned_t new_addr = addr;                         \
+        patomic_intptr_unsigned_t new_addr;                                \
         patomic_intptr_unsigned_t addr_mask;                               \
         int new_offset = offset;                                           \
         const __int##n * new_obj;                                          \
@@ -52,7 +52,10 @@
         new_offset += (int) ((addr - new_addr) * CHAR_BIT);                \
                                                                            \
         /* update offset to be less than n */                              \
-        new_addr += (patomic_intptr_unsigned_t) (new_offset / n);          \
+        new_addr += (patomic_intptr_unsigned_t) (                          \
+            /* must be separate, do not combine */                         \
+            (new_offset / n) * (n / (int) CHAR_BIT)                        \
+        );                                                                 \
         new_offset %= n;                                                   \
                                                                            \
         /* load */                                                         \
