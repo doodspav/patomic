@@ -8,6 +8,8 @@
 
 #include "../base.h"
 
+#include <patomic/macros/static_assert.h>
+
 #include <patomic/stdlib/stdint.h>
 
 #include <patomic/wrapped/direct.h>
@@ -15,6 +17,9 @@
 #include <patomic/api/ops.h>
 
 #include <limits.h>
+
+
+#if PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_SET_32
 
 
 /**
@@ -25,6 +30,8 @@
  */
 #define do_bit_test_set_explicit(type, obj, offset, order, res)              \
     do {                                                                     \
+        PATOMIC_STATIC_ASSERT(char_bit_is_8, CHAR_BIT == 8u);                \
+                                                                             \
         const patomic_intptr_unsigned_t addr =                               \
             (patomic_intptr_unsigned_t) obj;                                 \
                                                                              \
@@ -58,9 +65,6 @@
         }                                                                    \
     }                                                                        \
     while (0)
-
-
-#if PATOMIC_IMPL_MSVC_HAS_IL_BIT_TEST_SET_32
 
 
 unsigned char _interlockedbittestandset(long *, long);
