@@ -140,7 +140,7 @@ TEST_P(BtLogicTransaction, fp_multi_cmpxchg)
     for (std::size_t width : m_widths)
     {
         // setup
-        SCOPED_TRACE(width);
+        SCOPED_TRACE("width: " + std::to_string(width));
         m_config_wfb.width = width;
 
         // wrap operation

@@ -37,7 +37,7 @@ test_fetch_xor(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
-        SCOPED_TRACE(i);
+        SCOPED_TRACE("index: " + std::to_string(i));
 
         // set up params
         object.inv_at(i);
@@ -72,7 +72,7 @@ test_fetch_xor(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
-        SCOPED_TRACE(i);
+        SCOPED_TRACE("index: " + std::to_string(i));
 
         // set up params
         object.inv_at(i);
@@ -214,7 +214,7 @@ TEST_P(BtLogicTransaction, fp_xor)
     for (std::size_t width : m_widths)
     {
         // setup
-        SCOPED_TRACE(width);
+        SCOPED_TRACE("width: " + std::to_string(width));
         m_config.width = width;
 
         // wrap operation
@@ -246,7 +246,7 @@ TEST_P(BtLogicTransaction, fp_fetch_xor)
     for (std::size_t width : m_widths)
     {
         // setup
-        SCOPED_TRACE(width);
+        SCOPED_TRACE("width: " + std::to_string(width));
         m_config.width = width;
 
         // wrap operation

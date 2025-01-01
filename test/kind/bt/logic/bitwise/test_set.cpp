@@ -28,7 +28,7 @@ test_test_set(
     // go through all bit offsets
     for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
-        SCOPED_TRACE(i);
+        SCOPED_TRACE("index: " + std::to_string(i));
 
         // 0 -> 1
         object_exp.inv_at(i);
@@ -52,7 +52,7 @@ test_test_set(
     // go through all bit offsets
     for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
-        SCOPED_TRACE(i);
+        SCOPED_TRACE("index: " + std::to_string(i));
 
         // 1 -> 1
         ASSERT_EQ(1, fp_test_set(object, i));
@@ -123,7 +123,7 @@ TEST_P(BtLogicTransaction, fp_test_set)
     for (std::size_t width : m_widths)
     {
         // setup
-        SCOPED_TRACE(width);
+        SCOPED_TRACE("width: " + std::to_string(width));
         m_config.width = width;
 
         // wrap operation
