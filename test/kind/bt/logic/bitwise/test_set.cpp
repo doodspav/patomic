@@ -28,6 +28,8 @@ test_test_set(
     // go through all bit offsets
     for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
+        SCOPED_TRACE(i);
+
         // 0 -> 1
         object_exp.inv_at(i);
         ASSERT_EQ(0, fp_test_set(object, i));
@@ -50,6 +52,8 @@ test_test_set(
     // go through all bit offsets
     for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
+        SCOPED_TRACE(i);
+
         // 1 -> 1
         ASSERT_EQ(1, fp_test_set(object, i));
         ASSERT_EQ(object, object_exp);

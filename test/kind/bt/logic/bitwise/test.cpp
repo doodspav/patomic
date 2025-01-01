@@ -28,6 +28,8 @@ test_test(
     // go through all bit offsets
     for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
+        SCOPED_TRACE(i);
+
         // 1
         object.inv_at(i);
         object_exp = object;
@@ -48,6 +50,8 @@ test_test(
     // go through all bit offsets
     for (int i = 0; i < static_cast<int>(object.bit_width()); ++i)
     {
+        SCOPED_TRACE(i);
+
         // 0
         object.inv_at(i);
         object_exp = object;

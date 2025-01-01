@@ -37,6 +37,8 @@ test_fetch_xor(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
+        SCOPED_TRACE(i);
+
         // set up params
         object.inv_at(i);
         object_old = object;
@@ -70,6 +72,8 @@ test_fetch_xor(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
+        SCOPED_TRACE(i);
+
         // set up params
         object.inv_at(i);
         object_old = object;
