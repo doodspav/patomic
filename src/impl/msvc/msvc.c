@@ -128,6 +128,29 @@ DEFINE_CREATE_OPS(128, ops, seq_cst)
 #endif
 
 
+#define DO_CASE(N, n, pao, order)                     \
+    case N:                                           \
+        pao.ops = patomic_ops_create_##n##_##order(); \
+        pao.align.recommended = N##u;                 \
+        pao.align.minimum = N##u;                     \
+        pao.align.size_within = 0u;                   \
+        break
+
+#define DO_SWITCH(width, pao, order)     \
+    switch (width)                       \
+    {                                    \
+        DO_CASE(1,  8,   pao, order);    \
+        DO_CASE(2,  16,  pao, order);    \
+        DO_CASE(4,  32,  pao, order);    \
+        DO_CASE(8,  64,  pao, order);    \
+        DO_CASE(16, 128, pao, order);    \
+        default:                         \
+            pao.align.recommended = 1ul; \
+            pao.align.minimum = 1ul;     \
+            pao.align.size_within = 0ul; \
+    }
+
+
 patomic_t
 patomic_impl_create_msvc(
     const size_t byte_width,
@@ -135,17 +158,39 @@ patomic_impl_create_msvc(
     const unsigned int options
 )
 {
-    /* create */
+    /* setup */
     patomic_t impl = {0};
-
-    /* ignore parameters */
     PATOMIC_IGNORE_UNUSED(options);
 
-    /* populate ops */
-
-    /* set a valid minimal alignment */
-    impl.align.recommended = 1;
-    impl.align.minimum = 1;
+    /* set members */
+    switch (order)
+    {
+#if PATOMIC_IMPL_MSVC_HAS_IL_NF
+        case patomic_RELAXED:
+            DO_SWITCH(byte_width, impl, relaxed)
+            break;
+#endif
+#if PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+        case patomic_CONSUME:
+        case patomic_ACQUIRE:
+            DO_SWITCH(byte_width, impl, acquire)
+            break;
+        case patomic_RELEASE:
+            DO_SWITCH(byte_width, impl, release)
+#endif
+#if !PATOMIC_IMPL_MSVC_HAS_IL_NF
+        case patomic_RELAXED:
+#endif
+#if !PATOMIC_IMPL_MSVC_HAS_IL_ACQ_REL
+        case patomic_CONSUME:
+        case patomic_ACQUIRE:
+        case patomic_RELEASE:
+#endif
+        case patomic_ACQ_REL:
+        case patomic_SEQ_CST:
+        default:
+            DO_SWITCH(byte_width, impl, seq_cst)
+    }
 
     /* return */
     return impl;
@@ -160,48 +205,10 @@ patomic_impl_create_explicit_msvc(
 {
     /* setup */
     patomic_explicit_t impl = {0};
-    patomic_align_t align = {0};
     PATOMIC_IGNORE_UNUSED(options);
 
-    /* prepare align */
-    align.recommended = byte_width;
-    align.minimum = byte_width;
-    align.size_within = 0;
-
     /* set members */
-    switch (byte_width)
-    {
-        case 1:
-            impl.ops = patomic_ops_create_8_explicit();
-            impl.align = align;
-            break;
-        case 2:
-            impl.ops = patomic_ops_create_16_explicit();
-            impl.align = align;
-            break;
-        case 4:
-            impl.ops = patomic_ops_create_32_explicit();
-            impl.align = align;
-            break;
-        case 8:
-            impl.ops = patomic_ops_create_64_explicit();
-            impl.align = align;
-            break;
-        case 16:
-            impl.ops = patomic_ops_create_128_explicit();
-            impl.align = align;
-#if defined(_M_IX86) || defined(_M_X64)
-            /* only native 128bit operation is cmpxchg16b on x86 platform */
-            /* this has no alignment requirement */
-            impl.align.minimum = 64u;
-#endif
-            break;
-        default:
-            /* align always has to be valid */
-            impl.align.recommended = 1;
-            impl.align.minimum = 1;
-            impl.align.size_within = 0;
-    }
+    DO_SWITCH(byte_width, impl, explicit)
 
     /* return */
     return impl;
