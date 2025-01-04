@@ -4,7 +4,8 @@ This library provides portable access to lock-free atomic operations at runtime
 through a unified C90 interface. 
 
 Transactional operations are also provided in a similar manner, except there is
-no guarantee that a transaction ever succeeds.
+no guarantee that a transaction ever succeeds. It should also be noted that
+platform support for transactional operations is very rare.
 
 The goal of this library is to provide the foundation for an atomics library in
 Python, however there is no reason it could not be used in any other language.
@@ -255,6 +256,9 @@ them on larger objects.
 They come with the drawback that the operation might never succeed; this always
 needs to be checked after calling the operation.
 
+Transactions also require hardware support, making it very unlikely that they
+are supported on most platforms.
+
 ```c
 /* setup */
 patomic_transaction_t pa = patomic_create_transaction(...);
@@ -263,13 +267,13 @@ int expected = 0;
 const int desired = 5;
 
 /* configure */
-patomic_transaction_config_wfb_t config {};
+patomic_transaction_config_wfb_t config = {0};
 config.width = sizeof(obj);
 config.attempts = 1000;
 config.fallback_attempts = 1000;
 
 /* perform operation (checks omitted) */
-patomic_transaction_result_wfb_t result {};
+patomic_transaction_result_wfb_t result = {0};
 int ok = pa.ops.xchg_ops.fp_cmpxchg_weak(
     &obj, &expected, &desired, config, &result
 );
@@ -326,7 +330,7 @@ int obj;
 unsigned int kinds = patomic_opkind_ADD;
 kinds = patomic_feature_check_leaf(
     &pa.ops,
-    patomic_opcat_ARI_F
+    patomic_opcat_ARI_F,
     kinds
 );
 assert(kinds == 0);
@@ -365,7 +369,7 @@ int obj;
 unsigned int kinds = patomic_opkind_ADD;
 kinds = patomic_feature_check_leaf_explicit(
     &pa.ops,
-    patomic_opcat_ARI_F
+    patomic_opcat_ARI_F,
     kinds
 );
 assert(kinds == 0);
@@ -403,7 +407,7 @@ int obj;
 unsigned int kinds = patomic_opkind_ADD;
 kinds = patomic_feature_check_leaf_transaction(
     &pa.ops,
-    patomic_opcat_ARI_F
+    patomic_opcat_ARI_F,
     kinds
 );
 assert(kinds == 0);
@@ -412,10 +416,10 @@ assert(kinds == 0);
 obj = 1;
 const int arg = 5;
 int ret;
-patomic_transaction_config_t config {};
+patomic_transaction_config_t config = {0};
 config.width = sizeof(obj);
 config.attempts = 1000;
-patomic_transaction_config_t result {};
+patomic_transaction_result_t result = {0};
 pa.ops.arithmetic_ops.fp_fetch_add(&obj, &arg, &ret, config, &result);
 
 /* check transaction */
@@ -429,7 +433,7 @@ assert(ret == 1);
 
 # Traps and Pitfalls
 
-The biggest pitfall is not reading the documentation. These are some others:
+The biggest pitfall is not reading the documentation. Here are some others:
 
 ##### 1.
 
@@ -441,7 +445,8 @@ where both signed and unsigned objects have the same representation.
 ##### 2.
 
 Where multiple integer types have the same width, non-transaction atomic
-operations for that width will use the highest ranking unsigned integer type.
+operations for that width will use the highest ranking unsigned integer type
+which can be used for atomic operations.
 
 This could cause issues on platforms where multiple integer types have the same
 width but different representations (e.g. one has trap bits).

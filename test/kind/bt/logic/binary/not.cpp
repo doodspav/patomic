@@ -33,6 +33,8 @@ test_fetch_not(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
+        SCOPED_TRACE("index: " + std::to_string(i));
+
         // set up object
         object.inv_at(i);
         object_old = object;
@@ -53,6 +55,8 @@ test_fetch_not(
     // go through all bit offsets
     for (std::size_t i = 0; i < object.bit_width(); ++i)
     {
+        SCOPED_TRACE("index: " + std::to_string(i));
+
         // set up object
         object.inv_at(i);
         object_old = object;
@@ -179,7 +183,7 @@ TEST_P(BtLogicTransaction, fp_not)
     for (std::size_t width : m_widths)
     {
         // setup
-        SCOPED_TRACE(width);
+        SCOPED_TRACE("width: " + std::to_string(width));
         m_config.width = width;
 
         // wrap operation
@@ -211,7 +215,7 @@ TEST_P(BtLogicTransaction, fp_fetch_not)
     for (std::size_t width : m_widths)
     {
         // setup
-        SCOPED_TRACE(width);
+        SCOPED_TRACE("width: " + std::to_string(width));
         m_config.width = width;
 
         // wrap operation
