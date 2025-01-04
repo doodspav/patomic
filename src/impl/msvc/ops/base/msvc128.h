@@ -46,7 +46,12 @@ patomic_msvc128_shift_left(
     const unsigned __int64 obj_high = (unsigned __int64) obj.high;
     patomic_msvc128_t res = {0};
 
-    if (offset < 64)
+    if (offset == 0)
+    {
+        /* avoid (obj_low >> (64 - 0)) below which is undefined behaviour */
+        return obj;
+    }
+    else if (offset < 64)
     {
         res.low = (__int64) (obj_low << offset);
         res.high = (__int64) ((obj_high << offset) | (obj_low >> (64 - offset)));
