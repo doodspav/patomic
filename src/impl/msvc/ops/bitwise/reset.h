@@ -35,11 +35,16 @@
         const patomic_intptr_unsigned_t addr =                                 \
             (patomic_intptr_unsigned_t) obj;                                   \
                                                                                \
-        /* align our address to 4 bytes */                                     \
-        const patomic_intptr_unsigned_t new_addr =                             \
-            (patomic_intptr_unsigned_t) (addr & ~3ul);                         \
-        long * new_obj = (long *) new_addr;                                    \
+        /* declarations */                                                     \
+        patomic_intptr_unsigned_t new_addr;                                    \
+        long *new_obj;                                                         \
         int new_offset = offset;                                               \
+                                                                               \
+        /* align our address to 4 bytes */                                     \
+        new_addr = (patomic_intptr_unsigned_t) (                               \
+            (addr & ~((patomic_intptr_unsigned_t) 3ul))                        \
+        );                                                                     \
+        new_obj = (long *) new_addr;                                           \
         new_offset += (int) ((addr - new_addr) * CHAR_BIT);                    \
                                                                                \
         /* update offset to be less than 32 */                                 \
