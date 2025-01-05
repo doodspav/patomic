@@ -39,19 +39,19 @@ Nothing.
 
 # Visual Studio 2005
 
-???
+TODO: (GHI #49)
 
 # Visual Studio 2008
 
-???
+TODO: (GHI #49)
 
 # Visual Studio 2010
 
-???
+TODO: (GHI #49)
 
 # Visual Studio 2012
 
-???
+TODO: (GHI #49)
 
 
 
