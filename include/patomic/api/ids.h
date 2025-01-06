@@ -45,6 +45,9 @@ typedef unsigned long patomic_id_t;
 /** @brief The id corresponding to the C standard implementation. */
 #define patomic_id_STDC (1ul << 0ul)
 
+/** @brief The id corresponding to the _Interlocked intrinsics implementation. */
+#define patomic_id_MSVC (1ul << 1ul)
+
 
 /**
  * @addtogroup impl
@@ -73,7 +76,9 @@ typedef unsigned long patomic_id_t;
  * @note
  *   The BLTN (builtin) kind should only be used where the implementation makes
  *   a best-faith effort to provide an ASM implementation (e.g. with __atomic),
- *   otherwise LIB, OS, or DYN should be used.
+ *   otherwise LIB, OS, or DYN should be used. If a builtin or intrinsic is
+ *   guaranteed to compile to specific instructions equivalent to using inline
+ *   assembly, ASM kind may be used.
  */
 typedef enum {
 

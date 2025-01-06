@@ -25,6 +25,19 @@
 #endif
 
 
+#if PATOMIC_HAS_MS_INT64
+    typedef signed __int64   patomic_int64_signed_t;
+    typedef unsigned __int64 patomic_int64_unsigned_t;
+    #define PATOMIC_STDINT_HAS_INT64 1
+#elif PATOMIC_HAS_MS_INT64_EXTN
+    __extension__ typedef signed __int64   patomic_int64_signed_t;
+    __extension__ typedef unsigned __int64 patomic_int64_unsigned_t;
+    #define PATOMIC_STDINT_HAS_INT64 1
+#else
+    #define PATOMIC_STDINT_HAS_INT64 0
+#endif
+
+
 #if PATOMIC_HAS_MS_INT128
     typedef signed __int128   patomic_int128_signed_t;
     typedef unsigned __int128 patomic_int128_unsigned_t;
@@ -48,11 +61,14 @@
     typedef __INTPTR_TYPE__  patomic_intptr_signed_t;
     typedef __UINTPTR_TYPE__ patomic_intptr_unsigned_t;
 #elif PATOMIC_STDINT_HAS_I128
-    typedef patomic_i128_signed_t   patomic_intptr_signed_t;
-    typedef patomic_i128_unsigned_t patomic_intptr_unsigned_t;
+    typedef patomic_int128_signed_t   patomic_intptr_signed_t;
+    typedef patomic_int128_unsigned_t patomic_intptr_unsigned_t;
 #elif PATOMIC_STDINT_HAS_LLONG
     typedef patomic_llong_signed_t   patomic_intptr_signed_t;
     typedef patomic_llong_unsigned_t patomic_intptr_unsigned_t;
+#elif PATOMIC_STDINT_HAS_INT64
+    typedef patomic_int64_signed_t   patomic_intptr_signed_t;
+    typedef patomic_int64_unsigned_t patomic_intptr_unsigned_t;
 #else
     typedef signed long   patomic_intptr_signed_t;
     typedef unsigned long patomic_intptr_unsigned_t;

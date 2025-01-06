@@ -19,6 +19,8 @@ name_id(patomic_id_t id)
             return "NULL";
         case patomic_id_STDC:
             return "STDC";
+        case patomic_id_MSVC:
+            return "MSVC";
         default:
             return "(unknown)";
     }

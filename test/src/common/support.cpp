@@ -24,7 +24,10 @@ supported_widths()
         sizeof(short),
         sizeof(int),
         sizeof(long),
-        sizeof(long long)
+        sizeof(long long),
+
+        // msvc implementation
+        1, 2, 4, 8, 16
     };
     return { widths.begin(), widths.end() };
 }
@@ -66,7 +69,8 @@ supported_ids()
 {
     return {
         patomic_id_NULL,
-        patomic_id_STDC
+        patomic_id_STDC,
+        patomic_id_MSVC
     };
 }
 

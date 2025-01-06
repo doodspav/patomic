@@ -311,7 +311,7 @@
     res = atomic_fetch_sub_explicit(obj, (type) 1, order)
 
 #define do_make_desired_neg(type, exp, des) \
-    des = (type) -exp
+    des = (type) (~((type) exp) + ((type) 1))
 
 #define PATOMIC_DEFINE_ARITHMETIC_OPS_CREATE(type, name, vis_p, order, ops) \
     PATOMIC_WRAPPED_DIRECT_DEFINE_OP_VOID(                                  \
