@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [1.1.0] - 2024-04-01
+
+### Added
+
+- Add implementation to support implicit and explicit atomic operations using
+  the `_Interlocked` API
+- Implementation has id `patomic_id_MSVC`, kind `patomic_kind_ASM`, and
+  supports up to `128` bit operations
+
 ## [1.0.0] - 2024-12-25
 
 ### Added
